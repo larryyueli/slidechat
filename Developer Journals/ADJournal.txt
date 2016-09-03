@@ -1,21 +1,40 @@
 -----------------------------
 Date: Friday, Sep, 2nd , 2016
 -----------------------------
-Duration spend working: 
+-Today was just a learning day and geting 
+ideas understood. 
+
+-Learn't more about AngularJs, and PDO.
+
+-----------------------------
+Date: Saturday, Sep, 3rd, 2016
+-----------------------------
+
+Mood: Wonderful, nice sunny day. Was really ready to code.
+
+Duration spent working: 12 am to 9 pm
 
 What was I doing?
+  - Learnt have to use AngularJs to recieve Json format material, which is infromation 
+  from a mysql database.
+  
+  - Learn't about AngularJs's routing functionality. And implemented it into the project.
+  
+  - Wrote a bit a of code nothing to big. 
+  
+  - Got the folder structure done.
 
-Where was I planning on going next?
-
-Wins or Trobule areas in the work today?
-
-Mood: Great, it was a nice day to code and enjoy life.
-
-Pitfalls:
-
-Windfalls:
-
+Wins or Trouble areas in the work today:
+  Nothing big. The first time I trying to get Json from php I drastically screwed up. But on the second try
+  it worked.
+  
 Tasks:
-   What needs to be finished?
 
-   What is going to be started next?
+    What needs to be finshed? :
+        - Alot, I just started today
+
+    What is going to be started next? :
+       - Alot of stuff
+         - Going to desgin and write up error message pages
+         - Going to start to write some code the instructor page and desgin it
+         -  and more.....
