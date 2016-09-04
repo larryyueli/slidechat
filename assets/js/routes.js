@@ -4,7 +4,9 @@ angular.module('slidechat')
         templateUrl: 'templates/course/index.html',
         controller: 'showcourseController'
     }).when('/',{
-        templateUrl: 'templates/login/index.html'
+        templateUrl: 'templates/instructor/index.html'
+    }).when('/admin',{
+        templateUrl: 'templates/admin'
     }).otherwise({
         templateUrl:'templates/errors/404.html'
     });

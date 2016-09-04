@@ -9,6 +9,9 @@ $stm->bindParam(':id',$id);
 $stm->execute();
 
 $result = $stm->fetchAll();
-echo json_encode($result);
-
+if(count($result) > 0){
+    echo json_encode($result);
+}
+header("HTTP/1.0 404 Not Found");
+exit();
 ?>
