@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost:3306
--- Generation Time: Sep 04, 2016 at 06:42 PM
+-- Generation Time: Sep 05, 2016 at 08:54 PM
 -- Server version: 5.5.38
 -- PHP Version: 5.6.2
 
@@ -24,15 +24,16 @@ CREATE TABLE `accounts` (
 `id` int(11) NOT NULL,
   `email` text NOT NULL,
   `password` text NOT NULL,
-  `token` text NOT NULL
+  `token` text NOT NULL,
+  `accounttype` int(11) NOT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `accounts`
 --
 
-INSERT INTO `accounts` (`id`, `email`, `password`, `token`) VALUES
-(1, 'test@test.com', 'test', '');
+INSERT INTO `accounts` (`id`, `email`, `password`, `token`, `accounttype`) VALUES
+(1, 'test@test.com', 'a94a8fe5ccb19ba61c4c0873d391e987982fbbd3', '', 0);
 
 -- --------------------------------------------------------
 
