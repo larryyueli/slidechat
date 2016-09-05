@@ -38,3 +38,20 @@ Tasks:
          - Going to desgin and write up error message pages
          - Going to start to write some code the instructor page and desgin it
          -  and more.....
+
+-----------------------------
+Date: Saturday, Sep, 4th, 2016
+-----------------------------
+Mood: Wonderful.
+
+What was done?
+Research day, and started to implement intursctor login system.
+
+-----------------------------
+Date: Saturday, Sep, 5th, 2016
+-----------------------------
+Mood: wonderful.
+
+What was done?
+finished instructor login system with proper secuirty in place.
+

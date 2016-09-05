@@ -1,43 +1,40 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="slidechat">
- <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Arjun Dhiman, Larry Zhang">
-    <meta name="keywords" content="slide chat, education, learning tool">
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="">
+<meta name="author" content="Arjun Dhiman, Larry Zhang">
+<meta name="keywords" content="slide chat, education, learning tool">
+
 <head>
     <title>Slide Chat</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="stylesheet" href="assets/css/sticky-footer.css">
-    
-   </head>
+    <link rel="stylesheet" href="assets/css/sticky-footer.css"> </head>
+
 <body>
-<nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <div class="navbar-header">
-        <img alt="Slide Chat" src="assets/img/logo.png">
-    </div>
-  </div>
-</nav>
-
-<div ng-view></div>
-
-    
-<footer class="footer">
-      <div class="container">
-          <p class="text-muted">&copyright 2016 - present <a href="http://www.arjundhiman.com">Arjun Dhiman</a> and Larry Zhang </p>
-      </div>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header"> <img alt="Slide Chat" src="assets/img/logo.png"> </div>
+        </div>
+    </nav>
+    <div ui-view></div>
+    <footer class="footer">
+        <div class="container">
+            <p class="text-muted">&copyright 2016 - present <a href="http://www.arjundhiman.com">Arjun Dhiman</a> and Larry Zhang </p>
+        </div>
     </footer>
-<!---- Javascript --------->
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
-<script src="assets/js/angular-route.js"></script>
-<script src="app/app.js"></script>
-<script src="assets/js/routes.js"></script>
-<script src="controllers/showcourseController.js"></script>
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    
+    <!---- Javascript --------->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+    <script src="assets/js/angular-ui-router.js"></script>
+    <script src="app/app.js"></script>
+    <script src="app/routes.js"></script>
+    <script src="controllers/loginController.js"></script>
+    <script src="controllers/showcourseController.js"></script>
+    <script src="controllers/instructorPanelController.js"></script>
+    <script src="services/authenticate-service.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 </body>
+
 </html>

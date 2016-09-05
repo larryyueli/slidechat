@@ -1,1 +1,1 @@
-var app = angular.module("slidechat", ['ngRoute']);
+var app = angular.module("slidechat", ['ui.router']);
