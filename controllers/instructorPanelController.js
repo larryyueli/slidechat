@@ -119,10 +119,7 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
        
     //material list
     $scope.showMaterial = 0;
-     $scope.getMaterial = function(p){
-      //  console.log(p);
-    }
-     
+  
     /********* upload functionality end **********/
     
     //Create new course
@@ -148,11 +145,19 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
     
     //Table 1 get links of courses
         $http.post('ajax/panel.php', token).success(function (response) {
-           console.log(response);
+           console.log(JSON.stringify(response));
             if (response != "empty") {
                 $scope.nolinks = 0;
                 $scope.showlinks = 1;
-                $scope.links = response;
+                
+                $scope.dat = response.course;
+                $scope.mats = response.materials;
+                
+                console.log($scope.mats);
+                
+                $scope.links = response.course;
+                //console.log( $scope.links );
+                
             }
             else {
                 $scope.nolinks = 1;
