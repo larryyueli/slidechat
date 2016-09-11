@@ -10,7 +10,7 @@ app.service('AuthenticationService', ["$http", "$state", function ($http, $state
                 $state.go("login")
             }
             else {
-                console.log("Logged In");
+                //console.log("Logged In");
                 return response;
             }
         }).error(function (error) {

@@ -7,20 +7,13 @@ angular.module('slidechat').config(function ($stateProvider) {
         url: "/panel"
         , templateUrl: "templates/instructor/panel.html"
         , controller: 'instructorPanelController'
+    }).state('index', {
+        url: ""
+        , templateUrl: 'templates/instructor/index.html'
+        , controller: 'loginController'
+    }).state('course',{
+        url: '/course/:courseToken',
+        templateUrl: 'templates/course/index.html',
+        controller:'showcourseController'
     });
 });
-/****
- $stateProvider.when('/course/:id', {
-        templateUrl: 'templates/course/index.html'
-        , controller: 'showcourseController'
-    }).when('/', {
-        templateUrl: 'templates/instructor/index.html'
-    }).when('/admin', {
-        templateUrl: 'templates/admin'
-    }).when('/instructor', {
-        templateUrl: 'templates/instructor/panel.html'
-        , controller: 'instructorPanelController'
-    }).otherwise({
-        templateUrl: 'templates/errors/404.html'
-    });
-    */

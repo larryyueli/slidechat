@@ -1,0 +1,7 @@
+what should the instructor be able to do?
+
+- see links to courses
+- add course
+- delete course
+- edit course
+- see how many users are using the material

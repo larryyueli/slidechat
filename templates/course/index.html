@@ -1,8 +1,13 @@
-<div ng-if="error == 1">
-    <div ng-include="'templates/errors/404.html'"></div>
-</div>
-<div ng-repeat="course in courses track by id">
-Course Name: {{course.name}}
-<br/>
-Slide url: {{course.pdflink}}
+<div class="container">
+    <div ng-if="error == 1">
+        <div ng-include="'templates/errors/404.html'"></div>
+    </div>
+    
+    <div ng-repeat="course in courses"> Course Name: {{course.name}}
+        <br/> Slide url: <a href="{{course.pdflink}}">{{course.pdflink}}</a> </div>
+    
+    Add new course material
+    ----------------------
+    
+    
 </div>

@@ -1,7 +1,16 @@
-app.controller("showcourseController", ['$scope', '$http','$routeParams', function($scope, $http, $routeParams){
-    $http.get('ajax/showcourse.php?id='+$routeParams.id).success(function(data){
+app.controller("showcourseController", ['$scope', '$http','$stateParams', function($scope, $http, $stateParams){
+    
+    $http.get('ajax/showcourse.php?id='+$stateParams.courseToken).success(function(data){
      $scope.courses = data;
     }).error(function(){
         $scope.error = 1;
     });
+    
+    
+    
+    
+    
+    
+    
+    
 }]);

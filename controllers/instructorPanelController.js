@@ -1,7 +1,9 @@
-app.controller("instructorPanelController", function ($scope, $state, $http, AuthenticationService) {
+app.controller("instructorPanelController", function ($scope, $state, $http, AuthenticationService, $timeout) {
     //check if an instructor is logged in
     //if not kick them to the login page
     //If user is not logged in
+    
+    
     var token;
     if (localStorage['token']) {
         token = JSON.parse(localStorage['token']);
@@ -10,6 +12,156 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
         token = "-";
     }
     AuthenticationService.checkToken(token);
+    $scope.switchBool = function (param) {
+        if (param == "showFailureAlert") {
+            $scope.showFailureAlert = 0;
+        }
+        else {
+            $scope.showSuccessAlert = 0;
+        }
+    }
+ 
+    $scope.CreateButtonMode = 1;
+    $scope.openAddCourseForm = function () {
+            $scope.addcourse = 1;
+        }
+   
+    
+  /******** upload functionality **********/
+        $scope.DocUpload = function(event){
+         var files = event.target.files; //Filelist object
+         var file = files[files.length - 1];
+         $scope.file = file;
+
+         //check if the the type is correct
+         if(file.type !="application/pdf"){
+             $scope.showFailureAlert = 1;
+             $scope.FailureTextAlert = "Only pdf files are allowed";
+             $scope.CreateButtonMode = 1;
+         }
+         else{
+         $scope.CreateButtonMode = 0;
+         if($scope.showFailureAlert == 1){
+             $scope.showFailureAlert = 0;
+         }
+         var reader = new FileReader();
+         reader.onload = $scope.DocIsLoaded;
+         reader.readAsDataURL(file);
+         }
+
+     }
+     
+     $scope.DoIsLoaded = function(e){
+         $scope.$apply(function(){
+            $scope.step = e.target.result; 
+         });
+     }
+     $scope.UploadInfo = {
+         courseName: undefined,
+         f: undefined
+     }
+     
+     $scope.isProcessing = false;
+     $scope.createCourse = function(){
+        
+         $scope.isProcessing = true;
+         var fd = new FormData();
+         angular.forEach($scope.files, function(file){
+         
+            fd.append('file', file);
+       
+         });
+         
+         var request = $http({
+            method: 'POST',
+            url: 'ajax/upload.php',
+            data: fd,
+            transformRequest:angular.identity,
+            headers:{'Content-Type': undefined}
+         });
+         
+         request.then(function(response){
+            $scope.isProcessing = false;
+        
+             var files=document.getElementById('exampleInputFile').files[0];
+             
+               var bab = {
+                 courseName: $scope.UploadInfo.courseName,
+                 fileName: files.name,
+                  userToken: token
+             }
+    
+             $http.post('ajax/updatecourseTalbeinDb.php', bab).success(function(response){
+                 
+                 $scope.showSuccessAlert = 1;
+                 $scope.successTextAlert = "The course "+ bab.courseName + " was created successfully.";
+                 
+             }).error(function(error){
+                 consoloe.log("error happened");
+             });
+            
+         },function(error){
+        
+             $scope.msg = error.data;
+             $scope.isProcessing = false;
+             $scope.alert();
+                      });
+     }
+     
+     $scope.alert = function(){
+       
+         $scope.showMsg = true;
+         $timeout(function(){
+             $scope.showMsg = false;
+         }, 3000);
+     }
+   
+       
+    //material list
+    $scope.showMaterial = 0;
+     $scope.getMaterial = function(p){
+      //  console.log(p);
+    }
+     
+    /********* upload functionality end **********/
+    
+    //Create new course
+    $scope.addCourse = function () {
+            var d = {
+                courseN: $scope.courseN
+                , tok: token
+            }
+            $http.post('ajax/addcourse.php', d).success(function (response) {
+                location.reload();
+            }).error(function (error) {
+                console.log(error);
+            });
+        }
+    
+    $scope.deleteCourse = function(link){
+        $http.post('ajax/deleteCourse.php', link).success(function(response){
+            $scope.showSuccessAlert = 1;
+            $scope.successTextAlert = "The course has been successfully!";
+            
+        });
+    }
+    
+    //Table 1 get links of courses
+        $http.post('ajax/panel.php', token).success(function (response) {
+           console.log(response);
+            if (response != "empty") {
+                $scope.nolinks = 0;
+                $scope.showlinks = 1;
+                $scope.links = response;
+            }
+            else {
+                $scope.nolinks = 1;
+                $scope.showlinks = 0;
+            }
+        });
+    
+    
+    //Logout functionaility
     $scope.logMeOut = function () {
         var data = {
             token: token
@@ -21,4 +173,19 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
             console.error(error);
         })
     }
+    angular.element(document).ready(function () {
+        //Table 1 get links of courses
+        $http.post('ajax/panel.php', token).success(function (response) {
+          //  console.log(response);
+            if (response != "empty") {
+                $scope.nolinks = 0;
+                $scope.showlinks = 1;
+                $scope.links = response;
+            }
+            else {
+                $scope.nolinks = 1;
+                $scope.showlinks = 0;
+            }
+        })
+    });
 });
