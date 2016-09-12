@@ -62,8 +62,13 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
          f: undefined
      }
      
+     $scope.saveId = function(param){
+         $scope.pid = param;
+     }
+     
      $scope.isProcessing = false;
-     $scope.createCourse = function(){
+     $scope.createCourse = function(param){
+        console.log(param);
         
          $scope.isProcessing = true;
          var fd = new FormData();
@@ -84,17 +89,21 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
          
          request.then(function(response){
             $scope.isProcessing = false;
-        
+        console.log(response);
              var files = document.getElementById('exampleInputFile').files[0];
               console.log(response);
+             
+             
                var bab = {
                  courseName: $scope.UploadInfo.courseName,
                  fileName: files.name,
-                  userToken: token
+                  userToken: token,
+                   pid: $scope.pid
              }
     
              $http.post('ajax/updatecourseTalbeinDb.php', bab).success(function(response){
 console.log(response);
+                 console.log(response);
                  $scope.showSuccessAlert = 1;
                  $scope.successTextAlert = "The course "+ bab.courseName + " was created successfully.";
                  

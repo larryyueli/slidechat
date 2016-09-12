@@ -2,8 +2,7 @@
 
 include("db.php");
 
-$data = file_get_contents("php://input");
-var_dump('info'.$data);
+print_r($_FILES);
 
 if(!empty($_FILES)){
     

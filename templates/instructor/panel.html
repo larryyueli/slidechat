@@ -20,31 +20,36 @@
                         <form ng-show='addcourse'> Course Name:
                             <input type="text" ng-model="courseN" />
                             <input type='submit' name="submit" class="btn btn-primary" value="Add course" ng-click="addCourse()" /> <img src="assets/img/close.png" ng-click="addcourse = 0"> </form>
+                        
+                        
+                        
+                        
                         <ul ng-repeat="d in dat">
                             <p ng-show='nolinks'>Currently no courses are created.</p>
                             <li style="list-style-type: none;" ng-show='showlinks'> <img src="assets/img/course.png" width='30' height='30' /> <a ng-click="showMaterial = 1">{{d.name}}</a>
                                 <a ng-click="deleteCourse(d.id)"><img src="assets/img/delete.png" /></a>
                             </li>
+                            
+    
                             <div class="container" ng-show="showMaterial">
                                 <!-- Button trigger modal -->
                                 <br/>
-                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal"> Add Material </button>
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal" ng-click="saveId(d.id)"> Add Material </button>
+                                
                                 <!-- Button trigger modal -->
                                 <br/>
                                 <h3 style="text-decoration:underline">List of Course Material</h3>
-                                
-                                <li style="list-style-type: none;" ng-repeat="m in mats" ng-if="m.cid == d.id "> 
+                                <li style="list-style-type: none;" ng-repeat="m in mats" ng-if="m.cid == d.id ">
+                                    {{m.cid}}|:|{{d.id}}
                                     <img src="assets/img/slide.png" style="margin-right: 10px;"/><a href="#/viewer/{{m.cui}}">
                                     {{m.filename}}</a> &nbsp; [ Comments: {{m.numcomments}} | #Posts: {{m.numposts}} ] <a ng-click="deleteMaterial(m.id)"><img src="assets/img/delete.png" /></a>
                                 </li>
                                 
                             </div>
+                        </ul>
                     </div>
-                </div>
-            </div>
-        </div>
-        <!-- Modal -->
-        <div id="myModal" class="modal fade" role="dialog">
+                                             <!-- Modal -->
+       <div id="myModal" class="modal fade" role="dialog">
             <div class="modal-dialog">
                 <!-- Modal content-->
                 <div class="modal-content">
@@ -63,12 +68,14 @@
                             <br/> Size: {{file.size/1024|number:2}}
                             <br/> Type: {{file.type.slice(file.type.lastIndexOf('/') + 1)}}
                             <hr/>
-                            <button type="submit" class="btn btn-default" ng-disabled="CreateButtonMode" ng-click="createCourse()">Create</button>
+                            <button type="submit" class="btn btn-default" ng-disabled="CreateButtonMode" ng-click="createCourse(  )">Create</button>
                         </form>
                     </div>
-                    <!-- <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>--></div>
+                   </div>
+            </div>
+        </div>
+                     
+                </div>
             </div>
         </div>
     </div>
