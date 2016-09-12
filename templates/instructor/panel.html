@@ -40,7 +40,6 @@
                                 <br/>
                                 <h3 style="text-decoration:underline">List of Course Material</h3>
                                 <li style="list-style-type: none;" ng-repeat="m in mats" ng-if="m.cid == d.id ">
-                                    {{m.cid}}|:|{{d.id}}
                                     <img src="assets/img/slide.png" style="margin-right: 10px;"/><a href="#/viewer/{{m.cui}}">
                                     {{m.filename}}</a> &nbsp; [ Comments: {{m.numcomments}} | #Posts: {{m.numposts}} ] <a ng-click="deleteMaterial(m.id)"><img src="assets/img/delete.png" /></a>
                                 </li>
