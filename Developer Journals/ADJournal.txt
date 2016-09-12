@@ -48,10 +48,45 @@ What was done?
 Research day, and started to implement intursctor login system.
 
 -----------------------------
-Date: Saturday, Sep, 5th, 2016
+Date: Saturday, Sep, 5th - Sept 10th, 2016
 -----------------------------
 Mood: wonderful.
 
 What was done?
-finished instructor login system with proper secuirty in place.
+- finished instructor login system with proper secuirty in place.
+- A lot of re-desgining and re-structing of code
+................
 
+-----------------------------
+Date: Saturday, Sep, 11th, 2016
+-----------------------------
+
+Mood: Wonderful, nice sunny day. Was really ready to code.
+
+Duration spent working: 6 hours
+
+What was I doing?
+  - Re-designing and code the instructor panel.
+  
+  - enchancing the server side code.
+
+  - Fixed up the database, made it more sensiable
+  
+  - Did some research in terms of working with AngularJs and pdf's.
+
+Wins or Trouble areas in the work today:
+  - [Trouble] can decided on how to work with pdf and angularsjs. And keep things secure.
+  - [Wins] made the instructor panel really really user friendly and 
+  easy to use.
+  
+Tasks:
+
+    What needs to be finshed? :
+        - viewer page. That shows the pdf file and comments.
+ 
+    What is going to be started next? :
+       - Comment system
+       - pdf system
+       - Design viewer page
+       - clean the whole page up. add comments,refactor, and write techinal documentation to make it easier for other developers to code upon what is currently here.
+       - more....
