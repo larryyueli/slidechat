@@ -1,0 +1,22 @@
+
+<div class="container">
+    <div ng-if="error == 1">
+        <div ng-include="'templates/errors/404.html'"></div>
+    </div>
+
+    <div id="pdfviewer">
+    
+    {pdf goes here}
+    </div>
+    
+    <div id="comments">
+        <h3 style="text-decoration:underline;">Comments</h3>
+    {comments go here}
+       <form>
+          <textarea placeholder="enter comment"></textarea>
+           <input type="submit" value="submit"/>
+         </form>
+
+    </div>
+    
+</div>

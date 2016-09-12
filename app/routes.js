@@ -11,9 +11,9 @@ angular.module('slidechat').config(function ($stateProvider) {
         url: ""
         , templateUrl: 'templates/instructor/index.html'
         , controller: 'loginController'
-    }).state('course',{
-        url: '/course/:courseToken',
-        templateUrl: 'templates/course/index.html',
+    }).state('viewer',{
+        url: '/viewer/:courseToken',
+        templateUrl: 'templates/viewer/index.html',
         controller:'showcourseController'
     });
 });

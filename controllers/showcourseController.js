@@ -2,6 +2,7 @@ app.controller("showcourseController", ['$scope', '$http','$stateParams', functi
     
     $http.get('ajax/showcourse.php?id='+$stateParams.courseToken).success(function(data){
      $scope.courses = data;
+        console.log(data);
     }).error(function(){
         $scope.error = 1;
     });

@@ -2,8 +2,16 @@
 
 include("db.php");
 
+$data = file_get_contents("php://input");
+var_dump('info'.$data);
+
 if(!empty($_FILES)){
+    
+    //check if the instructor has a folder
+    //print_r($_FILES);
    
+    //echo json_encode($_FILES);
+    
     $tempPath = $_FILES['file']['tmp_name'];
     
     $uploadPath = "../slides/".$_FILES['file']['name'];

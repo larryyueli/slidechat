@@ -26,14 +26,14 @@
             $mat = $mat->fetchAll(PDO::FETCH_ASSOC);
          
             if(count($mat) == 0){
-                echo "empty";
+               // echo "empty";
             }
-            else{
+            
                 $datas = array(
                     "course" => $Info,
                     "materials" => $mat
                 );
-            }
+          
  
     echo json_encode($datas);
            

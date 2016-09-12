@@ -3,7 +3,6 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
     //if not kick them to the login page
     //If user is not logged in
     
-    
     var token;
     if (localStorage['token']) {
         token = JSON.parse(localStorage['token']);
@@ -12,6 +11,8 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
         token = "-";
     }
     AuthenticationService.checkToken(token);
+    
+    
     $scope.switchBool = function (param) {
         if (param == "showFailureAlert") {
             $scope.showFailureAlert = 0;
@@ -72,6 +73,7 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
        
          });
          
+         
          var request = $http({
             method: 'POST',
             url: 'ajax/upload.php',
@@ -83,8 +85,8 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
          request.then(function(response){
             $scope.isProcessing = false;
         
-             var files=document.getElementById('exampleInputFile').files[0];
-             
+             var files = document.getElementById('exampleInputFile').files[0];
+              console.log(response);
                var bab = {
                  courseName: $scope.UploadInfo.courseName,
                  fileName: files.name,
@@ -92,7 +94,7 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
              }
     
              $http.post('ajax/updatecourseTalbeinDb.php', bab).success(function(response){
-                 
+console.log(response);
                  $scope.showSuccessAlert = 1;
                  $scope.successTextAlert = "The course "+ bab.courseName + " was created successfully.";
                  
@@ -138,22 +140,29 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
     $scope.deleteCourse = function(link){
         $http.post('ajax/deleteCourse.php', link).success(function(response){
             $scope.showSuccessAlert = 1;
-            $scope.successTextAlert = "The course has been successfully!";
+            $scope.successTextAlert = "The course has been deleted successfully!";
             
         });
     }
     
+    
+    $scope.deleteMaterial = function(id){
+        console.log(id);
+    }
+    
     //Table 1 get links of courses
         $http.post('ajax/panel.php', token).success(function (response) {
-           console.log(JSON.stringify(response));
+          // console.log(JSON.stringify(response));
             if (response != "empty") {
                 $scope.nolinks = 0;
                 $scope.showlinks = 1;
                 
                 $scope.dat = response.course;
+                
+              
                 $scope.mats = response.materials;
                 
-                console.log($scope.mats);
+              //  console.log($scope.mats);
                 
                 $scope.links = response.course;
                 //console.log( $scope.links );
