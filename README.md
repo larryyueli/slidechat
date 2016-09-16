@@ -1,9 +1,11 @@
 #Slidechat Application
 This is the world's best application. :)
 
+#Supervisor
+- Larry Yueli Zhang
+
 #Developers
 - Arjun Dhiman
-- Larry Zhang
 
 #Languages used:
 - PHP
@@ -12,3 +14,4 @@ This is the world's best application. :)
 - JQuery
 - MySql (PDO)
 - AngularJs
+- latex
