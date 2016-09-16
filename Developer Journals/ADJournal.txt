@@ -98,3 +98,20 @@ Mood: off this planet. It was my birthday
 
 Since it was my birthday, I did not get a chance to work on the 
 application.
+
+
+-----------------------------------
+Date: Firday, Sept, 16th, 2016
+-----------------------------------
+Mood: great, but I have a small fever due to the weather change.
+
+What I did today:
+    I worked on the Q&A system for the viewer/:id page.
+
+What will I work on next:
+    - Q&A system
+    - Instructor panel, found a way to show instant insertation to page, instead
+      of reloading the page.
+
+    - Designing the site to look better.
+    - Pdf system
