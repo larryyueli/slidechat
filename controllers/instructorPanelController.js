@@ -13,6 +13,27 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
     AuthenticationService.checkToken(token);
     
     
+    reload();
+    function reload() {
+        //Table 1 get links of courses
+        $http.post('ajax/panel.php', token).success(function (response) {
+          //  console.log(response);
+            if (response != "empty") {
+                $scope.nolinks = 0;
+                $scope.showlinks = 1;
+                $scope.links = response;
+            }
+            else {
+                $scope.nolinks = 1;
+                $scope.showlinks = 0;
+            }
+              console.log(JSON.stringify(response));
+        });
+       
+    };
+    
+    
+    
     $scope.switchBool = function (param) {
         if (param == "showFailureAlert") {
             $scope.showFailureAlert = 0;
@@ -23,6 +44,7 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
     }
  
     $scope.CreateButtonMode = 1;
+    
     $scope.openAddCourseForm = function () {
             $scope.addcourse = 1;
         }
@@ -148,12 +170,14 @@ console.log(response);
     
     $scope.deleteCourse = function(link){
         $http.post('ajax/deleteCourse.php', link).success(function(response){
+            if(response == true){
+                reload();
             $scope.showSuccessAlert = 1;
             $scope.successTextAlert = "The course has been deleted successfully!";
-            
+            }        
         });
     }
-    
+   
     
     $scope.deleteMaterial = function(id){
         console.log(id);
@@ -196,19 +220,6 @@ console.log(response);
             console.error(error);
         })
     }
-    angular.element(document).ready(function () {
-        //Table 1 get links of courses
-        $http.post('ajax/panel.php', token).success(function (response) {
-          //  console.log(response);
-            if (response != "empty") {
-                $scope.nolinks = 0;
-                $scope.showlinks = 1;
-                $scope.links = response;
-            }
-            else {
-                $scope.nolinks = 1;
-                $scope.showlinks = 0;
-            }
-        })
-    });
+
+    
 });

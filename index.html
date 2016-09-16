@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="slidechat">
+<html lang="en" ng-app="slidechat" ng-value="applicationName ='SlideChat' ">
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,48 +10,73 @@
 <head>
     <title>Slide Chat</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="stylesheet" href="assets/css/sticky-footer.css"> 
-    
+    <link rel="stylesheet" href="assets/css/sticky-footer.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/trix/0.9.2/trix.css">
 </head>
     <style>
     input.ng-invalid.ng-dirty {
         border: 1px solid red;
         }
     </style>
+    
     <script>
-   
+          $(function() {
+          $('#edit').froalaEditor()
+      });
+        
+        
+   MathJax.Hub.Config({
+  tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+});
 
     $('#myModal').on('shown.bs.modal', function () {
   $('#myInput').focus()
 })
+    
     </script>
 
 <body>
 
     <nav class="navbar navbar-default">
+    
         <div class="container-fluid">
-            <div class="navbar-header"> <img alt="Slide Chat" src="assets/img/logo.png"> </div>
+            <div class="navbar-header"> <a href="#/"><img alt="Slide Chat" src="assets/img/logo.png"></a> </div>
         </div>
     </nav>
     <div ui-view></div>
     <footer class="footer">
+        <ul style="margin-top:2px; line-height:2;float:right;">
+                    <li>
+                        <a href="#/doc">Documentation</a>
+                    </li>
+                <li> <a href="#/careers">Careers</a></li>
+            </ul>
         <div class="container">
-            <p class="text-muted">&copy; 2016 - present <a href="http://www.arjundhiman.com">Arjun Dhiman</a> and Larry Zhang </p>
+            <p class="text-muted">
+                &copy; 2016 - present <a href="http://www.arjundhiman.com">Arjun Dhiman</a> and Larry Zhang 
+                
+            </p>
+            
         </div>
     </footer>
+
     <!---- Javascript --------->
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+    <script src="assets/js/angular.min.js"></script>
+    
     <script src="assets/js/angular-ui-router.js"></script>
     <script src="app/app.js"></script>
     <script src="app/routes.js"></script>
     <script src="controllers/loginController.js"></script>
-    <script src="controllers/showcourseController.js"></script>
+    <script src="controllers/viewerController.js"></script>
     <script src="controllers/instructorPanelController.js"></script>
     <script src="services/authenticate-service.js"></script>
     <script src="directives/files.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    <!-- include summernote css/js-->
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/trix/0.9.2/trix.js"></script>
+  
 </body>
 
 </html>

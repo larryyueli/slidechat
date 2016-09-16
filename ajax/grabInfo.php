@@ -9,7 +9,7 @@ $stm = $db->prepare("SELECT * FROM material WHERE cui=:id");
 $stm->bindParam(':id',$id);
 $stm->execute();
 
-$result = $stm->fetchAll();
+$result = $stm->fetchAll(PDO::FETCH_ASSOC);
 if(count($result) > 0){
     echo json_encode($result);
 }

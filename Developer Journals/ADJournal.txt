@@ -90,3 +90,11 @@ Tasks:
        - Design viewer page
        - clean the whole page up. add comments,refactor, and write techinal documentation to make it easier for other developers to code upon what is currently here.
        - more....
+       
+--------------------------
+Date: Monday, Sept ,12th, 2016
+-----------------------------
+Mood: off this planet. It was my birthday
+
+Since it was my birthday, I did not get a chance to work on the 
+application.

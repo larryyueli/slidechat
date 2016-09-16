@@ -5,17 +5,30 @@
     </div>
 
     <div id="pdfviewer">
-    
-    {pdf goes here}
+    <pre>{pdf goes here}</pre>
     </div>
     
+    {{info}}
     <div id="comments">
-        <h3 style="text-decoration:underline;">Comments</h3>
-    {comments go here}
-       <form>
-          <textarea placeholder="enter comment"></textarea>
-           <input type="submit" value="submit"/>
-         </form>
+        <h3 style="text-decoration:underline;">Q&A k</h3>
+    
+        <div id="qs" ng-repeat="q in questions">
+            <a ng-click="showQuestion(q.qid)">{{q.question}}</a>
+        </div>
+       <form style="padding: 10px; border: black 4px solid;">
+           Name:<input type="text" placeholder="(optional) Enter name" ng-model ="pname" />
+           <br/>
+          Question:
+            <textarea ng-model="comment"></textarea>
+           {{question}}
+           <input type="submit" value="submit" ng-click="postQuestion()"/>
+    
+        </form>
+       
+         Live preview
+        <div id="live">
+            {{question}}
+        </div>
 
     </div>
     
