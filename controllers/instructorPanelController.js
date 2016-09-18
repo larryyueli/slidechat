@@ -180,7 +180,13 @@ console.log(response);
    
     
     $scope.deleteMaterial = function(id){
-        console.log(id);
+        $http.post('ajax/deleteMaterial.php', id).success(function(response){
+            if(response == true){
+                reload();
+            $scope.showSuccessAlert = 1;
+            $scope.successTextAlert = "The item has been deleted successfully!";
+            }        
+        });
     }
     
     //Table 1 get links of courses

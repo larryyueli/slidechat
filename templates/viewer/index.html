@@ -2,21 +2,30 @@
     <div ng-if="error == 1">
         <div ng-include="'templates/errors/404.html'"></div>
     </div>
-    <div class="row">
+    <div class="row" ng-if="error != 1">
         <div class="col-md-7">
             <div id="pdfviewer" style="margin-top:32px;">
                 <div class="panel panel-default">
-  <div class="panel-body">
-     <h1>{{pdfName = "notes"}}</h1>
-                <ng-pdf template-url="templates/viewer/pdf.html" canvasid="pdf" scale="page-fit" page=1></ng-pdf>
-  </div>
-</div>
-
+                    <div class="panel-body">
+                        <h1>{{pdfName = "notes"}}</h1>
+                        <ng-pdf template-url="templates/viewer/pdf.html" canvasid="pdf" scale="page-fit" page=1></ng-pdf>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-md-5">
+            <h3 style="text-decoration:underline;margin-top:-4px;">Q&A</h3>
+            <form style="padding: 10px; border: black 4px solid;"> Name:
+                <input type="text" placeholder="(optional) Enter name" ng-model="pname" />
+                <br/> Question:
+                <textarea ng-model="comment"></textarea> {{question}}
+                <input type="submit" value="submit" ng-click="postQuestion()" /> 
+            </form>
+            
+            <!--  Live preview
+              <div id="live"> {{comment}} </div>-->
+            <br/>
             <div id="comments">
-                <h3 style="text-decoration:underline;margin-top:-4px;">Q&A</h3>
                 <div id="qs" ng-repeat="q in questions">
                     <div class="detailBox">
                         <div class="titleBox">
@@ -35,18 +44,12 @@
                                 <div class="form-group">
                                     <input class="form-control" type="text" placeholder="Your comments" /> </div>
                                 <div class="form-group">
-                                    <button class="btn btn-default">Add</button>
+                                    <button class="btn btn-default" ng-click="postAnswer(q.id)">Add</button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
-                <form style="padding: 10px; border: black 4px solid;"> Name:
-                    <input type="text" placeholder="(optional) Enter name" ng-model="pname" />
-                    <br/> Question:
-                    <textarea ng-model="comment"></textarea> {{question}}
-                    <input type="submit" value="submit" ng-click="postQuestion()" /> </form> Live preview
-                <div id="live"> {{question}} </div>
             </div>
         </div>
     </div>

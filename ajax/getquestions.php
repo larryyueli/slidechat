@@ -6,7 +6,7 @@ $id = $_GET['id'];
 $count = 0;
 // cui = content unquie id
 
-$stm = $db->prepare("SELECT question,writer,date,qid FROM questions WHERE qid=:id");
+$stm = $db->prepare("SELECT id,question,writer,date,qid FROM questions WHERE qid=:id");
 $stm->bindParam(':id',$id);
 $stm->execute();
 

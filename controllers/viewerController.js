@@ -8,7 +8,6 @@ app.controller("viewerController", ['$scope', '$http','$stateParams', function($
   
   /************** end pdf stuff *******************/
 
-
     var uid = $stateParams.uid;
     
     getQuestions(uid); //get all questions
@@ -48,11 +47,16 @@ app.controller("viewerController", ['$scope', '$http','$stateParams', function($
         $scope.error = 1;
     });
     
+
+    
+    $scope.postAnswer = function(id){
+        console.log(id);
+    }
     
     
     function getQuestions(uid){
     $http.get("ajax/getquestions.php?id="+uid).success(function(response){
-        
+        $scope.info = response;
         $scope.questions = response;
          MathJax.Hub.Queue(["Typeset",MathJax.Hub, "qs"]);
     });
@@ -91,6 +95,11 @@ app.controller("viewerController", ['$scope', '$http','$stateParams', function($
         });
     }
     
+
+  $scope.cp = function(pageNumber){
+      $scope.pageNum = pageNumber;
+      
+  }
     
     
     

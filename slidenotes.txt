@@ -39,4 +39,9 @@ Database struct
 Table1: question
 Table2: answers
 
+
+make the upload algo better so that each instrcutor gets a seprate folder to put
+there files in.
+
+
 ----------------------------------------------------------

@@ -10,7 +10,7 @@ $filename = $data->fileName;
     
     $uid = $pt.uniqid()."*^!".uniqid();
     
-    $path = "../slides/".$filename;
+    $path = "slides/".$filename;
     
     //echo $pdflink;
     $updateDataBase = "INSERT INTO material (filepath,filename,cui,cid) VALUES (:path,:fname, :uid, :id)";
