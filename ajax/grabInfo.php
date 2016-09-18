@@ -5,7 +5,7 @@ $id = $_GET['id'];
 
 // cui = content unquie id
 
-$stm = $db->prepare("SELECT * FROM material WHERE cui=:id");
+$stm = $db->prepare("SELECT filepath,filename FROM material WHERE cui=:id");
 $stm->bindParam(':id',$id);
 $stm->execute();
 

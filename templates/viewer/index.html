@@ -1,35 +1,53 @@
-
 <div class="container">
     <div ng-if="error == 1">
         <div ng-include="'templates/errors/404.html'"></div>
     </div>
+    <div class="row">
+        <div class="col-md-7">
+            <div id="pdfviewer" style="margin-top:32px;">
+                <div class="panel panel-default">
+  <div class="panel-body">
+     <h1>{{pdfName = "notes"}}</h1>
+                <ng-pdf template-url="templates/viewer/pdf.html" canvasid="pdf" scale="page-fit" page=1></ng-pdf>
+  </div>
+</div>
 
-    <div id="pdfviewer">
-    <pre>{pdf goes here}</pre>
-    </div>
-    
-    {{info}}
-    <div id="comments">
-        <h3 style="text-decoration:underline;">Q&A k</h3>
-    
-        <div id="qs" ng-repeat="q in questions">
-            <a ng-click="showQuestion(q.qid)">{{q.question}}</a>
+            </div>
         </div>
-       <form style="padding: 10px; border: black 4px solid;">
-           Name:<input type="text" placeholder="(optional) Enter name" ng-model ="pname" />
-           <br/>
-          Question:
-            <textarea ng-model="comment"></textarea>
-           {{question}}
-           <input type="submit" value="submit" ng-click="postQuestion()"/>
-    
-        </form>
-       
-         Live preview
-        <div id="live">
-            {{question}}
+        <div class="col-md-5">
+            <div id="comments">
+                <h3 style="text-decoration:underline;margin-top:-4px;">Q&A</h3>
+                <div id="qs" ng-repeat="q in questions">
+                    <div class="detailBox">
+                        <div class="titleBox">
+                            <label>{{q.question}}</label> <span class="badge" style="float:right;">10</span> <span class="glyphicon glyphicon-chevron-down"></span>
+                            <!--        <button type="button" class="close" aria-hidden="true">&times;</button>-->
+                        </div>
+                        <div class="actionBox">
+                            <ul class="commentList">
+                                <li>
+                                    <div class="commenterImage"> <img src="" /> </div>
+                                    <div class="commentText">
+                                        <p class="">Hello this is a test comment.</p> <span class="date sub-text">on March 5th, 2014</span> </div>
+                                </li>
+                            </ul>
+                            <form class="form-inline" role="form">
+                                <div class="form-group">
+                                    <input class="form-control" type="text" placeholder="Your comments" /> </div>
+                                <div class="form-group">
+                                    <button class="btn btn-default">Add</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <form style="padding: 10px; border: black 4px solid;"> Name:
+                    <input type="text" placeholder="(optional) Enter name" ng-model="pname" />
+                    <br/> Question:
+                    <textarea ng-model="comment"></textarea> {{question}}
+                    <input type="submit" value="submit" ng-click="postQuestion()" /> </form> Live preview
+                <div id="live"> {{question}} </div>
+            </div>
         </div>
-
     </div>
-    
 </div>

@@ -1,0 +1,18 @@
+   <nav ng-class="getNavStyle(scroll)">
+  <button ng-click="goPrevious()"><</span></button>
+  <button ng-click="goNext()">></span></button>
+
+  <button ng-click="zoomIn()">+</span></button>
+  <button ng-click="fit()">100%</span></button>
+  <button ng-click="zoomOut()">-</span></button>
+
+  <span>Page: </span>
+  <input type="text" min=1 ng-model="pageNum">
+  <span> / {{pageCount}}</span>
+
+</nav>
+
+<hr>
+
+{{loading}}
+<canvas id="pdf" class="rotate0"></canvas>

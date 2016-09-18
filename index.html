@@ -12,25 +12,19 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="assets/css/sticky-footer.css">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/trix/0.9.2/trix.css">
+    <link rel="stylesheet" text="text/css" href="assets/css/commentBox.css">
+    <link rel="stylesheet" text="text/css" href="assets/css/main.css">
 </head>
-    <style>
-    input.ng-invalid.ng-dirty {
-        border: 1px solid red;
-        }
-    </style>
+   
     
     <script>
-          $(function() {
-          $('#edit').froalaEditor()
-      });
-        
         
    MathJax.Hub.Config({
   tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
 });
 
     $('#myModal').on('shown.bs.modal', function () {
-  $('#myInput').focus()
+  $('#myInput').focus();
 })
     
     </script>
@@ -62,7 +56,6 @@
 
     <!---- Javascript --------->
     <script src="assets/js/angular.min.js"></script>
-    
     <script src="assets/js/angular-ui-router.js"></script>
     <script src="app/app.js"></script>
     <script src="app/routes.js"></script>
@@ -74,7 +67,10 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
-    
+    <script src="assets/pdfjs/build/pdf.js"></script>
+    <script src="assets/js/ng-pdfviewer.min.js"></script>
+    <script src="assets/js/pdf.compat.js"></script>
+    <script src="directives/angular-pdf.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/trix/0.9.2/trix.js"></script>
   
 </body>

@@ -3,6 +3,7 @@ require("db.php");
 
 $id = $_GET['id'];
 
+$count = 0;
 // cui = content unquie id
 
 $stm = $db->prepare("SELECT question,writer,date,qid FROM questions WHERE qid=:id");

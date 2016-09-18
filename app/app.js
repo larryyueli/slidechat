@@ -1,1 +1,1 @@
-var app = angular.module("slidechat", ['ui.router']);
+var app = angular.module("slidechat", ['ui.router', 'pdf']);
