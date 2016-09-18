@@ -115,3 +115,20 @@ What will I work on next:
 
     - Designing the site to look better.
     - Pdf system
+    
+-----------------------------------
+Date: Firday, Sept, 17th, 2016
+-----------------------------------
+Mood: great, but buzy.
+
+What did I do today?
+    - Added pdf viewer
+    - Added Q&A
+
+What will I work on next?
+
+   - Code refactoring
+   - Finish up Q&A
+   - Write user documentation
+   - Add small things to question and answer system/ finish pdf viewer system
+   - application designing
