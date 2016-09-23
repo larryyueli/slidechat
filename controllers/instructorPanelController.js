@@ -197,12 +197,12 @@ console.log(response);
                 $scope.showlinks = 1;
                 
                 $scope.dat = response.course;
-                
               
                 $scope.mats = response.materials;
                 
               //  console.log($scope.mats);
                 
+                console.log(response);
                 $scope.links = response.course;
                 //console.log( $scope.links );
                 

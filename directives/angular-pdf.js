@@ -110,6 +110,10 @@
           scope.pageToDisplay = parseInt(scope.pageToDisplay) + 1;
           scope.pageNum = scope.pageToDisplay;
         };
+          
+        scope.goTo = function(pageNumber){
+            scope.pageNum = parseInt(pageNumber);
+        }
 
         scope.zoomIn = function() {
           pageFit = false;
