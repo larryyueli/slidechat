@@ -5,6 +5,7 @@
   
     <div class="row" ng-if="error != 1">
         <div class="col-md-7">
+            
             <div id="pdfviewer" style="margin-top:32px;">
                 <div class="panel panel-default">
                     <div class="panel-body">
@@ -16,6 +17,7 @@
                 </div>
             </div>
         </div>
+        
         
         <div class="col-md-5">
             <h3 style="text-decoration:underline;margin-top:-4px;">Q&A</h3>
@@ -35,8 +37,7 @@
 <!--                    <a ng-click='goTo(3)'>@3</a>-->
                     <div class="detailBox">
                         <div class="titleBox">
-                            
-                            <label>{{q.question}}</label><span class="badge" style="float:right;">10</span> <span class="glyphicon glyphicon-chevron-down"></span>
+                            <label><img src="assets/img/question.png" width='30px' height='30px'/> &nbsp;{{q.question}}</label><span class="badge" style="float:right;">{{q.numanswers}}</span> <span class="glyphicon glyphicon-chevron-down"></span>
                             <!--        <button type="button" class="close" aria-hidden="true">&times;</button>-->
                         </div>
                         <div class="actionBox">
@@ -45,13 +46,13 @@
                                     <div class="commenterImage"></div>
                                     <div class="commentText">
                                         
-                                        <p class="" ng-repeat="a in answers" ng-if="a.qid == q.id ">
-                                          
-                                            
-                                            {{a. answer}}
+                                        <p style="margin-bottom:6px" class="alert alert-success" ng-repeat="a in answers" ng-if="a.qid == q.id ">
+                                           {{a. answer}}
                                             <br/>
                                             <span class="date sub-text">{{a.date}}</span>
-                                        </p> </div>
+                                        </p>
+                                        
+                                    </div>
                                 </li>
                             </ul>
                             <form class="form-inline" role="form">

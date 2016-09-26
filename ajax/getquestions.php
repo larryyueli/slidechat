@@ -7,7 +7,7 @@ $id = $_GET['id'];
 $count = 0;
 // cui = content unquie id
 
-$stm = $db->prepare("SELECT id,question,writer,date,uid FROM questions WHERE uid=:id");
+$stm = $db->prepare("SELECT id,question,writer,date,uid,numanswers FROM questions WHERE uid=:id");
 $stm->bindParam(':id',$id);
 $stm->execute();
 
@@ -24,7 +24,6 @@ if(count($result) > 0){
     $st2->execute();
     
     $ans = $st2->fetchAll(PDO::FETCH_ASSOC);
-    
     
     $output = array("questions" =>  $result,
                    "answers" => $ans);

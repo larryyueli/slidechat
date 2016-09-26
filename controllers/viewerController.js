@@ -1,13 +1,80 @@
 app.controller("viewerController", ['$scope', '$http','$stateParams','$sce', function($scope, $http, $stateParams,$timeout,$sce){
 
-$scope.pageN = 1;
+
  var uid = $stateParams.uid;
     
+      $scope.getQuestions = function (uid){
+    $http.get("ajax/getquestions.php?id="+uid).success(function(response){
+        
+       /// console.log(response);
+    //    console.log(JSON.stringify(response));
+        $scope.questions = response.questions;
+        $scope.answers = response.answers;
+        
     
-    $scope.pageNUMBER = 1;
+        
+     //   console.log($scope.questions.question);
+    });
+    }
+      
+      $scope.getQuestions(uid); //get all questions
     
-    getQuestions(uid); //get all questions  
+    $scope.postQuestion = function(){
+        
+//        console.log("im post question method");
+//        console.log($scope.pname);
+//        console.log($scope.quest);
+        
+        var username = "";
+        
+        if($scope.pname == undefined){
+            username = "anonymous";
+        }
+        else{
+            username = $scope.pname;
+        }
+        
+        
+        var data = {
+            name : username,
+            question: $scope.quest,
+            tok: uid
+        }
+
+    /*    var pageNumberToGoTo = $scope.quest.match('@.')[0].split("@")[1];
+        
+        console.log($scope.quest.replace($scope.quest.match('@.')[0], "<a> YOLO </a>"));
+      console.log($scope.quest.match('@[0-9]*'));
+
+        */
+        $http.post("ajax/addquestion.php", data).success(function(response){
+     
     
+            $scope.ci = response;
+           
+             location.reload();
+            
+            $scope.pname = "";
+            $scope.quest = "";
+            
+            
+            
+        }).error(function(error){
+            console.log("error: "+erorr);
+        });
+        
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  
   /************* pdf stuff ********************/
   
    loadPdf();
@@ -61,85 +128,12 @@ $scope.pageN = 1;
         }
     
         $http.post('ajax/addAnswer.php', data).success(function(response){
-            getQuestions(uid); //get all questions  
+            console.log(response);
+            
+            $scope.getQuestions(uid); //get all questions  
+            
     
         });
     }
    
-    
-    function htmlDecode(input){
-  var e = document.createElement('div');
-  e.innerHTML = input;
-  return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
-}
-    
-    function getQuestions(uid){
-    $http.get("ajax/getquestions.php?id="+uid).success(function(response){
-        
-       /// console.log(response);
-    //    console.log(JSON.stringify(response));
-        $scope.questions = response.questions;
-        $scope.answers = response.answers;
-        
-     //   console.log($scope.questions.question);
-    });
-
-    }
-  
-    
-    $scope.postQuestion = function(){
-        
-        console.log("im post question method");
-        console.log($scope.pname);
-        console.log($scope.quest);
-        
-        var username = "";
-        
-        if($scope.pname == undefined){
-            username = "anonymous";
-        }
-        else{
-            username = $scope.pname;
-        }
-        
-        
-        var data = {
-            name : username,
-            question: $scope.quest,
-            tok: uid
-        }
-
-    /*    var pageNumberToGoTo = $scope.quest.match('@.')[0].split("@")[1];
-        
-        console.log($scope.quest.replace($scope.quest.match('@.')[0], "<a> YOLO </a>"));
-      console.log($scope.quest.match('@[0-9]*'));
-
-        */
-        $http.post("ajax/addquestion.php", data).success(function(response){
-            $scope.ci = response;
-            getQuestions(uid);
-            $scope.pname = "";
-            $scope.quest = "";
-            
-        }).error(function(error){
-            console.log("error: "+erorr);
-        });
-    }
-    
-$scope.Yolo = function(a){
-    $scope.pageNum = a;
-    
-    console.log($scope.pageNum);
-}
-    
-  $scope.JumpTo = function(pageNumber){
-      $scope.pageN = pageNumber;
-      console.log($scope.pageNUMBER);
-      console.log("A");
-      
-  }
-  
-    
-    
-    
 }]);

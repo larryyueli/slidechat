@@ -1,5 +1,5 @@
 <div class="container">
-<button type="button" class="btn btn-default pull-right" ng-click="logMeOut()">Log Out</button>
+
 </div>
 <div class="container">
     <div class="row">
@@ -15,6 +15,7 @@
                     <div class="panel-body">
                         <!-- Button trigger modal -->
                         <button type="button" class="btn btn-primary" ng-click="openAddCourseForm()">Add Course</button>
+                        <button type="button" style="float:right;" class="btn btn-default pull-right" ng-click="logMeOut()">Log Out</button>
                         <br/>
                         <br/>
                         <form ng-show='addcourse'> Course Name:
@@ -26,7 +27,7 @@
                         
                         <ul ng-repeat="d in dat">
                             <p ng-show='nolinks'>Currently no courses are created.</p>
-                            <li style="list-style-type: none;" ng-show='showlinks'> <img src="assets/img/course.png" width='30' height='30' /> <a ng-click="showMaterial = 1">{{d.name}}</a>
+                            <li style="list-style-type: none;" ng-show='showlinks'> <img src="assets/img/course.png" width='30' height='30' /> <a ng-click="switchit()">{{d.name}}</a>
                                 <a ng-click="deleteCourse(d.id)"><img src="assets/img/delete.png" /></a>
                             </li>
                             
@@ -41,7 +42,7 @@
                                 <h3 style="text-decoration:underline">List of Course Material</h3>
                                 <li style="list-style-type: none;" ng-repeat="m in mats" ng-if="m.cid == d.id ">
                                     <img src="assets/img/slide.png" style="margin-right: 10px;"/><a href="#/viewer/{{m.cui}}">
-                                    {{m.filename}}</a> &nbsp; [ Comments: {{m.numcomments}} | #Posts: {{m.numposts}} ] <a ng-click="deleteMaterial(m.id)"><img src="assets/img/delete.png" /></a>
+                                    {{m.filename}}</a> &nbsp; [#Questions: {{m.numquestions}} ] <a ng-click="deleteMaterial(m.id)"><img src="assets/img/delete.png" /></a>
                                 </li>
                                 
                             </div>

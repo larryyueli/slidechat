@@ -1,4 +1,9 @@
 /*! Angular-PDF Version: 1.3.0 | Released under an MIT license */
+/*
+Modified by Arjun Dhiman. 2016 - present
+arjun.dhiman@mail.utoronto.ca
+All modifications are free to use.
+*/
 (function() {
 
   'use strict';
@@ -122,6 +127,12 @@
           return scale;
         };
 
+        scope.scaleTo = function(amount){
+            pageFit = false;
+            scale = parseFloat(amount) + 0.2;
+            scope.renderPage(scope.pageToDisplay);
+           return scale;
+        }
         scope.zoomOut = function() {
           pageFit = false;
           scale = parseFloat(scale) - 0.2;

@@ -24,6 +24,8 @@
             //get material info
             $mat = $db->query("SELECT * FROM material");
             $mat = $mat->fetchAll(PDO::FETCH_ASSOC);
+            
+     
          
             if(count($mat) == 0){
                // echo "empty";
@@ -31,7 +33,8 @@
             
                 $datas = array(
                     "course" => $Info,
-                    "materials" => $mat
+                    "materials" => $mat,
+                  
                 );
           
  

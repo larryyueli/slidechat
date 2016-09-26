@@ -32,7 +32,16 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
        
     };
     
-    
+    //open and close course 
+    $scope.switchit = function(){
+        console.log("I was hit");
+        if($scope.showMaterial == 1){
+            $scope.showMaterial = 0;
+        }
+        else{
+            $scope.showMaterial = 1;
+        }
+    }
     
     $scope.switchBool = function (param) {
         if (param == "showFailureAlert") {

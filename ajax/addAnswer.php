@@ -4,7 +4,7 @@ include("db.php");
 
 $data = json_decode(file_get_contents("php://input"));
 
-var_dump($data);
+//var_dump($data);
 
 $date = date("F j, Y, g:i a");
 
@@ -15,5 +15,27 @@ $info->bindParam(":answer", $data->answer);
 $info->bindParam(":uid", $data->unqiueId);
 $info->bindParam(":date", $date);
 $info->execute();
-echo "this script just ran";
+
+
+$f = "SELECT numanswers FROM questions WHERE id=:qid";
+$in = $db->prepare($f);
+$in->bindParam(":qid", $data->id);
+$in->execute();
+
+$get = $in->fetchAll(PDO::FETCH_ASSOC);
+$num = intval($get[0]['numanswers']);
+
+
+$fa =  "UPDATE questions SET numanswers =:noa  WHERE id = :q";
+
+$i = $db->prepare($fa);
+
+$newnum = $num + 1;
+
+$i->bindParam(":noa", $newnum);
+
+$i->bindParam(":q", $data->id);
+$i->execute();
+
+
 ?>

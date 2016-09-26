@@ -16,5 +16,25 @@ $info->bindParam(":question", $data->question);
 $info->bindParam(":date", $date);
 $info->execute();
 
-echo "the answer was added.";
+$f = "SELECT numquestions FROM material WHERE cui=:qid";
+$in = $db->prepare($f);
+$in->bindParam(":qid", $data->tok);
+$in->execute();
+
+$get = $in->fetchAll(PDO::FETCH_ASSOC);
+$num = intval($get[0]['numquestions']);
+
+
+$fa =  "UPDATE material SET numquestions =:noa  WHERE cui = :q";
+
+$i = $db->prepare($fa);
+
+$newnum = $num + 1;
+
+$i->bindParam(":noa", $newnum);
+
+$i->bindParam(":q", $data->tok);
+$i->execute();
+
+
 ?>
