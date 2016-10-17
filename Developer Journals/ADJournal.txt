@@ -132,3 +132,12 @@ What will I work on next?
    - Write user documentation
    - Add small things to question and answer system/ finish pdf viewer system
    - application designing
+
+   --------------------------------------
+
+Date: Sunday, 16th, Oct, 2016
+---------------------------------
+
+- Today was a great day. I figured out how to isolate each page 
+so that it gets its own questions and answer page.
+
