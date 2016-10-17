@@ -12,7 +12,7 @@
                         <h2>{{filena}}</h2>
                         <a style="float:right;" href="{{downloadlink}}" class="btn btn-primary"><span class="glyphicon glyphicon-download-alt"></span> Download Slides</a>
                         <ng-pdf template-url="templates/viewer/pdf.html" canvasid="pdf" scale="page-fit" page='1'></ng-pdf>
-                        
+            
                     </div>
                 </div>
             </div>
@@ -32,6 +32,7 @@
               <div id="live"> {{comment}} </div>-->
            <br/><!-- <a ng-value="pageNum = pageN"></a>-->
             <div id="comments">
+            
                 <div id="qs" ng-repeat="q in questions">
                     
 <!--                    <a ng-click='goTo(3)'>@3</a>-->
@@ -45,7 +46,6 @@
                                 <li>
                                     <div class="commenterImage"></div>
                                     <div class="commentText">
-                                        
                                         <p style="margin-bottom:6px" class="alert alert-success" ng-repeat="a in answers" ng-if="a.qid == q.id ">
                                            {{a. answer}}
                                             <br/>

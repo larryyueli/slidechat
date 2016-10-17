@@ -23,11 +23,10 @@
                             <input type='submit' name="submit" class="btn btn-primary" value="Add course" ng-click="addCourse()"/> <img src="assets/img/close.png" ng-click="addcourse = 0"> </form>
                         
                         
-                        
-                        
+                       
                         <ul ng-repeat="d in dat">
                             <p ng-show='nolinks'>Currently no courses are created.</p>
-                            <li style="list-style-type: none;" ng-show='showlinks'> <img src="assets/img/course.png" width='30' height='30' /> <a ng-click="switchit()">{{d.name}}</a>
+                            <li style="list-style-type: none;" ng-show='showlinks'> <img src="assets/img/course.png" width='30' height='30' /> <a ng-click="showMaterial = 1">{{d.name}}</a>
                                 <a ng-click="deleteCourse(d.id)"><img src="assets/img/delete.png" /></a>
                             </li>
                             
@@ -48,6 +47,7 @@
                             </div>
                         </ul>
                     </div>
+                    
                                              <!-- Modal -->
        <div id="myModal" class="modal fade" role="dialog">
             <div class="modal-dialog">
@@ -74,7 +74,41 @@
                    </div>
             </div>
         </div>
-                     
+                      
+                </div>
+                 <div ng-if="AdminLoggedIn">
+                     Admin material
+                     <hr/>
+                     <div class="container">
+					<form class="form-horizontal" method="post" action="#">
+						
+						<div class="form-group">
+							<label for="name" class="cols-sm-2 control-label">Your Name</label>
+							<div class="cols-sm-10">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-user fa" aria-hidden="true"></i></span>
+									<input type="text" class="form-control" name="name" id="name"  placeholder="Enter your Name"/>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="email" class="cols-sm-2 control-label">Your Email</label>
+							<div class="cols-sm-10">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-envelope fa" aria-hidden="true"></i></span>
+									<input type="text" class="form-control" name="email" id="email"  placeholder="Enter your Email"/>
+								</div>
+							</div>
+						</div>
+
+
+						<div class="form-group ">
+							<button type="button" class="btn btn-primary btn-lg btn-block login-button">Register</button>
+						</div>
+					
+					</form>
+				</div>
                 </div>
             </div>
         </div>

@@ -21,5 +21,8 @@ angular.module('slidechat').config(function ($stateProvider) {
     }).state('careers',{
         url: '/careers',
         templateUrl: 'templates/careers/index.html'
+    }).state('about',{
+        url:'/about',
+        templateUrl: 'templates/about/index.html'
     });
 });

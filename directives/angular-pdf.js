@@ -8,7 +8,7 @@ All modifications are free to use.
 
   'use strict';
 
-  angular.module('pdf', []).directive('ngPdf', [ '$window', function($window) {
+  angular.module('pdf', []).directive('ngPdf', [ '$window','$http', function($window,$http) {
     var renderTask = null;
     var pdfLoaderTask = null;
     var debug = false;
@@ -64,6 +64,45 @@ All modifications are free to use.
         PDFJS.disableWorker = true;
         scope.pageNum = pageToDisplay;
 
+          
+        ///////////////////////////////////////////////////
+          
+          
+          
+            scope.getQuestions = function (addr,pageNumberToShow){
+           
+    $http.get("ajax/getquestions.php?id="+addr+"&pnum="+pageNumberToShow).success(function(response){
+        
+        console.log(response);
+    //    console.log(JSON.stringify(response));
+    
+        scope.questions = response.questions;
+        scope.answers = response.answers;
+        
+       
+        //console.log($scope.questions.question);
+    });
+    };
+          
+          
+          
+          
+          
+          
+          
+          
+          
+       /////////////////////////////////////////////////////
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
         scope.renderPage = function(num) {
           if (renderTask) {
               renderTask._internalRenderTask.cancel();
@@ -98,6 +137,8 @@ All modifications are free to use.
                 console.log(reason);
             });
           });
+             //get page questions
+          scope.getQuestions(scope.pageadress,scope.pageToDisplay);
         };
 
         scope.goPrevious = function() {
@@ -106,7 +147,10 @@ All modifications are free to use.
           }
           scope.pageToDisplay = parseInt(scope.pageToDisplay) - 1;
           scope.pageNum = scope.pageToDisplay;
+             //get page questions
+          scope.getQuestions(scope.pageadress,scope.pageToDisplay);
         };
+
 
         scope.goNext = function() {
           if (scope.pageToDisplay >= pdfDoc.numPages) {
@@ -114,6 +158,8 @@ All modifications are free to use.
           }
           scope.pageToDisplay = parseInt(scope.pageToDisplay) + 1;
           scope.pageNum = scope.pageToDisplay;
+          //get page questions
+          scope.getQuestions(scope.pageadress,scope.pageToDisplay);
         };
           
         scope.goTo = function(pageNumber){
@@ -139,7 +185,7 @@ All modifications are free to use.
           scope.renderPage(scope.pageToDisplay);
           return scale;
         };
-
+     
         scope.fit = function() {
           pageFit = true;
           scope.renderPage(scope.pageToDisplay);

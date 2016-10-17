@@ -1,23 +1,38 @@
-app.controller("viewerController", ['$scope', '$http','$stateParams','$sce', function($scope, $http, $stateParams,$timeout,$sce){
-
+app.controller("viewerController", ['$scope', '$http','$stateParams','$sce', function($scope, $http, $stateParams,$sce){
 
  var uid = $stateParams.uid;
+
+    $scope.pageadress = uid;
     
-      $scope.getQuestions = function (uid){
-    $http.get("ajax/getquestions.php?id="+uid).success(function(response){
-        
-       /// console.log(response);
-    //    console.log(JSON.stringify(response));
-        $scope.questions = response.questions;
-        $scope.answers = response.answers;
-        
-    
-        
-     //   console.log($scope.questions.question);
-    });
-    }
+//      $scope.getQuestions = function (pnum){
+//    $http.get("ajax/getquestions.php?id="+uid).success(function(response){
+//        
+//        //console.log(response);
+//    //    console.log(JSON.stringify(response));
+//        $scope.questions = response.questions;
+//        $scope.answers = response.answers;
+//        
+//       
+//        //console.log($scope.questions.question);
+//    });
+//    }
+   
+//
+//      $scope.getID = function(pagenumber){
+//          console.log(pagenumber);
+//          $scope.e = {
+//              name : "Arjun",
+//              pnum: pagenumber
+//          }
+//          
+//          $http.get("ajax/getStuff.php?id="+pagenumber).success(function(res){
+//             console.log(res); 
+//          });
+//     
+//   
+//      }
       
-      $scope.getQuestions(uid); //get all questions
+    // $scope.getQuestions(uid); //get all questions
     
     $scope.postQuestion = function(){
         

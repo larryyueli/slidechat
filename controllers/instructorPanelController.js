@@ -13,6 +13,28 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
     AuthenticationService.checkToken(token);
     
     
+    /////////////////////////////////////////////////////////////////////
+    //check if the user is an admin
+    $scope.AdminLoggedIn = checkForAdminLogin(token);
+    
+    function checkForAdminLogin(tok){
+        var result = 0;
+        $http.post('ajax/checkForAdmin.php', tok).success(function(response){
+            
+            if(parseInt(response) == 1){
+                $scope.AdminLoggedIn = response;
+            };
+            
+          
+        }).error(function(error){
+           
+        console.log(error); 
+        });
+       
+    }
+    
+    /////////////////////////////////////////////////////////////////////
+    
     reload();
     function reload() {
         //Table 1 get links of courses
@@ -27,21 +49,12 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
                 $scope.nolinks = 1;
                 $scope.showlinks = 0;
             }
-              console.log(JSON.stringify(response));
+            //  console.log(JSON.stringify(response));
         });
        
     };
     
-    //open and close course 
-    $scope.switchit = function(){
-        console.log("I was hit");
-        if($scope.showMaterial == 1){
-            $scope.showMaterial = 0;
-        }
-        else{
-            $scope.showMaterial = 1;
-        }
-    }
+  
     
     $scope.switchBool = function (param) {
         if (param == "showFailureAlert") {
@@ -98,8 +111,9 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
      }
      
      $scope.isProcessing = false;
+    
      $scope.createCourse = function(param){
-        console.log(param);
+       // console.log(param);
         
          $scope.isProcessing = true;
          var fd = new FormData();
@@ -122,7 +136,7 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
             $scope.isProcessing = false;
         console.log(response);
              var files = document.getElementById('exampleInputFile').files[0];
-              console.log(response);
+              //console.log(response);
              
              
                var bab = {
@@ -180,6 +194,7 @@ console.log(response);
     $scope.deleteCourse = function(link){
         $http.post('ajax/deleteCourse.php', link).success(function(response){
             if(response == true){
+                $scope.showMaterial = 0;
                 reload();
             $scope.showSuccessAlert = 1;
             $scope.successTextAlert = "The course has been deleted successfully!";
@@ -211,7 +226,7 @@ console.log(response);
                 
               //  console.log($scope.mats);
                 
-                console.log(response);
+               // console.log(response);
                 $scope.links = response.course;
                 //console.log( $scope.links );
                 

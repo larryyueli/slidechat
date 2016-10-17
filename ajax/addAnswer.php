@@ -37,5 +37,4 @@ $i->bindParam(":noa", $newnum);
 $i->bindParam(":q", $data->id);
 $i->execute();
 
-
 ?>
