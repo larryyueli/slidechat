@@ -64,44 +64,82 @@ All modifications are free to use.
         PDFJS.disableWorker = true;
         scope.pageNum = pageToDisplay;
 
-          
-        ///////////////////////////////////////////////////
-          
-          
-          
+
+        /*
+        
+           create a module to get rid of this multi call for 
+           data.
+        
+        */
             scope.getQuestions = function (addr,pageNumberToShow){
-           
+
+                
+                //get data from db for questions,
+                // make a class to deal with this instead
     $http.get("ajax/getquestions.php?id="+addr+"&pnum="+pageNumberToShow).success(function(response){
         
-        console.log(response);
-    //    console.log(JSON.stringify(response));
-    
         scope.questions = response.questions;
         scope.answers = response.answers;
-        
-       
-        //console.log($scope.questions.question);
+    
+        //error call this will show error if it happens
+    }).error(function(error){
+        console.log("error:" + erorr)
     });
     };
           
+      scope.postQuestion = function(id){
+          console.log(id);
+          console.log(scope.pname);
           
           
           
+          /*
           
           
+          algo
+        ------------
+        things that are needed to finish tthis fn
+        
+        
+        universal - uid [X]
+        
+        //?
+        - pagenubmer []
+        - username
+        - user posted question 
+        
+        
+        
           
           
+          */
           
-       /////////////////////////////////////////////////////
+      }
           
-          
-          
-          
-          
-          
-          
-          
-          
+//          
+//            var username = "";
+//            if (scope.pname == undefined) {
+//                username = "anonymous";
+//            }
+//            else {
+//                username = scope.pname;
+//            }
+//            var data = {
+//                name: username
+//                , question: $scope.quest
+//                , tok: uid
+//                , pagenum: scope.pageToDisplay
+//        
+//            }
+//            $http.post("ajax/addquestion.php", data).success(function (response) {
+//                $scope.ci = response;
+//                location.reload();
+//                $scope.pname = "";
+//                $scope.quest = "";
+//            }).error(function (error) {
+//                console.log("error: " + erorr);
+//            });
+//      }
           
         scope.renderPage = function(num) {
           if (renderTask) {
@@ -137,6 +175,9 @@ All modifications are free to use.
                 console.log(reason);
             });
           });
+            
+            // add class instance here to get rid of multi call problem 
+            // during traficc load 
              //get page questions
           scope.getQuestions(scope.pageadress,scope.pageToDisplay);
         };
@@ -150,7 +191,6 @@ All modifications are free to use.
              //get page questions
           scope.getQuestions(scope.pageadress,scope.pageToDisplay);
         };
-
 
         scope.goNext = function() {
           if (scope.pageToDisplay >= pdfDoc.numPages) {
@@ -249,7 +289,7 @@ All modifications are free to use.
             );
           }
         }
-
+        
         scope.$watch('pageNum', function(newVal) {
           scope.pageToDisplay = parseInt(newVal);
           if (pdfDoc !== null) {

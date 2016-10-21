@@ -1,35 +1,11 @@
-
-    <div class="btn-group" role="group" aria-label="sliderbuttons">
-  <button class="btn btn-default glyphicon glyphicon-chevron-left" ng-click="goPrevious()"></button>
-  <button class="btn btn-default glyphicon glyphicon-chevron-right" ng-click="goNext()"></button>
-     
- <!-- <button class="btn btn-default glyphicon glyphicon-plus-sign" ng-click="zoomIn()"></button>
-   <button class="btn btn-default glyphicon glyphicon-minus-sign" ng-click="getID(pageNum)"></button>-->
-    
+<div class="btn-group" role="group" aria-label="sliderbuttons">
+    <button class="btn btn-default glyphicon glyphicon-chevron-left" ng-click="goPrevious()"></button>
+    <button class="btn btn-default glyphicon glyphicon-chevron-right" ng-click="goNext()"></button>
 </div>
-    <div class="btn-group" role="group">
-  <!--<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-    100%
-    <span class="caret"></span>
-  </button>
-  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-    <li><a ng-click="fit()" >100%</a></li>
-    <li><a ng-click="scaleTo(1.50)">150%</a></li>
-    <li><a ng-click="scaleTo(2)">200%</a></li>
-  </ul>-->
-        <div class="input-group" style="width:230px; padding-left:20px;">
-  <span class="input-group-addon" id="basic-addon1">Page:</span>
-  <input type="text" min=1 class="form-control"  ng-model="pageNum">
-  
+<div class="btn-group" role="group">
+        <div class="input-group" style="width:230px; padding-left:20px;"> 
+        <span class="input-group-addon" id="basic-addon1">Page:</span>
+        <input type="text" min=1 class="form-control" ng-model="pageNum"> </div>
 </div>
-</div>
-
-  <!--<span>Page: </span>
-  <input type="text" min=1 ng-model="pageNum">
-  <span> / {{pageCount}}</span>-->
-
-
-<hr>
-
-{{loading}}
+<hr> {{loading}}
 <canvas id="pdf" class="rotate0"></canvas>

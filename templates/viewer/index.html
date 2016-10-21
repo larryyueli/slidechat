@@ -28,14 +28,11 @@
                
                 <input type="submit" value="submit" ng-click="postQuestion()" /> 
             </form>
-            <!--  Live preview
-              <div id="live"> {{comment}} </div>-->
-           <br/><!-- <a ng-value="pageNum = pageN"></a>-->
+           <br/>
             <div id="comments">
             
                 <div id="qs" ng-repeat="q in questions">
                     
-<!--                    <a ng-click='goTo(3)'>@3</a>-->
                     <div class="detailBox">
                         <div class="titleBox">
                             <label><img src="assets/img/question.png" width='30px' height='30px'/> &nbsp;{{q.question}}</label><span class="badge" style="float:right;">{{q.numanswers}}</span> <span class="glyphicon glyphicon-chevron-down"></span>
@@ -55,6 +52,7 @@
                                     </div>
                                 </li>
                             </ul>
+                            
                             <form class="form-inline" role="form">
                                 <div class="form-group">
                                     <input class="form-control" type="text" ng-model="answer" placeholder="Your Answer" /></div>
