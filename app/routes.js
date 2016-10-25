@@ -15,14 +15,8 @@ angular.module('slidechat').config(function ($stateProvider) {
         url: '/viewer/:uid'
         , templateUrl: 'templates/viewer/index.html'
         , controller: 'viewerController'
-    }).state('doc', {
-        url: '/doc'
-        , templateUrl: 'templates/documentation/index.html'
-    }).state('careers',{
-        url: '/careers',
-        templateUrl: 'templates/careers/index.html'
-    }).state('about',{
-        url:'/about',
-        templateUrl: 'templates/about/index.html'
+    }).state('feedback', {
+        url: '/feedback'
+        , templateUrl: 'templates/feedback/index.html'
     });
 });

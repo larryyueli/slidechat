@@ -7,13 +7,13 @@ $data = json_decode(file_get_contents("php://input"));
 
 $date = date("F j, Y, g:i a");
 
-$query = "INSERT INTO questions (uid,question,writer,date) VALUES (:qid, :question, :name, :date, :pagenum)";
+$query = "INSERT INTO questions (uid,question,writer,date,pagenumber) VALUES (:qid, :question, :name, :date, :pagenum)";
 $info = $db->prepare($query);
 $info->bindParam(":qid", $data->tok);
 $info->bindParam(":name", $data->name);
 $info->bindParam(":question", $data->question);
 $info->bindParam(":date", $date);
-$info->bindParam(":pagenum", )
+$info->bindParam(":pagenum", $data->pagenum);
 $info->execute();
 
 $f = "SELECT numquestions FROM material WHERE cui=:qid";

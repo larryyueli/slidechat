@@ -10,7 +10,7 @@
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <h2>{{filena}}</h2>
-                        <a style="float:right;" href="{{downloadlink}}" class="btn btn-primary"><span class="glyphicon glyphicon-download-alt"></span> Download Slides</a>
+                        <a style="float:right;" href="{{downloadlink}}" download="{{downloadlink}}" class="btn btn-primary"><span class="glyphicon glyphicon-download-alt"></span> Download Slides</a>
                         <ng-pdf template-url="templates/viewer/pdf.html" canvasid="pdf" scale="page-fit" page='1'></ng-pdf>
             
                     </div>
@@ -26,7 +26,7 @@
                 <br/> Question:
                 <textarea ng-model="quest"></textarea>
                
-                <input type="submit" value="submit" ng-click="postQuestion()" /> 
+                <input type="submit" value="submit" ng-click="postQuestion(pname,quest)" /> 
             </form>
            <br/>
             <div id="comments">

@@ -35,6 +35,4 @@ if(count($result) > 0){
     echo json_encode($output);
     
 }
-header("HTTP/1.0 404 Not Found");
-exit();
 ?>

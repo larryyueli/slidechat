@@ -1,32 +1,8 @@
 app.controller("viewerController", ['$scope', '$http', '$stateParams', '$sce', function ($scope, $http, $stateParams, $sce) {
     
     var uid = $stateParams.uid;
+    
     $scope.pageadress = uid;
-//    
-//    $scope.postQuestion = function () {
-//            var username = "";
-//            if ($scope.pname == undefined) {
-//                username = "anonymous";
-//            }
-//            else {
-//                username = $scope.pname;
-//            }
-//            var data = {
-//                name: username
-//                , question: $scope.quest
-//                , tok: uid
-//        
-//            }
-//            $http.post("ajax/addquestion.php", data).success(function (response) {
-//                $scope.ci = response;
-//                location.reload();
-//                $scope.pname = "";
-//                $scope.quest = "";
-//            }).error(function (error) {
-//                console.log("error: " + erorr);
-//            });
-//        }
-//    
     
     /************* pdf stuff ********************/
     loadPdf();
@@ -57,15 +33,5 @@ app.controller("viewerController", ['$scope', '$http', '$stateParams', '$sce', f
     }).error(function () {
         $scope.error = 1;
     });
-    $scope.postAnswer = function (answer, id) {
-        var data = {
-            answer: answer
-            , unqiueId: uid
-            , id: id
-        }
-        $http.post('ajax/addAnswer.php', data).success(function (response) {
-            console.log(response);
-            $scope.getQuestions(uid); //get all questions  
-        });
-    }
+    
 }]);

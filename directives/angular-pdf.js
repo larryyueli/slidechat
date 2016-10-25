@@ -83,63 +83,50 @@ All modifications are free to use.
     
         //error call this will show error if it happens
     }).error(function(error){
+      
         console.log("error:" + erorr)
     });
     };
           
-      scope.postQuestion = function(id){
-          console.log(id);
-          console.log(scope.pname);
-          
-          
-          
-          /*
-          
-          
-          algo
-        ------------
-        things that are needed to finish tthis fn
+      scope.postQuestion = function(a,b){
+                   
+            var username = "";
+            if (a == undefined) {
+                username = "anonymous";
+            }
+            else {
+                username = a;
+            }
+            var data = {
+                name: username
+                , question: b
+                , tok: scope.pageadress
+                , pagenum: scope.pageToDisplay
         
-        
-        universal - uid [X]
-        
-        //?
-        - pagenubmer []
-        - username
-        - user posted question 
-        
-        
-        
-          
-          
-          */
-          
+            }
+            $http.post("ajax/addquestion.php", data).success(function (response) {
+                console.log("Question Added.");
+            }).error(function (error) {
+                console.log("Something went wrong");
+            });
+      
       }
           
-//          
-//            var username = "";
-//            if (scope.pname == undefined) {
-//                username = "anonymous";
-//            }
-//            else {
-//                username = scope.pname;
-//            }
-//            var data = {
-//                name: username
-//                , question: $scope.quest
-//                , tok: uid
-//                , pagenum: scope.pageToDisplay
-//        
-//            }
-//            $http.post("ajax/addquestion.php", data).success(function (response) {
-//                $scope.ci = response;
-//                location.reload();
-//                $scope.pname = "";
-//                $scope.quest = "";
-//            }).error(function (error) {
-//                console.log("error: " + erorr);
-//            });
-//      }
+      
+       scope.postAnswer = function (answer, id) {
+        var data = {
+            answer: answer
+            , unqiueId: scope.pageadress
+            , id: id,
+            slideid: scope.pageToDisplay
+        }
+        
+        $http.post('ajax/addAnswer.php', data).success(function (response) {
+            console.log(response);
+            scope.getQuestions(scope.pageadress,scope.pageToDisplay);
+            //get all questions  
+        });
+    }
           
         scope.renderPage = function(num) {
           if (renderTask) {
