@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost:3306
--- Generation Time: Oct 17, 2016 at 05:12 PM
+-- Generation Time: Oct 25, 2016 at 02:34 AM
 -- Server version: 5.5.38
 -- PHP Version: 5.6.2
 
@@ -34,7 +34,7 @@ CREATE TABLE `accounts` (
 --
 
 INSERT INTO `accounts` (`id`, `email`, `password`, `token`, `accounttype`, `postingToken`) VALUES
-(1, 'test@test.com', '7c4a8d09ca3762af61e59520943dc26494f8941b', 'test@test.com | 5804e9ba2b9465804e9ba2b94f5804e9ba2b954', 1, 'p1');
+(1, 'test@test.com', '7c4a8d09ca3762af61e59520943dc26494f8941b', 'test@test.com | 580e2db6b34c9580e2db6b34e5580e2db6b350a', 1, 'p1');
 
 -- --------------------------------------------------------
 
@@ -49,7 +49,21 @@ CREATE TABLE `answers` (
   `date` text NOT NULL,
   `uid` text NOT NULL,
   `pagenumber` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `answers`
+--
+
+INSERT INTO `answers` (`id`, `qid`, `answer`, `date`, `uid`, `pagenumber`) VALUES
+(3, 7, 'adsa', 'October 25, 2016, 2:03 am', '580e93fdc98ee*^!580e93fdc9970', 0),
+(4, 7, 'test comment', 'October 25, 2016, 2:10 am', '580e93fdc98ee*^!580e93fdc9970', 1),
+(5, 7, 'yolo', 'October 25, 2016, 2:12 am', '580e93fdc98ee*^!580e93fdc9970', 1),
+(6, 11, 'asdas', 'October 25, 2016, 2:13 am', '580e93fdc98ee*^!580e93fdc9970', 1),
+(7, 10, 'adasda', 'October 25, 2016, 2:14 am', '580e93fdc98ee*^!580e93fdc9970', 1),
+(8, 10, 'asdsa', 'October 25, 2016, 2:14 am', '580e93fdc98ee*^!580e93fdc9970', 1),
+(9, 9, 'asdas', 'October 25, 2016, 2:14 am', '580e93fdc98ee*^!580e93fdc9970', 2),
+(10, 8, 'asdas', 'October 25, 2016, 2:14 am', '580e93fdc98ee*^!580e93fdc9970', 2);
 
 -- --------------------------------------------------------
 
@@ -68,8 +82,7 @@ CREATE TABLE `course` (
 --
 
 INSERT INTO `course` (`id`, `name`, `instructor_id`) VALUES
-(20, 'CSC', 1),
-(21, 'asdas', 1);
+(20, 'CSC', 1);
 
 -- --------------------------------------------------------
 
@@ -85,16 +98,15 @@ CREATE TABLE `material` (
   `cui` text NOT NULL,
   `numquestions` int(11) NOT NULL DEFAULT '0',
   `pagenumber` int(11) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `material`
 --
 
 INSERT INTO `material` (`id`, `cid`, `filepath`, `filename`, `cui`, `numquestions`, `pagenumber`) VALUES
-(29, 20, 'slides/Lecture3Sept21th2016CSC324.pdf', 'Lecture3Sept21th2016CSC324.pdf', '57eaa4c75f536*^!57eaa4c75f56e', 6, 1),
-(30, 21, 'slides/a1.pdf', 'a1.pdf', '57ec73133e60c*^!57ec73133e651', 1, 0),
-(31, 20, 'slides/00Intro.pdf', '00Intro.pdf', '57f276e28b9af*^!57f276e28bac6', 0, 0);
+(33, 20, 'slides/a4.pdf', 'a4.pdf', '580e938f29f01*^!580e938f29f4d', 0, 0),
+(34, 20, 'slides/00Intro.pdf', '00Intro.pdf', '580e93fdc98ee*^!580e93fdc9970', 8, 0);
 
 -- --------------------------------------------------------
 
@@ -110,15 +122,19 @@ CREATE TABLE `questions` (
   `date` text NOT NULL,
   `numanswers` int(11) NOT NULL,
   `pagenumber` int(11) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `questions`
 --
 
 INSERT INTO `questions` (`id`, `uid`, `question`, `writer`, `date`, `numanswers`, `pagenumber`) VALUES
-(1, '57eaa4c75f536*^!57eaa4c75f56e', 'yo', 'anonymous', 'September 28, 2016, 9:47 pm', 4, 1),
-(2, '57eaa4c75f536*^!57eaa4c75f56e', 'page 2 test question', 'anonymous', 'September 28, 2016, 9:47 pm', 0, 2);
+(7, '580e93fdc98ee*^!580e93fdc9970', 'ba', 'ab', 'October 24, 2016, 7:37 pm', 3, 1),
+(8, '580e93fdc98ee*^!580e93fdc9970', 'this works?', 'hi', 'October 24, 2016, 7:37 pm', 2, 2),
+(9, '580e93fdc98ee*^!580e93fdc9970', 'asda', 'anonymous', 'October 24, 2016, 7:50 pm', 1, 2),
+(10, '580e93fdc98ee*^!580e93fdc9970', 'adas', 'arjun', 'October 24, 2016, 7:51 pm', 2, 1),
+(11, '580e93fdc98ee*^!580e93fdc9970', 'adasdas12312312', 'anonymous', 'October 24, 2016, 8:01 pm', 1, 1),
+(12, '580e93fdc98ee*^!580e93fdc9970', 'a', 'anonymous', 'October 24, 2016, 8:28 pm', 0, 1);
 
 --
 -- Indexes for dumped tables
@@ -167,7 +183,7 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
 -- AUTO_INCREMENT for table `answers`
 --
 ALTER TABLE `answers`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=11;
 --
 -- AUTO_INCREMENT for table `course`
 --
@@ -177,9 +193,9 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=22;
 -- AUTO_INCREMENT for table `material`
 --
 ALTER TABLE `material`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=32;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=35;
 --
 -- AUTO_INCREMENT for table `questions`
 --
 ALTER TABLE `questions`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=13;
