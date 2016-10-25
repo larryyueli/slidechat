@@ -215,7 +215,7 @@ console.log(response);
     
     //Table 1 get links of courses
         $http.post('ajax/panel.php', token).success(function (response) {
-          // console.log(JSON.stringify(response));
+         
             if (response != "empty") {
                 $scope.nolinks = 0;
                 $scope.showlinks = 1;
@@ -224,11 +224,7 @@ console.log(response);
               
                 $scope.mats = response.materials;
                 
-              //  console.log($scope.mats);
-                
-               // console.log(response);
-                $scope.links = response.course;
-                //console.log( $scope.links );
+                $scope.links = response.course;  
                 
             }
             else {

@@ -3,6 +3,8 @@
         <div ng-include="'templates/errors/404.html'"></div>
     </div>
   
+    
+    
     <div class="row" ng-if="error != 1">
         <div class="col-md-7">
             
@@ -17,8 +19,7 @@
                 </div>
             </div>
         </div>
-        
-        
+    
         <div class="col-md-5">
             <h3 style="text-decoration:underline;margin-top:-4px;">Q&A</h3>
             <form style="padding: 10px; border: black 4px solid;" ng-controller="viewerController"> Name:
@@ -29,6 +30,7 @@
                 <input type="submit" value="submit" ng-click="postQuestion(pname,quest)" /> 
             </form>
            <br/>
+          
             <div id="comments">
             
                 <div id="qs" ng-repeat="q in questions">
@@ -36,23 +38,29 @@
                     <div class="detailBox">
                         <div class="titleBox">
                             <label><img src="assets/img/question.png" width='30px' height='30px'/> &nbsp;{{q.question}}</label><span class="badge" style="float:right;">{{q.numanswers}}</span> <span class="glyphicon glyphicon-chevron-down"></span>
-                            <!--        <button type="button" class="close" aria-hidden="true">&times;</button>-->
+                              
                         </div>
                         <div class="actionBox">
                             <ul class="commentList">
                                 <li>
                                     <div class="commenterImage"></div>
                                     <div class="commentText">
-                                        <p style="margin-bottom:6px" class="alert alert-success" ng-repeat="a in answers" ng-if="a.qid == q.id ">
-                                           {{a. answer}}
-                                            <br/>
-                                            <span class="date sub-text">{{a.date}}</span>
+                                        <p style="margin-bottom:6px" class="alert alert-success" ng-repeat="a in answers" ng-if="a.qid == q.id">
+
+                                            <script type="text/javascript">
+                                            function goTo(id){
+                                                console.log($scope.pageNum);
+                                            }
+ 
+                                            </script>
+                                            <span ng-bind-html="to_trusted(a.answer)" ng-controller="viewerController"></span>
+                                            
                                         </p>
                                         
                                     </div>
                                 </li>
                             </ul>
-                            
+                         
                             <form class="form-inline" role="form">
                                 <div class="form-group">
                                     <input class="form-control" type="text" ng-model="answer" placeholder="Your Answer" /></div>

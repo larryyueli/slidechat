@@ -4,6 +4,12 @@ app.controller("viewerController", ['$scope', '$http', '$stateParams', '$sce', f
     
     $scope.pageadress = uid;
     
+
+    $scope.to_trusted = function(html_code) {
+    return $sce.trustAsHtml(html_code);
+    }
+    
+    
     /************* pdf stuff ********************/
     loadPdf();
     /************** end pdf stuff *******************/

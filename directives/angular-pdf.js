@@ -78,9 +78,11 @@ All modifications are free to use.
                 // make a class to deal with this instead
     $http.get("ajax/getquestions.php?id="+addr+"&pnum="+pageNumberToShow).success(function(response){
         
+        console.log(response);
         scope.questions = response.questions;
         scope.answers = response.answers;
     
+       
         //error call this will show error if it happens
     }).error(function(error){
       
@@ -106,6 +108,7 @@ All modifications are free to use.
             }
             $http.post("ajax/addquestion.php", data).success(function (response) {
                 console.log("Question Added.");
+                
             }).error(function (error) {
                 console.log("Something went wrong");
             });
@@ -190,6 +193,7 @@ All modifications are free to use.
         };
           
         scope.goTo = function(pageNumber){
+          
             scope.pageNum = parseInt(pageNumber);
         }
 
