@@ -18,4 +18,4 @@ Configuring the application
 Go to the backend folder and open db.php
 
 change all database information.
-
+----------------------------------------
