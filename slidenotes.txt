@@ -1,0 +1,47 @@
+----------------------------------------------------------
+what should the instructor be able to do?
+----------------------------------------------------------
+- see links to courses
+- add course
+- delete course
+- edit course
+- see how many users are using the material
+--------------------------------------------------------
+
+
+--------------------------------------------------------
+Question and Answer System
+--------------------------------------------------------
+
+-------------
+Student
+-------------
+- add a question
+- answer a question
+- tag a question
+- tag a page in the pdf
+
+----------------
+Instructor
+----------------
+- add a question
+- answer a question
+- tag a question
+- tag a page in the pdf
+
+- delete a question
+- delete an answer
+- change type of content allowed to be entered
+
+--------------------
+Database struct
+--------------------
+Table1: question
+Table2: answers
+
+
+make the upload algo better so that each instrcutor gets a seprate folder to put
+there files in.
+
+
+----------------------------------------------------------

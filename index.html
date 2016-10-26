@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="slidechat" ng-value="applicationName ='SlideChat' ">
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="">
+<meta name="author" content="Arjun Dhiman, Larry Zhang">
+<meta name="keywords" content="slide chat, education, learning tool">
+
+<head>
+    <title>Slide Chat</title>
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/sticky-footer.css">
+    <link rel="shortcut icon" type="image/png" href="assets/img/favicon.ico"/>
+    <link rel="stylesheet" text="text/css" href="assets/css/commentBox.css">
+    <link rel="stylesheet" text="text/css" href="assets/css/main.css">
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+</head>
+   
+    
+    <script>
+        
+   MathJax.Hub.Config({
+  tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+});
+      
+    $('#myModal').on('shown.bs.modal', function () {
+  $('#myInput').focus();
+})
+    
+    </script>
+
+<body>
+
+    <nav class="navbar navbar-default">
+    
+        <div class="container-fluid">
+            <div class="navbar-header"> 
+                <a href="#/"><img alt="Slide Chat" src="assets/img/logo.png"></a> 
+
+                  <ul style="margin-top: 24px; float:right;">
+                 
+                <li style="display:inline; padding:20px;"> <a href="#/feedback">Feedback</a></li>
+            </ul>
+            </div>
+        </div>
+    </nav>
+    <div ui-view></div>
+<!-- Spacer -->
+    <p style="margin-bottom:100px"></p>
+    <footer class="footer">
+      
+        <div class="container">
+            <p class="text-muted">
+                &copy; 2016 - present <a href="http://www.arjundhiman.com">Arjun Dhiman</a> and Larry Zhang 
+                
+            </p>
+            
+        </div>
+    </footer>
+
+    <!---- Javascript --------->
+
+    <script src="assets/js/angular.min.js"></script>
+    <script src="assets/js/angular-ui-router.js"></script>
+    <script src="app/app.js"></script>
+    <script src="app/routes.js"></script>
+    <script src="controllers/loginController.js"></script>
+    <script src="controllers/viewerController.js"></script>
+    <script src="controllers/instructorPanelController.js"></script>
+    <script src="services/authenticate-service.js"></script>
+    <script src="directives/files.js"></script>
+    
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-sanitize.js"></script>
+    
+    <script src="assets/pdfjs/build/pdf.js"></script>
+    <script src="assets/js/ng-pdfviewer.min.js"></script>
+    <script src="directives/angular-pdf.js"></script>
+
+
+  
+</body>
+
+</html>
