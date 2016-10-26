@@ -78,7 +78,6 @@ All modifications are free to use.
                 // make a class to deal with this instead
     $http.get("ajax/getquestions.php?id="+addr+"&pnum="+pageNumberToShow).success(function(response){
         
-        console.log(response);
         scope.questions = response.questions;
         scope.answers = response.answers;
     
@@ -125,7 +124,7 @@ All modifications are free to use.
         }
         
         $http.post('ajax/addAnswer.php', data).success(function (response) {
-            console.log(response);
+            //console.log(response);
             scope.getQuestions(scope.pageadress,scope.pageToDisplay);
             //get all questions  
         });

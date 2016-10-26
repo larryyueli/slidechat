@@ -15,8 +15,7 @@ $id = $row[0]['id'];
 
 if(count($userstuff) == 1){
     
-   
-    //echo $pdflink;
+    
     $updateDataBase = "INSERT INTO course (instructor_id,name) VALUES (:id, :coursename)";
     $stmt = $db->prepare($updateDataBase);
     $stmt->bindParam(":id", $id);

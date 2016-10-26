@@ -4,8 +4,7 @@ include("db.php");
 
 
 $data = json_decode(file_get_contents("php://input"));
-//var_dump($data);
-//echo $data;
+
 
 $query = "SELECT accounttype FROM accounts WHERE token=:tok";
 $a = $db->prepare($query);

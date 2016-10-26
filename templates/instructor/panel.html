@@ -62,6 +62,8 @@
                         <div class="alert alert-success" ng-show="showSuccessAlert">
                             <button type="button" class="close" data-ng-click="switchBool('showSuccessAlert')">×</button> <strong>Done!</strong> {{successTextAlert}} </div>
                         <form>
+                            File name: <input type="text" ng-model="filename"/>
+                            <br/>
                             <label for="exampleInputFile">File input</label>
                             <input type="file" id="exampleInputFile" ng-model="UploadInfo.fa" file-input="files" onchange="angular.element(this).scope().DocUpload(event)">
                             <h5>What is beigning uploaded:</h5> Name: {{file.name}}
