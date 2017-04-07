@@ -15,8 +15,5 @@ angular.module('slidechat').config(function ($stateProvider) {
         url: '/viewer/:uid'
         , templateUrl: 'templates/viewer/index.html'
         , controller: 'viewerController'
-    }).state('feedback', {
-        url: '/feedback'
-        , templateUrl: 'templates/feedback/index.html'
-    });
+    })
 });

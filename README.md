@@ -10,8 +10,8 @@ This is the world's best application. :)
 #Languages used:
 - PHP
 - JavaScript
-- Bootstrap (Html, Css)
+- Bootstrap (HTML5, CSS3)
 - JQuery
-- MySql (PDO)
+- Postgres
 - AngularJs
 - latex
