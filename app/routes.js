@@ -9,11 +9,14 @@ angular.module('slidechat').config(function ($stateProvider) {
         , controller: 'instructorPanelController'
     }).state('index', {
         url: ""
-        , templateUrl: 'templates/instructor/index.html'
-        , controller: 'loginController'
+        , templateUrl: 'templates/index.html'
     }).state('viewer', {
         url: '/viewer/:uid'
         , templateUrl: 'templates/viewer/index.html'
         , controller: 'viewerController'
+    }).state("instructor", {
+        url:"/instructor",
+        controller:'loginController',
+        templateUrl: 'templates/instructor/index.html'
     })
 });
