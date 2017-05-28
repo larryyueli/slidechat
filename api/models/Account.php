@@ -9,4 +9,18 @@ class Account
     private $token;
 
 
+
+    function __construct($dbinstance)
+    {
+        $db = $dbinstance;
+    }
+
+    function saltGenerator($password){
+        return hash('sha512', $password);
+    }
+
+    function login($username, $password){
+        return $this->saltGenerator($password);
+    }
+
 }
