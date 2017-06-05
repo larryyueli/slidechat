@@ -17,9 +17,6 @@ POTENTIAL IDEAS
 -> LIVE SURVEY SYSTEM
 
 
-
-
-
 ###################
 ----------------------------------------------------------
 what should the instructor be able to do?
