@@ -73,8 +73,6 @@ $app->post('/register', function () use ($app) {
   echo json_encode($response);
 });
 
-
-
 $app->post('/logout', function () use ($app) {
   $body = $app->request->getBody();
   $request = json_decode($body);
