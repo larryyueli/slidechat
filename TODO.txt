@@ -14,6 +14,8 @@ POTENTIAL IDEAS
 -> LIVE SURVEY SYSTEM
 
 
+make test cases
+
 ###################
 ----------------------------------------------------------
 what should the instructor be able to do?
