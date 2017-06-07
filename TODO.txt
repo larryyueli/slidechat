@@ -13,9 +13,6 @@ POTENTIAL IDEAS
 -> LIVE CHAT SYSTEM
 -> LIVE SURVEY SYSTEM
 
-
-make test cases
-
 ###################
 ----------------------------------------------------------
 what should the instructor be able to do?
