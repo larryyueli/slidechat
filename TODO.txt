@@ -13,7 +13,6 @@ POTENTIAL IDEAS
 -> LIVE CHAT SYSTEM
 -> LIVE SURVEY SYSTEM
 
-###################
 ----------------------------------------------------------
 what should the instructor be able to do?
 ----------------------------------------------------------
