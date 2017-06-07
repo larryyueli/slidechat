@@ -25,7 +25,6 @@ what should the instructor be able to do?
 - see how many users are using the material
 --------------------------------------------------------
 
-
 --------------------------------------------------------
 Question and Answer System
 --------------------------------------------------------
