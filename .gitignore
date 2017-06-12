@@ -2,3 +2,4 @@
 .idea
 slides/*
 .ftpconfig
+api/config.php
