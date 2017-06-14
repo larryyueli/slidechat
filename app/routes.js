@@ -1,8 +1,7 @@
 angular.module('slidechat').config(function ($stateProvider) {
     $stateProvider.state("login", {
         url: '/'
-        , controller: 'loginController'
-        , templateUrl: 'templates/instructor/index.html'
+        , templateUrl: 'templates/index.html'
     }).state("ipanel", {
         url: "/panel"
         , templateUrl: "templates/instructor/panel.html"

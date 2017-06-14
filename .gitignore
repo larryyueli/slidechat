@@ -1,9 +1,7 @@
+api/config.php
+
 .DS_STORE
 
 .idea
 
 slides/*
-
-.ftpconfig
-
-api/config.php
