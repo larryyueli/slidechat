@@ -8,8 +8,10 @@ app.controller('loginController', function ($scope, $http, $state) {
             email: $scope.loginInfo.email
             , password: $scope.loginInfo.password
         }
+
+        console.log(data)
+
         $http.post('api/index.php/login', data).success(function (response) {
-            //console.log(response);
             localStorage.setItem("token", JSON.stringify(response));
             console.log(localStorage);
             $state.go("ipanel");

@@ -38,7 +38,7 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
     reload();
     function reload() {
         //Table 1 get links of courses
-        $http.post('ajax/panel.php', token).success(function (response) {
+        $http.post('api/index.php/panel', token).success(function (response) {
           //  console.log(response);
             if (response != "empty") {
                 $scope.nolinks = 0;
@@ -172,7 +172,6 @@ console.log(response);
          }, 3000);
      }
 
-
     //material list
     $scope.showMaterial = 0;
 
@@ -181,11 +180,13 @@ console.log(response);
     //Create new course
     $scope.addCourse = function () {
             var d = {
-                courseN: $scope.courseN
-                , tok: token
+                courseN: $scope.courseN,
+                tok: token
             }
-            $http.post('ajax/addcourse.php', d).success(function (response) {
-                location.reload();
+            console.log(d)
+            $http.post('api/index.php/addcourse', d).success(function (response) {
+                //location.reload();
+                console.log(response)
             }).error(function (error) {
                 console.log(error);
             });
@@ -214,18 +215,14 @@ console.log(response);
     }
 
     //Table 1 get links of courses
-        $http.post('ajax/panel.php', token).success(function (response) {
+        $http.post('api/index.php/panel', token).success(function (response) {
 
             if (response != "empty") {
                 $scope.nolinks = 0;
                 $scope.showlinks = 1;
-
                 $scope.dat = response.course;
-
                 $scope.mats = response.materials;
-
                 $scope.links = response.course;
-
             }
             else {
                 $scope.nolinks = 1;
@@ -239,7 +236,7 @@ console.log(response);
         var data = {
             token: token
         }
-        $http.post('ajax/logout.php', data).success(function (response) {
+        $http.post('api/index.php/logout', data).success(function (response) {
             localStorage.clear();
             $state.go("login");
         }).error(function (error) {

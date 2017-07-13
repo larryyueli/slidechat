@@ -19,14 +19,13 @@ class Account
       return $this->email;
     }
 
-
     function saltGenerator($password){
         return hash('sha1', $password);
     }
 
     function validate(){
       //check if account is in db
-      pg_prepare($this->db, "check_for_account", 'SELECT email FROM accounts WHERE email= $1 and password=$2');
+      pg_prepare($this->db, "check_for_account", 'SELECT email FROM accounts WHERE email=$1 and password=$2');
       $result = pg_execute($this->db, "check_for_account", array($this->email, $this->saltGenerator($this->password)));
 
       if($result){
@@ -69,6 +68,10 @@ class Account
 
     function login($username, $password){
         return $this->saltGenerator($password);
+    }
+
+    function checkToken($token){
+
     }
 
 }

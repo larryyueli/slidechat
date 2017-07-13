@@ -8,58 +8,58 @@
 <meta name="keywords" content="slide chat, education, learning tool">
 
 <head>
-    <title>SlideChat</title>
-    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="assets/css/sticky-footer.css">
-    <link rel="shortcut icon" type="image/png" href="assets/img/favicon.ico" />
-    <link rel="stylesheet" text="text/css" href="assets/css/commentBox.css">
-    <link rel="stylesheet" text="text/css" href="assets/css/main.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <title>SlideChat</title>
+  <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/sticky-footer.css">
+  <link rel="shortcut icon" type="image/png" href="assets/img/favicon.ico" />
+  <link rel="stylesheet" text="text/css" href="assets/css/commentBox.css">
+  <link rel="stylesheet" text="text/css" href="assets/css/main.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 </head>
 
 <script>
-    $('#myModal').on('shown.bs.modal', function() {
-        $('#myInput').focus();
-    })
+  $('#myModal').on('shown.bs.modal', function() {
+    $('#myInput').focus();
+  })
 </script>
 
 <body>
-    <nav class="navbar navbar-default">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <img alt="Slide Chat" src="assets/img/logo.png">
-            </div>
-        </div>
-    </nav>
-    <div ui-view></div>
-    <!-- Spacer -->
-    <p style="margin-bottom:100px"></p>
-    <footer class="footer">
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <img alt="Slide Chat" src="assets/img/logo.png">
+      </div>
+    </div>
+  </nav>
+  <div ui-view></div>
+  <!-- Spacer -->
+  <p style="margin-bottom:100px"></p>
+  <footer class="footer">
 
-        <div class="container">
-            <p class="text-muted">
-                &copy; 2016 - present <a href="http://www.arjundhiman.com">
+    <div class="container">
+      <p class="text-muted">
+        &copy; 2016 - present <a href="http://www.arjundhiman.com">
                 Arjun Dhiman</a> and <a href="http://www.cs.utoronto.ca/~ylzhang/">Larry Yueli Zhang
             </a>
-            </p>
-        </div>
-    </footer>
+      </p>
+    </div>
+  </footer>
 
-    <!-- Javascript -->
-    <script src="assets/js/angular.min.js"></script>
-    <script src="assets/js/angular-ui-router.js"></script>
-    <script src="app/app.js"></script>
-    <script src="app/routes.js"></script>
-    <script src="controllers/loginController.js"></script>
-    <script src="controllers/viewerController.js"></script>
-    <script src="controllers/instructorPanelController.js"></script>
-    <script src="services/authenticate-service.js"></script>
-    <script src="directives/files.js"></script>
-    <script src="assets/js/bootstrap.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-sanitize.js"></script>
-    <script src="assets/pdfjs/build/pdf.js"></script>
-    <script src="assets/js/ng-pdfviewer.min.js"></script>
-    <script src="directives/angular-pdf.js"></script>
+  <!-- Javascript -->
+  <script src="assets/js/angular.min.js"></script>
+  <script src="assets/js/angular-ui-router.js"></script>
+  <script src="app/app.js"></script>
+  <script src="app/routes.js"></script>
+  <script src="controllers/loginController.js"></script>
+  <script src="controllers/viewerController.js"></script>
+  <script src="controllers/instructorPanelController.js"></script>
+  <script src="services/authenticate-service.js"></script>
+  <script src="directives/files.js"></script>
+  <script src="assets/js/bootstrap.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-sanitize.js"></script>
+  <script src="assets/pdfjs/build/pdf.js"></script>
+  <script src="assets/js/ng-pdfviewer.min.js"></script>
+  <script src="directives/angular-pdf.js"></script>
 </body>
 
 </html>
