@@ -15,5 +15,3 @@ This is the world's best application. :)
 - Postgres
 - AngularJs
 
-#CIAD
--> Jenkins
