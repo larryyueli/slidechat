@@ -19,6 +19,7 @@ $app->post('/login', function () use ($app) {
   if ($request == null) { // if json_decode returned null, it was not able to decode input string
       $response = array('success' => false, 'msg' => 'Request body not valid JSON.');
   } else {
+
       $account = new Account($app->db, $request->email, $request->password);
      $validation = $account->validate();
 
@@ -29,6 +30,26 @@ $app->post('/login', function () use ($app) {
        } else {
          $response = array("success" => false, "msg" => "Failed to login");
        }
+
+      $response = array('success' => true);
+      // $account = new Account($app->db);
+      // $account->populate($request);
+      // $validation = $account->validate();
+      
+      // if ($validation != "OK") {
+      //     $response = array("success" => false, "msg" => $validation);
+      // } else {
+      //     if (!$account->exists()) {
+      //         if ($account->insert()) {
+      //             $response = array("success" => true, "token" => $account->token, "msg" => "OK");
+      //         } else {
+      //             $response = array("success" => false, "msg" => "Unable to communicate with database, please try again later.");
+      //         }
+      //     } else {
+      //         $response = array("success" => false, "msg" => "Account with this email already exists.");
+      //     }
+      // }
+
   }
   echo json_encode($response);
 });
@@ -91,8 +112,6 @@ $app->post('/addcourse', function () use ($app) {
   //echo json_encode(array("success" => "AA"));
 
 });
-
-
 
 
 
