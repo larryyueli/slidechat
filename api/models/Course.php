@@ -1,25 +1,40 @@
 <?php
 
-class Course{
+class Course
+{
 
-  private $db;
+    private $db;
 
-  function __construct($dbinstance){
-    $this->$db = $dbinstance;
-  }
+    function __construct($dbinstance)
+    {
+        $this->db = $dbinstance;
+    }
 
-  function addCourse($courseName, $token){
-  //  pg_prepare($this->db, "q1", 'SELECT id FROM accounts WHERE token=$1');
-    //$result = pg_execute($this->db, "q1", array($this->token));
+    function addCourse($courseName, $token){
 
-    //$row = pg_fetch_assoc($result);
+try{
+      pg_prepare($this->db, "add_course", 'INSERT INTO course(name, instructor_token) VALUES($1,$2)');
 
-    return "AS";
+    $result = pg_execute($this->db, "add_course", array($courseName,$token));
 
-  }
+       if($result){
+         return true;
+       }
+       else{
+         return false;
+       }
+     }
+     catch(Exception $e){
+       echo $e->getMessage();
+     }
+    }
 
+    function deleteCourse(){
+
+    }
+
+    function updateCourse(){
+
+    }
 
 }
-
-
- ?>

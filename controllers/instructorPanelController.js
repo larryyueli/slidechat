@@ -179,13 +179,13 @@ console.log(response);
 
     //Create new course
     $scope.addCourse = function () {
-            var d = {
+            var data = {
                 courseN: $scope.courseN,
                 tok: token
             }
             console.log(d)
-            $http.post('api/index.php/addcourse', d).success(function (response) {
-                //location.reload();
+            $http.post('api/index.php/addcourse', data).success(function (response) {
+                location.reload();
                 console.log(response)
             }).error(function (error) {
                 console.log(error);

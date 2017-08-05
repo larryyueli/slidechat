@@ -75,20 +75,16 @@ $app->post('/addcourse', function () use ($app) {
   $body = $app->request->getBody();
   $request = json_decode($body);
 
+  $tokenKey = $request->tok->token;
+
   if($app->db){
+    $course = new Course($app->db, "a");
 
-    $c = new Course($app->db);
-
-    echo json_encode("AAAAA ");
+    echo $course->addCourse($request->courseN, $tokenKey);
   }
   else{
-    echo json_encode("F");
+    throw Exception("Something went wrong");
   }
-
-  //$course = new Course($app->db);
-  //$stuff = $course->addCourse($request->courseN, $request->tok);
-
-  //echo json_encode(array("success" => "AA"));
 
 });
 
