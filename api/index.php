@@ -79,7 +79,7 @@ $app->post('/addcourse', function () use ($app) {
 
     $c = new Course($app->db);
 
-    echo json_encode("AAAAA "));
+    echo json_encode("AAAAA ");
   }
   else{
     echo json_encode("F");
