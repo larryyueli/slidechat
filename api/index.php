@@ -63,12 +63,17 @@ $app->post('/logout', function () use ($app) {
   echo json_encode($response);
 });
 
-
 $app->post('/panel',function() use ($app){
   $body = $app->response->getBody();
   $request = json_decode($body);
 
-  echo json_encode(array("success" => true));
+  $datas = array(
+      "course" => array("AA"),
+      "materials" => array("Ad"),
+
+  );
+
+  echo json_encode($datas);
 });
 
 $app->post('/addcourse', function () use ($app) {
@@ -78,9 +83,9 @@ $app->post('/addcourse', function () use ($app) {
   $tokenKey = $request->tok->token;
 
   if($app->db){
-    $course = new Course($app->db, "a");
+    $course = new Course($app->db, $tokenKey);
 
-    echo $course->addCourse($request->courseN, $tokenKey);
+    echo $course->addCourse($request->courseN);
   }
   else{
     throw Exception("Something went wrong");

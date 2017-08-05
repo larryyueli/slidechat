@@ -65,7 +65,7 @@ class Account
       }
 
     }
-
+    
     function login($username, $password){
         return $this->saltGenerator($password);
     }
