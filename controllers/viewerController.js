@@ -1,15 +1,15 @@
 app.controller("viewerController", ['$scope', '$http', '$stateParams', '$sce', function ($scope, $http, $stateParams, $sce) {
-    
+
     var uid = $stateParams.uid;
-    
+
     $scope.pageadress = uid;
-    
+
 
     $scope.to_trusted = function(html_code) {
     return $sce.trustAsHtml(html_code);
     }
-    
-    
+
+
     /************* pdf stuff ********************/
     loadPdf();
     /************** end pdf stuff *******************/
@@ -31,7 +31,12 @@ app.controller("viewerController", ['$scope', '$http', '$stateParams', '$sce', f
             //console.log(progress);
         }
     }
-    $http.get('ajax/grabInfo.php?id=' + $stateParams.uid).success(function (data) {
+    var data = {
+      id: $stateParams.uid
+    }
+    console.log(data)
+    $http.post('api/index.php/viewer',data).success(function (data) {
+      console.log(data)
         loadPdf(data[0].filepath);
         $scope.s = data;
         $scope.downloadlink = data[0].filepath;
@@ -39,5 +44,5 @@ app.controller("viewerController", ['$scope', '$http', '$stateParams', '$sce', f
     }).error(function () {
         $scope.error = 1;
     });
-    
+
 }]);

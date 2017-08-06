@@ -175,15 +175,17 @@ try{
   pg_prepare($app->db, "add_material", "INSERT INTO material (filepath,filename,cui,cid,pagenumber) VALUES ($1,$2, $3, $4,$5)");
   $result = pg_execute($app->db, "add_material", array($path,$filename,$uid,$pid,0));
 
+  //
+    if($result){
+      echo "done";
+    }
+    else{
+      echo "failed";
+    }
+
 }catch(Exception $e){
   echo $e->getMessage();
-}//
-  // if($result){
-  //   echo "done";
-  // }
-  // else{
-  //   echo "failed";
-  // }
+}
 
 });
 
@@ -193,6 +195,25 @@ $app->post('/deletematerial', function () use ($app) {
   $request = json_decode($body);
 
   echo "delete material";
+
+});
+
+
+$app->post('/viewer', function () use ($app) {
+  $body = $app->request->getBody();
+  $request = json_decode($body);
+
+  pg_prepare($app->db, "viewer_q", "SELECT filepath,filename FROM material WHERE cui=$1");
+  $result = pg_execute($app->db, "viewer_q", array($request->id));
+
+  if($result){
+    $row = pg_fetch_all($result);
+    echo json_encode($row);
+  }
+  else{
+    throw ErrorException("something went wrong");
+  }
+
 
 });
 
