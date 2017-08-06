@@ -41,7 +41,7 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
 
         //Table 1 get links of courses
         $http.post('api/index.php/panel', token).success(function (response) {
-           console.log(response);
+           //console.log(response);
 
             if (response != "empty") {
                 $scope.nolinks = 0;
@@ -55,8 +55,6 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
         });
 
     };
-
-
 
     $scope.switchBool = function (param) {
         if (param == "showFailureAlert") {
@@ -128,7 +126,7 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
 
          var request = $http({
             method: 'POST',
-            url: 'ajax/upload.php',
+            url: 'api/index.php/uploadfile',
             data: fd,
             transformRequest:angular.identity,
             headers:{'Content-Type': undefined}
@@ -140,7 +138,6 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
              var files = document.getElementById('exampleInputFile').files[0];
               //console.log(response);
 
-
                var bab = {
                  courseName: $scope.UploadInfo.courseName,
                  fileName: files.name,
@@ -148,14 +145,13 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
                    pid: $scope.pid
              }
 
-             $http.post('ajax/updatecourseTalbeinDb.php', bab).success(function(response){
-console.log(response);
-                 console.log(response);
+             $http.post('api/index.php/addmaterial', bab).success(function(response){
+               console.log(response);
                  $scope.showSuccessAlert = 1;
                  $scope.successTextAlert = "The course "+ bab.courseName + " was created successfully.";
 
              }).error(function(error){
-                 consoloe.log("error happened");
+                 //console.log("error happened");
              });
 
          },function(error){
@@ -213,8 +209,8 @@ console.log(response);
 
 
     $scope.deleteMaterial = function(id){
-        $http.post('ajax/deleteMaterial.php', id).success(function(response){
-            if(response == true){
+        $http.post('api/index.php//deletematerial', id).success(function(response){
+            if(response['success'] == true){
                 reload();
             $scope.showSuccessAlert = 1;
             $scope.successTextAlert = "The item has been deleted successfully!";

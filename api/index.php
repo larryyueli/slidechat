@@ -128,4 +128,74 @@ $app->post('/deletecourse', function () use ($app) {
 
 });
 
+
+$app->post('/uploadfile', function () use ($app) {
+  $body = $app->request->getBody();
+  $request = json_decode($body);
+
+  // print_r($_FILES);
+  //
+  // if(!empty($_FILES)){
+  //
+  //     //check if the instructor has a folder
+  //     //print_r($_FILES);
+  //
+  //     //echo json_encode($_FILES);
+  //
+  //     $tempPath = $_FILES['file']['tmp_name'];
+  //
+  //     $uploadPath = "../slides/".$_FILES['file']['name'];
+  //
+  //     if(move_uploaded_file($tempPath, $uploadPath)){
+  //         echo "L";
+  //
+  //     }
+  //     else{
+  //         echo "Failed to upload!";
+  //     }
+  // }
+  // else{
+  //     echo "Error occured";
+  // }
+
+
+});
+
+$app->post('/addmaterial', function () use ($app) {
+  $body = $app->request->getBody();
+  $request = json_decode($body);
+
+   $pid = $request->pid;
+   $uid = $request->pid.uniqid()."*^!".uniqid();
+   $path = "slides/".$request->fileName;
+   $token = $request->userToken;
+   $filename = $request->fileName;
+
+try{
+  pg_prepare($app->db, "add_material", "INSERT INTO material (filepath,filename,cui,cid,pagenumber) VALUES ($1,$2, $3, $4,$5)");
+  $result = pg_execute($app->db, "add_material", array($path,$filename,$uid,$pid,0));
+
+}catch(Exception $e){
+  echo $e->getMessage();
+}//
+  // if($result){
+  //   echo "done";
+  // }
+  // else{
+  //   echo "failed";
+  // }
+
+});
+
+
+$app->post('/deletematerial', function () use ($app) {
+  $body = $app->request->getBody();
+  $request = json_decode($body);
+
+  echo "delete material";
+
+});
+
+
+
 $app->run();
