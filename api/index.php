@@ -64,16 +64,36 @@ $app->post('/logout', function () use ($app) {
 });
 
 $app->post('/panel',function() use ($app){
-  $body = $app->response->getBody();
+  $body = $app->request->getBody();
   $request = json_decode($body);
 
-  $datas = array(
-      "course" => array("AA"),
-      "materials" => array("Ad"),
+$course = new Course($app->db,$request->token);
+$uid = $course->userId();
 
+//courses
+$resultCourses = pg_query($app->db, "SELECT id,name FROM course WHERE instructor_id='$uid' ");
+ if($resultCourses){
+   $courses = pg_fetch_all($resultCourses);
+ }else{
+   echo "empty";
+ }
+
+// //material
+  $resultMaterial = pg_query($app->db, "SELECT * FROM material");
+  if($resultMaterial){
+    $material = pg_fetch_all($resultMaterial);
+  }
+  else{
+    echo "empty";
+  }
+
+  $datas = array(
+      "course" => $courses,
+      "materials" => $material,
   );
 
   echo json_encode($datas);
+
 });
 
 $app->post('/addcourse', function () use ($app) {
@@ -93,8 +113,19 @@ $app->post('/addcourse', function () use ($app) {
 
 });
 
+$app->post('/deletecourse', function () use ($app) {
+  $body = $app->request->getBody();
+  $request = json_decode($body);
 
+  $course = new Course($app->db, $request->tok);
 
+  if($course->deletecourse($request->link)){
+    echo json_encode(array("sucess" => true, "msg" => "course deleted"));
+  }
+  else{
+    echo json_encode(array("sucess" => false, "msg" => "Error"));
+  }
 
+});
 
 $app->run();

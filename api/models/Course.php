@@ -46,8 +46,15 @@ try{
      }
     }
 
-    function deleteCourse(){
-
+    function deleteCourse($id){
+      pg_prepare($this->db, "delete_course", "DELETE FROM course WHERE id = $1");
+      $result = pg_execute($this->db, "delete_course", array($id));
+      if($result){
+        return true;
+      }
+      else{
+        return false;
+      }
     }
 
     function updateCourse(){

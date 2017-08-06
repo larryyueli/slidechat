@@ -36,10 +36,13 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
     /////////////////////////////////////////////////////////////////////
 
     reload();
+
     function reload() {
+
         //Table 1 get links of courses
         $http.post('api/index.php/panel', token).success(function (response) {
-          //  console.log(response);
+           console.log(response);
+
             if (response != "empty") {
                 $scope.nolinks = 0;
                 $scope.showlinks = 1;
@@ -49,7 +52,6 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
                 $scope.nolinks = 1;
                 $scope.showlinks = 0;
             }
-            //  console.log(JSON.stringify(response));
         });
 
     };
@@ -183,7 +185,7 @@ console.log(response);
                 courseN: $scope.courseN,
                 tok: token
             }
-            console.log(d)
+            console.log(data)
             $http.post('api/index.php/addcourse', data).success(function (response) {
                 location.reload();
                 console.log(response)
@@ -193,8 +195,14 @@ console.log(response);
         }
 
     $scope.deleteCourse = function(link){
-        $http.post('ajax/deleteCourse.php', link).success(function(response){
-            if(response == true){
+      var data = {
+        tok: token['token'],
+        link : link
+      }
+        $http.post('api/index.php/deletecourse', data).success(function(response){
+          console.log(data);
+          console.log(response);
+            if(response['sucess'] == true){
                 $scope.showMaterial = 0;
                 reload();
             $scope.showSuccessAlert = 1;

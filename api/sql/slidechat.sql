@@ -27,7 +27,7 @@ DROP TABLE IF EXISTS course CASCADE;
 CREATE TABLE course (
 id serial NOT NULL,
   name text NOT NULL,
-  instructor_id text NOT NULL
+  instructor_id INT NOT NULL
 );
 
 DROP TABLE IF EXISTS material CASCADE;
