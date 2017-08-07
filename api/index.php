@@ -36,6 +36,7 @@ $app->post('/login', function () use ($app) {
   if ($request == null) { // if json_decode returned null, it was not able to decode input string
       $response = array('success' => false, 'msg' => 'Request body not valid JSON.');
   } else {
+
       $account = new Account($app->db, $request->email, $request->password);
       $validation = $account->validate();
 
