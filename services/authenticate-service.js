@@ -4,13 +4,12 @@ app.service('AuthenticationService', ["$http", "$state", function ($http, $state
         var data = {
             token: token
         };
-        $http.post("ajax/checkToken.php", data).success(function (response) {
+        $http.post("api/index.php/checktoken", data).success(function (response) {
             if (response === "unauthorized") {
                 console.log("Logged out");
                 $state.go("login")
             }
             else {
-                //console.log("Logged In");
                 return response;
             }
         }).error(function (error) {

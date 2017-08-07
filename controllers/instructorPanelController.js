@@ -10,7 +10,7 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
     else {
         token = "-";
     }
-    //AuthenticationService.checkToken(token);
+    AuthenticationService.checkToken(token);
 
 
     /////////////////////////////////////////////////////////////////////
