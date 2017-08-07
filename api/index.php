@@ -29,6 +29,25 @@ $app->post('/checktoken', function () use ($app) {
 
 });
 
+$app->post('/checkForAdmin', function () use ($app) {
+  $body = $app->request->getBody();
+  $request = json_decode($body);
+
+   $token = $request->token;
+   pg_prepare($app->db, 'checkadmin', 'SELECT accounttype FROM accounts WHERE token=$1');
+
+   $result = pg_execute($app->db, 'checkadmin', array($token));
+
+if ($result) {
+    $row = pg_fetch_array($result);
+
+    echo $row['accounttype'];
+} else {
+    echo 'Error';
+}
+
+});
+
 $app->post('/login', function () use ($app) {
   $body = $app->request->getBody();
   $request = json_decode($body);
@@ -36,7 +55,6 @@ $app->post('/login', function () use ($app) {
   if ($request == null) { // if json_decode returned null, it was not able to decode input string
       $response = array('success' => false, 'msg' => 'Request body not valid JSON.');
   } else {
-
       $account = new Account($app->db, $request->email, $request->password);
       $validation = $account->validate();
 

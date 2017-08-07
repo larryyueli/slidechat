@@ -11,28 +11,24 @@ app.controller("instructorPanelController", function($scope, $state, $http, Auth
   }
   AuthenticationService.checkToken(token);
 
-
-  /////////////////////////////////////////////////////////////////////
   //check if the user is an admin
-  // $scope.AdminLoggedIn = checkForAdminLogin(token);
-  //
-  // function checkForAdminLogin(tok){
-  //     var result = 0;
-  //     $http.post('ajax/checkForAdmin.php', tok).success(function(response){
-  //
-  //         if(parseInt(response) == 1){
-  //             $scope.AdminLoggedIn = response;
-  //         };
-  //
-  //
-  //     }).error(function(error){
-  //
-  //     console.log(error);
-  //     });
-  //
-  // }
-  //
-  /////////////////////////////////////////////////////////////////////
+  $scope.AdminLoggedIn = checkForAdminLogin(token);
+
+  function checkForAdminLogin(tok) {
+    var result = 0;
+    $http.post('api/index.php/checkForAdmin', tok).success(function(response) {
+
+      if (parseInt(response) == 1) {
+        console.log("Admin logged in")
+        $scope.AdminLoggedIn = response;
+      };
+
+    }).error(function(error) {
+
+      console.log(error);
+    });
+
+  }
 
   reload();
 
