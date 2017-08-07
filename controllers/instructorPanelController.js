@@ -134,7 +134,7 @@ app.controller("instructorPanelController", function($scope, $state, $http, Auth
       $scope.isProcessing = false;
       console.log(response);
       var files = document.getElementById('exampleInputFile').files[0];
-      //console.log(response);
+      console.log(response);
 
       var bab = {
         courseName: $scope.UploadInfo.courseName,

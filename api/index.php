@@ -58,23 +58,6 @@ $app->post('/logout', function () use ($app) {
       $response = array('success' => false, 'msg' => 'Request body not valid JSON.');
   } else {
       $response = array('success' => true);
-      // $account = new Account($app->db);
-      // $account->populate($request);
-      // $validation = $account->validate();
-      //
-      // if ($validation != "OK") {
-      //     $response = array("success" => false, "msg" => $validation);
-      // } else {
-      //     if (!$account->exists()) {
-      //         if ($account->insert()) {
-      //             $response = array("success" => true, "token" => $account->token, "msg" => "OK");
-      //         } else {
-      //             $response = array("success" => false, "msg" => "Unable to communicate with database, please try again later.");
-      //         }
-      //     } else {
-      //         $response = array("success" => false, "msg" => "Account with this email already exists.");
-      //     }
-      // }
   }
 
   echo json_encode($response);
@@ -146,30 +129,24 @@ $app->post('/uploadfile', function () use ($app) {
   $body = $app->request->getBody();
   $request = json_decode($body);
 
-  // print_r($_FILES);
-  //
-  // if(!empty($_FILES)){
-  //
-  //     //check if the instructor has a folder
-  //     //print_r($_FILES);
-  //
-  //     //echo json_encode($_FILES);
-  //
-  //     $tempPath = $_FILES['file']['tmp_name'];
-  //
-  //     $uploadPath = "../slides/".$_FILES['file']['name'];
-  //
-  //     if(move_uploaded_file($tempPath, $uploadPath)){
-  //         echo "L";
-  //
-  //     }
-  //     else{
-  //         echo "Failed to upload!";
-  //     }
-  // }
-  // else{
-  //     echo "Error occured";
-  // }
+try {
+    if (!empty($_FILES)) {
+        echo 'filed exists';
+
+        $tempPath = $_FILES['file']['tmp_name'];
+        $uploadPath = '../slides/'.$_FILES['file']['name'];
+
+        if (move_uploaded_file($tempPath, $uploadPath)) {
+            echo 'L';
+        } else {
+            echo 'Failed to upload!';
+        }
+    } else {
+        echo 'Error occured';
+    }
+} catch (Exception $e) {
+    echo $e->getMessage();
+}
 
 });
 
