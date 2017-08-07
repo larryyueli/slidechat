@@ -29,6 +29,25 @@ $app->post('/checktoken', function () use ($app) {
 
 });
 
+$app->post('/checkForAdmin', function () use ($app) {
+  $body = $app->request->getBody();
+  $request = json_decode($body);
+
+   $token = $request->token;
+   pg_prepare($app->db, 'checkadmin', 'SELECT accounttype FROM accounts WHERE token=$1');
+
+   $result = pg_execute($app->db, 'checkadmin', array($token));
+
+if ($result) {
+    $row = pg_fetch_array($result);
+
+    echo $row['accounttype'];
+} else {
+    echo 'Error';
+}
+
+});
+
 $app->post('/login', function () use ($app) {
   $body = $app->request->getBody();
   $request = json_decode($body);
@@ -36,7 +55,6 @@ $app->post('/login', function () use ($app) {
   if ($request == null) { // if json_decode returned null, it was not able to decode input string
       $response = array('success' => false, 'msg' => 'Request body not valid JSON.');
   } else {
-
       $account = new Account($app->db, $request->email, $request->password);
       $validation = $account->validate();
 
@@ -71,7 +89,6 @@ $app->post('/panel', function () use ($app) {
 $course = new Course($app->db, $request->token);
 $uid = $course->userId();
 
-//courses
 $resultCourses = pg_query($app->db, "SELECT id,name FROM course WHERE instructor_id='$uid' ");
  if ($resultCourses) {
      $courses = pg_fetch_all($resultCourses);
@@ -79,7 +96,6 @@ $resultCourses = pg_query($app->db, "SELECT id,name FROM course WHERE instructor
      echo 'empty';
  }
 
-// //material
   $resultMaterial = pg_query($app->db, 'SELECT * FROM material');
   if ($resultMaterial) {
       $material = pg_fetch_all($resultMaterial);
@@ -218,20 +234,20 @@ $date = date('F j, Y, g:i a');
 try {
     pg_prepare($app->db, 'pans', 'INSERT INTO questions (uid,question,writer,date,pagenumber) VALUES ($1, $2, $3, $4, $5)');
     $result = pg_execute($app->db, 'pans', array($request->tok, $request->question, $request->name, $date, $request->pagenum));
-//
-if ($result) {
-    echo 'question added';
-} else {
-    echo 'something went wrong';
-}
-//
-pg_prepare($app->db, 'A', 'SELECT numquestions FROM material WHERE cui=$1');
+
+    if ($result) {
+        echo 'question added';
+    } else {
+        echo 'something went wrong';
+    }
+
+    pg_prepare($app->db, 'A', 'SELECT numquestions FROM material WHERE cui=$1');
     $r = pg_execute($app->db, 'A', $request->tok);
-//
-$get = pg_fetch_all($r);
+
+    $get = pg_fetch_all($r);
     $num = intval($get[0]['numquestions']);
-//
-$newnum = $num + 1;
+
+    $newnum = $num + 1;
     pg_prepare($app->db, 'update_nq', 'UPDATE material SET numquestions =$1  WHERE cui = $2');
     $re = pg_execute($app->db, 'update_nq', arrary($newnum, $request->tok));
 } catch (Exception $e) {
