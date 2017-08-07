@@ -189,15 +189,22 @@ try{
 
 });
 
-
 $app->post('/deletematerial', function () use ($app) {
   $body = $app->request->getBody();
   $request = json_decode($body);
 
-  echo "delete material";
+  pg_prepare($app->db,"delete_id","DELETE FROM material WHERE id = $1");
+  $result = pg_execute($app->db, "delete_id", array($request->did));
+
+  if($result){
+    echo json_encode(array("sucess" => true, "msg" => "item deleted"));
+  }
+  else{
+    echo json_encode(array("sucess" => false, "msg" => "something went wrong"));
+
+  }
 
 });
-
 
 $app->post('/viewer', function () use ($app) {
   $body = $app->request->getBody();

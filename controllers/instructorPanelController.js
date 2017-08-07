@@ -210,8 +210,11 @@ app.controller("instructorPanelController", function ($scope, $state, $http, Aut
 
     $scope.deleteMaterial = function(id){
       console.log("delete material")
-        $http.post('api/index.php//deletematerial', id).success(function(response){
-          console.log("AAA")
+      var data = {
+        did : id
+      }
+        $http.post('api/index.php/deletematerial', data).success(function(response){
+          console.log(response)
             if(response['success'] == true){
                 reload();
             $scope.showSuccessAlert = 1;
