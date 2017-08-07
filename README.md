@@ -1,16 +1,3 @@
 #Slidechat Application
-This is the world's best application. :)
-
-#Supervisor
-- Larry Yueli Zhang
-
-#Developers
-- Arjun Dhiman
-
-#Languages used:
-- PHP
-- JavaScript
-- Bootstrap (HTML5, CSS3)
-- JQuery
-- Postgres
-- AngularJs
+An online platform to actively communicate with peers and provide
+instructors with useful information about material taught or being taught. 
