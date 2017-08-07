@@ -70,8 +70,4 @@ class Account
     {
         return $this->saltGenerator($password);
     }
-
-    public function checkToken($token)
-    {
-    }
 }

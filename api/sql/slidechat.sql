@@ -12,7 +12,6 @@ INSERT INTO accounts (id, email, password, token, accounttype, postingToken) VAL
 (1, 'test@test.com', '7c4a8d09ca3762af61e59520943dc26494f8941b', 'test@test.com | 580e2db6b34c9580e2db6b34e5580e2db6b350a', 1, 'p1');
 
 
-
 DROP TABLE IF EXISTS answers CASCADE;
 CREATE TABLE answers (
 id serial NOT NULL,

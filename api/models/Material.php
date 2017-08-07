@@ -1,4 +1,5 @@
 <?php
-class Material{
+
+class Material
+{
 }
-?>
