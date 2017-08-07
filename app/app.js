@@ -6,4 +6,4 @@
 */
 
 //Init of the application
-var app = angular.module("slidechat", ['ui.router', 'pdf','ngSanitize']);
+var app = angular.module("slidechat", ['ui.router', 'pdf', 'ngSanitize']);

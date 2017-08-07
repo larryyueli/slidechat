@@ -1,13 +1,5 @@
 <?php
 
-
-class Viewer{
-
-
-
-  
+class Viewer
+{
 }
-
-
-
- ?>

@@ -8,11 +8,6 @@ id serial NOT NULL,
   postingToken text NOT NULL
 );
 
-INSERT INTO accounts (id, email, password, token, accounttype, postingToken) VALUES
-(1, 'test@test.com', '7c4a8d09ca3762af61e59520943dc26494f8941b', 'test@test.com | 580e2db6b34c9580e2db6b34e5580e2db6b350a', 1, 'p1');
-
-
-
 DROP TABLE IF EXISTS answers CASCADE;
 CREATE TABLE answers (
 id serial NOT NULL,
@@ -27,7 +22,7 @@ DROP TABLE IF EXISTS course CASCADE;
 CREATE TABLE course (
 id serial NOT NULL,
   name text NOT NULL,
-  instructor_id integer NOT NULL
+  instructor_id INT NOT NULL
 );
 
 DROP TABLE IF EXISTS material CASCADE;
@@ -48,6 +43,14 @@ id serial NOT NULL,
   question text,
   writer text,
   date text NOT NULL,
-  numanswers integer NOT NULL,
+  numanswers integer NOT NULL DEFAULT '0',
   pagenumber integer NOT NULL
 );
+
+
+INSERT INTO accounts (id, email, password, token, accounttype, postingToken) VALUES
+(1, 'test@test.com', '7c4a8d09ca3762af61e59520943dc26494f8941b', 'test@test.com | 580e2db6b34c9580e2db6b34e5580e2db6b350a', 1, 'p1');
+
+
+INSERT INTO material (filepath,filename,cui,cid,pagenumber) VALUES
+('slides/test.pdf', 'test.pdf', 'test', 9991, '0');

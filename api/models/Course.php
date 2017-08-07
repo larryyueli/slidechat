@@ -1,25 +1,59 @@
 <?php
 
-class Course{
+class Course
+{
+    private $db;
+    private $token;
 
-  private $db;
+    public function __construct($dbinstance, $token)
+    {
+        $this->db = $dbinstance;
+        $this->token = $token;
+    }
 
-  function __construct($dbinstance){
-    $this->$db = $dbinstance;
-  }
+    public function userId()
+    {
+        pg_prepare($this->db, 'get_id', 'SELECT * FROM accounts WHERE token = $1');
+        $result = pg_execute($this->db, 'get_id', array($this->token));
 
-  function addCourse($courseName, $token){
-  //  pg_prepare($this->db, "q1", 'SELECT id FROM accounts WHERE token=$1');
-    //$result = pg_execute($this->db, "q1", array($this->token));
+        if ($result) {
+            $row = pg_fetch_array($result);
 
-    //$row = pg_fetch_assoc($result);
+            return $row['id'];
+        } else {
+            throw ErrorException('Something went wrong');
+        }
+    }
 
-    return "AS";
+    public function addCourse($courseName)
+    {
+        try {
+            pg_prepare($this->db, 'add_course', 'INSERT INTO course(name, instructor_id) VALUES($1,$2)');
 
-  }
+            $result = pg_execute($this->db, 'add_course', array($courseName, $this->userId()));
 
+            if ($result) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+    }
 
+    public function deleteCourse($id)
+    {
+        pg_prepare($this->db, 'delete_course', 'DELETE FROM course WHERE id = $1');
+        $result = pg_execute($this->db, 'delete_course', array($id));
+        if ($result) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function updateCourse()
+    {
+    }
 }
-
-
- ?>
