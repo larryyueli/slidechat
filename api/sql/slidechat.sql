@@ -47,6 +47,6 @@ id serial NOT NULL,
   question text,
   writer text,
   date text NOT NULL,
-  numanswers integer NOT NULL,
+  numanswers integer NOT NULL DEFAULT '0',
   pagenumber integer NOT NULL
 );

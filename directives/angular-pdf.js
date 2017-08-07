@@ -64,33 +64,38 @@ All modifications are free to use.
         PDFJS.disableWorker = true;
         scope.pageNum = pageToDisplay;
 
-
         /*
-        
-           create a module to get rid of this multi call for 
+
+           create a module to get rid of this multi call for
            data.
-        
+
         */
             scope.getQuestions = function (addr,pageNumberToShow){
 
-                
+              var data = {
+                 id: addr,
+                 pagenumber: pageNumberToShow
+              }
                 //get data from db for questions,
                 // make a class to deal with this instead
-    $http.get("ajax/getquestions.php?id="+addr+"&pnum="+pageNumberToShow).success(function(response){
-        
+    $http.post("api/index.php/getquestions",data).success(function(response){
+
+
+      console.log(response)
+
         scope.questions = response.questions;
         scope.answers = response.answers;
-    
-       
+
+
         //error call this will show error if it happens
     }).error(function(error){
-      
+
         console.log("error:" + erorr)
     });
     };
-          
+
       scope.postQuestion = function(a,b){
-                   
+
             var username = "";
             if (a == undefined) {
                 username = "anonymous";
@@ -99,37 +104,38 @@ All modifications are free to use.
                 username = a;
             }
             var data = {
-                name: username
-                , question: b
-                , tok: scope.pageadress
-                , pagenum: scope.pageToDisplay
-        
+                name: username,
+                question: b,
+                tok: scope.pageadress,
+                pagenum: scope.pageToDisplay
+
             }
-            $http.post("ajax/addquestion.php", data).success(function (response) {
-                console.log("Question Added.");
-                
+            $http.post("api/index.php/addquestion", data).success(function (response) {
+              console.log(response)
+                //console.log("Question Added.");
+
             }).error(function (error) {
                 console.log("Something went wrong");
             });
-      
+
       }
-          
-      
+
+
        scope.postAnswer = function (answer, id) {
         var data = {
-            answer: answer
-            , unqiueId: scope.pageadress
-            , id: id,
+            answer: answer,
+            unqiueId: scope.pageadress,
+            id: id,
             slideid: scope.pageToDisplay
         }
-        
-        $http.post('ajax/addAnswer.php', data).success(function (response) {
-            //console.log(response);
+
+        $http.post('api/index.php/addanswer', data).success(function (response) {
+            console.log(response);
             scope.getQuestions(scope.pageadress,scope.pageToDisplay);
-            //get all questions  
+            //get all questions
         });
     }
-          
+
         scope.renderPage = function(num) {
           if (renderTask) {
               renderTask._internalRenderTask.cancel();
@@ -164,9 +170,9 @@ All modifications are free to use.
                 console.log(reason);
             });
           });
-            
-            // add class instance here to get rid of multi call problem 
-            // during traficc load 
+
+            // add class instance here to get rid of multi call problem
+            // during traficc load
              //get page questions
           scope.getQuestions(scope.pageadress,scope.pageToDisplay);
         };
@@ -190,9 +196,9 @@ All modifications are free to use.
           //get page questions
           scope.getQuestions(scope.pageadress,scope.pageToDisplay);
         };
-          
+
         scope.goTo = function(pageNumber){
-          
+
             scope.pageNum = parseInt(pageNumber);
         }
 
@@ -215,7 +221,7 @@ All modifications are free to use.
           scope.renderPage(scope.pageToDisplay);
           return scale;
         };
-     
+
         scope.fit = function() {
           pageFit = true;
           scope.renderPage(scope.pageToDisplay);
@@ -279,7 +285,7 @@ All modifications are free to use.
             );
           }
         }
-        
+
         scope.$watch('pageNum', function(newVal) {
           scope.pageToDisplay = parseInt(newVal);
           if (pdfDoc !== null) {

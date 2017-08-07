@@ -229,4 +229,99 @@ $app->post('/viewer', function () use ($app) {
 
 });
 
+$app->post('/addquestion', function () use ($app) {
+  $body = $app->request->getBody();
+  $request = json_decode($body);
+
+  var_dump($request);
+
+$date = date('F j, Y, g:i a');
+
+try {
+    pg_prepare($app->db, 'pans', 'INSERT INTO questions (uid,question,writer,date,pagenumber) VALUES ($1, $2, $3, $4, $5)');
+    $result = pg_execute($app->db, 'pans', array($request->tok, $request->question, $request->name, $date, $request->pagenum));
+//
+if ($result) {
+    echo 'question added';
+} else {
+    echo 'something went wrong';
+}
+//
+pg_prepare($app->db, 'A', 'SELECT numquestions FROM material WHERE cui=$1');
+    $r = pg_execute($app->db, 'A', $request->tok);
+//
+$get = pg_fetch_all($r);
+    $num = intval($get[0]['numquestions']);
+//
+$newnum = $num + 1;
+    pg_prepare($app->db, 'update_nq', 'UPDATE material SET numquestions =$1  WHERE cui = $2');
+    $re = pg_execute($app->db, 'update_nq', arrary($newnum, $request->tok));
+} catch (Exception $e) {
+    echo $e->getMessage();
+}
+
+});
+
+$app->post('/getquestions', function () use ($app) {
+  $body = $app->request->getBody();
+  $request = json_decode($body);
+
+  pg_prepare($app->db, 'quests', 'SELECT id,question,writer,date,uid,numanswers FROM questions WHERE uid=$1 AND pagenumber=$2');
+  $result = pg_execute($app->db, 'quests', array($request->id, $request->pagenumber));
+
+  if ($result) {
+      $questions = pg_fetch_all($result);
+  } else {
+      echo 'error';
+  }
+
+  if (pg_num_rows($result) > 0) {
+
+    //make a call to db to get answer / question
+
+    pg_prepare($app->db, 'answers', 'SELECT * FROM answers WHERE uid=$1 AND pagenumber=$2');
+      $r = pg_execute($app->db, 'answers', array($request->id, $request->pagenumber));
+
+      $ans = pg_fetch_all($r);
+
+      $output = array('questions' => $questions,
+                   'answers' => $ans, );
+
+    //Output the json formated material back to client
+    echo json_encode($output);
+  }
+});
+
+$app->post('/addanswer', function () use ($app) {
+  $body = $app->request->getBody();
+  $request = json_decode($body);
+
+//  var_dump($request);
+  $date = date('F j, Y, g:i a');
+
+  try {
+      pg_prepare($app->db, 'aq', 'INSERT INTO answers (qid,answer,date,uid,pagenumber) VALUES ($1, $2, $3, $4, $5)');
+      $result = pg_execute($app->db, 'aq', array($request->id, $request->answer, $date, $request->unqiueId, $request->slideid));
+
+      if ($result) {
+          echo 'good';
+      } else {
+          echo 'failed';
+      }
+
+      pg_prepare($app->db, 'ea', 'SELECT numanswers FROM questions WHERE id=$1');
+      $r = pg_execute($app->db, 'ea', array($request->id));
+      $get = pg_fetch_all($r);
+
+      $num = intval($get[0]['numanswers']);
+
+      $newnum = $num + 1;
+      pg_prepare($app->db, 'da', 'UPDATE questions SET numanswers = $1  WHERE id = $2');
+      $ae = pg_execute($app->db, 'da', array($newnum, $request->id));
+  } catch (Exception $e) {
+      echo $e->getMessage();
+  }
+
+});
+
 $app->run();
