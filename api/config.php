@@ -1,5 +1,4 @@
 <?php
-
 date_default_timezone_set('America/Toronto');
 // enter database credentials here
 try {

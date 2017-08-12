@@ -1,7 +1,4 @@
-api/config.php
-
 .DS_STORE
-
 .idea
-
 slides/*
+api/config.php
