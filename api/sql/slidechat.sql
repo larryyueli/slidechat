@@ -53,4 +53,4 @@ INSERT INTO accounts (id, email, password, token, accounttype, postingToken) VAL
 
 
 INSERT INTO material (filepath,filename,cui,cid,pagenumber) VALUES
-('slides/test.pdf', 'test.pdf', 'test', 9991, '0');
+('assets/testpdf/test.pdf', 'test.pdf', 'test', 9991, '0');
