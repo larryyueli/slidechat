@@ -1,71 +1,76 @@
 <div class="container" ng-init="gpage(pageNum)">
-    <div ng-if="error == 1">
-        <div ng-include="'templates/errors/404.html'"></div>
-    </div>
+  <div ng-if="error == 1">
+    <div ng-include="'templates/errors/404.html'"></div>
+  </div>
   <div class="row" ng-if="error != 1">
-        <div class="col-md-7">
+    <div class="col-md-7">
 
-            <div id="pdfviewer" style="margin-top:32px;">
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        <h2>{{filena}}</h2>
-                        <a style="float:right;" href="{{downloadlink}}" download="{{downloadlink}}" class="btn btn-primary"><span class="glyphicon glyphicon-download-alt"></span> Download Slides</a>
-                        <ng-pdf template-url="templates/viewer/pdf.html" canvasid="pdf" scale="page-fit" page='1'></ng-pdf>
+      <div id="pdfviewer" style="margin-top:32px;">
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <h2>{{filena}}</h2>
+            <a style="float:right;" href="{{downloadlink}}" download="{{downloadlink}}" class="btn btn-primary"><span class="glyphicon glyphicon-download-alt"></span> Download Slides</a>
+            <ng-pdf template-url="templates/viewer/pdf.html" canvasid="pdf" scale="page-fit" page='1'></ng-pdf>
 
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
-
-
-        <div class="col-md-5">
-            <form style="padding: 10px; border: black 4px solid; margin-top:30px;" ng-controller="viewerController"> Name:
-                <input type="text" placeholder="(optional) Enter name" ng-model="pname" />
-                <br/> Question:
-                <textarea ng-model="quest"></textarea>
-
-                <input type="submit" value="submit"  ng-click="postQuestion(pname,quest)" />
-            </form>
-           <br/>
-
-            <div id="comments">
-
-                <div id="qs" ng-repeat="q in questions">
-
-                    <div class="detailBox">
-                        <div class="titleBox">
-                            <label><img src="assets/img/question.png" width='30px' height='30px'/> &nbsp;{{q.question}}</label><span class="badge" style="float:right;">{{q.numanswers}}</span> <span class="glyphicon glyphicon-chevron-down"></span>
-
-                        </div>
-                        <div class="actionBox">
-                            <ul class="commentList">
-                                <li>
-                                    <div class="commenterImage"></div>
-                                    <div class="commentText">
-                                        <p style="margin-bottom:6px" class="alert alert-success" ng-repeat="a in answers" ng-if="a.qid == q.id">
-
-
-                                            {{a.answer}}
-                                        <br/>
-                                            {{a.date}}
-
-                                        </p>
-
-                                    </div>
-                                </li>
-                            </ul>
-
-                            <form class="form-inline" role="form">
-                                <div class="form-group">
-                                    <input class="form-control" type="text" ng-model="answer" placeholder="Your Answer" /></div>
-                                <div class="form-group">
-                                    <button class="btn btn-default" ng-click="postAnswer(answer,q.id)">Post</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+
+
+    <div class="col-md-5">
+      <div class="panel panel-default" style="margin-top:30px;">
+  <div class="panel-body">
+
+    <form ng-controller="viewerController">
+      <input  class="form-control" type="text" placeholder="(optional) Enter name" ng-model="pname" />
+      <br/>
+      <textarea class="form-control" ng-model="quest" placeholder="Enter Question Here"></textarea>
+      <br />
+      <input type="submit" value="Ask!" ng-click="postQuestion(pname,quest)" class="btn btn-primary" />
+    </form>
+  </div>
+</div>
+
+      <br/>
+
+      <div id="comments">
+
+        <div id="qs" ng-repeat="q in questions">
+
+          <div class="detailBox">
+            <div class="titleBox">
+              <label><img src="assets/img/question.png" width='30px' height='30px'/> &nbsp;{{q.question}}</label><span class="badge" style="float:right;">{{q.numanswers}}</span> <span class="glyphicon glyphicon-chevron-down"></span>
+
+            </div>
+            <div class="actionBox">
+              <ul class="commentList">
+                <li>
+                  <div class="commenterImage"></div>
+                  <div class="commentText">
+                    <p style="margin-bottom:6px" class="alert alert-success" ng-repeat="a in answers" ng-if="a.qid == q.id">
+
+
+                      {{a.answer}}
+                      <br/> {{a.date}}
+
+                    </p>
+
+                  </div>
+                </li>
+              </ul>
+
+              <form class="form-inline" role="form">
+                <div class="form-group">
+                  <input class="form-control" type="text" ng-model="answer" placeholder="Your Answer" /></div>
+                <div class="form-group">
+                  <button class="btn btn-default" ng-click="postAnswer(answer,q.id)">Post</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

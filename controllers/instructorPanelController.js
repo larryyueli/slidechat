@@ -141,7 +141,7 @@ app.controller("instructorPanelController", function($scope, $state, $http, Auth
 
       $http.post('api/index.php/addmaterial', bab).success(function(response) {
         console.log(response);
-        $scope.showSuccessAlert = 1;
+        $scope.showSMaterialAlert = 1
         $scope.successTextAlert = "The course " + bab.courseName + " was created successfully.";
 
       }).error(function(error) {
