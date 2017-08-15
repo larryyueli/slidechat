@@ -201,7 +201,6 @@ app.controller("instructorPanelController", function($scope, $state, $http, Auth
     });
   }
 
-
   $scope.deleteMaterial = function(id) {
     console.log("delete material")
     var data = {
