@@ -8,11 +8,5 @@ class OutputTest extends TestCase
         $this->expectOutputString('foo');
         print 'foo';
     }
-
-    public function testExpectBarActualBaz()
-    {
-        $this->expectOutputString('bar');
-        print 'baz';
-    }
 }
 ?>

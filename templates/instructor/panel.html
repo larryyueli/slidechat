@@ -2,84 +2,81 @@
 
 </div>
 <div class="container">
-    <div class="row">
-        <div class="alert alert-danger" ng-show="showFailureAlert">
-            <button type="button" class="close" data-ng-click="switchBool('showFailureAlert')">×</button> <strong>Warning!</strong> {{FailureTextAlert}} </div>
-        <div class="alert alert-success" ng-show="showSuccessAlert">
-            <button type="button" class="close" data-ng-click="switchBool('showSuccessAlert')">×</button> <strong>Done!</strong> {{successTextAlert}} </div>
-        <div class="col-md-20">
-            <div class="row">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Course Management</h3> </div>
-                    <div class="panel-body">
-                        <!-- Button trigger modal -->
-                        <button type="button" class="btn btn-primary" ng-click="openAddCourseForm()">Add Course</button>
-                        <button type="button" style="float:right;" class="btn btn-default pull-right" ng-click="logMeOut()">Log Out</button>
-                        <br/>
-                        <br/>
-                        <form ng-show='addcourse'> Course Name:
-                            <input type="text" ng-model="courseN" />
-                            <input type='submit' name="submit" class="btn btn-primary" value="Add course" ng-click="addCourse()"/> <img src="assets/img/close.png" ng-click="addcourse = 0"> </form>
-                        
-                        
-                       
-                        <ul ng-repeat="d in dat">
-                            <p ng-show='nolinks'>Currently no courses are created.</p>
-                            <li style="list-style-type: none;" ng-show='showlinks'> <img src="assets/img/course.png" width='30' height='30' /> <a ng-click="showMaterial = 1">{{d.name}}</a>
-                                <a ng-click="deleteCourse(d.id)"><img src="assets/img/delete.png" /></a>
-                            </li>
-                            
-    
-                            <div class="container" ng-show="showMaterial">
-                                <!-- Button trigger modal -->
-                                <br/>
-                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal"
-                                        ng-click="saveId(d.id)"> Add Material </button>
-                                
-                                <!-- Button trigger modal -->
-                                <br/>
-                                <h3 style="text-decoration:underline">List of Course Material</h3>
-                                <li style="list-style-type: none;" ng-repeat="m in mats" ng-if="m.cid == d.id ">
-                                    <img src="assets/img/slide.png" style="margin-right: 10px;"/><a href="#/viewer/{{m.cui}}">
+  <div class="row">
+    <div class="alert alert-danger" ng-show="showFailureAlert">
+      <button type="button" class="close" data-ng-click="switchBool('showFailureAlert')">×</button> <strong>Warning!</strong> {{FailureTextAlert}} </div>
+    <div class="alert alert-success" ng-show="showSuccessAlert">
+      <button type="button" class="close" data-ng-click="switchBool('showSuccessAlert')">×</button> <strong>Done!</strong> {{successTextAlert}} </div>
+    <div class="col-md-20">
+      <div class="row">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Course Management</h3> </div>
+          <div class="panel-body">
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-primary" ng-click="openAddCourseForm()">Add Course</button>
+            <button type="button" style="float:right;" class="btn btn-default pull-right" ng-click="logMeOut()">Log Out</button>
+            <br/>
+            <br/>
+            <form ng-show='addcourse'> Course Name:
+              <input type="text" ng-model="courseN" />
+              <input type='submit' name="submit" class="btn btn-primary" value="Add course" ng-click="addCourse()" /> <img src="assets/img/close.png" ng-click="addcourse = 0"> </form>
+
+
+
+            <ul ng-repeat="d in dat">
+              <p ng-show='nolinks'>Currently no courses are created.</p>
+              <li style="list-style-type: none;" ng-show='showlinks'> <img src="assets/img/course.png" width='30' height='30' /> <a ng-click="showMaterial = 1">{{d.name}}</a>
+                <a ng-click="deleteCourse(d.id)"><img src="assets/img/delete.png" /></a>
+              </li>
+
+
+              <div class="container" ng-show="showMaterial">
+                <!-- Button trigger modal -->
+                <br/>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal" ng-click="saveId(d.id)"> Add Material </button>
+
+                <!-- Button trigger modal -->
+                <br/>
+                <h3 style="text-decoration:underline">List of Course Material</h3>
+                <li style="list-style-type: none;" ng-repeat="m in mats" ng-if="m.cid == d.id ">
+                  <img src="assets/img/slide.png" style="margin-right: 10px;" /><a href="#/viewer/{{m.cui}}">
                                     {{m.filename}}</a> &nbsp; [#Questions: {{m.numquestions}} ] <a ng-click="deleteMaterial(m.id)"><img src="assets/img/delete.png" /></a>
-                                </li>
-                                
-                            </div>
-                        </ul>
-                    </div>
-                    
-                                             <!-- Modal -->
-       <div id="myModal" class="modal fade" role="dialog">
+                </li>
+
+              </div>
+            </ul>
+          </div>
+
+          <!-- Modal -->
+          <div id="myModal" class="modal fade" role="dialog">
             <div class="modal-dialog">
-                <!-- Modal content-->
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Add Course Material</h4> </div>
-                    <div class="modal-body">
-                        <div class="alert alert-danger" ng-show="showFailureAlert">
-                            <button type="button" class="close" data-ng-click="switchBool('showFailureAlert')">×</button> <strong>Warning!</strong> {{FailureTextAlert}} </div>
-                        <div class="alert alert-success" ng-show="showSuccessAlert">
-                            <button type="button" class="close" data-ng-click="switchBool('showSuccessAlert')">×</button> <strong>Done!</strong> {{successTextAlert}} </div>
-                        <form>
-                            File name: <input type="text" ng-model="filename"/>
-                            <br/>
-                            <label for="exampleInputFile">File input</label>
-                            <input type="file" id="exampleInputFile" ng-model="UploadInfo.fa" file-input="files" onchange="angular.element(this).scope().DocUpload(event)">
-                            <h5>What is beigning uploaded:</h5> Name: {{file.name}}
-                            <br/> Size: {{file.size/1024|number:2}}
-                            <br/> Type: {{file.type.slice(file.type.lastIndexOf('/') + 1)}}
-                            <hr/>
-                            <button type="submit" class="btn btn-default" ng-disabled="CreateButtonMode" ng-click="createCourse(  )">Create</button>
-                        </form>
-                    </div>
-                   </div>
-            </div>
-        </div>
-                      
+              <!-- Modal content-->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h4 class="modal-title">Add Course Material</h4> </div>
+                <div class="modal-body">
+                  <div class="alert alert-danger" ng-show="showFailureAlert">
+                    <button type="button" class="close">×</button> <strong>Warning!</strong></div>
+                  <div class="alert alert-success" ng-show="showSMaterialAlert">
+                    <button type="button" class="close">×</button> <strong>Done! material uploaded</strong></div>
+                  <form>
+                    <label for="exampleInputFile">File input</label>
+                    <input type="file" id="exampleInputFile" ng-model="UploadInfo.fa" file-input="files" onchange="angular.element(this).scope().DocUpload(event)">
+                    <h5>What is beigning uploaded:</h5> Name: {{file.name}}
+                    <br/> Size: {{file.size/1024|number:2}}
+                    <br/> Type: {{file.type.slice(file.type.lastIndexOf('/') + 1)}}
+                    <hr/>
+                    <button type="submit" class="btn btn-default" ng-disabled="CreateButtonMode" ng-click="createCourse()">Create</button>
+                  </form>
                 </div>
-                 
+              </div>
             </div>
+          </div>
+
         </div>
+
+      </div>
     </div>
+  </div>
