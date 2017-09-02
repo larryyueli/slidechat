@@ -208,11 +208,13 @@ app.controller("instructorPanelController", function($scope, $state, $http, Auth
     }
     $http.post('api/index.php/deletematerial', data).success(function(response) {
       console.log(response)
-      if (response['success'] == true) {
-        reload();
-        $scope.showSuccessAlert = 1;
-        $scope.successTextAlert = "The item has been deleted successfully!";
-      }
+      //if (response['success'] == true) {
+
+      console.log("Course deleted")
+      $scope.showSuccessAlert = 1;
+      $scope.successTextAlert = "The item has been deleted successfully!";
+      setInterval(location.reload(), 7000);
+      //}
     });
   }
 
@@ -230,7 +232,6 @@ app.controller("instructorPanelController", function($scope, $state, $http, Auth
       $scope.showlinks = 0;
     }
   });
-
 
   //Logout functionaility
   $scope.logMeOut = function() {
