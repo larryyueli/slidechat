@@ -6,7 +6,7 @@ instructors with useful information about material taught or being taught.
 ## Contact
 
 If you have a question, find a bug, need a feature, or want to contribute,
-please open a ticket on our github page
+please open a ticket on our github page.
 
 ## Credits
 
