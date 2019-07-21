@@ -1,17 +1,9 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
 
-import CommentArea from './CommentArea.js'
+import CommentArea from './CommentArea.js';
+import PDFViewer from './PDFViewer.js';
 
-class PDFViewer extends React.Component {
-
-    render() {
-        return (
-            <Box className="pdf-viewer" />
-        );
-    }
-}
 
 class MainContent extends React.Component {
 
