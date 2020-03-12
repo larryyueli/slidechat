@@ -3,6 +3,9 @@ import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import {Document, Page} from 'react-pdf';
+
+// Use Webpack to load the PDF, doesn't work currently, need to change webpack
+// configuration to work around it
 // import {Document, Page} from 'react-pdf/dist/entry.webpack';
 
 class PDFViewer extends React.Component {
