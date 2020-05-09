@@ -1,0 +1,70 @@
+$primary: rgb(69, 89, 180);
+
+body {
+    margin: 0;
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+.appbar {
+    position: static;
+    padding: 0.5em 3em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #FFFFFF;
+    background-color: $primary;
+    box-shadow: 0 3px 10px #AAAAAA;
+}
+
+.appbar-logo {
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+.appbar-item {
+    margin: 0 1rem;
+}
+
+.main {
+    margin: 1rem;
+    text-align: center;
+
+    button {
+        margin: 1rem;
+    }
+}
+
+.questions {
+    padding: 1rem;
+}
+
+.comments {
+    border-bottom: 1px solid #CCCCCC !important;
+}
+
+.MuiExpansionPanelDetails-root {
+    padding-top: 16px !important;
+    padding-bottom: 16px !important;
+}
+
+.send-message-bar {
+    display: flex;
+    padding: 0.5rem;
+    align-items: center;
+
+    .MuiTextField-root {
+        flex: 1;
+        margin-right: 0.5rem;
+
+        .MuiOutlinedInput-multiline {
+            padding: 6px;
+        }
+    }
+
+}

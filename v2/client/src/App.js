@@ -1,21 +1,18 @@
 import React from 'react';
-import './App.css';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
-import Banner from './Banner.js'
+import Appbar from './Appbar.js'
 import MainContent from './MainContent.js'
 
-class App extends React.Component {
-
-    render() {
-        return (
-            <React.Fragment>
-                <CssBaseline />
-                <Banner />
-                <MainContent />
-            </React.Fragment>
-        );
-    }
+function App() {
+    return (
+        <>
+            <CssBaseline />
+            <Appbar />
+            <MainContent />
+        </>
+    );
 }
+
 
 export default App;

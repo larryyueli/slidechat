@@ -1,61 +1,50 @@
 import React from 'react';
-import Box from '@material-ui/core/Box';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import Typography from '@material-ui/core/Typography';
+import axios from 'axios';
+import { Button, TextField, Typography, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails } from '@material-ui/core';
+
+import './App.scss';
 
 class CommentArea extends React.Component {
-    
-    render() {
-        return (
-            <Box>
-                <ExpansionPanel>
-                    <ExpansionPanelSummary>
-                        <Typography>
-                            What is the question?
-                        </Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
-                        <Typography>
-                            This is answer to this question. I'm sure it is working.
-                        </Typography>
-                    </ExpansionPanelDetails>
-                    <ExpansionPanelDetails>
-                        <Typography>
-                            Another answer.
-                        </Typography>
-                    </ExpansionPanelDetails>
-                </ExpansionPanel>
+	render() {
+		let questions = [];
+		for (let j = 0; j < this.props.questions.length; j++) {
+			let post = this.props.questions[j];
+			let comments = [];
+			comments.push(
+				<ExpansionPanelSummary className='comments'>
+					<Typography>
+						{post[0].content}
+					</Typography>
+				</ExpansionPanelSummary>);
+			for (let i = 1; i < post.length; i++) {
+				comments.push(
+					<ExpansionPanelDetails className='comments'>
+						<Typography>
+							{post[i].content}
+						</Typography>
+					</ExpansionPanelDetails>
+				)
+			}
+			comments.push(
+				<ExpansionPanelDetails class='send-message-bar'>
+					<TextField
+						variant='outlined'
+						id={`input-${j}`}
+						multiline
+						rowsMax="4"/>
+					<Button variant="contained" color="primary">Send</Button>
+				</ExpansionPanelDetails>
+			)
 
-                <ExpansionPanel>
-                <ExpansionPanelSummary>
-                    <Typography>
-                        Second question?
-                    </Typography>
-                </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
-                    <Typography>
-                        Another answer to the same question.
-                    </Typography>
-                </ExpansionPanelDetails>
-                </ExpansionPanel>
+			questions.push(<ExpansionPanel>{comments}</ExpansionPanel>);
+		}
 
-                <ExpansionPanel>
-                <ExpansionPanelSummary>
-                    <Typography>
-                        Three questions.
-                    </Typography>
-                </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
-                    <Typography>
-                        Another answer to the same question.
-                    </Typography>
-                </ExpansionPanelDetails>
-                </ExpansionPanel>
-            </Box>
-        );
-    }
+		return (
+			<div className='questions'>
+				{questions}
+			</div>
+		);
+	}
 }
 
 export default CommentArea;
