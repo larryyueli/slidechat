@@ -32,12 +32,27 @@ code {
 }
 
 .main {
-    margin: 1rem;
+    margin-top: 1rem;
+}
+
+@media (min-width: 768px) {
+    .main {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+    }
+}
+
+.slide-container {
     text-align: center;
 
     button {
         margin: 1rem;
     }
+}
+
+.slide {
+    min-width: 80%;
+    max-width: 100%;
 }
 
 .questions {
@@ -46,6 +61,20 @@ code {
 
 .comments {
     border-bottom: 1px solid #CCCCCC !important;
+
+    .author {
+        font-size: 1.2rem;
+        font-weight: 500;
+        overflow-wrap: anywhere;
+    }
+
+    .time {
+        margin-left: 0.5rem;
+        color: #CCCCCC;
+        overflow-wrap: anywhere;
+    }
+
+
 }
 
 .MuiExpansionPanelDetails-root {

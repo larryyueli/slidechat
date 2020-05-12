@@ -10,9 +10,9 @@ class Slides extends React.Component {
 		let prevBtnDisable = this.props.pageNum === 1;
 
 		return (
-			<div className="main">
+			<div className="slide-container">
 				<div>
-					<img src={this.props.pageImg} alt="slide" />
+					<img src={this.props.pageImg} alt="slide" className="slide"/>
 				</div>
 				<Button variant="contained" disabled={prevBtnDisable} onClick={this.props.prevPage}>PREV</Button>
 				<Button variant="contained" disabled={nextBtnDisable} onClick={this.props.nextPage}>NEXT</Button>
