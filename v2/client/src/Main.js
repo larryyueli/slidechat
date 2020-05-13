@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 
-import CommentArea from './CommentArea.js';
+import ChatArea from './ChatArea.js';
 import Slides from './Slides.js';
 
 
@@ -13,10 +13,13 @@ const dummyState = {
 	questions: [
 		[
 			{
+				title: 'A question'
+			},
+			{
 				author: 'name1',
 				content: 'question question question question question question question question question ',
 				time: '2000/01/01 00:00 AM',
-				likes: [],
+				likes: ['Ling'],
 				endorsements: [],
 			},
 			{
@@ -28,6 +31,9 @@ const dummyState = {
 			}
 		],
 		[
+			{
+				title: 'Another questionasdfasdfasdfasdfasdfasdasdfsadfasdf'
+			},
 			{
 				author: 'name2',
 				content: 'another question another question another question another question another question another question ',
@@ -82,7 +88,7 @@ class Main extends React.Component {
 					pageImg={this.state.pageImg}
 					nextPage={this.nextPage}
 					prevPage={this.prevPage} />
-				<CommentArea questions={this.state.questions} />
+				<ChatArea questions={this.state.questions} />
 			</div>
 		);
 	}

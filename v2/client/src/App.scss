@@ -1,99 +1,145 @@
 $primary: rgb(69, 89, 180);
 
 body {
-    margin: 0;
-    font-family: "Roboto", "Helvetica", "Arial", sans-serif, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+	margin: 0;
+	font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif, sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 code {
-    font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+		monospace;
 }
 
 .appbar {
-    position: static;
-    padding: 0.5em 3em;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: #FFFFFF;
-    background-color: $primary;
-    box-shadow: 0 3px 10px #AAAAAA;
+	position: static;
+	padding: 0.5em 3em;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	color: #ffffff;
+	background-color: $primary;
+	box-shadow: 0 3px 10px #aaaaaa;
 }
 
 .appbar-logo {
-    font-size: 1.5rem;
-    font-weight: 500;
+	font-size: 1.5rem;
+	font-weight: 500;
 }
 
 .appbar-item {
-    margin: 0 1rem;
+	margin: 0 1rem;
 }
 
 .main {
-    margin-top: 1rem;
+	margin-top: 1rem;
 }
 
 @media (min-width: 768px) {
-    .main {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-    }
+	.main {
+		display: grid;
+		grid-template-columns: 2fr 1fr;
+	}
 }
 
 .slide-container {
-    text-align: center;
+	text-align: center;
 
-    button {
-        margin: 1rem;
-    }
+	button {
+		margin: 1rem;
+	}
 }
 
 .slide {
-    min-width: 80%;
-    max-width: 100%;
+	min-width: 80%;
+	max-width: 100%;
 }
 
-.questions {
-    padding: 1rem;
+.chat-area {
+	padding: 1rem;
+	overflow: hidden;
+
+	.new-chat {
+		text-align: center;
+		margin-bottom: 1rem;
+	}
+
+	.new-chat-form {
+		margin-bottom: 1rem;
+
+		p {
+			margin: 0.3em 0;
+		}
+
+		.title {
+			font-size: 1.1rem;
+		}
+
+		button {
+			margin: 0.5rem 0.5rem;
+		}
+
+		.MuiTextField-root {
+			width: 100%;
+
+			.MuiOutlinedInput-input {
+				padding: 6px;
+			}
+			.MuiOutlinedInput-multiline {
+				padding: 6px;
+			}
+		}
+	}
+
+	.chat {
+		border-bottom: 1px solid #cccccc !important;
+
+		.title {
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+
+		.author {
+			font-size: 1.2rem;
+			font-weight: 500;
+			overflow-wrap: anywhere;
+		}
+
+		.time {
+			margin-left: 0.5rem;
+			color: #cccccc;
+		}
+
+		.like {
+			color: #cccccc;
+		}
+	}
+
+	.MuiExpansionPanelDetails-root {
+		padding-top: 16px !important;
+		padding-bottom: 16px !important;
+	}
+
+	.send-message-bar {
+		display: flex;
+		padding: 0.5rem;
+		align-items: center;
+
+		.MuiTextField-root {
+			flex: 1;
+			margin-right: 0.5rem;
+
+			.MuiOutlinedInput-multiline {
+				padding: 6px;
+			}
+		}
+	}
 }
 
-.comments {
-    border-bottom: 1px solid #CCCCCC !important;
-
-    .author {
-        font-size: 1.2rem;
-        font-weight: 500;
-        overflow-wrap: anywhere;
-    }
-
-    .time {
-        margin-left: 0.5rem;
-        color: #CCCCCC;
-        overflow-wrap: anywhere;
-    }
-
-
-}
-
-.MuiExpansionPanelDetails-root {
-    padding-top: 16px !important;
-    padding-bottom: 16px !important;
-}
-
-.send-message-bar {
-    display: flex;
-    padding: 0.5rem;
-    align-items: center;
-
-    .MuiTextField-root {
-        flex: 1;
-        margin-right: 0.5rem;
-
-        .MuiOutlinedInput-multiline {
-            padding: 6px;
-        }
-    }
-
+.overflow-test {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }

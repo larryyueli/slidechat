@@ -12,7 +12,7 @@ class AppBar extends React.Component {
                 </div>
                 <div>
                     <span className='appbar-item'>Notification</span>
-                    <span className='appbar-item'>Logout</span>
+                    <span className='appbar-item'>Profile</span>
                 </div>
             </div>
         );
