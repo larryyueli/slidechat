@@ -5,6 +5,8 @@ body {
 	font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif, sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+	letter-spacing: 0.00938em;
+	background-color: #fafafa;
 }
 
 code {
@@ -14,22 +16,23 @@ code {
 
 .appbar {
 	position: static;
-	padding: 0.5em 3em;
+	padding: 0.5rem 3rem;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 	color: #ffffff;
 	background-color: $primary;
 	box-shadow: 0 3px 10px #aaaaaa;
-}
 
-.appbar-logo {
-	font-size: 1.5rem;
-	font-weight: 500;
-}
+	.appbar-logo {
+		font-size: 1.5rem;
+		line-height: 2rem;
+		font-weight: 500;
+	}
 
-.appbar-item {
-	margin: 0 1rem;
+	.appbar-item {
+		margin: 0 1rem;
+	}
 }
 
 .main {
@@ -40,25 +43,33 @@ code {
 	.main {
 		display: grid;
 		grid-template-columns: 2fr 1fr;
+		grid-template-rows: auto;
+		height: calc(100vh - 4rem);
+		/* 2rem line height + 0.5rem padding * 2 + 1rem margin */
+	}
+
+	.chat-area {
+		overflow-y: scroll;
+		border-left: 1px solid #cccccc;
 	}
 }
 
 .slide-container {
 	text-align: center;
 
+	.slide {
+		min-width: 80%;
+		max-width: 100%;
+	}
+
 	button {
 		margin: 1rem;
 	}
 }
 
-.slide {
-	min-width: 80%;
-	max-width: 100%;
-}
-
 .chat-area {
 	padding: 1rem;
-	overflow: hidden;
+	overflow-x: hidden;
 
 	.new-chat {
 		text-align: center;
@@ -83,9 +94,7 @@ code {
 		.MuiTextField-root {
 			width: 100%;
 
-			.MuiOutlinedInput-input {
-				padding: 6px;
-			}
+			.MuiOutlinedInput-input,
 			.MuiOutlinedInput-multiline {
 				padding: 6px;
 			}
@@ -103,7 +112,7 @@ code {
 
 		.author {
 			font-size: 1.2rem;
-			font-weight: 500;
+			font-weight: 450;
 			overflow-wrap: anywhere;
 		}
 
@@ -139,6 +148,7 @@ code {
 }
 
 .overflow-test {
+	padding: 15px;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;

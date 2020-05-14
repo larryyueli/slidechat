@@ -34,14 +34,17 @@ class ChatArea extends React.Component {
 		// If creating a new chat
 		if (this.state.newChat) {
 			chats.push(<div className="new-chat-form">
-				<p className="title">Title:</p>
-				<p><TextField variant='outlined' id={`new-title`} /></p>
-				<p className="title">Body:</p>
+				<p className="title">New chat</p>
+				<p><TextField
+					variant='outlined'
+					id={`new-title`}
+					placeholder="Title" /></p>
 				<p><TextField
 					variant='outlined'
 					id={`new-body`}
 					multiline
-					rowsMax="4" /></p>
+					rowsMax="4"
+					placeholder="Body" /></p>
 				<p><Button variant="contained" color="primary" onClick={this.sendNewChat}>Send</Button>
 					<Button variant="contained" onClick={this.cancelNewChat}>Cancel</Button></p>
 			</div>);
