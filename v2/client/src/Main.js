@@ -60,6 +60,12 @@ class Main extends React.Component {
 
 		this.nextPage = this.nextPage.bind(this);
 		this.prevPage = this.prevPage.bind(this);
+		if (window.location.hash) {
+			let n = +window.location.hash.substring(1);
+			if (n > 0 && n <= this.state.pageTotal) {
+				this.state.pageNum = n;
+			}
+		}
 	}
 
 	fetchPage() {
@@ -72,11 +78,17 @@ class Main extends React.Component {
 	}
 
 	nextPage() {
-		this.setState((prev) => { return { pageNum: prev.pageNum + 1 } });
+		this.setState((prev) => {
+			window.location.hash = prev.pageNum + 1;
+			return { pageNum: prev.pageNum + 1 }
+		});
 	}
 
 	prevPage() {
-		this.setState((prev) => { return { pageNum: prev.pageNum - 1 } });
+		this.setState((prev) => {
+			window.location.hash = prev.pageNum - 1;
+			return { pageNum: prev.pageNum - 1 }
+		});
 	}
 
 	render() {

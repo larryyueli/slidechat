@@ -33,7 +33,7 @@ class ChatArea extends React.Component {
 
 		// If creating a new chat
 		if (this.state.newChat) {
-			chats.push(<div className="new-chat-form">
+			chats.push(<div className="new-chat-form" key={-1}>
 				<p className="title">New chat</p>
 				<p><TextField
 					variant='outlined'
@@ -49,7 +49,7 @@ class ChatArea extends React.Component {
 					<Button variant="contained" onClick={this.cancelNewChat}>Cancel</Button></p>
 			</div>);
 		} else {
-			chats.push(<div className="new-chat">
+			chats.push(<div className="new-chat" key={-1}>
 				<Button variant="contained" color="primary" onClick={this.createNewChat}>Create a new chat</Button>
 			</div>);
 		}
