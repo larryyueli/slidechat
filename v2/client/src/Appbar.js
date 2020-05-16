@@ -2,6 +2,9 @@ import React from 'react';
 
 import './App.scss';
 
+/**
+ * App bar: consisting the logo and some menu buttons
+ */
 class AppBar extends React.Component {
 
     render() {

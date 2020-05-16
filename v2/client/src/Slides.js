@@ -4,6 +4,9 @@ import Button from '@material-ui/core/Button';
 
 import './App.scss';
 
+/**
+ * Slides on the left of the screen
+ */
 class Slides extends React.Component {
 	render() {
 		let nextBtnDisable = this.props.pageNum === this.props.pageTotal;

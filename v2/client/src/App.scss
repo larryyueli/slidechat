@@ -1,4 +1,5 @@
 $primary: rgb(69, 89, 180);
+$backgroundColour: #fafafa;
 
 body {
 	margin: 0;
@@ -6,7 +7,7 @@ body {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	letter-spacing: 0.00938em;
-	background-color: #fafafa;
+	background-color: $backgroundColour;
 }
 
 code {
@@ -23,6 +24,7 @@ code {
 	color: #ffffff;
 	background-color: $primary;
 	box-shadow: 0 3px 10px #aaaaaa;
+	user-select: none;
 
 	.appbar-logo {
 		font-size: 1.5rem;
@@ -49,7 +51,7 @@ code {
 	}
 
 	.chat-area {
-		overflow-y: scroll;
+		overflow-y: auto;
 		border-left: 1px solid #cccccc;
 	}
 }
@@ -67,24 +69,131 @@ code {
 	}
 }
 
-.chat-area {
-	padding: 1rem;
-	overflow-x: hidden;
+@mixin ellipsis {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
 
-	.new-chat {
+.chat-area {
+	min-width: 0;
+
+	.chat-area-title {
+		font-size: 1.5rem;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0.3rem 1.5rem;
+		border: 1px solid #cccccc;
+		box-shadow: 0 3px 6px #cccccc;
+		user-select: none;
+
+		.title {
+			margin: 0 1em;
+			@include ellipsis();
+		}
+
+		.back-button {
+			justify-self: left;
+			transition: color 0.2s;
+
+			&:hover {
+				color: #888888;
+			}
+		}
+	}
+
+	.new-chat-btn-row {
 		text-align: center;
-		margin-bottom: 1rem;
+		padding: 1rem 0;
+		border-bottom: 1px solid #cccccc;
+	}
+
+	.chat-list {
+		.chat {
+			padding: 0.5rem;
+			border-bottom: 1px solid #cccccc;
+
+			.title {
+				font-weight: 420;
+				@include ellipsis();
+			}
+
+			.info {
+				display: flex;
+				justify-content: space-between;
+				.author {
+					flex: 1;
+					color: #cccccc;
+					@include ellipsis();
+				}
+
+				.time {
+					margin-left: 0.5rem;
+					color: #cccccc;
+				}
+			}
+		}
+	}
+
+	.chat-details {
+		.title {
+			font-size: 1.3rem;
+			padding: 0.5rem;
+			overflow-wrap: anywhere;
+		}
+
+		.chat {
+			padding: 0.5rem;
+			border-bottom: 1px solid #cccccc;
+
+			.author {
+				font-size: 1.2rem;
+				font-weight: 450;
+				overflow-wrap: anywhere;
+			}
+
+			.time {
+				margin-left: 0.5rem;
+				color: #cccccc;
+			}
+
+			.like {
+				color: #cccccc;
+			}
+		}
+
+		.MuiExpansionPanelDetails-root {
+			padding-top: 16px !important;
+			padding-bottom: 16px !important;
+		}
+
+		.send-message-bar {
+			display: flex;
+			padding: 0.5rem;
+			align-items: center;
+
+			.MuiTextField-root {
+				flex: 1;
+				margin-right: 0.5rem;
+
+				.MuiOutlinedInput-multiline {
+					padding: 6px;
+				}
+			}
+		}
 	}
 
 	.new-chat-form {
 		margin-bottom: 1rem;
 
 		p {
-			margin: 0.3em 0;
+			margin: 0.3em 1rem;
+			text-align: center;
 		}
 
 		.title {
-			font-size: 1.1rem;
+			font-size: 1.5rem;
 		}
 
 		button {
@@ -95,51 +204,6 @@ code {
 			width: 100%;
 
 			.MuiOutlinedInput-input,
-			.MuiOutlinedInput-multiline {
-				padding: 6px;
-			}
-		}
-	}
-
-	.chat {
-		border-bottom: 1px solid #cccccc !important;
-
-		.title {
-			overflow: hidden;
-			white-space: nowrap;
-			text-overflow: ellipsis;
-		}
-
-		.author {
-			font-size: 1.2rem;
-			font-weight: 450;
-			overflow-wrap: anywhere;
-		}
-
-		.time {
-			margin-left: 0.5rem;
-			color: #cccccc;
-		}
-
-		.like {
-			color: #cccccc;
-		}
-	}
-
-	.MuiExpansionPanelDetails-root {
-		padding-top: 16px !important;
-		padding-bottom: 16px !important;
-	}
-
-	.send-message-bar {
-		display: flex;
-		padding: 0.5rem;
-		align-items: center;
-
-		.MuiTextField-root {
-			flex: 1;
-			margin-right: 0.5rem;
-
 			.MuiOutlinedInput-multiline {
 				padding: 6px;
 			}
