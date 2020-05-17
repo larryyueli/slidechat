@@ -16,7 +16,7 @@ const fs = require('fs');
 let rawdata = fs.readFileSync('config/instructors.json');
 let instructors = JSON.parse(rawdata);
 
-router.get('/:slideID/:pageNumber', function (req, res) {
+router.get('/:slideID/:pageNumber/img', function (req, res) {
     MongoClient.connect(url, dbconfig).then(client => {
         const db = client.db("slidechat");
         var slides = db.collection('slides');
@@ -27,8 +27,29 @@ router.get('/:slideID/:pageNumber', function (req, res) {
         }
         var result = {};
         result["img"] = slide.pages[req.params.pageNumber].location;
+        res.json(result);
+    }).catch(err => {
+        if (err && err.status) {
+            return res.status(err.status).send({ error: err.error });
+        } else {
+            console.error(err);
+            return res.status(500).send();
+        }
+    });
+});
+
+router.get('/:slideID/:pageNumber/questions', function (req, res) {
+    MongoClient.connect(url, dbconfig).then(client => {
+        const db = client.db("slidechat");
+        var slides = db.collection('slides');
+        return slides.findOne({ _id: ObjectID.createFromHexString(req.params.slideID) });
+    }).then(slide => {
+        if (!slide) {
+            throw { status: 404, error: "slide not found" };
+        }
+        var result = {};
         result["questions"] = slide.pages[req.params.pageNumber].questions;
-        for (let question of result.questions){
+        for (let question of result.questions) {
             delete question.chats;
         }
         res.json(result);
@@ -176,7 +197,7 @@ router.post('/api/createCourse', function (req, res) {
  * anoymity: anoymity level of the slide
  * author: uploader's utorid
  */
-router.post('/api/slide', function (req, res) {
+router.post('/api/addSlide', function (req, res) {
     if (req.body.cid.length != 24 || (req.body.anoymity != "anyone" && req.body.anoymity != "UofT student" && req.body.anoymity != "nonymous")) {
         return res.status(400).send();
     }
@@ -202,10 +223,9 @@ router.post('/api/slide', function (req, res) {
         }
     }).then(slide => {
         console.log(`Inserted slide ${JSON.stringify(slide.ops[0]._id)}`);
-        req.id = slide.ops[0]._id.toHexString();
-        req.course.slides.push(req.id);
+        let id = slide.ops[0]._id.toHexString();
         const courses = req.db.collection('courses');
-        return courses.updateOne({ _id: ObjectID.createFromHexString(req.body.cid) }, { $set: { slides: req.course.slides } });
+        return courses.updateOne({ _id: ObjectID.createFromHexString(req.body.cid) }, { $push: { slides: id } });
     }).then(updateRes => {
         if (updateRes.modifiedCount > 0) {
             console.log(`updated course ${JSON.stringify(req.body.cid)}`);
@@ -232,7 +252,7 @@ router.post('/api/slide', function (req, res) {
  * body: question body
  * author: uploader's utorid
  */
-router.post('/api/question', function (req, res) {
+router.post('/api/addQuestion', function (req, res) {
     if (req.body.sid.length != 24) {
         return res.status(400).send();
     }
@@ -247,11 +267,12 @@ router.post('/api/question', function (req, res) {
             throw { status: 400, error: "Bad Request" };
         }
         let newQuestion = { status: "unsolved", time: Date(), chats: [], title: req.body.title, author: req.body.author };
-        slide.pages[req.body.pageNum].questions.push(newQuestion);
         var newChat = { time: Date(), body: req.body.body, author: req.body.author, likes: [], endorsement: null };
-        slide.pages[req.body.pageNum].questions[slide.pages[req.body.pageNum].questions.length - 1].chats.push(newChat);
-        const slides = req.db.collection('slides');
-        return slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) }, { $set: { pages: slide.pages } });
+        newQuestion.chats.push(newChat);
+        let insertQuestion = {}; // cannot use template string on the left hand side
+        insertQuestion[`pages.${req.body.pageNum}.questions`] = newQuestion;
+        const slides = req.db.collection('slides'); 
+        return slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) }, { $push: insertQuestion });
     }).then(updateRes => {
         if (updateRes.modifiedCount > 0) {
             console.log(`updated slide ${JSON.stringify(req.body.sid)}`);
@@ -278,7 +299,7 @@ router.post('/api/question', function (req, res) {
  * body: question body
  * author: uploader's utorid
  */
-router.post('/api/chat', function (req, res) {
+router.post('/api/addChat', function (req, res) {
     if (req.body.sid.length != 24) {
         return res.status(400).send();
     }
@@ -292,10 +313,11 @@ router.post('/api/chat', function (req, res) {
         } else if (req.body.pageNum >= slide.pages.length || req.body.qid >= slide.pages[req.body.pageNum].questions.length) {
             throw { status: 400, error: "Bad Request" };
         }
-        var newChat = { time: Date(), body: req.body.body, author: req.body.author, likes: [], endorsement: null };
-        slide.pages[req.body.pageNum].questions[req.body.qid].chats.push(newChat);
+        let newChat = { time: Date(), body: req.body.body, author: req.body.author, likes: [], endorsement: null };
+        let insertChat = {}; // cannot use template string on the left hand side
+        insertChat[`pages.${req.body.pageNum}.questions.${req.body.qid}.chats`] = newChat;
         const slides = req.db.collection('slides');
-        return slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) }, { $set: { pages: slide.pages } });
+        return slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) }, { $push: insertChat });
     }).then(updateRes => {
         if (updateRes.modifiedCount > 0) {
             console.log(`updated slide ${JSON.stringify(req.body.sid)}`);
@@ -338,9 +360,10 @@ router.post('/api/like', function (req, res) {
             req.body.cid >= slide.pages[req.body.pageNum].questions[req.body.qid].chats.length) {
             throw { status: 400, error: "Bad Request" };
         }
-        slide.pages[req.body.pageNum].questions[req.body.qid].chats[req.body.cid].likes.push(req.body.author);
+        let insertLike = {}; // cannot use template string on the left hand side
+        insertLike[`pages.${req.body.pageNum}.questions.${req.body.qid}.chats.${req.body.cid}.likes`] = req.body.author;
         const slides = req.db.collection('slides');
-        return slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) }, { $set: { pages: slide.pages } });
+        return slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) }, { $push: insertLike });
     }).then(updateRes => {
         if (updateRes.modifiedCount > 0) {
             console.log(`updated slide ${JSON.stringify(req.body.sid)}`);
