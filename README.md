@@ -17,6 +17,12 @@ Arujun Dhiman, since Fall 2016
 
 Larry Yueli Zhang, since Fall 2016
 
+Ling Xiao Lu, since Summer 2020
+
+Chen Yao, since Summer 2020
+
+Kevin Hua, since Summer 2020
+
 
 Supervisor: Larry Yueli Zhang
 
