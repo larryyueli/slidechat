@@ -1,88 +1,74 @@
 const express = require('express');
-const path = require('path');
+const fs = require('fs');
 
-const router = express.Router();
-
-const MongoClient = require('mongodb').MongoClient;
-const ObjectID = require('mongodb').ObjectID;
-const url = "mongodb://slidechat:V2Good!%40%23@localhost:27017/slidechat";
-const dbconfig = {
+const { MongoClient, ObjectID } = require('mongodb');
+const dbConfig = {
     useUnifiedTopology: true,
     useNewUrlParser: true,
 };
 
-const fs = require('fs');
 
-let rawdata = fs.readFileSync('config/instructors.json');
-let instructors = JSON.parse(rawdata);
+const config = JSON.parse(fs.readFileSync('config.json'));
+const instructors = config.instructors;
+const dbURL = config.dbURL;
 
-router.get('/:slideID/:pageNumber/img', function (req, res) {
-    MongoClient.connect(url, dbconfig).then(client => {
+
+const router = express.Router();
+
+function errorHandler(res, err) {
+    if (err && err.status) {
+        return res.status(err.status).send({ error: err.error });
+    } else {
+        console.error(err);
+        return res.status(500).send();
+    }
+}
+
+router.get('/api/:slideID/:pageNumber/img', (req, res) => {
+    MongoClient.connect(dbURL, dbConfig).then(client => {
         const db = client.db("slidechat");
-        var slides = db.collection('slides');
+        const slides = db.collection('slides');
         return slides.findOne({ _id: ObjectID.createFromHexString(req.params.slideID) });
-    }).then(slide=>{
-        if (!slide){
-            throw { status: 404, error: "slide not found" };
-        }
-        var result = {};
-        result["img"] = slide.pages[req.params.pageNumber].location;
-        res.json(result);
+    }).then(slide => {
+        if (!slide) throw { status: 404, error: "slide not found" };
+        res.json({ img: slide.pages[req.params.pageNumber].location });
     }).catch(err => {
-        if (err && err.status) {
-            return res.status(err.status).send({ error: err.error });
-        } else {
-            console.error(err);
-            return res.status(500).send();
-        }
+        errorHandler(res, err);
     });
 });
 
-router.get('/:slideID/:pageNumber/questions', function (req, res) {
-    MongoClient.connect(url, dbconfig).then(client => {
+router.get('/api/:slideID/:pageNumber/questions', (req, res) => {
+    MongoClient.connect(dbURL, dbConfig).then(client => {
         const db = client.db("slidechat");
-        var slides = db.collection('slides');
+        const slides = db.collection('slides');
         return slides.findOne({ _id: ObjectID.createFromHexString(req.params.slideID) });
     }).then(slide => {
         if (!slide) {
             throw { status: 404, error: "slide not found" };
         }
-        var result = {};
-        result["questions"] = slide.pages[req.params.pageNumber].questions;
+        let result = { questions: slide.pages[req.params.pageNumber].questions };
         for (let question of result.questions) {
             delete question.chats;
         }
         res.json(result);
     }).catch(err => {
-        if (err && err.status) {
-            return res.status(err.status).send({ error: err.error });
-        } else {
-            console.error(err);
-            return res.status(500).send();
-        }
+        errorHandler(res, err);
     });
 });
 
-router.get('/:slideID/:pageNumber/:questionID', function (req, res) {
-    MongoClient.connect(url, dbconfig).then(client => {
+router.get('/api/:slideID/:pageNumber/:questionID', (req, res) => {
+    MongoClient.connect(dbURL, dbConfig).then(client => {
         const db = client.db("slidechat");
-        var slides = db.collection('slides');
+        const slides = db.collection('slides');
         return slides.findOne({ _id: ObjectID.createFromHexString(req.params.slideID) });
     }).then(slide => {
-        if (!slide) {
-            throw { status: 404, error: "slide not found" };
-        }
-        var result = {};
-        result["questions"] = slide.pages[req.params.pageNumber].questions[req.params.questionID].body;
-        result["comments"] = slide.pages[req.params.pageNumber].questions[req.params.questionID].chats;
-        res.json(result);
+        if (!slide) throw { status: 404, error: "slide not found" };
+        res.json({
+            questions: slide.pages[req.params.pageNumber].questions[req.params.questionID].body,
+            comments: slide.pages[req.params.pageNumber].questions[req.params.questionID].chats
+        });
     }).catch(err => {
-        if (err && err.status) {
-            return res.status(err.status).send({ error: err.error });
-        } else {
-            console.error(err);
-            return res.status(500).send();
-        }
+        errorHandler(res, err);
     });
 });
 
@@ -93,7 +79,7 @@ router.get('/:slideID/:pageNumber/:questionID', function (req, res) {
  * password: admin's password
  * utorID: utorID
  */
-// router.post('/api/addInstructor', function (req, res) {
+// router.post('/api/addInstructor', (req, res) =>  {
 //     if (typeof req.body.utorID != 'number'){
 //         return res.status(400).send({error:"invalid urtorID"});
 //     } if (req.body.userName != "admin user name" || req.body.password != "admin password"){
@@ -128,8 +114,8 @@ router.get('/:slideID/:pageNumber/:questionID', function (req, res) {
  * name: course name
  * author: uploader's utorid
  */
-router.post('/api/createCourse', function (req, res) {
-    MongoClient.connect(url, dbconfig).then(client => {
+router.post('/api/createCourse', (req, res) => {
+    MongoClient.connect(dbURL, dbConfig).then(client => {
         req.slidechat = client.db('slidechat')
         let users = req.slidechat.collection('users');
         return users.findOne({ _id: req.body.author });
@@ -155,12 +141,7 @@ router.post('/api/createCourse', function (req, res) {
             throw "createCourse update error";
         }
     }).catch(err => {
-        if (err && err.status) {
-            return res.status(err.status).send({ error: err.error });
-        } else {
-            console.error(err);
-            return res.status(500).send();
-        }
+        errorHandler(res, err);
     });
 });
 
@@ -170,7 +151,7 @@ router.post('/api/createCourse', function (req, res) {
  * cid: course id
  * author: uploader's utorid
  */
-// router.post('/api/joinCourse', function (req, res) {
+// router.post('/api/joinCourse', (req, res) =>  {
 //     MongoClient.connect(url, function (err, db) {
 //         var courses = db.collection('courses');
 //         var course = null;
@@ -197,11 +178,11 @@ router.post('/api/createCourse', function (req, res) {
  * anoymity: anoymity level of the slide
  * author: uploader's utorid
  */
-router.post('/api/addSlide', function (req, res) {
-    if (req.body.cid.length != 24 || (req.body.anoymity != "anyone" && req.body.anoymity != "UofT student" && req.body.anoymity != "nonymous")) {
+router.post('/api/addSlide', (req, res) => {
+    if (req.body.cid.length != 24 || (["anyone", "UofT student", "nonymous"].indexOf(req.body.anoymity) < 0)) {
         return res.status(400).send();
     }
-    MongoClient.connect(url, dbconfig).then(client => {
+    MongoClient.connect(dbURL, dbConfig).then(client => {
         req.db = client.db("slidechat");
         const courses = req.db.collection('courses');
         return courses.findOne({ _id: ObjectID.createFromHexString(req.body.cid) });
@@ -234,12 +215,7 @@ router.post('/api/addSlide', function (req, res) {
             throw "slide update error";
         }
     }).catch(err => {
-        if (err && err.status) {
-            return res.status(err.status).send({ error: err.error });
-        } else {
-            console.error(err);
-            return res.status(500).send();
-        }
+        errorHandler(res, err);
     });
 });
 
@@ -252,11 +228,11 @@ router.post('/api/addSlide', function (req, res) {
  * body: question body
  * author: uploader's utorid
  */
-router.post('/api/addQuestion', function (req, res) {
+router.post('/api/addQuestion', (req, res) => {
     if (req.body.sid.length != 24) {
         return res.status(400).send();
     }
-    MongoClient.connect(url, dbconfig).then(client => {
+    MongoClient.connect(dbURL, dbConfig).then(client => {
         req.db = client.db("slidechat");
         const slides = req.db.collection('slides');
         return slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
@@ -271,7 +247,7 @@ router.post('/api/addQuestion', function (req, res) {
         newQuestion.chats.push(newChat);
         let insertQuestion = {}; // cannot use template string on the left hand side
         insertQuestion[`pages.${req.body.pageNum}.questions`] = newQuestion;
-        const slides = req.db.collection('slides'); 
+        const slides = req.db.collection('slides');
         return slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) }, { $push: insertQuestion });
     }).then(updateRes => {
         if (updateRes.modifiedCount > 0) {
@@ -281,12 +257,7 @@ router.post('/api/addQuestion', function (req, res) {
             throw "question update error";
         }
     }).catch(err => {
-        if (err && err.status) {
-            return res.status(err.status).send({ error: err.error });
-        } else {
-            console.error(err);
-            return res.status(500).send();
-        }
+        errorHandler(res, err);
     });
 });
 
@@ -299,11 +270,11 @@ router.post('/api/addQuestion', function (req, res) {
  * body: question body
  * author: uploader's utorid
  */
-router.post('/api/addChat', function (req, res) {
+router.post('/api/addChat', (req, res) => {
     if (req.body.sid.length != 24) {
         return res.status(400).send();
     }
-    MongoClient.connect(url, dbconfig).then(client => {
+    MongoClient.connect(dbURL, dbConfig).then(client => {
         req.db = client.db("slidechat");
         const slides = req.db.collection('slides');
         return slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
@@ -326,12 +297,7 @@ router.post('/api/addChat', function (req, res) {
             throw "chat update error";
         }
     }).catch(err => {
-        if (err && err.status) {
-            return res.status(err.status).send({ error: err.error });
-        } else {
-            console.error(err);
-            return res.status(500).send();
-        }
+        errorHandler(res, err);
     });
 });
 
@@ -344,11 +310,11 @@ router.post('/api/addChat', function (req, res) {
  * pageNum: page number
  * author: uploader's utorid
  */
-router.post('/api/like', function (req, res) {
+router.post('/api/like', (req, res) => {
     if (req.body.sid.length != 24) {
         return res.status(400).send();
     }
-    MongoClient.connect(url, dbconfig).then(client => {
+    MongoClient.connect(dbURL, dbConfig).then(client => {
         req.db = client.db("slidechat");
         const slides = req.db.collection('slides');
         return slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
@@ -372,16 +338,11 @@ router.post('/api/like', function (req, res) {
             throw "chat update error";
         }
     }).catch(err => {
-        if (err && err.status) {
-            return res.status(err.status).send({ error: err.error });
-        } else {
-            console.error(err);
-            return res.status(500).send();
-        }
+        errorHandler(res, err);
     });
 });
 
-router.use(express.static(path.join(__dirname, '..', 'static')));
+router.use(express.static('react-build'));
 
 router.use((req, res) => res.status(404).send());
 

@@ -89,7 +89,7 @@ code {
 		user-select: none;
 
 		.title {
-			margin: 0 1em;
+			margin: 0.7rem;
 			@include ellipsis();
 		}
 
@@ -111,7 +111,7 @@ code {
 
 	.chat-list {
 		.chat {
-			padding: 0.5rem;
+			padding: 1rem;
 			border-bottom: 1px solid #cccccc;
 
 			.title {
@@ -139,12 +139,12 @@ code {
 	.chat-details {
 		.title {
 			font-size: 1.3rem;
-			padding: 0.5rem;
+			padding: 1rem;
 			overflow-wrap: anywhere;
 		}
 
 		.chat {
-			padding: 0.5rem;
+			padding: 1rem;
 			border-bottom: 1px solid #cccccc;
 
 			.author {

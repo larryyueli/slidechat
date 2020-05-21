@@ -12,6 +12,7 @@
     "react-scripts": "^3.4.0",
     "styled-components": "^5.0.1"
   },
+  "homepage": "/slidechat/",
   "scripts": {
     "start": "URL='http://mcsapps.utm.utoronto.ca:10000/slidechat' PORT=10000 react-scripts start",
     "build": "react-scripts build",
