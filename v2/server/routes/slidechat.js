@@ -1,5 +1,7 @@
 const express = require('express');
+const PDFImage = require("pdf-image").PDFImage;
 const fs = require('fs');
+const path = require('path');
 
 const { MongoClient, ObjectID } = require('mongodb');
 const dbConfig = {
@@ -22,6 +24,11 @@ function errorHandler(res, err) {
         console.error(err);
         return res.status(500).send();
     }
+}
+
+function instructorAuth(req, res, next) {
+    // todo
+    next();
 }
 
 router.get('/api/:slideID/:pageNumber/img', (req, res) => {
@@ -114,7 +121,7 @@ router.get('/api/:slideID/:pageNumber/:questionID', (req, res) => {
  * name: course name
  * author: uploader's utorid
  */
-router.post('/api/createCourse', (req, res) => {
+router.post('/api/createCourse', instructorAuth, (req, res) => {
     MongoClient.connect(dbURL, dbConfig).then(client => {
         req.slidechat = client.db('slidechat')
         let users = req.slidechat.collection('users');
@@ -178,8 +185,11 @@ router.post('/api/createCourse', (req, res) => {
  * anoymity: anoymity level of the slide
  * author: uploader's utorid
  */
-router.post('/api/addSlide', (req, res) => {
-    if (req.body.cid.length != 24 || (["anyone", "UofT student", "nonymous"].indexOf(req.body.anoymity) < 0)) {
+router.post('/api/addSlide', instructorAuth, (req, res) => {
+    if (req.body.cid.length != 24
+        || (["anyone", "UofT student", "nonymous"].indexOf(req.body.anoymity) < 0)
+        || !req.files.file
+        || !req.files.file.name.toLocaleLowerCase().endsWidth('.pdf')) {
         return res.status(400).send();
     }
     MongoClient.connect(dbURL, dbConfig).then(client => {
@@ -189,31 +199,95 @@ router.post('/api/addSlide', (req, res) => {
     }).then(course => {
         if (!course) {
             throw { status: 404, error: "course not exist" };
-        } else if (course.instructors.indexOf(req.body.author)) {
+        } else if (course.instructors.indexOf(req.body.author)) {   // TODO: UNSAFE
             throw { status: 403, error: "Unauthorized" };
-        } else {
-            req.course = course;
-            let newSlide = { anoymity: req.body.anoymity };
-            // save pdf TODO
-            newSlide.pdfLocation = "location";
-            // pdf to img TODO
-            newSlide.pages = [{ location: "location", questions: [] }];
-            // insert into database
-            let slides = req.db.collection('slides');
-            return slides.insertOne(newSlide);
+        } else {    // Step 1: insert into database to get a ObjectID
+            let newSlide = {
+                filename: req.files.file.name,
+                anoymity: req.body.anoymity
+            };
+            req.slides = req.db.collection('slides');
+            return req.slides.insertOne(newSlide);
         }
-    }).then(slide => {
-        console.log(`Inserted slide ${JSON.stringify(slide.ops[0]._id)}`);
-        let id = slide.ops[0]._id.toHexString();
+    }).then(slide => {  // Step 2: use the id as the directory name, create a directory, move pdf to directory
+        req.ObjectID = slide.ops[0]._id;
+        req.id = req.ObjectID.toHexString();
+        req.dir = path.join('files', req.id);
+        console.log(`Saving files to: ${req.dir}`);
+
+        // overwrite if exists. should not happen: id is unique
+        if (fs.existsSync(req.dir)) {
+            console.log(`Directory ${id} already exists, overwriting...`);
+            fs.rmdirSync(req.dir, { recursive: true });
+        }
+
+        fs.mkdirSync(path.join('files', id));
+        return req.files.file.mv(req.dir);
+    }).then(_ => {  // Step 3: convert to images
+        let pdfImage = new PDFImage(path.join(req.dir, req.files.file.name), {
+            pdfFileBaseName: 'page',
+            outputDirectory: req.dir
+        });
+        return pdfImage.convertFile();
+    }).then(imagePaths => { // Step 4: create the list of pages, update database
+        let pages = [];
+        for (let i of imagePaths) {
+            pages.push({ location: i, questions: [] });
+        }
+        return req.slides.updateOne({ _id: req.ObjectID }, {
+            $set: {
+                pdfLocation: path.join(req.dir, req.files.file.name),
+                pages: pages
+            }
+        });
+    }).then(updateRes => {  // step 5: add slide to its course
+        if (updateRes.modifiedCount <= 0) {
+            throw "slide update pages error";
+        }
         const courses = req.db.collection('courses');
-        return courses.updateOne({ _id: ObjectID.createFromHexString(req.body.cid) }, { $push: { slides: id } });
-    }).then(updateRes => {
-        if (updateRes.modifiedCount > 0) {
-            console.log(`updated course ${JSON.stringify(req.body.cid)}`);
-            res.json({ id: req.id });
-        } else {
+        return courses.updateOne({ _id: ObjectID.createFromHexString(req.body.cid) }, { $push: { slides: req.id } });
+    }).then(updateRes => {  // done
+        if (updateRes.modifiedCount <= 0) {
             throw "slide update error";
         }
+        res.json({ ok: req.id });
+    }).catch(err => {
+        errorHandler(res, err);
+    });
+});
+
+router.get('/api/myCourses', instructorAuth, (req, res) => {
+    MongoClient.connect(dbURL, dbConfig).then(client => {
+        req.db = client.db("slidechat");
+        const users = req.db.collection('users');
+        return users.findOne({ _id: req.body.id });
+    }).then(async user => {
+        if (!user) { throw { status: 404, error: "user not found" } }
+        let result = [];
+        const courses = req.db.collection('courses');
+        const slides = req.db.collection('slides');
+        for (let course of user.courses) {
+            let myCourse = await courses.findOne({ _id: ObjectID.createFromHexString(course.id) }, { name: 1, slides: 1 });
+            if (!myCourse) {
+                console.log(`course ${course.id} not found`);
+                continue;
+            }
+            // console.log(myCourse);
+            let courseSlides = [];
+            for (let slideId in myCourse.slides) {
+                let slideEntry = await slides.findOne({ _id: ObjectID.createFromHexString(slideId) }, { filename: 1 });
+                if (!slideEntry) {
+                    console.log(`slide ${slideId} not found`);
+                    continue;
+                }
+                courseSlides.push({ filename: slideEntry.filename, id: slideId });
+            }
+            result.push({
+                name: myCourse.name,
+                slides: courseSlides
+            });
+        }
+        res.json(result);
     }).catch(err => {
         errorHandler(res, err);
     });

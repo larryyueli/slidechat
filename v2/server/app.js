@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const fileUpload = require('express-fileupload');
 
 const slidechat = require('./routes/slidechat');
 
@@ -15,6 +16,7 @@ app.use(morgan('dev'));
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 app.use(cookieParser());
+app.use(fileUpload());
 
 app.use('/slidechat', slidechat);
 
