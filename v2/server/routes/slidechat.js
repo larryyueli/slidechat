@@ -178,6 +178,10 @@ router.post('/api/createCourse', instructorAuth, (req, res) => {
 //     });
 // });
 
+router.post('/api/testPDF', (req, res) => { 
+    console.log(req.files.file.name);
+});
+
 /**
  * add a new slide to course
  * body:

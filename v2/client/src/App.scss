@@ -186,9 +186,9 @@ code {
 
 	.new-chat-form {
 		margin-bottom: 1rem;
-
-		p {
-			margin: 0.3em 1rem;
+		padding-top: 2rem;
+		& > div {
+			margin: 0.5em 1rem;
 			text-align: center;
 		}
 
