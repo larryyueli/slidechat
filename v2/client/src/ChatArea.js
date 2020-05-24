@@ -108,18 +108,17 @@ class ChatArea extends React.Component {
 				title = "Create a new chat";
 				content = (
 					<div className="new-chat-form" key={-1}>
-						<p className="title">New chat</p>
-						<p><TextField
+						<div><TextField
 							variant='outlined'
 							id={`new-title`}
-							placeholder="Title" /></p>
-						<p><TextField
+							placeholder="Title" /></div>
+						<div><TextField
 							variant='outlined'
 							id={`new-body`}
 							multiline
-							rowsMax="4"
-							placeholder="Body" /></p>
-						<p><Button variant="contained" color="primary" onClick={this.sendNewChat}>Send</Button></p>
+							rows="6"
+							placeholder="Body" /></div>
+						<div><Button variant="contained" color="primary" onClick={this.sendNewChat}>Send</Button></div>
 					</div>
 				);
 				break;
