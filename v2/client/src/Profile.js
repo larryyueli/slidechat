@@ -15,9 +15,11 @@ class Profile extends Component {
 
     uploadPDF() {
         var formData = new FormData();
+        formData.append("cid", "5ebeed9c67acf26a3bebe22e");
+        formData.append("anoymity", "anyone");
+        formData.append("author", 3);
         formData.append("file", document.getElementById("file").files[0]);
-        console.log(formData);
-        axios.post("http://mcsapps.utm.utoronto.ca:10000/slidechat/api/testPDF/",
+        axios.post("http://mcsapps.utm.utoronto.ca:10000/slidechat/api/addSlide/",
             formData
         ).then(function (response) {
             console.log(response);

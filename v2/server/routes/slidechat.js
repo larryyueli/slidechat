@@ -1,5 +1,5 @@
 const express = require('express');
-const PDFImage = require("pdf-image").PDFImage;
+const PDFImage = require("../lib/pdf-image").PDFImage;
 const fs = require('fs');
 const path = require('path');
 
@@ -55,6 +55,28 @@ async function startApp() {
         });
     });
 
+    router.get('/api/:slideID/pageTotal', (req, res) => {
+        slides.findOne({
+            _id: ObjectID.createFromHexString(req.params.slideID)
+        }).then(slide => {
+            if (!slide) throw { status: 404, error: "slide not found" };
+            res.json({ pageTotal: slide.pages.length });
+        }).catch(err => {
+            errorHandler(res, err);
+        });
+    });
+
+    router.get('/api/:slideID/:pageNumber/img', (req, res) => {
+        slides.findOne({
+            _id: ObjectID.createFromHexString(req.params.slideID)
+        }).then(slide => {
+            if (!slide) throw { status: 404, error: "slide not found" };
+            res.json({ pageImg: slide.pages[req.params.pageNumber].location });
+        }).catch(err => {
+            errorHandler(res, err);
+        });
+    });
+
     router.get('/api/:slideID/:pageNumber/questions', (req, res) => {
         slides.findOne({
             _id: ObjectID.createFromHexString(req.params.slideID)
@@ -72,15 +94,13 @@ async function startApp() {
         });
     });
 
+
     router.get('/api/:slideID/:pageNumber/:questionID', (req, res) => {
         slides.findOne({
             _id: ObjectID.createFromHexString(req.params.slideID)
         }).then(slide => {
             if (!slide) throw { status: 404, error: "slide not found" };
-            res.json({
-                questions: slide.pages[req.params.pageNumber].questions[req.params.questionID].body,
-                comments: slide.pages[req.params.pageNumber].questions[req.params.questionID].chats
-            });
+            res.json(slide.pages[req.params.pageNumber].questions[req.params.questionID].chats);
         }).catch(err => {
             errorHandler(res, err);
         });
@@ -179,10 +199,10 @@ async function startApp() {
     //             res.json({});
     //         }
     //     });
-    // });
-
+    // });    
     router.post('/api/testPDF', (req, res) => {
         console.log(req.files.file.name);
+        res.send();
     });
 
     /**
@@ -205,7 +225,7 @@ async function startApp() {
         }).then(course => {
             if (!course) {
                 throw { status: 404, error: "course not exist" };
-            } else if (course.instructors.indexOf(req.body.author) < 0) {   // TODO: UNSAFE
+            } else if (false) {   // check in instructor's list TODO: UNSAFE
                 throw { status: 403, error: "Unauthorized" };
             }
 
@@ -226,24 +246,27 @@ async function startApp() {
                 console.log(`Directory ${id} already exists, overwriting...`);
                 fs.rmdirSync(req.dir, { recursive: true });
             }
-
-            fs.mkdirSync(path.join('files', id));
-            return req.files.file.mv(req.dir);
+            fs.mkdirSync(path.join('files', req.id));
+            console.log(`mkdir`);
+            return req.files.file.mv(path.join(req.dir, req.files.file.name));
         }).then(_ => {  // Step 3: convert to images
             let pdfImage = new PDFImage(path.join(req.dir, req.files.file.name), {
                 pdfFileBaseName: 'page',
                 outputDirectory: req.dir
             });
+            console.log("convert")
             return pdfImage.convertFile();
         }).then(imagePaths => { // Step 4: create the list of pages, update database
             let pages = [];
+            console.log("mv")
             for (let i of imagePaths) {
                 pages.push({ location: i, questions: [] });
             }
-            return slides.updateOne({ _id: req.ObjectID }, {
+            return req.slides.updateOne({ _id: req.ObjectID }, {
                 $set: {
                     pdfLocation: path.join(req.dir, req.files.file.name),
                     pages: pages
+
                 }
             });
         }).then(updateRes => {  // step 5: add slide to its course
@@ -294,6 +317,7 @@ async function startApp() {
         });
     });
 
+
     /**
      * add a new question to page
      * body:
@@ -335,6 +359,7 @@ async function startApp() {
             errorHandler(res, err);
         });
     });
+
 
     /**
      * add a new chat to question
@@ -419,13 +444,12 @@ async function startApp() {
     router.use('/:slideID', (req, res) => res.sendFile('index.html', { root: path.join(__dirname, '..', 'react-build') }));
 
     router.use(express.static('react-build'));
+    router.use('/files', express.static(__dirname + '/../files'));
 
     router.use((req, res) => res.status(404).send());
 
     console.log("slidechat app started");
     return router;
 }
-
-
 
 module.exports = startApp;
