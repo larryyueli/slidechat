@@ -54,15 +54,15 @@ class ChatArea extends React.Component {
 	// probably need a loading state here
 	fetchChatDetails(questionID) {
 		console.log(questionID);
-		// axios.get(`/${this.state.slideID}/${this.state.pageNum}/${questionID}`).then(data => {
-		this.setState({
-			state: "chat-details",
-			chatID: questionID,
-			chatDetails: dummyDetails
+		axios.get(`/slidechat/api/${this.props.slideID}/${this.props.pageNum - 1}/${questionID}`).then(data => {
+			this.setState({
+				state: "chat-details",
+				chatID: questionID,
+				chatDetails: data.data
+			});
+		}).catch(err => {
+			console.error(err);
 		});
-		// }).catch(err => {
-		// 	console.error(err);
-		// });
 	}
 
 	// onClick handler for back button to go back to the chat list
@@ -138,7 +138,7 @@ class ChatArea extends React.Component {
 						<div className="chat" key={i}>
 							<span className="author">{message.author}</span>
 							<span className="time">{message.time}</span>
-							<div className="body">{message.content}</div>
+							<div className="body">{message.body}</div>
 							{likes}
 						</div>
 					);

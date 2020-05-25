@@ -1,5 +1,5 @@
 const express = require('express');
-const PDFImage = require("pdf-image").PDFImage;
+const PDFImage = require("../lib/pdf-image").PDFImage;
 const fs = require('fs');
 const path = require('path');
 
@@ -31,6 +31,19 @@ function instructorAuth(req, res, next) {
     next();
 }
 
+router.get('/api/:slideID/pageTotal', (req, res) => {
+    MongoClient.connect(dbURL, dbConfig).then(client => {
+        const db = client.db("slidechat");
+        const slides = db.collection('slides');
+        return slides.findOne({ _id: ObjectID.createFromHexString(req.params.slideID) });
+    }).then(slide => {
+        if (!slide) throw { status: 404, error: "slide not found" };
+        res.json({ pageTotal: slide.pages.length });
+    }).catch(err => {
+        errorHandler(res, err);
+    });
+});
+
 router.get('/api/:slideID/:pageNumber/img', (req, res) => {
     MongoClient.connect(dbURL, dbConfig).then(client => {
         const db = client.db("slidechat");
@@ -38,7 +51,7 @@ router.get('/api/:slideID/:pageNumber/img', (req, res) => {
         return slides.findOne({ _id: ObjectID.createFromHexString(req.params.slideID) });
     }).then(slide => {
         if (!slide) throw { status: 404, error: "slide not found" };
-        res.json({ img: slide.pages[req.params.pageNumber].location });
+        res.json({ pageImg: slide.pages[req.params.pageNumber].location });
     }).catch(err => {
         errorHandler(res, err);
     });
@@ -70,10 +83,7 @@ router.get('/api/:slideID/:pageNumber/:questionID', (req, res) => {
         return slides.findOne({ _id: ObjectID.createFromHexString(req.params.slideID) });
     }).then(slide => {
         if (!slide) throw { status: 404, error: "slide not found" };
-        res.json({
-            questions: slide.pages[req.params.pageNumber].questions[req.params.questionID].body,
-            comments: slide.pages[req.params.pageNumber].questions[req.params.questionID].chats
-        });
+        res.json(slide.pages[req.params.pageNumber].questions[req.params.questionID].chats);
     }).catch(err => {
         errorHandler(res, err);
     });
@@ -180,6 +190,7 @@ router.post('/api/createCourse', instructorAuth, (req, res) => {
 
 router.post('/api/testPDF', (req, res) => { 
     console.log(req.files.file.name);
+    res.send();
 });
 
 /**
@@ -193,7 +204,7 @@ router.post('/api/addSlide', instructorAuth, (req, res) => {
     if (req.body.cid.length != 24
         || (["anyone", "UofT student", "nonymous"].indexOf(req.body.anoymity) < 0)
         || !req.files.file
-        || !req.files.file.name.toLocaleLowerCase().endsWidth('.pdf')) {
+        || !req.files.file.name.toLocaleLowerCase().endsWith('.pdf')) {
         return res.status(400).send();
     }
     MongoClient.connect(dbURL, dbConfig).then(client => {
@@ -203,7 +214,7 @@ router.post('/api/addSlide', instructorAuth, (req, res) => {
     }).then(course => {
         if (!course) {
             throw { status: 404, error: "course not exist" };
-        } else if (course.instructors.indexOf(req.body.author)) {   // TODO: UNSAFE
+        } else if (false) {   // TODO: UNSAFE
             throw { status: 403, error: "Unauthorized" };
         } else {    // Step 1: insert into database to get a ObjectID
             let newSlide = {
@@ -224,17 +235,19 @@ router.post('/api/addSlide', instructorAuth, (req, res) => {
             console.log(`Directory ${id} already exists, overwriting...`);
             fs.rmdirSync(req.dir, { recursive: true });
         }
-
-        fs.mkdirSync(path.join('files', id));
-        return req.files.file.mv(req.dir);
+        fs.mkdirSync(path.join('files', req.id));
+        console.log(`mkdir`);
+        return req.files.file.mv(path.join(req.dir, req.files.file.name));
     }).then(_ => {  // Step 3: convert to images
         let pdfImage = new PDFImage(path.join(req.dir, req.files.file.name), {
             pdfFileBaseName: 'page',
             outputDirectory: req.dir
         });
+        console.log("convert")
         return pdfImage.convertFile();
     }).then(imagePaths => { // Step 4: create the list of pages, update database
         let pages = [];
+        console.log("mv")
         for (let i of imagePaths) {
             pages.push({ location: i, questions: [] });
         }
@@ -321,7 +334,7 @@ router.post('/api/addQuestion', (req, res) => {
             throw { status: 400, error: "Bad Request" };
         }
         let newQuestion = { status: "unsolved", time: Date(), chats: [], title: req.body.title, author: req.body.author };
-        var newChat = { time: Date(), body: req.body.body, author: req.body.author, likes: [], endorsement: null };
+        var newChat = { time: Date(), body: req.body.body, author: req.body.author, likes: [], endorsement: [] };
         newQuestion.chats.push(newChat);
         let insertQuestion = {}; // cannot use template string on the left hand side
         insertQuestion[`pages.${req.body.pageNum}.questions`] = newQuestion;
@@ -362,7 +375,7 @@ router.post('/api/addChat', (req, res) => {
         } else if (req.body.pageNum >= slide.pages.length || req.body.qid >= slide.pages[req.body.pageNum].questions.length) {
             throw { status: 400, error: "Bad Request" };
         }
-        let newChat = { time: Date(), body: req.body.body, author: req.body.author, likes: [], endorsement: null };
+        let newChat = { time: Date(), body: req.body.body, author: req.body.author, likes: [], endorsement: [] };
         let insertChat = {}; // cannot use template string on the left hand side
         insertChat[`pages.${req.body.pageNum}.questions.${req.body.qid}.chats`] = newChat;
         const slides = req.db.collection('slides');
@@ -420,6 +433,7 @@ router.post('/api/like', (req, res) => {
     });
 });
 
+router.use('/files', express.static(__dirname + '/../files'));
 router.use(express.static('react-build'));
 
 router.use((req, res) => res.status(404).send());
