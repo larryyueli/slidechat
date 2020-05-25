@@ -39,6 +39,7 @@ async function startApp() {
         process.exit(1);
     }
 
+    console.log('connected to database');
     const db = dbClient.db('slidechat');
     const users = db.collection('users');
     const courses = db.collection('courses');
@@ -49,7 +50,14 @@ async function startApp() {
             _id: ObjectID.createFromHexString(req.params.slideID)
         }).then(slide => {
             if (!slide) throw { status: 404, error: "slide not found" };
-            res.json({ img: slide.pages[req.params.pageNumber].location });
+            if (isNaN(req.params.pageNumber)
+                || +req.params.pageNumber < 1
+                || +req.params.pageNumber > slide.pageTotal) {
+                throw { status: 400, error: "bad request" };
+            }
+            res.sendFile(`page-${+req.params.pageNumber - 1}.png`, {
+                root: path.join(__dirname, '..', 'files', req.params.slideID)
+            });
         }).catch(err => {
             errorHandler(res, err);
         });
@@ -247,22 +255,19 @@ async function startApp() {
                 fs.rmdirSync(req.dir, { recursive: true });
             }
             fs.mkdirSync(path.join('files', req.id));
-            console.log(`mkdir`);
             return req.files.file.mv(path.join(req.dir, req.files.file.name));
         }).then(_ => {  // Step 3: convert to images
             let pdfImage = new PDFImage(path.join(req.dir, req.files.file.name), {
                 pdfFileBaseName: 'page',
                 outputDirectory: req.dir
             });
-            console.log("convert")
             return pdfImage.convertFile();
         }).then(imagePaths => { // Step 4: create the list of pages, update database
             let pages = [];
-            console.log("mv")
             for (let i of imagePaths) {
                 pages.push({ location: i, questions: [] });
             }
-            return req.slides.updateOne({ _id: req.ObjectID }, {
+            return slides.updateOne({ _id: req.ObjectID }, {
                 $set: {
                     pdfLocation: path.join(req.dir, req.files.file.name),
                     pages: pages
@@ -441,10 +446,14 @@ async function startApp() {
 
     router.get('/', (req, res) => res.sendFile('index.html', { root: path.join(__dirname, '..', 'static') }));
 
-    router.use('/:slideID', (req, res) => res.sendFile('index.html', { root: path.join(__dirname, '..', 'react-build') }));
+    router.get('/:slideID(\\w+)/', (req, res) => {
+        res.sendFile('index.html', {
+            root: path.join(__dirname, '..', 'react-build')
+        });
+    });
 
     router.use(express.static('react-build'));
-    router.use('/files', express.static(__dirname + '/../files'));
+    router.use('/files', express.static(path.join(__dirname, '..', 'files')));
 
     router.use((req, res) => res.status(404).send());
 

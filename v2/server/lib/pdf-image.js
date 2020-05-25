@@ -1,4 +1,5 @@
-// node-pdf
+// Modified from node module pdf-image: https://www.npmjs.com/package/pdf-image
+// the original version has the undesired sorting of the output (eg. 1, 10, 11, ..., 2, 20, 21,...)
 
 var Promise = require("es6-promise").Promise;
 
