@@ -14,9 +14,9 @@ class Profile extends Component {
 
     uploadPDF() {
         var formData = new FormData();
-        formData.append("cid", "5ebeed9c67acf26a3bebe22e");
+        formData.append("cid", "5ecccb8f49066e5cb50ebd48");
         formData.append("anoymity", "anyone");
-        formData.append("author", 3);
+        formData.append("user", 'lulingxi');
         formData.append("file", document.getElementById("file").files[0]);
         axios.post(`${fullURL}/api/addSlide/`,
             formData

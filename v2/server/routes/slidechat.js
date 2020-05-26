@@ -9,6 +9,9 @@ const dbConfig = {
     useNewUrlParser: true,
 };
 
+const config = JSON.parse(fs.readFileSync('config.json'));
+const instructors = config.instructors;
+const dbURL = config.dbURL;
 
 function errorHandler(res, err) {
     if (err && err.status) {
@@ -21,15 +24,34 @@ function errorHandler(res, err) {
 
 function instructorAuth(req, res, next) {
     // todo
-    next();
+    if (instructors.indexOf(req.body.user) < 0) {
+        res.status(401).send("Unauthorized");
+        console.error(req.body);
+    } else {
+        next();
+    }
+}
+
+function isNotValidPage(pageNum, pageTotal) {
+    if (isNaN(pageNum)
+        || +pageNum < 1
+        || +pageNum > pageTotal) {
+        return true;
+    }
+    return false;
+}
+
+function isNotValidQuestionID(qid, questions) {
+    if (isNaN(qid)
+        || +qid < 0
+        || +qid >= questions.length) {
+        return true;
+    }
+    return false;
 }
 
 async function startApp() {
     const router = express.Router();
-
-    const config = JSON.parse(fs.readFileSync('config.json'));
-    const instructors = config.instructors;
-    const dbURL = config.dbURL;
 
     let dbClient;
     try {
@@ -39,267 +61,208 @@ async function startApp() {
         process.exit(1);
     }
 
+    console.log('connected to database');
     const db = dbClient.db('slidechat');
     const users = db.collection('users');
     const courses = db.collection('courses');
     const slides = db.collection('slides');
 
-    router.get('/api/:slideID/:pageNumber/img', (req, res) => {
-        slides.findOne({
-            _id: ObjectID.createFromHexString(req.params.slideID)
-        }).then(slide => {
-            if (!slide) throw { status: 404, error: "slide not found" };
-            res.json({ img: slide.pages[req.params.pageNumber].location });
-        }).catch(err => {
-            errorHandler(res, err);
-        });
-    });
 
-    router.get('/api/:slideID/pageTotal', (req, res) => {
-        slides.findOne({
-            _id: ObjectID.createFromHexString(req.params.slideID)
-        }).then(slide => {
-            if (!slide) throw { status: 404, error: "slide not found" };
-            res.json({ pageTotal: slide.pages.length });
-        }).catch(err => {
-            errorHandler(res, err);
-        });
-    });
-
-    router.get('/api/:slideID/:pageNumber/img', (req, res) => {
-        slides.findOne({
-            _id: ObjectID.createFromHexString(req.params.slideID)
-        }).then(slide => {
-            if (!slide) throw { status: 404, error: "slide not found" };
-            res.json({ pageImg: slide.pages[req.params.pageNumber].location });
-        }).catch(err => {
-            errorHandler(res, err);
-        });
-    });
-
-    router.get('/api/:slideID/:pageNumber/questions', (req, res) => {
-        slides.findOne({
-            _id: ObjectID.createFromHexString(req.params.slideID)
-        }).then(slide => {
-            if (!slide) {
-                throw { status: 404, error: "slide not found" };
-            }
-            let result = { questions: slide.pages[req.params.pageNumber].questions };
-            for (let question of result.questions) {
-                delete question.chats;
-            }
-            res.json(result);
-        }).catch(err => {
-            errorHandler(res, err);
-        });
-    });
-
-
-    router.get('/api/:slideID/:pageNumber/:questionID', (req, res) => {
-        slides.findOne({
-            _id: ObjectID.createFromHexString(req.params.slideID)
-        }).then(slide => {
-            if (!slide) throw { status: 404, error: "slide not found" };
-            res.json(slide.pages[req.params.pageNumber].questions[req.params.questionID].chats);
-        }).catch(err => {
-            errorHandler(res, err);
-        });
-    });
+    /**=====================
+     *    Instructor APIs
+     * ===================== */
 
     /**
-     * add a new instructor to users
-     * body:
-     * userName: admin's user name
-     * password: admin's password
-     * utorID: utorID
+     * create a new course
+     * req body:
+     *   course: course name
+     *   user: instructor utorid
      */
-    // router.post('/api/addInstructor', (req, res) =>  {
-    //     if (typeof req.body.utorID != 'number'){
-    //         return res.status(400).send({error:"invalid urtorID"});
-    //     } if (req.body.userName != "admin user name" || req.body.password != "admin password"){
-    //         return res.status(403).send({ error: "invalid userName or password" });
-    //     }
-    //     MongoClient.connect(url)
-    //         .then(function (client) {
-    //             const slidechat = client.db('slidechat');
-    //             req.users = slidechat.collection('users');
-    //             return req.users.findOne({ _id: req.body.utorID });
-    //         }).then(usersRes =>{
-    //             if (usersRes){
-    //                 throw { status: 400, error: "this user is an instructor" };
-    //             }
-    //             return req.users.insertOne({ _id: req.body.utorID, courses: [] });
-    //         }).then(usersRes => {
-    //             console.log(`Inserted instructor ${JSON.stringify(usersRes.ops[0])}`);
-    //             res.json({ "ok": usersRes.ops[0]._id });
-    //         }).catch(err => { 
-    //             if (err.status){
-    //                 return res.status(err.status).send({ error: err.error}); 
-    //             }else{
-    //                 console.error(err);
-    //                 return res.status(500).send(); 
-    //             }
-    //         });
-    // });
+    router.post('/api/createCourse', instructorAuth, async (req, res) => {
+        try {
+            let insertRes = await courses.insertOne({
+                name: req.body.course,
+                instructors: [req.body.user],
+                slides: []
+            });
 
-    /**
-     * add a new course to user
-     * body:
-     * name: course name
-     * author: uploader's utorid
-     */
-    router.post('/api/createCourse', instructorAuth, (req, res) => {
-        users.findOne({
-            _id: req.body.author
-        }).then(user => {
-            if (!user || instructors.indexOf(user._id) < 0) {
-                throw { status: 401, error: "Unauthorized" };
+            let courseID = insertRes.ops[0]._id.toHexString();
+
+            let updateRes = await users.updateOne({ _id: req.body.user },
+                { $push: { courses: { role: "instructor", id: courseID } } },
+                { upsert: true });
+
+            if (updateRes.modifiedCount === 0 && updateRes.upsertedCount === 0) {
+                throw "createCourse update failed";
             }
-            req.user = user;
-            let newCourse = { name: req.body.name, instructors: [req.body.author], slides: [] };
-            return courses.insertOne(newCourse);
-        }).then(course => {
-            console.log(`Inserted course ${JSON.stringify(course.ops[0]._id)}`);
-            req.id = course.ops[0]._id.toHexString();
-            req.user.courses.push({ role: "instructor", id: req.id });
-            return users.updateOne({ _id: req.body.author }, { $push: { courses: { role: "instructor", id: req.id } } });
-        }).then(updateRes => {
-            if (updateRes.modifiedCount > 0) {
-                console.log(`updated user ${JSON.stringify(req.body.author)}`);
-                res.json({ id: req.id });
-            } else {
-                throw "createCourse update error";
-            }
-        }).catch(err => {
+
+            console.log(`created course: ${req.body.course}`);
+            res.json({ id: courseID });
+        } catch (err) {
             errorHandler(res, err);
-        });
+        }
     });
 
+
     /**
-     * join a course
+     * add a new instructor to a course
      * body:
-     * cid: course id
-     * author: uploader's utorid
+     *   user: utorid
+     *   newUser: utorid
+     *   course: object ID of a course
      */
-    // router.post('/api/joinCourse', (req, res) =>  {
-    //     MongoClient.connect(url, function (err, db) {
-    //         var courses = db.collection('courses');
-    //         var course = null;
-    //         courses.findOne({ _id: ObjectID.createFromHexString(req.body.cid) }, function (err, res) {
-    //             course = res.ops[0];
-    //         });
-    //         if (!course) {
-    //             res.status(404).json({ error: "course not exist" });
-    //         } else {
-    //             var users = db.collection('users');
-    //             users.findOne({ _id: ObjectID.createFromHexString(req.body.author) }, function (err, res) {
-    //                 var user = res.ops[0];
-    //                 user.courses.push({ role: "student", id: course._idtoHexString() });
-    //             });
-    //             res.json({});
-    //         }
-    //     });
-    // });    
-    router.post('/api/testPDF', (req, res) => {
-        console.log(req.files.file.name);
-        res.send();
+    router.post('/api/addInstructor', instructorAuth, async (req, res) => {
+        try {
+            if (typeof req.body.newUser !== 'string') {
+                throw { status: 400, error: 'bad request' };
+            }
+            let course = await courses.findOne({ _id: ObjectID.createFromHexString(req.body.course) },
+                { projection: { instructors: 1 } });
+            if (!course) throw { status: 404, error: "course not found" };
+            if (course.instructors.indexOf(req.body.user) < 0) throw { status: 401, error: "Unauthorized" };
+
+            // add instructor to course
+            let updateRes = await couses.updateOne({ _id: ObjectID.createFromHexString(req.body.course) },
+                { $push: { instructors: req.body.newUser } });
+            if (updateRes.modifiedCount !== 1) {
+                throw `add instructor failed, modifiedCount = ${updateRes.modifiedCount}`;
+            }
+
+            // add course to instructor's course list
+            updateRes = await users.updateOne({ _id: req.body.newUser },
+                { $push: { courses: { role: "instructor", id: courseID } } },
+                { upsert: true });
+
+            if (updateRes.modifiedCount === 0 && updateRes.upsertedCount === 0) {
+                throw "add course to instructor failed";
+            }
+
+            res.send();
+        } catch (err) {
+            errorHandler(res, err);
+        }
     });
 
     /**
      * add a new slide to course
-     * body:
-     * cid: course id
-     * anoymity: anoymity level of the slide
-     * author: uploader's utorid
+     * req body:
+     *   cid: course id
+     *   anoymity: anoymity level of the slide
+     *   user: instructor utorid
+     * req.files:
+     *   file: *.pdf
      */
-    router.post('/api/addSlide', instructorAuth, (req, res) => {
-        if (req.body.cid.length != 24
-            || (["anyone", "UofT student", "nonymous"].indexOf(req.body.anoymity) < 0)
-            || !req.files.file
-            || !req.files.file.name.toLocaleLowerCase().endsWidth('.pdf')) {
-            return res.status(400).send();
-        }
+    router.post('/api/addSlide', instructorAuth, async (req, res) => {
+        try {
+            if (req.body.cid.length != 24
+                || (["anyone", "UofT student", "nonymous"].indexOf(req.body.anoymity) < 0)
+                || !req.files.file
+                || !req.files.file.name.toLocaleLowerCase().endsWith('.pdf')) {
+                return res.status(400).send();
+            }
+            let course = await courses.findOne({ _id: ObjectID.createFromHexString(req.body.cid) });
 
-        courses.findOne({
-            _id: ObjectID.createFromHexString(req.body.cid)
-        }).then(course => {
             if (!course) {
-                throw { status: 404, error: "course not exist" };
+                throw { status: 400, error: "course not exist" };
             } else if (false) {   // check in instructor's list TODO: UNSAFE
                 throw { status: 403, error: "Unauthorized" };
             }
 
             // Step 1: insert into database to get a ObjectID
-            let newSlide = {
+            let insertRes = await slides.insertOne({
                 filename: req.files.file.name,
                 anoymity: req.body.anoymity
-            };
-            return slides.insertOne(newSlide);
-        }).then(slide => {  // Step 2: use the id as the directory name, create a directory, move pdf to directory
-            req.ObjectID = slide.ops[0]._id;
-            req.id = req.ObjectID.toHexString();
-            req.dir = path.join('files', req.id);
-            console.log(`Saving files to: ${req.dir}`);
+            });
+
+            // Step 2: use the id as the directory name, create a directory, move pdf to directory
+            let objID = insertRes.ops[0]._id;
+            let id = objID.toHexString();
+            let dir = path.join('files', id);
+            console.log(`Saving files to: ${dir}`);
 
             // overwrite if exists. should not happen: id is unique
-            if (fs.existsSync(req.dir)) {
+            if (fs.existsSync(dir)) {
                 console.log(`Directory ${id} already exists, overwriting...`);
-                fs.rmdirSync(req.dir, { recursive: true });
+                fs.rmdirSync(dir, { recursive: true });
             }
-            fs.mkdirSync(path.join('files', req.id));
-            console.log(`mkdir`);
-            return req.files.file.mv(path.join(req.dir, req.files.file.name));
-        }).then(_ => {  // Step 3: convert to images
-            let pdfImage = new PDFImage(path.join(req.dir, req.files.file.name), {
-                pdfFileBaseName: 'page',
-                outputDirectory: req.dir
-            });
-            console.log("convert")
-            return pdfImage.convertFile();
-        }).then(imagePaths => { // Step 4: create the list of pages, update database
-            let pages = [];
-            console.log("mv")
-            for (let i of imagePaths) {
-                pages.push({ location: i, questions: [] });
-            }
-            return req.slides.updateOne({ _id: req.ObjectID }, {
-                $set: {
-                    pdfLocation: path.join(req.dir, req.files.file.name),
-                    pages: pages
+            fs.mkdirSync(path.join('files', id));
 
+            await req.files.file.mv(path.join(dir, req.files.file.name));
+
+            // Step 3: convert to images
+            let pdfImage = new PDFImage(path.join(dir, req.files.file.name), {
+                pdfFileBaseName: 'page',
+                outputDirectory: dir
+            });
+            let imagePaths = await pdfImage.convertFile();
+
+            // Step 4: create the list of pages, update database
+            let pages = [];
+            for (let i of imagePaths) {
+                pages.push({ questions: [] });
+            }
+            let updateRes = await slides.updateOne({ _id: objID }, {
+                $set: {
+                    pdfLocation: path.join(dir, req.files.file.name),
+                    pages: pages,
+                    pageTotal: imagePaths.length
                 }
             });
-        }).then(updateRes => {  // step 5: add slide to its course
-            if (updateRes.modifiedCount <= 0) {
-                throw "slide update pages error";
+            if (updateRes.modifiedCount !== 1) {
+                throw "slide add pages failed";
             }
-            return courses.updateOne({ _id: ObjectID.createFromHexString(req.body.cid) }, { $push: { slides: req.id } });
-        }).then(updateRes => {  // done
-            if (updateRes.modifiedCount <= 0) {
-                throw "slide update error";
+
+            // step 5: add slide to its course
+            updateRes = await courses.updateOne({ _id: ObjectID.createFromHexString(req.body.cid) },
+                { $push: { slides: id } });
+            if (updateRes.modifiedCount !== 1) {
+                throw "slide add to course failed";
             }
-            res.json({ ok: req.id });
-        }).catch(err => {
+
+            console.log("pdf file processing complete")
+            res.json({ id: id });
+        } catch (err) {
             errorHandler(res, err);
-        });
+        }
     });
 
-    router.get('/api/myCourses', instructorAuth, (req, res) => {
-        users.findOne({
-            _id: req.body.id
-        }).then(async user => {
-            if (!user) { throw { status: 404, error: "user not found" } }
+    // router.post('/api/testPDF', (req, res) => {
+    //     console.log(req.files.file.name);
+    //     res.send();
+    // });
+
+
+    /**====================
+     *    Everyone APIs
+     * ==================== */
+
+    /**
+     * get the courses the user joined, either as an instructor or a student
+     * also the list of slides of that each course
+     * req body:
+     *   id: utorid
+     */
+    router.get('/api/myCourses', async (req, res) => {
+        try {
+            let user = await users.findOne({ _id: req.body.id });
+            if (!user) return res.json([]);  // does not need to initialize here
+
             let result = [];
+            console.log(user.courses);
             for (let course of user.courses) {
-                let myCourse = await courses.findOne({ _id: ObjectID.createFromHexString(course.id) }, { name: 1, slides: 1 });
+                let myCourse = await courses.findOne({ _id: ObjectID.createFromHexString(course.id) },
+                    { projection: { instructors: 0 } });
                 if (!myCourse) {
                     console.log(`course ${course.id} not found`);
                     continue;
                 }
-                // console.log(myCourse);
+
                 let courseSlides = [];
+
+                console.log(myCourse.slides);
                 for (let slideId in myCourse.slides) {
-                    let slideEntry = await slides.findOne({ _id: ObjectID.createFromHexString(slideId) }, { filename: 1 });
+                    let slideEntry = await slides.findOne({ _id: ObjectID.createFromHexString(slideId) },
+                        { projection: { filename: 1 } });
                     if (!slideEntry) {
                         console.log(`slide ${slideId} not found`);
                         continue;
@@ -308,143 +271,255 @@ async function startApp() {
                 }
                 result.push({
                     name: myCourse.name,
+                    role: course.role,
                     slides: courseSlides
                 });
             }
             res.json(result);
-        }).catch(err => {
+        } catch (err) {
             errorHandler(res, err);
-        });
+        }
+    });
+
+    /**
+     * get slide image
+     * req body:
+     *   slideID: object ID of the slide
+     *   pageNum: integer range from from 1 to pageTotal (inclusive)
+     */
+    router.get('/api/slideImg', async (req, res) => {
+        try {
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.slideID) },
+                { projection: { _id: true } });
+            if (!slide) throw { status: 404, error: "slide not found" };
+            if (isNotValidPage(req.body.pageNum, slide.pageTotal)) {
+                throw { status: 400, error: "bad request" };
+            }
+            res.sendFile(`page-${+req.body.pageNum - 1}.png`, {
+                root: path.join('files', req.body.slideID)
+            });
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    });
+
+    /**
+     * get total number of pages of a slide
+     * req body:
+     *   slideID: object ID of a slide
+     */
+    router.get('/api/pageTotal', async (req, res) => {
+        try {
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.slideID) },
+                { projection: { pageTotal: 1 } });
+            if (!slide) throw { status: 404, error: "slide not found" };
+            res.json({ pageTotal: slide.pageTotal });
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    });
+
+    /**
+     * get question list of a page
+     * req body:
+     *   slideID: object ID of a slide
+     *   pageNum: integer range from from 1 to pageTotal (inclusive)
+     */
+    router.get('/api/questions', async (req, res) => {
+        try {
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.slideID) },
+                { projection: { pages: 1 } });
+            if (!slide) throw { status: 404, error: "slide not found" };
+            if (isNotValidPage(req.body.pageNum, slide.pageTotal)) {
+                throw { status: 400, error: "bad request" };
+            }
+            let result = slide.pages[+req.body.pageNum - 1].questions;
+            for (let question of result) {
+                delete question.chats;
+            }
+            res.json(result);
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    });
+
+    /**
+     * get chats under a question
+     * req body:
+     *   slideID: object ID of a slide
+     *   pageNum: integer range from from 1 to pageTotal (inclusive)
+     *   qid: question index, integer range from from 0 to questions.length (exclusive)
+     */
+    router.get('/api/question', async (req, res) => {
+        try {
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.slideID) },
+                { projection: { pages: 1 } });
+            if (!slide) throw { status: 404, error: "slide not found" };
+            if (isNotValidPage(req.body.pageNum, slide.pageTotal)
+                || isNotValidQuestionID(req.body.qid, slide.pages[+req.body.pageNum - 1].questions)) {
+                throw { status: 400, error: "bad request" };
+            }
+            res.json(slide.pages[+req.body.pageNum - 1].questions[req.body.qid].chats);
+        } catch (err) {
+            errorHandler(res, err);
+        }
     });
 
 
     /**
      * add a new question to page
-     * body:
-     * sid: slide id
-     * pageNum: page number
-     * title: question title
-     * body: question body
-     * author: uploader's utorid
+     * req body:
+     *   sid: slide id
+     *   pageNum: page number
+     *   title: question title
+     *   body: question body
+     *   user: uploader's utorid
      */
-    router.post('/api/addQuestion', (req, res) => {
-        if (req.body.sid.length != 24) {
-            return res.status(400).send();
-        }
-
-        slides.findOne({
-            _id: ObjectID.createFromHexString(req.body.sid)
-        }).then(slide => {
-            if (!slide) {
-                throw { status: 404, error: "slide not found" };
-            } else if (req.body.pageNum >= slide.pages.length) {
-                throw { status: 400, error: "Bad Request" };
+    router.post('/api/addQuestion', async (req, res) => {
+        try {
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) },
+                { projection: { pageTotal: 1 } });
+            if (!slide) throw { status: 404, error: "slide not found" };
+            if (isNotValidPage(req.body.pageNum, slide.pageTotal)
+                || typeof req.body.title !== 'string'
+                || typeof req.body.body !== 'string'
+                || typeof req.body.user !== 'string') {
+                throw { status: 400, error: "bad request" };
             }
 
-            let newQuestion = { status: "unsolved", time: Date(), chats: [], title: req.body.title, author: req.body.author };
-            var newChat = { time: Date(), body: req.body.body, author: req.body.author, likes: [], endorsement: null };
+            let time = Date.now();
+            let newQuestion = {
+                status: "unsolved",
+                time: time,
+                chats: [],
+                title: req.body.title,
+                user: req.body.user
+            };
+            let newChat = {
+                time: time,
+                body: req.body.body,
+                user: req.body.user,
+                likes: [],
+                endorsement: []
+            };
             newQuestion.chats.push(newChat);
-            let insertQuestion = {}; // cannot use template string on the left hand side
-            insertQuestion[`pages.${req.body.pageNum}.questions`] = newQuestion;
 
-            return slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) }, { $push: insertQuestion });
-        }).then(updateRes => {
-            if (updateRes.modifiedCount > 0) {
-                console.log(`updated slide ${JSON.stringify(req.body.sid)}`);
-                res.json({ id: req.id });
-            } else {
+            let insertQuestion = {}; // cannot use template string on the left hand side
+            insertQuestion[`pages.${req.body.pageNum - 1}.questions`] = newQuestion;
+            let updateRes = await slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) },
+                { $push: insertQuestion });
+            if (updateRes.modifiedCount !== 1) {
                 throw "question update error";
             }
-        }).catch(err => {
+
+            res.send();
+        } catch (err) {
             errorHandler(res, err);
-        });
+        }
     });
 
 
     /**
      * add a new chat to question
      * body:
-     * sid: slide id
-     * qid: question index
-     * pageNum: page number
-     * body: question body
-     * author: uploader's utorid
+     *   sid: slide id
+     *   qid: question index, integer range from from 0 to questions.length (exclusive)
+     *   pageNum: page number
+     *   body: message body
+     *   user: utorid
      */
-    router.post('/api/addChat', (req, res) => {
-        if (req.body.sid.length != 24) {
-            return res.status(400).send();
-        }
-
-        slides.findOne({
-            _id: ObjectID.createFromHexString(req.body.sid)
-        }).then(slide => {
-            if (!slide) {
-                throw { status: 404, error: "slide not found" };
-            } else if (req.body.pageNum >= slide.pages.length
-                || req.body.qid >= slide.pages[req.body.pageNum].questions.length) {
-                throw { status: 400, error: "Bad Request" };
+    router.post('/api/addChat', async (req, res) => {
+        try {
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) },
+                { projection: { pageTotal: 1, pages: 1 } });
+            if (!slide) throw { status: 404, error: "slide not found" };
+            if (isNotValidPage(req.body.pageNum, slide.pageTotal)
+                || isNotValidQuestionID(req.body.qid, slide.pages[+req.body.pageNum - 1].questions)
+                || typeof req.body.body !== 'string'
+                || typeof req.body.user !== 'string') {
+                throw { status: 400, error: "bad request" };
             }
-            let newChat = { time: Date(), body: req.body.body, author: req.body.author, likes: [], endorsement: null };
+
+            let time = Date.now();
+            let newChat = {
+                time: time,
+                body: req.body.body,
+                user: req.body.user,
+                likes: [],
+                endorsement: []
+            };
+
             let insertChat = {}; // cannot use template string on the left hand side
-            insertChat[`pages.${req.body.pageNum}.questions.${req.body.qid}.chats`] = newChat;
-            return slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) }, { $push: insertChat });
-        }).then(updateRes => {
-            if (updateRes.modifiedCount > 0) {
-                console.log(`updated slide ${JSON.stringify(req.body.sid)}`);
-                res.json({ id: req.id });
-            } else {
+            insertChat[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats`] = newChat;
+            let updateLastActiveTime = {};
+            updateLastActiveTime[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.time`] = time;
+            let updateRes = await slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) },
+                { $push: insertChat, $set: updateLastActiveTime });
+
+            if (updateRes.modifiedCount !== 1) {
                 throw "chat update error";
             }
-        }).catch(err => {
+
+            res.send();
+        } catch (err) {
             errorHandler(res, err);
-        });
+        }
     });
 
     /**
      * add a new chat to question
-     * body:
-     * sid: slide id
-     * qid: question index
-     * cid: chat index
-     * pageNum: page number
-     * author: uploader's utorid
+     * req body:
+     *   sid: slide id
+     *   qid: question index
+     *   cid: chat index
+     *   pageNum: page number
+     *   user: utorid
      */
-    router.post('/api/like', (req, res) => {
-        if (req.body.sid.length != 24) {
-            return res.status(400).send();
-        }
+    router.post('/api/like', async (req, res) => {
+        try {
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) },
+                { projection: { questions: 1 } });
+            if (!slide) throw { status: 404, error: "slide not found" };
+            if (isNotValidPage(req.body.pageNum, slide.pageTotal)
+                || isNotValidQuestionID(req.body.qid, slide.pages[+req.body.pageNum - 1].questions)
+                || typeof req.body.title !== 'string'
+                || typeof req.body.body !== 'string'
+                || typeof req.body.user !== 'string') {
+                throw { status: 400, error: "bad request" };
+            }
 
-        slides.findOne({
-            _id: ObjectID.createFromHexString(req.body.sid)
-        }).then(slide => {
-            if (!slide) {
-                throw { status: 404, error: "slide not found" };
-            } else if (req.body.pageNum >= slide.pages.length ||
-                req.body.qid >= slide.pages[req.body.pageNum].questions.length ||
-                req.body.cid >= slide.pages[req.body.pageNum].questions[req.body.qid].chats.length) {
-                throw { status: 400, error: "Bad Request" };
+            // is valid chat id
+            if (isNaN(req.body.cid)
+                || +req.body.cid < 0
+                || +req.body.cid > slide.pages[+req.body.pageNum - 1].questions[req.body.qid].length) {
+                throw { status: 400, error: "bad request" };
             }
+
             let insertLike = {}; // cannot use template string on the left hand side
-            insertLike[`pages.${req.body.pageNum}.questions.${req.body.qid}.chats.${req.body.cid}.likes`] = req.body.author;
-            return slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) }, { $push: insertLike });
-        }).then(updateRes => {
-            if (updateRes.modifiedCount > 0) {
-                console.log(`updated slide ${JSON.stringify(req.body.sid)}`);
-                res.json({ id: req.id });
+            // if instructor, add to endorsement, else add to likes
+            if (instructors.indexOf(req.body.user) < 0) {
+                insertLike[`pages.${req.body.pageNum}.questions.${req.body.qid}.chats.${req.body.cid}.likes`] = req.body.user;
             } else {
-                throw "chat update error";
+                insertLike[`pages.${req.body.pageNum}.questions.${req.body.qid}.chats.${req.body.cid}.endorsement`] = req.body.user;
             }
-        }).catch(err => {
+            let updateRes = await slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) },
+                { $push: insertLike });
+
+            if (updateRes.modifiedCount !== 1) {
+                throw "like update error";
+            }
+
+            res.send();
+        } catch (err) {
             errorHandler(res, err);
-        });
+        }
     });
 
-    router.get('/', (req, res) => res.sendFile('index.html', { root: path.join(__dirname, '..', 'static') }));
+    router.get('/', (req, res) => res.sendFile('index.html', { root: 'static' }));
 
-    router.get('/:slideID', (req, res) => res.sendFile('index.html', { root: path.join(__dirname, '..', 'react-build') }));
+    router.get('/:slideID([A-Fa-f0-9]+)/', (req, res) => { res.sendFile('index.html', { root: 'react-build' }); });
 
     router.use(express.static('react-build'));
-    router.use('/files', express.static(__dirname + '/../files'));
 
     router.use((req, res) => res.status(404).send());
 
