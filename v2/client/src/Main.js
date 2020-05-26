@@ -1,62 +1,9 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 
-import ChatArea from './ChatArea.js';
-import Slides from './Slides.js';
-
-const dummyState = {
-    err: "",
-    pageNum: 1,
-    pageTotal: 3,
-    pageImg: "example-16.png",
-    chats: [
-        {
-            title: 'A question',
-            time: '2000/01/01 00:00 AM',
-            author: 'name1'
-        },
-        {
-            title: 'Another questionasdfasdfasdfasdfasdfasdasdfsadfasdf',
-            time: '2000/01/01 00:00 AM',
-            author: 'name1'
-        },
-        {
-            title: 'A question',
-            time: '2000/01/01 00:00 AM',
-            author: 'name1'
-        },
-        {
-            title: 'A question',
-            time: '2000/01/01 00:00 AM',
-            author: 'name1'
-        },
-        {
-            title: 'A question',
-            time: '2000/01/01 00:00 AM',
-            author: 'name1'
-        },
-        {
-            title: 'A question',
-            time: '2000/01/01 00:00 AM',
-            author: 'name1'
-        },
-        {
-            title: 'A question',
-            time: '2000/01/01 00:00 AM',
-            author: 'name1'
-        },
-        {
-            title: 'A question',
-            time: '2000/01/01 00:00 AM',
-            author: 'name1'
-        },
-        {
-            title: 'A question',
-            time: '2000/01/01 00:00 AM',
-            author: 'name1'
-        }
-    ]
-};
+import ChatArea from './ChatArea';
+import Slides from './Slides';
+import {baseURL} from './config';
 
 /**
  * The main entrance of the application
@@ -67,7 +14,7 @@ class Main extends Component {
         super(props);
         this.state = { pageNum: 1, chats: {}, pageTotal: 1, pageImg: "default.png", };
         this.state.id = "5ecae7fdb7d01649ea0a7097";
-        axios.get(`/slidechat/api/${this.state.id}/pageTotal`).then(data => {
+        axios.get(`${baseURL}/api/${this.state.id}/pageTotal`).then(data => {
             this.setState({ pageTotal: data.data.pageTotal });
             if (window.location.hash) {
                 let n = +window.location.hash.substring(1);
@@ -75,9 +22,9 @@ class Main extends Component {
                     this.setState({ pageNum: n });
                 }
             }
-            return axios.get(`/slidechat/api/${this.state.id}/${this.state.pageNum - 1}/img`);
+            return axios.get(`${baseURL}/api/${this.state.id}/${this.state.pageNum - 1}/img`);
         }).then(data=>{
-            this.setState({ pageImg: data.data.pageImg });
+            this.setState({ pageImg: baseURL + "/" + data.data.pageImg });
             this.fetchChatList();
         }).catch(err => {
             console.error(err);
@@ -100,7 +47,7 @@ class Main extends Component {
     // TO-DO
     fetchChatList() {
         let main = this;
-        axios.get(`/slidechat/api/${this.state.id}/${this.state.pageNum - 1}/questions`).then(data => {
+        axios.get(`${baseURL}/api/${this.state.id}/${this.state.pageNum - 1}/questions`).then(data => {
             main.setState({ chats: data.data.questions });
         }).catch(err => {
             console.error(err);
@@ -115,10 +62,10 @@ class Main extends Component {
         if (this.state.pageNum >= this.state.pageTotal) {
             return;
         }
-        axios.get(`/slidechat/api/${this.state.id}/${this.state.pageNum}/img`).then(data=>{
+        axios.get(`${baseURL}/api/${this.state.id}/${this.state.pageNum}/img`).then(data=>{
             this.setState((prev) => {
                 window.location.hash = prev.pageNum + 1;
-                return { pageNum: prev.pageNum + 1, pageImg: data.data.pageImg }
+                return { pageNum: prev.pageNum + 1, pageImg: baseURL + "/" + data.data.pageImg }
             });
         });
         this.fetchChatList();
@@ -132,10 +79,10 @@ class Main extends Component {
         if (this.state.pageNum<1){
             return;
         }
-        axios.get(`/slidechat/api/${this.state.id}/${this.state.pageNum - 2}/img`).then(data => {
+        axios.get(`${baseURL}/api/${this.state.id}/${this.state.pageNum - 2}/img`).then(data => {
             this.setState((prev) => {
                 window.location.hash = prev.pageNum - 1;
-                return { pageNum: prev.pageNum - 1, pageImg: data.data.pageImg }
+                return { pageNum: prev.pageNum - 1, pageImg: baseURL + "/" + data.data.pageImg }
             });
         });
         this.fetchChatList();

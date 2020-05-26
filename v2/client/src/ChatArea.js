@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Button, TextField } from '@material-ui/core';
 
 import './App.scss';
+import { baseURL } from './config';
 
 
 let dummyDetails = [
@@ -37,6 +38,7 @@ class ChatArea extends React.Component {
 		};
 
 		this.createNewChat = this.createNewChat.bind(this);
+		this.sendNewQuestion = this.sendNewQuestion.bind(this);
 		this.sendNewChat = this.sendNewChat.bind(this);
 	}
 
@@ -45,19 +47,47 @@ class ChatArea extends React.Component {
 		this.setState({ state: "new-chat" });
 	}
 
+	sendNewQuestion() {
+		axios.post(`${baseURL}/api/addQuestion/`,
+			{
+				sid: this.props.slideID,
+				pageNum: this.props.pageNum - 1,
+				title: this.refs.title.getValue(),
+				body: this.refs.body.getValue(),
+				user: 1
+			}
+		).then(function (response) {
+			console.log(response);
+			this.setState({ state: "list" });
+		}).catch(function (error) {
+			console.error(error);
+		});
+	}
+
 	// TO-DO
-	sendNewChat() {
-		this.setState({ state: "list" });
+	sendNewChat(questionID) {
+		axios.post(`${baseURL}/api/addChat/`,
+			{
+				sid: this.props.slideID,
+				pageNum: this.props.pageNum - 1,
+				qid: this.state.questionID,
+				body: this.refs.chat.getValue(),
+				user: 1
+			}
+		).then(function (response) {
+			console.log(response);
+		}).catch(function (error) {
+			console.error(error);
+		});
 	}
 
 	// TO-DO
 	// probably need a loading state here
 	fetchChatDetails(questionID) {
-		console.log(questionID);
-		axios.get(`/slidechat/api/${this.props.slideID}/${this.props.pageNum - 1}/${questionID}`).then(data => {
+		axios.get(`${baseURL}/api/${this.props.slideID}/${this.props.pageNum - 1}/${questionID}`).then(data => {
 			this.setState({
 				state: "chat-details",
-				chatID: questionID,
+				questionID: questionID,
 				chatDetails: data.data
 			});
 		}).catch(err => {
@@ -111,21 +141,23 @@ class ChatArea extends React.Component {
 						<div><TextField
 							variant='outlined'
 							id={`new-title`}
-							placeholder="Title" /></div>
+							placeholder="Title"
+							ref="title" /></div>
 						<div><TextField
 							variant='outlined'
 							id={`new-body`}
 							multiline
 							rows="6"
-							placeholder="Body" /></div>
-						<div><Button variant="contained" color="primary" onClick={this.sendNewChat}>Send</Button></div>
+							placeholder="Body"
+							ref="body" /></div>
+						<div><Button variant="contained" color="primary" onClick={this.sendNewQuestion}>Send</Button></div>
 					</div>
 				);
 				break;
 
 			// the content of the chat thread
 			case "chat-details":
-				title = this.props.chats[this.state.chatID].title;
+				title = this.props.chats[this.state.questionID].title;
 				let chatDetails = [
 					<div className="title">{title}</div>
 				];
@@ -149,8 +181,9 @@ class ChatArea extends React.Component {
 							variant='outlined'
 							id={`chat-response`}
 							multiline
-							rowsMax="4" />
-						<Button variant="contained" color="primary">Send</Button>
+							rowsMax="4"
+							ref="chat" />
+						<Button variant="contained" color="primary" onClick={this.sendNewChat}>Send</Button>
 					</div>
 				);
 				content = (

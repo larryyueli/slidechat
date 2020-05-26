@@ -441,7 +441,7 @@ async function startApp() {
 
     router.get('/', (req, res) => res.sendFile('index.html', { root: path.join(__dirname, '..', 'static') }));
 
-    router.use('/:slideID', (req, res) => res.sendFile('index.html', { root: path.join(__dirname, '..', 'react-build') }));
+    router.get('/:slideID', (req, res) => res.sendFile('index.html', { root: path.join(__dirname, '..', 'react-build') }));
 
     router.use(express.static('react-build'));
     router.use('/files', express.static(__dirname + '/../files'));

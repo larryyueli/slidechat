@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 
-import ChatArea from './ChatArea.js';
-import Slides from './Slides.js';
+import { fullURL} from './config';
 
 /**
  * The main entrance of the application
@@ -19,7 +18,7 @@ class Profile extends Component {
         formData.append("anoymity", "anyone");
         formData.append("author", 3);
         formData.append("file", document.getElementById("file").files[0]);
-        axios.post("http://mcsapps.utm.utoronto.ca:10000/slidechat/api/addSlide/",
+        axios.post(`${fullURL}/api/addSlide/`,
             formData
         ).then(function (response) {
             console.log(response);

@@ -27,8 +27,9 @@ async function main() {
 
   app.use((req, res) => res.status(404).send());
 
-  app.listen(10000, function () {
-    console.log('App listening on port ' + 10000);
+  const port = 10001;
+  app.listen(10001, function () {
+    console.log('App listening on port ' + 10001);
   });
 }
 
