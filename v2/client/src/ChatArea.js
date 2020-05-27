@@ -51,31 +51,31 @@ class ChatArea extends React.Component {
 		axios.post(`${baseURL}/api/addQuestion/`,
 			{
 				sid: this.props.slideID,
-				pageNum: this.props.pageNum - 1,
-				title: this.refs.title.getValue(),
-				body: this.refs.body.getValue(),
-				user: 1
+				pageNum: this.props.pageNum,
+				title: this.titleRef.value,
+				body: this.bodyRef.value,
+				user: "yaochen8"
 			}
-		).then(function (response) {
-			console.log(response);
-			this.setState({ state: "list" });
+		).then(response => {
+			this.props.fetchChatList(this.props.slideID, this.props.pageNum);
 		}).catch(function (error) {
 			console.error(error);
 		});
 	}
 
 	// TO-DO
-	sendNewChat(questionID) {
+	sendNewChat() {
 		axios.post(`${baseURL}/api/addChat/`,
 			{
 				sid: this.props.slideID,
-				pageNum: this.props.pageNum - 1,
+				pageNum: this.props.pageNum,
 				qid: this.state.questionID,
-				body: this.refs.chat.getValue(),
-				user: 1
+				body: this.chatRef.value,
+				user: "yaochen8"
 			}
-		).then(function (response) {
-			console.log(response);
+		).then(response => {
+			this.chatRef.value = "";
+			this.fetchChatDetails(chatarea.state.questionID);
 		}).catch(function (error) {
 			console.error(error);
 		});
@@ -84,7 +84,7 @@ class ChatArea extends React.Component {
 	// TO-DO
 	// probably need a loading state here
 	fetchChatDetails(questionID) {
-		axios.get(`${baseURL}/api/${this.props.slideID}/${this.props.pageNum - 1}/${questionID}`).then(data => {
+		axios.get(`${baseURL}/api/chats?slideID=${this.props.slideID}&pageNum=${this.props.pageNum}&qid=${questionID}`).then(data => {
 			this.setState({
 				state: "chat-details",
 				questionID: questionID,
@@ -120,7 +120,7 @@ class ChatArea extends React.Component {
 						<div className="chat" key={i} onClick={e => this.fetchChatDetails(i)}>
 							<div className="title">{this.props.chats[i].title}</div>
 							<div className="info">
-								<div className="author">{this.props.chats[i].author}</div>
+								<div className="author">{this.props.chats[i].user}</div>
 								<div className="time">{this.props.chats[i].time}</div>
 							</div>
 						</div>
@@ -142,14 +142,14 @@ class ChatArea extends React.Component {
 							variant='outlined'
 							id={`new-title`}
 							placeholder="Title"
-							ref="title" /></div>
+							inputRef={ref => { this.titleRef = ref; }} /></div>
 						<div><TextField
 							variant='outlined'
 							id={`new-body`}
 							multiline
 							rows="6"
 							placeholder="Body"
-							ref="body" /></div>
+							inputRef={ref => { this.bodyRef = ref; }} /></div>
 						<div><Button variant="contained" color="primary" onClick={this.sendNewQuestion}>Send</Button></div>
 					</div>
 				);
@@ -159,7 +159,7 @@ class ChatArea extends React.Component {
 			case "chat-details":
 				title = this.props.chats[this.state.questionID].title;
 				let chatDetails = [
-					<div className="title">{title}</div>
+					<div className="title" key={-2}>{title}</div>
 				];
 				for (let i = 0; i < this.state.chatDetails.length; i++) {
 					let message = this.state.chatDetails[i];
@@ -168,7 +168,7 @@ class ChatArea extends React.Component {
 						: null;
 					chatDetails.push(
 						<div className="chat" key={i}>
-							<span className="author">{message.author}</span>
+							<span className="author">{message.user}</span>
 							<span className="time">{message.time}</span>
 							<div className="body">{message.body}</div>
 							{likes}
@@ -182,7 +182,7 @@ class ChatArea extends React.Component {
 							id={`chat-response`}
 							multiline
 							rowsMax="4"
-							ref="chat" />
+							inputRef={ref => { this.chatRef = ref; }} />
 						<Button variant="contained" color="primary" onClick={this.sendNewChat}>Send</Button>
 					</div>
 				);

@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 
-import { fullURL} from './config';
+import { Button } from '@material-ui/core';
+
+import { fullURL, baseURL} from './config';
 
 /**
  * The main entrance of the application
@@ -10,18 +12,23 @@ import { fullURL} from './config';
 class Profile extends Component {
     constructor(props) {
         super(props);
+        this.state = {uploading : false};
+
+        this.uploadPDF = this.uploadPDF.bind(this);
     }
 
     uploadPDF() {
+        this.setState({uploading : true});
         var formData = new FormData();
         formData.append("cid", "5ecccb8f49066e5cb50ebd48");
-        formData.append("anoymity", "anyone");
+        formData.append("anonymity", "anyone");
         formData.append("user", 'lulingxi');
         formData.append("file", document.getElementById("file").files[0]);
-        axios.post(`${fullURL}/api/addSlide/`,
+        axios.post(`${baseURL}/api/addSlide/`,
             formData
-        ).then(function (response) {
+        ).then(response=> {
             console.log(response);
+            this.setState({ uploading: false });
         }).catch(function (error) {
             console.log(error);
         });
@@ -30,8 +37,8 @@ class Profile extends Component {
     render() {
         return (
             <div className="profile">
-                <input id="file" type="file" name="file" />
-                <button id="fileSubmit" onClick={this.uploadPDF}>Upload</button>
+                <input id="file" type="file" name="file" /> 
+                <Button id="fileSubmit" onClick={this.uploadPDF} disabled={this.state.uploading} variant="contained" color="primary">Upload</Button>
             </div>
         );
     }

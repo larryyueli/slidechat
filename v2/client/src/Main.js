@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import ChatArea from './ChatArea';
 import Slides from './Slides';
-import {baseURL} from './config';
+import { baseURL } from './config';
 
 /**
  * The main entrance of the application
@@ -12,20 +12,23 @@ import {baseURL} from './config';
 class Main extends Component {
     constructor(props) {
         super(props);
-        this.state = { pageNum: 1, chats: {}, pageTotal: 1, pageImg: "default.png", };
-        this.state.id = "5ecae7fdb7d01649ea0a7097";
-        axios.get(`${baseURL}/api/${this.state.id}/pageTotal`).then(data => {
+        this.fetchChatList = this.fetchChatList.bind(this);
+        this.state = { pageNum: 1, questions: [], pageTotal: 1, pageImg: "default.png", };
+        let path = window.location.pathname.split("/");
+        this.state.id = path.pop();
+        axios.get(`${baseURL}/api/pageTotal?slideID=${this.state.id}`).then(data => {
             this.setState({ pageTotal: data.data.pageTotal });
+            let defaultPage = 1;
             if (window.location.hash) {
                 let n = +window.location.hash.substring(1);
-                if (n > 0 && n <= this.state.pageTotal) {
-                    this.setState({ pageNum: n });
+                if (n > 0 && n <= data.data.pageTotal) {
+                    defaultPage = n;
                 }
             }
-            return axios.get(`${baseURL}/api/${this.state.id}/${this.state.pageNum - 1}/img`);
-        }).then(data=>{
-            this.setState({ pageImg: baseURL + "/" + data.data.pageImg });
-            this.fetchChatList();
+            this.fetchChatList(this.state.id, defaultPage);
+            this.setState({ pageNum: defaultPage });
+            this.setState({ pageImg: `${baseURL}/api/slideImg?slideID=${this.state.id}&pageNum=${defaultPage}` });
+            
         }).catch(err => {
             console.error(err);
         });
@@ -34,58 +37,40 @@ class Main extends Component {
         this.prevPage = this.prevPage.bind(this);
     }
 
-    // TODO
-    fetchPage() {
-        axios.get(`/${this.state.slideID}/${this.state.pageNum - 1}`)
-            .then((data) => {
-                this.setState(data);
-            }).catch(err => {
-                console.error(err);
-            })
-    }
-
-    // TO-DO
-    fetchChatList() {
-        let main = this;
-        axios.get(`${baseURL}/api/${this.state.id}/${this.state.pageNum - 1}/questions`).then(data => {
-            main.setState({ chats: data.data.questions });
+    // get chats under a question
+    fetchChatList(slideID, pageNum) {
+        this.refs.chatArea.setState({ state: "list" });
+        axios.get(`${baseURL}/api/questions?slideID=${slideID}&pageNum=${pageNum}`).then(data => {
+            this.setState({ questions: data.data });
         }).catch(err => {
             console.error(err);
         });
     }
 
     /**
-     * TODO
      * Go to the next page of slide, should fetch the url and the chat threads list of the new page 
      */
     nextPage() {
         if (this.state.pageNum >= this.state.pageTotal) {
             return;
         }
-        axios.get(`${baseURL}/api/${this.state.id}/${this.state.pageNum}/img`).then(data=>{
-            this.setState((prev) => {
-                window.location.hash = prev.pageNum + 1;
-                return { pageNum: prev.pageNum + 1, pageImg: baseURL + "/" + data.data.pageImg }
-            });
-        });
-        this.fetchChatList();
+        let newPageNum = this.state.pageNum + 1;
+        window.location.hash = newPageNum;
+        this.fetchChatList(this.state.id, newPageNum);
+        this.setState({ pageImg: `${baseURL}/api/slideImg?slideID=${this.state.id}&pageNum=${newPageNum}`, pageNum: newPageNum });
     }
 
     /**
-     * TODO
      * Go to the previous page of slide, should fetch the url and the chat threads list of the new page 
      */
     prevPage() {
-        if (this.state.pageNum<1){
+        if (this.state.pageNum < 1) {
             return;
         }
-        axios.get(`${baseURL}/api/${this.state.id}/${this.state.pageNum - 2}/img`).then(data => {
-            this.setState((prev) => {
-                window.location.hash = prev.pageNum - 1;
-                return { pageNum: prev.pageNum - 1, pageImg: baseURL + "/" + data.data.pageImg }
-            });
-        });
-        this.fetchChatList();
+        let newPageNum = this.state.pageNum - 1;
+        window.location.hash = newPageNum;
+        this.fetchChatList(this.state.id, newPageNum);
+        this.setState({ pageImg: `${baseURL}/api/slideImg?slideID=${this.state.id}&pageNum=${newPageNum}`, pageNum: newPageNum});
     }
 
     render() {
@@ -98,7 +83,7 @@ class Main extends Component {
                         pageImg={this.state.pageImg}
                         nextPage={this.nextPage}
                         prevPage={this.prevPage} />
-                    <ChatArea chats={this.state.chats} slideID={this.state.id} pageNum={this.state.pageNum}/>
+                    <ChatArea chats={this.state.questions} slideID={this.state.id} pageNum={this.state.pageNum} fetchChatList={this.fetchChatList} ref="chatArea"/>
                 </div>
             </>
         );

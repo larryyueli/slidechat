@@ -147,7 +147,7 @@ async function startApp() {
      * add a new slide to course
      * req body:
      *   cid: course id
-     *   anoymity: anoymity level of the slide
+     *   anonymity: anonymity level of the slide
      *   user: instructor utorid
      * req.files:
      *   file: *.pdf
@@ -155,7 +155,7 @@ async function startApp() {
     router.post('/api/addSlide', instructorAuth, async (req, res) => {
         try {
             if (req.body.cid.length != 24
-                || (["anyone", "UofT student", "nonymous"].indexOf(req.body.anoymity) < 0)
+                || (["anyone", "UofT student", "nonymous"].indexOf(req.body.anonymity) < 0)
                 || !req.files.file
                 || !req.files.file.name.toLocaleLowerCase().endsWith('.pdf')) {
                 return res.status(400).send();
@@ -171,7 +171,7 @@ async function startApp() {
             // Step 1: insert into database to get a ObjectID
             let insertRes = await slides.insertOne({
                 filename: req.files.file.name,
-                anoymity: req.body.anoymity
+                anonymity: req.body.anonymity
             });
 
             // Step 2: use the id as the directory name, create a directory, move pdf to directory
@@ -244,7 +244,7 @@ async function startApp() {
      */
     router.get('/api/myCourses', async (req, res) => {
         try {
-            let user = await users.findOne({ _id: req.body.id });
+            let user = await users.findOne({ _id: req.query.id });
             if (!user) return res.json([]);  // does not need to initialize here
 
             let result = [];
@@ -289,14 +289,14 @@ async function startApp() {
      */
     router.get('/api/slideImg', async (req, res) => {
         try {
-            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.slideID) },
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.slideID) },
                 { projection: { _id: true } });
             if (!slide) throw { status: 404, error: "slide not found" };
-            if (isNotValidPage(req.body.pageNum, slide.pageTotal)) {
+            if (isNotValidPage(req.query.pageNum, slide.pageTotal)) {
                 throw { status: 400, error: "bad request" };
             }
-            res.sendFile(`page-${+req.body.pageNum - 1}.png`, {
-                root: path.join('files', req.body.slideID)
+            res.sendFile(`page-${+req.query.pageNum - 1}.png`, {
+                root: path.join('files', req.query.slideID)
             });
         } catch (err) {
             errorHandler(res, err);
@@ -310,7 +310,7 @@ async function startApp() {
      */
     router.get('/api/pageTotal', async (req, res) => {
         try {
-            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.slideID) },
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.slideID) },
                 { projection: { pageTotal: 1 } });
             if (!slide) throw { status: 404, error: "slide not found" };
             res.json({ pageTotal: slide.pageTotal });
@@ -327,13 +327,13 @@ async function startApp() {
      */
     router.get('/api/questions', async (req, res) => {
         try {
-            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.slideID) },
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.slideID) },
                 { projection: { pages: 1 } });
             if (!slide) throw { status: 404, error: "slide not found" };
-            if (isNotValidPage(req.body.pageNum, slide.pageTotal)) {
+            if (isNotValidPage(req.query.pageNum, slide.pageTotal)) {
                 throw { status: 400, error: "bad request" };
             }
-            let result = slide.pages[+req.body.pageNum - 1].questions;
+            let result = slide.pages[+req.query.pageNum - 1].questions;
             for (let question of result) {
                 delete question.chats;
             }
@@ -345,21 +345,21 @@ async function startApp() {
 
     /**
      * get chats under a question
-     * req body:
+     * req query:
      *   slideID: object ID of a slide
      *   pageNum: integer range from from 1 to pageTotal (inclusive)
      *   qid: question index, integer range from from 0 to questions.length (exclusive)
      */
-    router.get('/api/question', async (req, res) => {
+    router.get('/api/chats', async (req, res) => {
         try {
-            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.slideID) },
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.slideID) },
                 { projection: { pages: 1 } });
             if (!slide) throw { status: 404, error: "slide not found" };
-            if (isNotValidPage(req.body.pageNum, slide.pageTotal)
-                || isNotValidQuestionID(req.body.qid, slide.pages[+req.body.pageNum - 1].questions)) {
+            if (isNotValidPage(req.query.pageNum, slide.pageTotal)
+                || isNotValidQuestionID(req.query.qid, slide.pages[+req.query.pageNum - 1].questions)) {
                 throw { status: 400, error: "bad request" };
             }
-            res.json(slide.pages[+req.body.pageNum - 1].questions[req.body.qid].chats);
+            res.json(slide.pages[+req.query.pageNum - 1].questions[req.query.qid].chats);
         } catch (err) {
             errorHandler(res, err);
         }
@@ -373,7 +373,7 @@ async function startApp() {
      *   pageNum: page number
      *   title: question title
      *   body: question body
-     *   user: uploader's utorid
+     *   user: utorid
      */
     router.post('/api/addQuestion', async (req, res) => {
         try {
