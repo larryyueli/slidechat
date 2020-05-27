@@ -41,13 +41,22 @@ function isNotValidPage(pageNum, pageTotal) {
     return false;
 }
 
-function isNotValidQuestionID(qid, questions) {
-    if (isNaN(qid)
-        || +qid < 0
-        || +qid >= questions.length) {
+function notExistInList(index, list) {
+    // if (isNaN(index)
+    //     || +index < 0
+    //     || +index >= list.length
+    //     || !list[+index]) {
+    //     return true;
+    // }
+    // return false;
+    try {
+        if (list[+index]) return false;
+    } catch (err) {
+        console.log(err)
         return true;
     }
-    return false;
+    console.log(null)
+    return true;
 }
 
 async function startApp() {
@@ -76,7 +85,7 @@ async function startApp() {
      * create a new course
      * req body:
      *   course: course name
-     *   user: instructor utorid
+     *   user: instructor userID
      */
     router.post('/api/createCourse', instructorAuth, async (req, res) => {
         try {
@@ -107,8 +116,8 @@ async function startApp() {
     /**
      * add a new instructor to a course
      * body:
-     *   user: utorid
-     *   newUser: utorid
+     *   user: userID
+     *   newUser: userID
      *   course: object ID of a course
      */
     router.post('/api/addInstructor', instructorAuth, async (req, res) => {
@@ -122,7 +131,7 @@ async function startApp() {
             if (course.instructors.indexOf(req.body.user) < 0) throw { status: 401, error: "Unauthorized" };
 
             // add instructor to course
-            let updateRes = await couses.updateOne({ _id: ObjectID.createFromHexString(req.body.course) },
+            let updateRes = await courses.updateOne({ _id: ObjectID.createFromHexString(req.body.course) },
                 { $push: { instructors: req.body.newUser } });
             if (updateRes.modifiedCount !== 1) {
                 throw `add instructor failed, modifiedCount = ${updateRes.modifiedCount}`;
@@ -148,7 +157,7 @@ async function startApp() {
      * req body:
      *   cid: course id
      *   anonymity: anonymity level of the slide
-     *   user: instructor utorid
+     *   user: instructor userID
      * req.files:
      *   file: *.pdf
      */
@@ -231,6 +240,75 @@ async function startApp() {
     //     res.send();
     // });
 
+    /**
+     * Delete a question
+     * req query:
+     *   user: userID
+     *   sid: slide object ID
+     *   pageNum: page number, integer range from from 1 to pageTotal (inclusive)
+     *   qid: question index, integer range from from 0 to questions.length (exclusive)
+     */
+    router.delete('/api/question', instructorAuth, async (req, res) => {
+        try {
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.sid) },
+                { projection: { pageTotal: 1, pages: 1 } });
+            if (!slide) throw { status: 404, error: "slide not found" };
+            if (isNotValidPage(req.query.pageNum, slide.pageTotal)
+                || notExistInList(req.query.qid, slide.pages[+req.query.pageNum - 1].questions)) {
+                throw { status: 400, error: "bad request" };
+            }
+
+            let deleteQuery = {};
+            deleteQuery[`pages.${req.query.pageNum - 1}.questions.${+req.query.qid}`] = null;
+            let updateRes = await slides.updateOne({ _id: ObjectID.createFromHexString(req.query.sid) },
+                { $set: deleteQuery });
+            if (updateRes.modifiedCount !== 1) {
+                throw "delete question error";
+            }
+
+            res.send();
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    })
+
+    /**
+     * Delete a chat
+     * req query:
+     *   user: userID
+     *   sid: slide object ID
+     *   pageNum: page number, integer range from from 1 to pageTotal (inclusive)
+     *   qid: question index, integer range from from 0 to questions.length (exclusive)
+     *   c
+     */
+    router.delete('/api/chat', instructorAuth, async (req, res) => {
+        try {
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.sid) },
+                { projection: { pageTotal: 1, pages: 1 } });
+            if (!slide) throw { status: 404, error: "slide not found" };
+            if (isNotValidPage(req.query.pageNum, slide.pageTotal)
+                || notExistInList(req.query.qid, slide.pages[+req.query.pageNum - 1].questions)
+                || notExistInList(req.query.cid, slide.pages[+req.query.pageNum - 1].questions[req.query.qid].chats)) {
+                console.log(req.query.qid, req.query.cid)
+                console.log(slide.pages[+req.query.pageNum - 1].questions[req.query.qid])
+                throw { status: 400, error: "bad request" };
+            }
+
+            let deleteQuery = {};
+            deleteQuery[`pages.${req.query.pageNum - 1}.questions.${+req.query.qid}.chats.${+req.query.cid}`] = null;
+            let updateRes = await slides.updateOne({ _id: ObjectID.createFromHexString(req.query.sid) },
+                { $set: deleteQuery });
+            if (updateRes.modifiedCount !== 1) {
+                throw "delete chat error";
+            }
+
+            res.send();
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    })
+
+
 
     /**====================
      *    Everyone APIs
@@ -240,7 +318,7 @@ async function startApp() {
      * get the courses the user joined, either as an instructor or a student
      * also the list of slides of that each course
      * req body:
-     *   id: utorid
+     *   id: userID
      */
     router.get('/api/myCourses', async (req, res) => {
         try {
@@ -356,7 +434,7 @@ async function startApp() {
                 { projection: { pages: 1 } });
             if (!slide) throw { status: 404, error: "slide not found" };
             if (isNotValidPage(req.query.pageNum, slide.pageTotal)
-                || isNotValidQuestionID(req.query.qid, slide.pages[+req.query.pageNum - 1].questions)) {
+                || notExistInList(req.query.qid, slide.pages[+req.query.pageNum - 1].questions)) {
                 throw { status: 400, error: "bad request" };
             }
             res.json(slide.pages[+req.query.pageNum - 1].questions[req.query.qid].chats);
@@ -373,7 +451,7 @@ async function startApp() {
      *   pageNum: page number
      *   title: question title
      *   body: question body
-     *   user: utorid
+     *   user: userID
      */
     router.post('/api/addQuestion', async (req, res) => {
         try {
@@ -426,7 +504,7 @@ async function startApp() {
      *   qid: question index, integer range from from 0 to questions.length (exclusive)
      *   pageNum: page number
      *   body: message body
-     *   user: utorid
+     *   user: userID
      */
     router.post('/api/addChat', async (req, res) => {
         try {
@@ -434,7 +512,7 @@ async function startApp() {
                 { projection: { pageTotal: 1, pages: 1 } });
             if (!slide) throw { status: 404, error: "slide not found" };
             if (isNotValidPage(req.body.pageNum, slide.pageTotal)
-                || isNotValidQuestionID(req.body.qid, slide.pages[+req.body.pageNum - 1].questions)
+                || notExistInList(req.body.qid, slide.pages[+req.body.pageNum - 1].questions)
                 || typeof req.body.body !== 'string'
                 || typeof req.body.user !== 'string') {
                 throw { status: 400, error: "bad request" };
@@ -473,34 +551,25 @@ async function startApp() {
      *   qid: question index
      *   cid: chat index
      *   pageNum: page number
-     *   user: utorid
+     *   user: userID
      */
     router.post('/api/like', async (req, res) => {
         try {
             let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) },
-                { projection: { questions: 1 } });
+                { projection: { pageTotal: 1, pages: 1 } });
             if (!slide) throw { status: 404, error: "slide not found" };
             if (isNotValidPage(req.body.pageNum, slide.pageTotal)
-                || isNotValidQuestionID(req.body.qid, slide.pages[+req.body.pageNum - 1].questions)
-                || typeof req.body.title !== 'string'
-                || typeof req.body.body !== 'string'
-                || typeof req.body.user !== 'string') {
-                throw { status: 400, error: "bad request" };
-            }
-
-            // is valid chat id
-            if (isNaN(req.body.cid)
-                || +req.body.cid < 0
-                || +req.body.cid > slide.pages[+req.body.pageNum - 1].questions[req.body.qid].length) {
+                || notExistInList(req.body.qid, slide.pages[+req.body.pageNum - 1].questions)
+                || notExistInList(req.body.cid, slide.pages[+req.body.pageNum - 1].questions[req.body.qid].chats)) {
                 throw { status: 400, error: "bad request" };
             }
 
             let insertLike = {}; // cannot use template string on the left hand side
             // if instructor, add to endorsement, else add to likes
             if (instructors.indexOf(req.body.user) < 0) {
-                insertLike[`pages.${req.body.pageNum}.questions.${req.body.qid}.chats.${req.body.cid}.likes`] = req.body.user;
+                insertLike[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.likes`] = req.body.user;
             } else {
-                insertLike[`pages.${req.body.pageNum}.questions.${req.body.qid}.chats.${req.body.cid}.endorsement`] = req.body.user;
+                insertLike[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.endorsement`] = req.body.user;
             }
             let updateRes = await slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) },
                 { $push: insertLike });

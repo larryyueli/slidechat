@@ -25,7 +25,7 @@ async function test() {
     // console.log('upload pdf')
     // let form = new FormData();
     // form.append("cid", courseID);
-    // form.append("anoymity", "anyone");
+    // form.append("anonymity", "anyone");
     // form.append("user", "lulingxi");
     // form.append('file', fs.createReadStream('./example.pdf'));
     // await axios.post(URL + '/api/addSlide',
@@ -58,14 +58,74 @@ async function test() {
     //     console.error(err.response.data);
     // })
 
-    // add a chat
-    console.log('add chat')
-    await axios.post(URL + '/api/addChat', {
+    // // add a chat
+    // console.log('add chat')
+    // await axios.post(URL + '/api/addChat', {
+    //     user: "lulingxi",
+    //     sid: slideID,
+    //     pageNum: 1,
+    //     qid: 0,
+    //     body: 'answer'
+    // }).then(res => {
+    //     console.log(res.status);
+    //     console.log(res.data);
+    //     courseID = res.data.id;
+    // }).catch(err => {
+    //     console.error(err.response.status);
+    //     console.error(err.response.data);
+    // })
+
+    // // delete a question
+    // console.log('delete question')
+    // await axios.delete(`${URL}/api/question?sid=${slideID}&pageNum=1&qid=1`, {
+    //     data: { user: "lulingxi" }
+    // }).then(res => {
+    //     console.log(res.status);
+    //     console.log(res.data);
+    //     courseID = res.data.id;
+    // }).catch(err => {
+    //     console.error(err.response.status);
+    //     console.error(err.response.data);
+    // })
+
+    // // delete a chat
+    // console.log('delete chat')
+    // await axios.delete(`${URL}/api/chat?sid=${slideID}&pageNum=1&qid=0&cid=1`, {
+    //     data: { user: "lulingxi" }
+    // }).then(res => {
+    //     console.log(res.status);
+    //     console.log(res.data);
+    //     courseID = res.data.id;
+    // }).catch(err => {
+    //     console.error(err.response.status);
+    //     console.error(err.response.data);
+    // })
+
+    // // like
+    // console.log('like')
+    // await axios.post(URL + '/api/like', {
+    //     user: "someone",
+    //     sid: slideID,
+    //     pageNum: 1,
+    //     qid: 0,
+    //     cid: 0
+    // }).then(res => {
+    //     console.log(res.status);
+    //     console.log(res.data);
+    //     courseID = res.data.id;
+    // }).catch(err => {
+    //     console.error(err.response.status);
+    //     console.error(err.response.data);
+    // })
+
+    // endorse
+    console.log('endorse')
+    await axios.post(URL + '/api/like', {
         user: "lulingxi",
         sid: slideID,
         pageNum: 1,
         qid: 0,
-        body: 'answer'
+        cid: 0
     }).then(res => {
         console.log(res.status);
         console.log(res.data);
