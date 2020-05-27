@@ -67,6 +67,10 @@ class Profile extends Component {
         });
     }
 
+    fetchCourses(){
+        
+    }
+
     render() {
         let content = [];
         console.log(this.state.courses);
@@ -83,7 +87,7 @@ class Profile extends Component {
             }
             let course = <div className="course" key={i}>
                 <div className="title">{this.state.courses[i].name}</div>
-                <div className="slides">                    {slides}                </div>
+                <div className="slides">{slides}</div>
                 <div className="upload-bar">
                     <input id="file" type="file" name="file" />
                     <Button id="fileSubmit" onClick={this.uploadPDF} disabled={this.state.uploading} variant="contained" color="primary">Upload</Button>

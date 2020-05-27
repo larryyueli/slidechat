@@ -413,7 +413,9 @@ async function startApp() {
             }
             let result = slide.pages[+req.query.pageNum - 1].questions;
             for (let question of result) {
-                delete question.chats;
+                if (question) {
+                    delete question.chats;
+                }
             }
             res.json(result);
         } catch (err) {

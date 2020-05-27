@@ -116,6 +116,9 @@ class ChatArea extends React.Component {
 				];
 
 				for (let i = 0; i < this.props.chats.length; i++) {
+					if (!this.props.chats[i]){
+						continue;
+					}
 					chats.push(
 						<div className="chat" key={i} onClick={e => this.fetchChatDetails(i)}>
 							<div className="title">{this.props.chats[i].title}</div>
@@ -163,6 +166,9 @@ class ChatArea extends React.Component {
 				];
 				for (let i = 0; i < this.state.chatDetails.length; i++) {
 					let message = this.state.chatDetails[i];
+					if (!message) {
+						continue;
+					}
 					let likes = message.likes && message.likes.length > 0
 						? <div className="like">{`${message.likes.length} likes`}</div>
 						: null;
