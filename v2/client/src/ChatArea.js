@@ -75,7 +75,7 @@ class ChatArea extends React.Component {
 			}
 		).then(response => {
 			this.chatRef.value = "";
-			this.fetchChatDetails(chatarea.state.questionID);
+			this.fetchChatDetails(this.state.questionID);
 		}).catch(function (error) {
 			console.error(error);
 		});
