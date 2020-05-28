@@ -5,6 +5,8 @@ import { Button, TextField } from '@material-ui/core';
 
 import { fullURL, baseURL } from './config';
 
+import './Profile.scss';
+
 
 /**
  * The main entrance of the application
@@ -26,9 +28,7 @@ class Profile extends Component {
     // get course list from server
     fetchCourses() {
         axios.get(`${baseURL}/api/myCourses?id=${this.state.uid}`).then(data => {
-            this.setState({
-                courses: data.data,
-            });
+            this.setState({ courses: data.data });
         }).catch(err => {
             console.error(err);
         });
@@ -111,7 +111,9 @@ class Course extends Component {
     }
 
     deleteSlide(sid) {
-        axios.delete(`${baseURL}/api/slide?sid=${sid}`, { data: { user: this.props.uid } }).then(data => {
+        axios.delete(`${baseURL}/api/slide?sid=${sid}`, {
+            data: { user: this.props.uid }
+        }).then(data => {
             this.props.fetchCourses();
         }).catch(err => {
             console.error(err);

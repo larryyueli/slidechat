@@ -1,6 +1,6 @@
 import React from 'react';
 
-import './App.scss';
+import './Appbar.scss';
 
 /**
  * App bar: consisting the logo and some menu buttons

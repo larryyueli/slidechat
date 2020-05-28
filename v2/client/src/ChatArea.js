@@ -2,10 +2,9 @@ import React from 'react';
 import axios from 'axios';
 import { Button, TextField } from '@material-ui/core';
 
-import './App.scss';
 import { baseURL } from './config';
 import { formatTime, formatNames } from './util';
-
+import './ChatArea.scss';
 
 /**
  * This is the chat area on the right of the page.
@@ -17,7 +16,7 @@ class ChatArea extends React.Component {
 			state: "list", 		// possible values: list, new-chat, chat-details
 			loading: false,		// to-do: add loading state whenever loading
 			chatDetails: [],	// content of the chat
-			questionID: -1,		// the expanded question's ID
+			qid: -1,			// the expanded question's ID
 		};
 
 		this.createNewChat = this.createNewChat.bind(this);
@@ -53,13 +52,13 @@ class ChatArea extends React.Component {
 			{
 				sid: this.props.slideID,
 				pageNum: this.props.pageNum,
-				qid: this.state.questionID,
+				qid: this.state.qid,
 				body: this.chatRef.value,
 				user: "yaochen8"
 			}
 		).then(response => {
 			this.chatRef.value = "";
-			this.fetchChatDetails(this.state.questionID);
+			this.fetchChatDetails(this.state.qid);
 		}).catch(function (error) {
 			console.error(error);
 		});
@@ -67,11 +66,11 @@ class ChatArea extends React.Component {
 
 	// TO-DO
 	// probably need a loading state here
-	fetchChatDetails(questionID) {
-		axios.get(`${baseURL}/api/chats?slideID=${this.props.slideID}&pageNum=${this.props.pageNum}&qid=${questionID}`).then(data => {
+	fetchChatDetails(qid) {
+		axios.get(`${baseURL}/api/chats?slideID=${this.props.slideID}&pageNum=${this.props.pageNum}&qid=${qid}`).then(data => {
 			this.setState({
 				state: "chat-details",
-				questionID: questionID,
+				qid: qid,
 				chatDetails: data.data
 			});
 		}).catch(err => {
@@ -79,16 +78,16 @@ class ChatArea extends React.Component {
 		});
 	}
 
-	// like, if the user is an instructor, then endorse
+	// like, if the user is an instructor, endorse
 	likeChat(cid) {
 		axios.post(`${baseURL}/api/like/`, {
 			sid: this.props.slideID,
 			pageNum: this.props.pageNum,
-			qid: this.state.questionID,
+			qid: this.state.qid,
 			cid: cid,
 			user: "yaochen8",
 		}).then(res => {
-			this.fetchChatDetails(this.state.questionID);
+			this.fetchChatDetails(this.state.qid);
 		}).catch(err => {
 			console.error(err);
 		});
@@ -159,7 +158,7 @@ class ChatArea extends React.Component {
 
 			// the content of the chat thread
 			case "chat-details":
-				title = this.props.chats[this.state.questionID].title;
+				title = this.props.chats[this.state.qid].title;
 				let chatDetails = [
 					<div className="title" key={-2}>{title}</div>
 				];

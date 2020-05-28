@@ -1,0 +1,95 @@
+@import './palette.scss';
+@import './util.scss';
+
+.profile {
+	width: 35rem;
+	max-width: 100%;
+	margin: 3rem auto;
+
+	> .title {
+		text-align: center;
+		font-size: 3rem;
+	}
+
+	.course {
+		margin: 2rem 0;
+		border: 2px solid $primary;
+		border-radius: 2rem;
+		padding: 2rem;
+
+		.title {
+			font-size: 1.5rem;
+			font-weight: 450;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+
+			.manage {
+				@include clickable();
+				background-color: $primary;
+				color: white;
+				font-size: 1.2rem;
+				padding: 0.5rem;
+				border-radius: 0.4rem;
+				box-shadow: 1px 1px 4px #aaaaaa;
+			}
+
+			.managing {
+				background-color: $secondary;
+			}
+		}
+
+		.slides {
+			margin: 1rem 0;
+
+			.slide-item {
+				display: flex;
+				padding: 0.5rem 0;
+				border-top: 1px solid $dividerColour;
+				border-bottom: 1px solid $dividerColour;
+				margin-top: -1px;
+
+				.slide-link {
+					@include ellipsis();
+					flex: 1;
+					padding: 0.6rem 0;
+					color: $primary;
+				}
+			}
+		}
+
+		.upload-bar {
+			text-align: center;
+		}
+
+		.addInstructor-bar {
+            @include centers();
+			margin-top: 1em;
+
+			.MuiTextField-root {
+				width: 50%;
+				margin-right: 1em;
+
+				.MuiOutlinedInput-input,
+				.MuiOutlinedInput-multiline {
+					padding: 6px;
+				}
+			}
+		}
+	}
+
+	.createCourse-bar {
+        @include centers();
+		margin-top: 1em;
+
+		.MuiTextField-root {
+			width: 50%;
+			margin-right: 1em;
+
+			.MuiOutlinedInput-input,
+			.MuiOutlinedInput-multiline {
+				padding: 6px;
+			}
+		}
+	}
+}
