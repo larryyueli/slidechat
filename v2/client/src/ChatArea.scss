@@ -1,0 +1,162 @@
+@import './palette.scss';
+@import './util.scss';
+
+.chat-area {
+	min-width: 0;
+
+	.chat-area-title {
+		font-size: 1.5rem;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 1rem 1.5rem;
+		border: 1px solid #cccccc;
+		box-shadow: 0 3px 6px #cccccc;
+		user-select: none;
+
+		.title {
+			margin: 0 0.7rem;
+			@include ellipsis();
+		}
+
+		.back-button {
+			display: flex;
+			align-items: center;
+			transition: color 0.2s;
+
+			&:hover {
+				color: #aaaaaa;
+			}
+		}
+	}
+
+	.new-chat-btn-row {
+		text-align: center;
+		padding: 1rem 0;
+		border-bottom: 1px solid #cccccc;
+	}
+
+	.chat-list {
+		.chat {
+			padding: 1rem;
+			border-bottom: 1px solid #cccccc;
+
+			.title {
+				font-weight: 420;
+				@include ellipsis();
+			}
+
+			.info {
+				@include sides();
+
+				.author {
+					flex: 1;
+					font-size: 0.9rem;
+					color: #cccccc;
+					@include ellipsis();
+				}
+
+				.time {
+					font-size: 0.9rem;
+					margin-left: 0.5rem;
+					color: #cccccc;
+				}
+			}
+		}
+	}
+
+	.chat-details {
+		.title {
+			font-size: 1.3rem;
+			padding: 1rem;
+			overflow-wrap: anywhere;
+		}
+
+		.chat {
+			padding: 1rem;
+			border-bottom: 1px solid #cccccc;
+			overflow-wrap: anywhere;
+
+			.info {
+				@include sides();
+				font-size: 0.9rem;
+
+				.author {
+					overflow-wrap: anywhere;
+				}
+
+				.time {
+					margin-left: 0.5rem;
+					color: #cccccc;
+				}
+
+				.liked {
+					@include clickable();
+					display: flex;
+					align-items: center;
+					color: $likeColour;
+				}
+
+				.nobody-liked {
+					@include clickable();
+					color: #cccccc;
+				}
+			}
+
+			.info-bottom {
+				font-size: 0.9rem;
+				margin-top: 1rem;
+
+				.endorsement {
+					color: $endorsementColour;
+				}
+			}
+		}
+
+		.MuiExpansionPanelDetails-root {
+			padding-top: 16px !important;
+			padding-bottom: 16px !important;
+		}
+
+		.send-message-bar {
+			display: flex;
+			padding: 0.5rem;
+			align-items: center;
+
+			.MuiTextField-root {
+				flex: 1;
+				margin-right: 0.5rem;
+
+				.MuiOutlinedInput-multiline {
+					padding: 6px;
+				}
+			}
+		}
+	}
+
+	.new-chat-form {
+		margin-bottom: 1rem;
+		padding-top: 2rem;
+		& > div {
+			margin: 0.5em 1rem;
+			text-align: center;
+		}
+
+		.title {
+			font-size: 1.5rem;
+		}
+
+		button {
+			margin: 0.5rem 0.5rem;
+		}
+
+		.MuiTextField-root {
+			width: 100%;
+
+			.MuiOutlinedInput-input,
+			.MuiOutlinedInput-multiline {
+				padding: 6px;
+			}
+		}
+	}
+}

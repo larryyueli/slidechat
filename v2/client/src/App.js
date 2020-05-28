@@ -1,64 +1,10 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 
 import AppBar from './Appbar.js'
-import ChatArea from './ChatArea.js';
-import Slides from './Slides.js';
 
+import Main from './Main.js';
+import Profile from './Profile.js';
 
-const dummyState = {
-    err: "",
-    pageNum: 1,
-    pageTotal: 3,
-    pageImg: "example-16.png",
-    chats: [
-        {
-            title: 'A question',
-            time: '2000/01/01 00:00 AM',
-            author: 'name1'
-        },
-        {
-            title: 'Another questionasdfasdfasdfasdfasdfasdasdfsadfasdf',
-            time: '2000/01/01 00:00 AM',
-            author: 'name1'
-        },
-        {
-            title: 'A question',
-            time: '2000/01/01 00:00 AM',
-            author: 'name1'
-        },
-        {
-            title: 'A question',
-            time: '2000/01/01 00:00 AM',
-            author: 'name1'
-        },
-        {
-            title: 'A question',
-            time: '2000/01/01 00:00 AM',
-            author: 'name1'
-        },
-        {
-            title: 'A question',
-            time: '2000/01/01 00:00 AM',
-            author: 'name1'
-        },
-        {
-            title: 'A question',
-            time: '2000/01/01 00:00 AM',
-            author: 'name1'
-        },
-        {
-            title: 'A question',
-            time: '2000/01/01 00:00 AM',
-            author: 'name1'
-        },
-        {
-            title: 'A question',
-            time: '2000/01/01 00:00 AM',
-            author: 'name1'
-        }
-    ]
-};
 
 
 /**
@@ -68,72 +14,31 @@ const dummyState = {
 class App extends Component {
     constructor(props) {
         super(props);
-        this.state = dummyState;
+        this.state = { state: "main" };
 
-        this.nextPage = this.nextPage.bind(this);
-        this.prevPage = this.prevPage.bind(this);
-        if (window.location.hash) {
-            let n = +window.location.hash.substring(1);
-            if (n > 0 && n <= this.state.pageTotal) {
-                this.state.pageNum = n;
-            }
-        }
+        this.toProfile = this.toProfile.bind(this);
+        this.toMain = this.toMain.bind(this);
     }
 
-    // TODO
-    fetchPage() {
-        axios.get(`/${this.state.slideID}/${this.state.pageNum}`)
-            .then((data) => {
-                this.setState(data);
-            }).catch(err => {
-                console.error(err);
-            })
-    }
-
-	// TO-DO
-	fetchChatList() {
-		axios.get(`/${this.state.slideID}/${this.state.pageNum}/chats`).then(data => {
-			this.setState({ chats: data });
-		}).catch(err => {
-			console.error(err);
-		});
-	}
-
-    /**
-     * TODO
-     * Go to the next page of slide, should fetch the url and the chat threads list of the new page 
-     */
-    nextPage() {
-        this.setState((prev) => {
-            window.location.hash = prev.pageNum + 1;
-            return { pageNum: prev.pageNum + 1 }
+    toProfile(e) {
+        this.setState((prevState, props) => {
+            return { state: "profile" };
         });
     }
 
-    /**
-     * TODO
-     * Go to the previous page of slide, should fetch the url and the chat threads list of the new page 
-     */
-    prevPage() {
-        this.setState((prev) => {
-            window.location.hash = prev.pageNum - 1;
-            return { pageNum: prev.pageNum - 1 }
+    toMain(e) {
+        this.setState((prevState, props) => {
+            return { state: "main" };
         });
     }
 
     render() {
         return (
             <>
-                <AppBar />
-                <div className="main">
-                    <Slides
-                        pageNum={this.state.pageNum}
-                        pageTotal={this.state.pageTotal}
-                        pageImg={this.state.pageImg}
-                        nextPage={this.nextPage}
-                        prevPage={this.prevPage} />
-                    <ChatArea chats={this.state.chats} />
-                </div>
+                <AppBar toProfile={this.toProfile} toMain={this.toMain} state={this.state.state} />
+                {this.state.state === "profile"
+                    ? <Profile />
+                    : <Main />}
             </>
         );
     }

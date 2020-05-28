@@ -2,26 +2,9 @@ import React from 'react';
 import axios from 'axios';
 import { Button, TextField } from '@material-ui/core';
 
-import './App.scss';
-
-
-let dummyDetails = [
-	{
-		author: 'name1',
-		content: 'question question question question question question question question question ',
-		time: '2000/01/01 00:00 AM',
-		likes: ['Ling'],
-		endorsements: [],
-	},
-	{
-		author: 'name11111111111111111111111111111111111111111111111111',
-		content: 'a answer',
-		time: '2000/01/01 00:00 AM',
-		likes: [],
-		endorsements: [],
-	}
-];
-
+import { baseURL } from './config';
+import { formatTime, formatNames } from './util';
+import './ChatArea.scss';
 
 /**
  * This is the chat area on the right of the page.
@@ -33,11 +16,13 @@ class ChatArea extends React.Component {
 			state: "list", 		// possible values: list, new-chat, chat-details
 			loading: false,		// to-do: add loading state whenever loading
 			chatDetails: [],	// content of the chat
-			chatID: -1,			// the expanded chat's ID
+			qid: -1,			// the expanded question's ID
 		};
 
 		this.createNewChat = this.createNewChat.bind(this);
+		this.sendNewQuestion = this.sendNewQuestion.bind(this);
 		this.sendNewChat = this.sendNewChat.bind(this);
+		this.likeChat = this.likeChat.bind(this);
 	}
 
 	// TO-DO
@@ -45,24 +30,67 @@ class ChatArea extends React.Component {
 		this.setState({ state: "new-chat" });
 	}
 
+	sendNewQuestion() {
+		axios.post(`${baseURL}/api/addQuestion/`,
+			{
+				sid: this.props.slideID,
+				pageNum: this.props.pageNum,
+				title: this.titleRef.value,
+				body: this.bodyRef.value,
+				user: "yaochen8"
+			}
+		).then(response => {
+			this.props.fetchChatList(this.props.slideID, this.props.pageNum);
+		}).catch(function (error) {
+			console.error(error);
+		});
+	}
+
 	// TO-DO
 	sendNewChat() {
-		this.setState({ state: "list" });
+		axios.post(`${baseURL}/api/addChat/`,
+			{
+				sid: this.props.slideID,
+				pageNum: this.props.pageNum,
+				qid: this.state.qid,
+				body: this.chatRef.value,
+				user: "yaochen8"
+			}
+		).then(response => {
+			this.chatRef.value = "";
+			this.fetchChatDetails(this.state.qid);
+		}).catch(function (error) {
+			console.error(error);
+		});
 	}
 
 	// TO-DO
 	// probably need a loading state here
-	fetchChatDetails(questionID) {
-		console.log(questionID);
-		// axios.get(`/${this.state.slideID}/${this.state.pageNum}/${questionID}`).then(data => {
-		this.setState({
-			state: "chat-details",
-			chatID: questionID,
-			chatDetails: dummyDetails
+	fetchChatDetails(qid) {
+		axios.get(`${baseURL}/api/chats?slideID=${this.props.slideID}&pageNum=${this.props.pageNum}&qid=${qid}`).then(data => {
+			this.setState({
+				state: "chat-details",
+				qid: qid,
+				chatDetails: data.data
+			});
+		}).catch(err => {
+			console.error(err);
 		});
-		// }).catch(err => {
-		// 	console.error(err);
-		// });
+	}
+
+	// like, if the user is an instructor, endorse
+	likeChat(cid) {
+		axios.post(`${baseURL}/api/like/`, {
+			sid: this.props.slideID,
+			pageNum: this.props.pageNum,
+			qid: this.state.qid,
+			cid: cid,
+			user: "yaochen8",
+		}).then(res => {
+			this.fetchChatDetails(this.state.qid);
+		}).catch(err => {
+			console.error(err);
+		});
 	}
 
 	// onClick handler for back button to go back to the chat list
@@ -86,12 +114,15 @@ class ChatArea extends React.Component {
 				];
 
 				for (let i = 0; i < this.props.chats.length; i++) {
+					if (!this.props.chats[i]) {
+						continue;
+					}
 					chats.push(
 						<div className="chat" key={i} onClick={e => this.fetchChatDetails(i)}>
 							<div className="title">{this.props.chats[i].title}</div>
 							<div className="info">
-								<div className="author">{this.props.chats[i].author}</div>
-								<div className="time">{this.props.chats[i].time}</div>
+								<div className="author">{this.props.chats[i].user}</div>
+								<div className="time">{formatTime(this.props.chats[i].time)}</div>
 							</div>
 						</div>
 					);
@@ -108,39 +139,56 @@ class ChatArea extends React.Component {
 				title = "Create a new chat";
 				content = (
 					<div className="new-chat-form" key={-1}>
-						<p className="title">New chat</p>
-						<p><TextField
+						<div><TextField
 							variant='outlined'
 							id={`new-title`}
-							placeholder="Title" /></p>
-						<p><TextField
+							placeholder="Title"
+							inputRef={ref => { this.titleRef = ref; }} /></div>
+						<div><TextField
 							variant='outlined'
 							id={`new-body`}
 							multiline
-							rowsMax="4"
-							placeholder="Body" /></p>
-						<p><Button variant="contained" color="primary" onClick={this.sendNewChat}>Send</Button></p>
+							rows="6"
+							placeholder="Body"
+							inputRef={ref => { this.bodyRef = ref; }} /></div>
+						<div><Button variant="contained" color="primary" onClick={this.sendNewQuestion}>Send</Button></div>
 					</div>
 				);
 				break;
 
 			// the content of the chat thread
 			case "chat-details":
-				title = this.props.chats[this.state.chatID].title;
+				title = this.props.chats[this.state.qid].title;
 				let chatDetails = [
-					<div className="title">{title}</div>
+					<div className="title" key={-2}>{title}</div>
 				];
 				for (let i = 0; i < this.state.chatDetails.length; i++) {
 					let message = this.state.chatDetails[i];
-					let likes = message.likes && message.likes.length > 0
-						? <div className="like">{`${message.likes.length} likes`}</div>
+					if (!message) {
+						continue;
+					}
+
+					let endorsements = message.endorsement && message.endorsement.length > 0
+						? <div className="endorsement">{`endorsed by ${formatNames(message.endorsement)}`}</div>
 						: null;
+
 					chatDetails.push(
 						<div className="chat" key={i}>
-							<span className="author">{message.author}</span>
-							<span className="time">{message.time}</span>
-							<div className="body">{message.content}</div>
-							{likes}
+							<div className="info">
+								<div>
+									<span className="author">{message.user}</span>
+									<span className="time">{formatTime(message.time)}</span>
+								</div>
+								<div className={message.likes.length ? 'liked' : 'nobody-liked'}>
+									<span>{message.likes.length ? message.likes.length : ''}</span>
+									<span className="material-icons" onClick={e => this.likeChat(i)}>favorite</span>
+								</div>
+
+							</div>
+							<div className="body">{message.body}</div>
+							<div className="info-bottom">
+								{endorsements}
+							</div>
 						</div>
 					);
 				}
@@ -150,8 +198,9 @@ class ChatArea extends React.Component {
 							variant='outlined'
 							id={`chat-response`}
 							multiline
-							rowsMax="4" />
-						<Button variant="contained" color="primary">Send</Button>
+							rowsMax="4"
+							inputRef={ref => { this.chatRef = ref; }} />
+						<Button variant="contained" color="primary" onClick={this.sendNewChat}>Send</Button>
 					</div>
 				);
 				content = (
@@ -167,7 +216,7 @@ class ChatArea extends React.Component {
 		if (this.state.state !== "list") {
 			backButton = (
 				<div className="back-button" onClick={e => this.backToList()}>
-					&lt;
+					<span className="material-icons">arrow_back_ios</span>
 				</div>
 			);
 		} else backButton = <div>&nbsp;</div>;
