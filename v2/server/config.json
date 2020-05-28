@@ -1,8 +1,8 @@
 {
     "dbURL": "mongodb://slidechat:V2Good!%40%23@localhost:27017/slidechat",
     "instructors": [
-        1,
-        2,
-        3
+        "lulingxi",
+        "yaochen8",
+        "huakevi6"
     ]
 }

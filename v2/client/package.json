@@ -14,12 +14,11 @@
   },
   "homepage": "/slidechat/",
   "scripts": {
-    "start": "URL='http://mcsapps.utm.utoronto.ca:10000/slidechat' PORT=10000 react-scripts start",
+    "start": "PORT=10005 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-  "proxy": "http://localhost:9000",
   "eslintConfig": {
     "extends": "react-app"
   },

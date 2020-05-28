@@ -4,22 +4,33 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const cors = require('cors');
+const compression = require('compression');
 const bodyParser = require('body-parser');
+const fileUpload = require('express-fileupload');
 
-const slidechat = require('./routes/slidechat');
+const startSlidechat = require('./routes/slidechat');
 
-const app = express();
-app.disable("x-powered-by");  // remove the HTTP header "X-powered-by: express"
-app.use(cors());
-app.use(morgan('dev'));
-app.use(bodyParser.json()); // support json encoded bodies
-app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
-app.use(cookieParser());
+async function main() {
+  const app = express();
+  app.disable("x-powered-by");  // remove the HTTP header "X-powered-by: express"
 
-app.use('/slidechat', slidechat);
+  app.use(compression());
+  app.use(cors());
+  app.use(morgan('dev'));
+  app.use(bodyParser.json()); // support json encoded bodies
+  app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+  app.use(cookieParser());
+  app.use(fileUpload());
 
-app.use((req, res) => res.status(404).send());
+  const slidechat = await startSlidechat();
+  app.use('/slidechat', slidechat);
 
-app.listen(10000, function () {
-  console.log('App listening on port ' + 10000);
-});
+  app.use((req, res) => res.status(404).send());
+
+  const port = 10004;
+  app.listen(port, function () {
+    console.log('App listening on port ' + port);
+  });
+}
+
+main();

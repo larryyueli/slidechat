@@ -1,13 +1,18 @@
 import React from 'react';
 
-import './App.scss';
+import './Appbar.scss';
 
 /**
  * App bar: consisting the logo and some menu buttons
  */
 class AppBar extends React.Component {
-
     render() {
+        let content;
+        if (this.props.state === "main") {
+            content = <span className='appbar-item' onClick={this.props.toProfile}>My Courses</span>;
+        } else {
+            content = <span className='appbar-item' onClick={this.props.toMain}>Slides</span>;
+        }
         return (
             <div className='appbar'>
                 <div className="appbar-logo">
@@ -15,7 +20,7 @@ class AppBar extends React.Component {
                 </div>
                 <div>
                     <span className='appbar-item'>Notification</span>
-                    <span className='appbar-item'>Profile</span>
+                    {content}
                 </div>
             </div>
         );

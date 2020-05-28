@@ -1,0 +1,24 @@
+@mixin clickable {
+	user-select: none;
+	&:hover {
+		cursor: pointer;
+	}
+}
+
+@mixin ellipsis {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+@mixin centers {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+@mixin sides {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
