@@ -1,4 +1,5 @@
-$primary: rgb(69, 89, 180);
+$primary: rgb(63,81,181);
+$secondary: rgb(220,0,78);
 $dividerColour: #cccccc;
 $backgroundColour: #fafafa;
 
@@ -234,6 +235,26 @@ code {
 		.title {
 			font-size: 1.5rem;
 			font-weight: 450;
+			display: flex;
+			justify-content: space-between;;
+			align-items: center;
+			
+			.manage {
+	background-color: $primary;
+	color: white;
+	font-size: 1.2rem;
+	padding: 0.5rem;
+	border-radius: 0.4rem;
+	box-shadow: 1px 1px 4px #aaaaaa;
+	user-select: none;
+	&:hover {
+		cursor: pointer;
+	}
+
+}
+	.managing{
+		background-color: $secondary;
+	}
 		}
 
 		.slides {
@@ -249,15 +270,45 @@ code {
 				.slide-link {
 					@include ellipsis();
 					flex: 1;
-					padding: 6px 0;
+					padding: 0.6rem 0;
 					color: $primary;
 				}
 			}
 		}
 
-		.upload-bar {
+		.upload-bar{
 			text-align: center;
+		}
+
+		.addInstructor-bar {
+			text-align: center;
+			margin-top: 1em;
+
+			.MuiTextField-root {
+			width: 50%;
+
+			.MuiOutlinedInput-input,
+			.MuiOutlinedInput-multiline {
+				padding: 6px;
+			}
+		}
 		}
 		
 	}
+
+	.createCourse-bar {
+			text-align: center;
+			margin-top: 1em;
+
+			.MuiTextField-root {
+			width: 50%;
+			margin-right: 1em;
+
+			.MuiOutlinedInput-input,
+			.MuiOutlinedInput-multiline {
+				padding: 6px;
+			}
+		}
+		}
 }
+

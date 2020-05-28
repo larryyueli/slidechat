@@ -16,6 +16,7 @@ class Main extends Component {
         this.state = { pageNum: 1, questions: [], pageTotal: 1, pageImg: "default.png", };
         let path = window.location.pathname.split("/");
         this.state.id = path.pop();
+        if (!this.state.id) this.state.id = path.pop(); // handle URL like /slidechat/slideID/
         axios.get(`${baseURL}/api/pageTotal?slideID=${this.state.id}`).then(data => {
             this.setState({ pageTotal: data.data.pageTotal });
             let defaultPage = 1;

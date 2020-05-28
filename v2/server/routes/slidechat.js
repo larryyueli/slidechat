@@ -139,7 +139,7 @@ async function startApp() {
 
             // add course to instructor's course list
             updateRes = await users.updateOne({ _id: req.body.newUser },
-                { $push: { courses: { role: "instructor", id: courseID } } },
+                { $push: { courses: { role: "instructor", id: req.body.course } } },
                 { upsert: true });
 
             if (updateRes.modifiedCount === 0 && updateRes.upsertedCount === 0) {
@@ -241,6 +241,35 @@ async function startApp() {
     // });
 
     /**
+     * Delete a slide
+     * req query:
+     *   user: userID
+     *   sid: slide object ID
+     */
+    router.delete('/api/slide', instructorAuth, async (req, res) => {
+        try {
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.sid) },
+                { projection: { pageTotal: 1, pages: 1 } });
+            if (!slide) throw { status: 404, error: "slide not found" };
+
+            let updateRes = await courses.updateOne({},
+                { $pull: { slides: req.query.sid }});
+            if (updateRes.modifiedCount !== 1) {
+                throw "delete slide error";
+            }
+
+            let removeRes = await slides.deleteOne({ _id: ObjectID.createFromHexString(req.query.sid)});
+            if (removeRes.deletedCount  !== 1) {
+                throw "delete slide error";
+            }
+
+            res.send();
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    })
+
+    /**
      * Delete a question
      * req query:
      *   user: userID
@@ -300,7 +329,7 @@ async function startApp() {
                 { $set: deleteQuery });
             if (updateRes.modifiedCount !== 1) {
                 throw "delete chat error";
-            }
+            } 
 
             res.send();
         } catch (err) {
@@ -337,8 +366,8 @@ async function startApp() {
 
                 let courseSlides = [];
 
-                console.log(myCourse.slides);
-                for (let slideId in myCourse.slides) {
+                // console.log(myCourse.slides);
+                for (let slideId of myCourse.slides) {
                     let slideEntry = await slides.findOne({ _id: ObjectID.createFromHexString(slideId) },
                         { projection: { filename: 1 } });
                     if (!slideEntry) {
@@ -350,7 +379,8 @@ async function startApp() {
                 result.push({
                     name: myCourse.name,
                     role: course.role,
-                    slides: courseSlides
+                    slides: courseSlides,
+                    cid: course.id
                 });
             }
             res.json(result);
