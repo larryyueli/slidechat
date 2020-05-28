@@ -1,6 +1,8 @@
 $primary: rgb(69, 89, 180);
 $dividerColour: #cccccc;
 $backgroundColour: #fafafa;
+$likeColour: #ff2744;
+$endorsementColour: rgb(255, 187, 0);
 
 body {
 	margin: 0;
@@ -14,6 +16,13 @@ body {
 code {
 	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
 		monospace;
+}
+
+@mixin clickable {
+	user-select: none;
+	&:hover {
+		cursor: pointer;
+	}
 }
 
 .appbar {
@@ -87,22 +96,23 @@ code {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		padding: 0.3rem 1.5rem;
+		padding: 1rem 1.5rem;
 		border: 1px solid #cccccc;
 		box-shadow: 0 3px 6px #cccccc;
 		user-select: none;
 
 		.title {
-			margin: 0.7rem;
+			margin: 0 0.7rem;
 			@include ellipsis();
 		}
 
 		.back-button {
-			justify-self: left;
+			display: flex;
+			align-items: center;
 			transition: color 0.2s;
 
 			&:hover {
-				color: #888888;
+				color: #aaaaaa;
 			}
 		}
 	}
@@ -128,11 +138,13 @@ code {
 				justify-content: space-between;
 				.author {
 					flex: 1;
+					font-size: 0.9rem;
 					color: #cccccc;
 					@include ellipsis();
 				}
 
 				.time {
+					font-size: 0.9rem;
 					margin-left: 0.5rem;
 					color: #cccccc;
 				}
@@ -151,19 +163,41 @@ code {
 			padding: 1rem;
 			border-bottom: 1px solid #cccccc;
 
-			.author {
-				font-size: 1.2rem;
-				font-weight: 450;
-				overflow-wrap: anywhere;
+			.info {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				font-size: 0.9rem;
+
+				.author {
+					overflow-wrap: anywhere;
+				}
+
+				.time {
+					margin-left: 0.5rem;
+					color: #cccccc;
+				}
+
+				.liked {
+					@include clickable();
+					display: flex;
+					align-items: center;
+					color: $likeColour;
+				}
+
+				.nobody-liked {
+					@include clickable();
+					color: #cccccc;
+				}
 			}
 
-			.time {
-				margin-left: 0.5rem;
-				color: #cccccc;
-			}
+			.info-bottom {
+				font-size: 0.9rem;
+				margin-top: 1rem;
 
-			.like {
-				color: #cccccc;
+				.endorsement {
+					color: $endorsementColour;
+				}
 			}
 		}
 
@@ -238,7 +272,7 @@ code {
 
 		.slides {
 			margin: 1rem 0;
-			
+
 			.slide-item {
 				padding: 0.5rem 0;
 				display: flex;
@@ -258,6 +292,5 @@ code {
 		.upload-bar {
 			text-align: center;
 		}
-		
 	}
 }

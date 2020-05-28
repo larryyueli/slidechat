@@ -4,24 +4,7 @@ import { Button, TextField } from '@material-ui/core';
 
 import './App.scss';
 import { baseURL } from './config';
-
-
-let dummyDetails = [
-	{
-		author: 'name1',
-		content: 'question question question question question question question question question ',
-		time: '2000/01/01 00:00 AM',
-		likes: ['Ling'],
-		endorsements: [],
-	},
-	{
-		author: 'name11111111111111111111111111111111111111111111111111',
-		content: 'a answer',
-		time: '2000/01/01 00:00 AM',
-		likes: [],
-		endorsements: [],
-	}
-];
+import { formatTime, formatNames } from './util';
 
 
 /**
@@ -34,12 +17,13 @@ class ChatArea extends React.Component {
 			state: "list", 		// possible values: list, new-chat, chat-details
 			loading: false,		// to-do: add loading state whenever loading
 			chatDetails: [],	// content of the chat
-			chatID: -1,			// the expanded chat's ID
+			questionID: -1,		// the expanded question's ID
 		};
 
 		this.createNewChat = this.createNewChat.bind(this);
 		this.sendNewQuestion = this.sendNewQuestion.bind(this);
 		this.sendNewChat = this.sendNewChat.bind(this);
+		this.likeChat = this.likeChat.bind(this);
 	}
 
 	// TO-DO
@@ -95,6 +79,21 @@ class ChatArea extends React.Component {
 		});
 	}
 
+	// like, if the user is an instructor, then endorse
+	likeChat(cid) {
+		axios.post(`${baseURL}/api/like/`, {
+			sid: this.props.slideID,
+			pageNum: this.props.pageNum,
+			qid: this.state.questionID,
+			cid: cid,
+			user: "yaochen8",
+		}).then(res => {
+			this.fetchChatDetails(this.state.questionID);
+		}).catch(err => {
+			console.error(err);
+		});
+	}
+
 	// onClick handler for back button to go back to the chat list
 	backToList() {
 		this.setState({ state: "list" });
@@ -116,7 +115,7 @@ class ChatArea extends React.Component {
 				];
 
 				for (let i = 0; i < this.props.chats.length; i++) {
-					if (!this.props.chats[i]){
+					if (!this.props.chats[i]) {
 						continue;
 					}
 					chats.push(
@@ -124,7 +123,7 @@ class ChatArea extends React.Component {
 							<div className="title">{this.props.chats[i].title}</div>
 							<div className="info">
 								<div className="author">{this.props.chats[i].user}</div>
-								<div className="time">{this.props.chats[i].time}</div>
+								<div className="time">{formatTime(this.props.chats[i].time)}</div>
 							</div>
 						</div>
 					);
@@ -169,15 +168,28 @@ class ChatArea extends React.Component {
 					if (!message) {
 						continue;
 					}
-					let likes = message.likes && message.likes.length > 0
-						? <div className="like">{`${message.likes.length} likes`}</div>
+
+					let endorsements = message.endorsement && message.endorsement.length > 0
+						? <div className="endorsement">{`endorsed by ${formatNames(message.endorsement)}`}</div>
 						: null;
+
 					chatDetails.push(
 						<div className="chat" key={i}>
-							<span className="author">{message.user}</span>
-							<span className="time">{message.time}</span>
+							<div className="info">
+								<div>
+									<span className="author">{message.user}</span>
+									<span className="time">{formatTime(message.time)}</span>
+								</div>
+								<div className={message.likes.length ? 'liked' : 'nobody-liked'}>
+									<span>{message.likes.length ? message.likes.length : ''}</span>
+									<span className="material-icons" onClick={e => this.likeChat(i)}>favorite</span>
+								</div>
+
+							</div>
 							<div className="body">{message.body}</div>
-							{likes}
+							<div className="info-bottom">
+								{endorsements}
+							</div>
 						</div>
 					);
 				}
@@ -205,7 +217,7 @@ class ChatArea extends React.Component {
 		if (this.state.state !== "list") {
 			backButton = (
 				<div className="back-button" onClick={e => this.backToList()}>
-					&lt;
+					<span className="material-icons">arrow_back_ios</span>
 				</div>
 			);
 		} else backButton = <div>&nbsp;</div>;
