@@ -1,10 +1,15 @@
 import React from 'react';
 import axios from 'axios';
 import { Button, TextField } from '@material-ui/core';
+import markdownIt from 'markdown-it';
+import markdownItMathJax from 'markdown-it-mathjax';
 
 import { baseURL } from './config';
 import { formatTime, formatNames } from './util';
 import './ChatArea.scss';
+
+const md = markdownIt({breaks: true});
+md.use(markdownItMathJax());
 
 /**
  * This is the chat area on the right of the page.
@@ -23,6 +28,12 @@ class ChatArea extends React.Component {
 		this.sendNewQuestion = this.sendNewQuestion.bind(this);
 		this.sendNewChat = this.sendNewChat.bind(this);
 		this.likeChat = this.likeChat.bind(this);
+
+		this.self = React.createRef();
+	}
+
+	componentDidUpdate() {
+		window.MathJax.typeset();
 	}
 
 	// TO-DO
@@ -103,12 +114,12 @@ class ChatArea extends React.Component {
 		switch (this.state.state) {
 			// list of all chat threads
 			case "list":
-				title = "Chat";
+				title = "Discussion";
 
 				let chats = [
 					<div className="new-chat-btn-row" key={-1}>
 						<Button variant="contained" color="primary" onClick={this.createNewChat}>
-							Create a new chat
+							Ask a new question
 						</Button>
 					</div>
 				];
@@ -136,7 +147,7 @@ class ChatArea extends React.Component {
 
 			// view for creating a new chat thread
 			case "new-chat":
-				title = "Create a new chat";
+				title = "Ask a new question";
 				content = (
 					<div className="new-chat-form" key={-1}>
 						<div><TextField
@@ -183,9 +194,8 @@ class ChatArea extends React.Component {
 									<span>{message.likes.length ? message.likes.length : ''}</span>
 									<span className="material-icons" onClick={e => this.likeChat(i)}>favorite</span>
 								</div>
-
 							</div>
-							<div className="body">{message.body}</div>
+							<div className="body" dangerouslySetInnerHTML={{ __html: md.render(message.body) }}></div>
 							<div className="info-bottom">
 								{endorsements}
 							</div>
@@ -223,7 +233,7 @@ class ChatArea extends React.Component {
 
 
 		return (
-			<div className='chat-area'>
+			<div className='chat-area' ref={this.self}>
 				<div className="chat-area-title">
 					{backButton}
 					<div className="title">{title}</div>

@@ -1,7 +1,9 @@
-const express = require('express');
-const PDFImage = require("../lib/pdf-image").PDFImage;
 const fs = require('fs');
 const path = require('path');
+
+const express = require('express');
+const { escape } = require('html-escaper');
+const PDFImage = require("../lib/pdf-image").PDFImage;
 
 const { MongoClient, ObjectID } = require('mongodb');
 const dbConfig = {
@@ -501,12 +503,12 @@ async function startApp() {
                 status: "unsolved",
                 time: time,
                 chats: [],
-                title: req.body.title,
+                title: escape(req.body.title),
                 user: req.body.user
             };
             let newChat = {
                 time: time,
-                body: req.body.body,
+                body: escape(req.body.body),
                 user: req.body.user,
                 likes: [],
                 endorsement: []
@@ -552,7 +554,7 @@ async function startApp() {
             let time = Date.now();
             let newChat = {
                 time: time,
-                body: req.body.body,
+                body: escape(req.body.body),
                 user: req.body.user,
                 likes: [],
                 endorsement: []
