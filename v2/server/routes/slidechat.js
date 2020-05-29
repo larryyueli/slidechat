@@ -9,9 +9,10 @@ const dbConfig = {
     useNewUrlParser: true,
 };
 
-const config = JSON.parse(fs.readFileSync('config.json'));
+const config = require('../config');
 const instructors = config.instructors;
 const dbURL = config.dbURL;
+const fileStorage = config.fileStorage;
 
 function errorHandler(res, err) {
     if (err && err.status) {
@@ -186,15 +187,14 @@ async function startApp() {
             // Step 2: use the id as the directory name, create a directory, move pdf to directory
             let objID = insertRes.ops[0]._id;
             let id = objID.toHexString();
-            let dir = path.join('files', id);
-            console.log(`Saving files to: ${dir}`);
-
+            let dir = path.join(fileStorage, id);
             // overwrite if exists. should not happen: id is unique
             if (fs.existsSync(dir)) {
                 console.log(`Directory ${id} already exists, overwriting...`);
-                fs.rmdirSync(dir, { recursive: true });
+                await fs.promises.rmdir(dir, { recursive: true });
             }
-            fs.mkdirSync(path.join('files', id));
+            await fs.promises.mkdir(dir, { recursive: true });
+            console.log(`Saving files to: ${dir}`);
 
             await req.files.file.mv(path.join(dir, req.files.file.name));
 
@@ -249,19 +249,21 @@ async function startApp() {
     router.delete('/api/slide', instructorAuth, async (req, res) => {
         try {
             let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.sid) },
-                { projection: { pageTotal: 1, pages: 1 } });
+                { projection: { _id: 1 } });
             if (!slide) throw { status: 404, error: "slide not found" };
 
-            let updateRes = await courses.updateOne({},
-                { $pull: { slides: req.query.sid }});
+            let updateRes = await courses.updateMany({},
+                { $pull: { slides: req.query.sid } });
             if (updateRes.modifiedCount !== 1) {
-                throw "delete slide error";
+                throw `delete slide from course error: updateRes = ${updateRes}`;
             }
 
-            let removeRes = await slides.deleteOne({ _id: ObjectID.createFromHexString(req.query.sid)});
-            if (removeRes.deletedCount  !== 1) {
-                throw "delete slide error";
+            let removeRes = await slides.deleteOne({ _id: ObjectID.createFromHexString(req.query.sid) });
+            if (removeRes.deletedCount !== 1) {
+                throw `delete slide error: removeRes = ${removeRes}`;
             }
+
+            await fs.promises.rmdir(path.join(fileStorage, req.query.sid), { recursive: true });
 
             res.send();
         } catch (err) {
@@ -329,7 +331,7 @@ async function startApp() {
                 { $set: deleteQuery });
             if (updateRes.modifiedCount !== 1) {
                 throw "delete chat error";
-            } 
+            }
 
             res.send();
         } catch (err) {
@@ -355,7 +357,6 @@ async function startApp() {
             if (!user) return res.json([]);  // does not need to initialize here
 
             let result = [];
-            console.log(user.courses);
             for (let course of user.courses) {
                 let myCourse = await courses.findOne({ _id: ObjectID.createFromHexString(course.id) },
                     { projection: { instructors: 0 } });
@@ -403,9 +404,7 @@ async function startApp() {
             if (isNotValidPage(req.query.pageNum, slide.pageTotal)) {
                 throw { status: 400, error: "bad request" };
             }
-            res.sendFile(`page-${+req.query.pageNum - 1}.png`, {
-                root: path.join('files', req.query.slideID)
-            });
+            res.sendFile(path.join(fileStorage, req.query.slideID, `page-${+req.query.pageNum - 1}.png`));
         } catch (err) {
             errorHandler(res, err);
         }
@@ -604,7 +603,7 @@ async function startApp() {
                 insertLike[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.endorsement`] = req.body.user;
             }
             let updateRes = await slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) },
-                { $push: insertLike });
+                { $addToSet: insertLike });
 
             if (updateRes.modifiedCount !== 1) {
                 throw "like update error";

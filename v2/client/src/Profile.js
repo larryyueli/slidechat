@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-
 import { Button, TextField } from '@material-ui/core';
 
 import { fullURL, baseURL } from './config';
-
 import './Profile.scss';
 
 
@@ -48,7 +46,6 @@ class Profile extends Component {
 
     render() {
         let content = [];
-        console.log(this.state.courses);
         for (let i in this.state.courses) {
             content.push(
                 <Course
@@ -95,12 +92,10 @@ class Course extends Component {
         formData.append("cid", this.props.course.cid);
         formData.append("anonymity", "anyone");
         formData.append("user", this.props.uid);
-        console.log(this.fileUpload.current);
         formData.append("file", this.fileUpload.current.files[0]);
         axios.post(`${baseURL}/api/addSlide/`,
             formData
         ).then(response => {
-            console.log(response);
             this.setState({ uploading: false });
             this.props.fetchCourses();
         }).catch(error => {
@@ -110,7 +105,9 @@ class Course extends Component {
         });
     }
 
-    deleteSlide(sid) {
+    deleteSlide(filename, sid) {
+        if (!window.confirm(`Are you sure to delete "${filename}"?`)) return;
+
         axios.delete(`${baseURL}/api/slide?sid=${sid}`, {
             data: { user: this.props.uid }
         }).then(data => {
@@ -149,7 +146,7 @@ class Course extends Component {
                         className="slide-delete-btn"
                         variant="outlined"
                         color="secondary"
-                        onClick={e => this.deleteSlide(slide.id)}>Delete</Button> : null}
+                        onClick={e => this.deleteSlide(slide.filename, slide.id)}>Delete</Button> : null}
                 </div>
             );
         }
