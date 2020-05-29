@@ -28,15 +28,12 @@ class ChatArea extends React.Component {
 		this.sendNewQuestion = this.sendNewQuestion.bind(this);
 		this.sendNewChat = this.sendNewChat.bind(this);
 		this.likeChat = this.likeChat.bind(this);
-
-		this.self = React.createRef();
 	}
 
 	componentDidUpdate() {
 		window.MathJax.typeset();
 	}
 
-	// TO-DO
 	createNewChat() {
 		this.setState({ state: "new-chat" });
 	}
@@ -153,14 +150,14 @@ class ChatArea extends React.Component {
 						<div><TextField
 							variant='outlined'
 							id={`new-title`}
-							placeholder="Title"
+							placeholder="Title: briefly summarize your question"
 							inputRef={ref => { this.titleRef = ref; }} /></div>
 						<div><TextField
 							variant='outlined'
 							id={`new-body`}
 							multiline
 							rows="6"
-							placeholder="Body"
+							placeholder="Describe your question in more details"
 							inputRef={ref => { this.bodyRef = ref; }} /></div>
 						<div><Button variant="contained" color="primary" onClick={this.sendNewQuestion}>Send</Button></div>
 					</div>
@@ -233,7 +230,7 @@ class ChatArea extends React.Component {
 
 
 		return (
-			<div className='chat-area' ref={this.self}>
+			<div className='chat-area'>
 				<div className="chat-area-title">
 					{backButton}
 					<div className="title">{title}</div>

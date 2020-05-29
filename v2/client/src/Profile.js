@@ -21,8 +21,6 @@ class Profile extends Component {
         this.fetchCourses();
     }
 
-
-
     // get course list from server
     fetchCourses() {
         axios.get(`${baseURL}/api/myCourses?id=${this.state.uid}`).then(data => {
@@ -43,7 +41,6 @@ class Profile extends Component {
         });
     }
 
-
     render() {
         let content = [];
         for (let i in this.state.courses) {
@@ -55,7 +52,6 @@ class Profile extends Component {
                     uid={this.state.uid} />
             );
         }
-
 
         return (
             <div className="profile">

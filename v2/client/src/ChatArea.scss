@@ -40,6 +40,10 @@
 		.chat {
 			padding: 1rem;
 			border-bottom: 1px solid #cccccc;
+			&:hover {
+				background: #fdfdfd;
+				cursor: pointer;
+			}
 
 			.title {
 				font-weight: 420;
@@ -153,9 +157,15 @@
 		.MuiTextField-root {
 			width: 100%;
 
-			.MuiOutlinedInput-input,
-			.MuiOutlinedInput-multiline {
+			.MuiOutlinedInput-input {
+				padding: 6px 6px 6px 14px;
+			}
+			.MuiInputBase-multiline {
 				padding: 6px;
+
+				.MuiOutlinedInput-input {
+					padding: 6px;
+				}
 			}
 		}
 	}
