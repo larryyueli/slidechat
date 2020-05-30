@@ -135,14 +135,15 @@ async function startApp() {
 
             // add instructor to course
             let updateRes = await courses.updateOne({ _id: ObjectID.createFromHexString(req.body.course) },
-                { $push: { instructors: req.body.newUser } });
+                { $addToSet: { instructors: req.body.newUser } });
+
             if (updateRes.modifiedCount !== 1) {
                 throw `add instructor failed, modifiedCount = ${updateRes.modifiedCount}`;
             }
 
-            // add course to instructor's course list
+            // add course to instructor's course list, create user if not exist
             updateRes = await users.updateOne({ _id: req.body.newUser },
-                { $push: { courses: { role: "instructor", id: req.body.course } } },
+                { $addToSet: { courses: { role: "instructor", id: req.body.course } } },
                 { upsert: true });
 
             if (updateRes.modifiedCount === 0 && updateRes.upsertedCount === 0) {
@@ -360,8 +361,7 @@ async function startApp() {
 
             let result = [];
             for (let course of user.courses) {
-                let myCourse = await courses.findOne({ _id: ObjectID.createFromHexString(course.id) },
-                    { projection: { instructors: 0 } });
+                let myCourse = await courses.findOne({ _id: ObjectID.createFromHexString(course.id) });
                 if (!myCourse) {
                     console.log(`course ${course.id} not found`);
                     continue;
@@ -381,6 +381,7 @@ async function startApp() {
                 }
                 result.push({
                     name: myCourse.name,
+                    instructors: myCourse.instructors,
                     role: course.role,
                     slides: courseSlides,
                     cid: course.id

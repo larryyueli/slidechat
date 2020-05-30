@@ -23,11 +23,12 @@ class Profile extends Component {
 
     // get course list from server
     fetchCourses() {
-        axios.get(`${baseURL}/api/myCourses?id=${this.state.uid}`).then(data => {
-            this.setState({ courses: data.data });
-        }).catch(err => {
-            console.error(err);
-        });
+        axios.get(`${baseURL}/api/myCourses?id=${this.state.uid}`)
+            .then(res => {
+                this.setState({ courses: res.data });
+            }).catch(err => {
+                console.error(err);
+            });
     }
 
     createCourse() {
@@ -91,7 +92,7 @@ class Course extends Component {
         formData.append("file", this.fileUpload.current.files[0]);
         axios.post(`${baseURL}/api/addSlide/`,
             formData
-        ).then(response => {
+        ).then(res => {
             this.setState({ uploading: false });
             this.props.fetchCourses();
         }).catch(error => {
@@ -106,7 +107,7 @@ class Course extends Component {
 
         axios.delete(`${baseURL}/api/slide?sid=${sid}`, {
             data: { user: this.props.uid }
-        }).then(data => {
+        }).then(res => {
             this.props.fetchCourses();
         }).catch(err => {
             console.error(err);
@@ -118,31 +119,59 @@ class Course extends Component {
             user: this.props.uid,
             course: this.props.course.cid,
             newUser: this.newUserRef.value,
-        }).then(data => {
+        }).then(res => {
+            this.setState({
+                addInstructorRes: <div className="result-ok">Add instructor "{this.newUserRef.value}" successfully!</div>
+            });
             this.newUserRef.value = "";
             console.log("add instructor success");
         }).catch(err => {
+            this.setState({
+                addInstructorRes: <div className="result-fail">Add instructor "{this.newUserRef.value}" failed!</div>
+            });
             console.error(err);
         });
     }
 
-
     changeManageStatus() {
-        this.setState(pre => { return { managing: !pre.managing } });
+        this.setState(pre => {
+            return {
+                addInstructorRes: null,
+                managing: !pre.managing
+            }
+        });
     }
+
+    copyToClipboard(str) {
+        const el = document.createElement('textarea');
+        el.value = str;
+        el.setAttribute('readonly', '');
+        el.style.visibility = false;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+    };
 
     render() {
         let slides = [];
         for (let j in this.props.course.slides) {
             let slide = this.props.course.slides[j];
+            let link = `${fullURL}/${slide.id}`;
             slides.push(
                 <div key={j} className="slide-item">
-                    <a className="slide-link" href={`${fullURL}/${slide.id}`}>{slide.filename}</a>
-                    {this.state.managing ? <Button
-                        className="slide-delete-btn"
-                        variant="outlined"
-                        color="secondary"
-                        onClick={e => this.deleteSlide(slide.filename, slide.id)}>Delete</Button> : null}
+                    <a className="slide-link" href={link}>{slide.filename}</a>
+                    {this.state.managing
+                        ? <Button
+                            className="slide-delete-btn"
+                            variant="outlined"
+                            color="secondary"
+                            onClick={e => this.deleteSlide(slide.filename, slide.id)}>Delete</Button>
+                        : <Button
+                            variant="outlined"
+                            color="primary"
+                            onClick={e => this.copyToClipboard(link)}
+                        >Copy link</Button>}
                 </div>
             );
         }
@@ -151,10 +180,13 @@ class Course extends Component {
             <div className="course">
                 <div className="title">
                     {this.props.course.name}
-                    <span className={`material-icons manage ${this.state.managing ? "managing" : ""}`} onClick={this.changeManageStatus}>settings</span>
+                    <span className={`manage ${this.state.managing ? "managing" : ""}`}
+                        onClick={this.changeManageStatus}>
+                        <span className='material-icons icon'>settings</span>
+                    </span>
                 </div>
                 <div className="slides">{slides}</div>
-                {this.state.managing ? <>
+                {this.state.managing ?
                     <div className="upload-bar">
                         <input type="file" name="file" ref={this.fileUpload} />
                         <Button
@@ -162,16 +194,23 @@ class Course extends Component {
                             disabled={this.state.uploading}
                             variant="contained"
                             color="primary">Upload</Button>
-                    </div>
+                    </div> : null}
+                <div className="instructors"><strong>Instructors: </strong>{this.props.course.instructors.join(', ')}</div>
+                {this.state.managing ? <>
                     <div className="addInstructor-bar">
                         <TextField
                             variant='outlined'
                             id={`new-instructor`}
                             placeholder="utorid"
                             inputRef={ref => { this.newUserRef = ref; }} />
-                        <Button id="fileSubmit" variant="contained" color="primary" onClick={e => this.addInstructor(this.props.course.cid)}>Add Instructor</Button>
+                        <Button id="fileSubmit"
+                            variant="contained"
+                            color="primary"
+                            onClick={e => this.addInstructor(this.props.course.cid)}>Add Instructor</Button>
                     </div>
-                </> : null}
+                    {this.state.addInstructorRes}
+                </> : null
+                }
             </div>
         );
     }

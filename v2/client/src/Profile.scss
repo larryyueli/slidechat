@@ -26,16 +26,25 @@
 
 			.manage {
 				@include clickable();
+				@include flexCenter();
+				height: 2.4rem;
+				width: 2.4rem;
 				background-color: $primary;
 				color: white;
-				font-size: 1.2rem;
-				padding: 0.5rem;
 				border-radius: 0.4rem;
 				box-shadow: 1px 1px 4px #aaaaaa;
+
+				.icon {
+					font-size: 1.5rem;
+					transition: transform 0.3s;
+				}
 			}
 
 			.managing {
 				background-color: $secondary;
+				.icon {
+					transform: rotate(120deg);
+				}
 			}
 		}
 
@@ -59,11 +68,12 @@
 		}
 
 		.upload-bar {
+			margin-bottom: 1em;
 			text-align: center;
 		}
 
 		.addInstructor-bar {
-            @include centers();
+			@include flexCenter();
 			margin-top: 1em;
 
 			.MuiTextField-root {
@@ -76,10 +86,20 @@
 				}
 			}
 		}
+
+		.result-ok {
+			text-align: center;
+			color: green;
+		}
+
+		.result-fail {
+			text-align: center;
+			color: $secondary;
+		}
 	}
 
 	.createCourse-bar {
-        @include centers();
+		@include flexCenter();
 		margin-top: 1em;
 
 		.MuiTextField-root {

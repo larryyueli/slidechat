@@ -51,7 +51,7 @@
 			}
 
 			.info {
-				@include sides();
+				@include flexSides();
 
 				.author {
 					flex: 1;
@@ -82,7 +82,7 @@
 			overflow-wrap: anywhere;
 
 			.info {
-				@include sides();
+				@include flexSides();
 				font-size: 0.9rem;
 
 				.author {
