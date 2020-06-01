@@ -8,7 +8,7 @@ import { baseURL } from './config';
 import { formatTime, formatNames } from './util';
 import './ChatArea.scss';
 
-const md = markdownIt({breaks: true});
+const md = markdownIt({ breaks: true });
 md.use(markdownItMathJax());
 
 /**
@@ -22,12 +22,24 @@ class ChatArea extends React.Component {
 			loading: false,		// to-do: add loading state whenever loading
 			chatDetails: [],	// content of the chat
 			qid: -1,			// the expanded question's ID
+			managing: false,
+			uid: "yaochen8"
 		};
 
 		this.createNewChat = this.createNewChat.bind(this);
 		this.sendNewQuestion = this.sendNewQuestion.bind(this);
 		this.sendNewChat = this.sendNewChat.bind(this);
 		this.likeChat = this.likeChat.bind(this);
+		this.changeManageStatus = this.changeManageStatus.bind(this);
+	}
+
+	changeManageStatus() {
+		this.setState(pre => {
+			return {
+				addInstructorRes: null,
+				managing: !pre.managing
+			}
+		});
 	}
 
 	componentDidUpdate() {
@@ -103,7 +115,38 @@ class ChatArea extends React.Component {
 
 	// onClick handler for back button to go back to the chat list
 	backToList() {
+		this.props.fetchChatList(this.props.slideID, this.props.pageNum);
 		this.setState({ state: "list" });
+	}
+
+	deleteQuestion(qid) {
+		let title = this.props.chats[qid].title;
+		let sid = this.props.slideID;
+		let pageNum = this.props.pageNum;
+		if (!window.confirm(`Are you sure to delete "${title}"?`)) return;
+
+		axios.delete(`${baseURL}/api/question?sid=${sid}&qid=${qid}&pageNum=${pageNum}`, {
+			data: { user: this.state.uid }
+		}).then(res => {
+			this.props.fetchChatList(this.props.slideID, this.props.pageNum);
+		}).catch(err => {
+			console.error(err);
+		});
+	}
+
+	deleteChat(cid) {
+		let qid = this.state.qid;
+		let sid = this.props.slideID;
+		let pageNum = this.props.pageNum;
+		if (!window.confirm(`Are you sure to delete this chat?`)) return;
+
+		axios.delete(`${baseURL}/api/chat?sid=${sid}&qid=${qid}&pageNum=${pageNum}&cid=${cid}`, {
+			data: { user: this.state.uid }
+		}).then(res => {
+			this.fetchChatDetails(this.state.qid);
+		}).catch(err => {
+			console.error(err);
+		});
 	}
 
 	render() {
@@ -127,7 +170,15 @@ class ChatArea extends React.Component {
 					}
 					chats.push(
 						<div className="chat" key={i} onClick={e => this.fetchChatDetails(i)}>
-							<div className="title">{this.props.chats[i].title}</div>
+							<div className="title">{this.props.chats[i].title}
+								{this.state.managing
+									? <Button
+										className="slide-delete-btn"
+										variant="outlined"
+										color="secondary"
+										onClick={e => this.deleteQuestion(i)}>Delete</Button>
+									: null}
+							</div>
 							<div className="info">
 								<div className="author">{this.props.chats[i].user}</div>
 								<div className="time">{formatTime(this.props.chats[i].time)}</div>
@@ -190,6 +241,13 @@ class ChatArea extends React.Component {
 								<div className={message.likes.length ? 'liked' : 'nobody-liked'}>
 									<span>{message.likes.length ? message.likes.length : ''}</span>
 									<span className="material-icons" onClick={e => this.likeChat(i)}>favorite</span>
+									{this.state.managing
+										? <Button
+											className="slide-delete-btn"
+											variant="outlined"
+											color="secondary"
+											onClick={e => this.deleteChat(i)}>Delete</Button>
+										: null}
 								</div>
 							</div>
 							<div className="body" dangerouslySetInnerHTML={{ __html: md.render(message.body) }}></div>
@@ -226,15 +284,23 @@ class ChatArea extends React.Component {
 					<span className="material-icons">arrow_back_ios</span>
 				</div>
 			);
-		} else backButton = <div>&nbsp;</div>;
+		} else backButton = <div className="placeholder">&nbsp;</div>;
 
 
 		return (
 			<div className='chat-area'>
 				<div className="chat-area-title">
 					{backButton}
-					<div className="title">{title}</div>
-					<div>&nbsp;</div>
+					<div className="title">
+						{title}
+
+					</div>
+					<div>
+						<span className={`manage ${this.state.managing ? "managing" : ""}`}
+							onClick={this.changeManageStatus}>
+							<span className='material-icons icon'>settings</span>
+						</span>
+					</div>
 				</div>
 				{content}
 			</div>

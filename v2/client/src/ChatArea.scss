@@ -17,6 +17,9 @@
 		.title {
 			margin: 0 0.7rem;
 			@include ellipsis();
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
 		}
 
 		.back-button {
@@ -28,6 +31,41 @@
 				color: #aaaaaa;
 			}
 		}
+
+		.placeholder {
+			width: 2.4rem;
+		}
+
+		.manage {
+				@include clickable();
+				@include flexCenter();
+				float: right;
+				height: 2.4rem;
+				width: 2.4rem;
+				// background-color: $primary;
+				color: black;
+				border-radius: 0.4rem;
+				// box-shadow: 1px 1px 4px #aaaaaa;
+
+				.icon {
+					font-size: 1.5rem;
+					transition: transform 0.3s;
+				}
+
+				&:hover{
+					background-color: #e9e9e9;
+				}
+			}
+
+			.managing {
+				// background-color: $secondary;
+				background-color: #e9e9e9;
+				box-shadow: inset 1px 1px 4px #aaaaaa;
+				// color: $secondary;
+				.icon {
+					transform: rotate(120deg);
+				}
+			}
 	}
 
 	.new-chat-btn-row {
