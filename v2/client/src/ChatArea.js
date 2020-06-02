@@ -3,12 +3,26 @@ import axios from 'axios';
 import { Button, TextField } from '@material-ui/core';
 import markdownIt from 'markdown-it';
 import markdownItMathJax from 'markdown-it-mathjax';
+import highlight from 'highlight.js';
 
 import { baseURL } from './config';
 import { formatTime, formatNames } from './util';
 import './ChatArea.scss';
 
-const md = markdownIt({ breaks: true });
+
+const md = markdownIt({
+	breaks: true,
+	highlight: function (str, lang) {
+		if (lang && highlight.getLanguage(lang)) {
+			try {
+				return highlight.highlight(lang, str).value;
+			} catch (err) {
+				console.error(err);
+			}
+		}
+		return '';
+	}
+});
 md.use(markdownItMathJax());
 
 /**
@@ -119,11 +133,11 @@ class ChatArea extends React.Component {
 		this.setState({ state: "list" });
 	}
 
-	deleteQuestion(qid) {
+	deleteQuestion(e, qid) {
 		let title = this.props.chats[qid].title;
 		let sid = this.props.slideID;
 		let pageNum = this.props.pageNum;
-		if (!window.confirm(`Are you sure to delete "${title}"?`)) return;
+		if (!window.confirm(`Are you sure to delete "${title}"?`)) return e.stopPropagation();
 
 		axios.delete(`${baseURL}/api/question?sid=${sid}&qid=${qid}&pageNum=${pageNum}`, {
 			data: { user: this.state.uid }
@@ -134,11 +148,11 @@ class ChatArea extends React.Component {
 		});
 	}
 
-	deleteChat(cid) {
+	deleteChat(e, cid) {
 		let qid = this.state.qid;
 		let sid = this.props.slideID;
 		let pageNum = this.props.pageNum;
-		if (!window.confirm(`Are you sure to delete this chat?`)) return;
+		if (!window.confirm(`Are you sure to delete this chat?`)) return e.stopPropagation();
 
 		axios.delete(`${baseURL}/api/chat?sid=${sid}&qid=${qid}&pageNum=${pageNum}&cid=${cid}`, {
 			data: { user: this.state.uid }
@@ -150,7 +164,7 @@ class ChatArea extends React.Component {
 	}
 
 	render() {
-		let content, title, backButton;
+		let content, title;
 		switch (this.state.state) {
 			// list of all chat threads
 			case "list":
@@ -170,13 +184,12 @@ class ChatArea extends React.Component {
 					}
 					chats.push(
 						<div className="chat" key={i} onClick={e => this.fetchChatDetails(i)}>
-							<div className="title">{this.props.chats[i].title}
+							<div className="title-row">
+								<div className="title">{this.props.chats[i].title}</div>
 								{this.state.managing
-									? <Button
-										className="slide-delete-btn"
-										variant="outlined"
-										color="secondary"
-										onClick={e => this.deleteQuestion(i)}>Delete</Button>
+									? <span className="material-icons icon" onClick={e => this.deleteQuestion(e, i)}>
+										delete_forever
+									</span>
 									: null}
 							</div>
 							<div className="info">
@@ -238,17 +251,23 @@ class ChatArea extends React.Component {
 									<span className="author">{message.user}</span>
 									<span className="time">{formatTime(message.time)}</span>
 								</div>
-								<div className={message.likes.length ? 'liked' : 'nobody-liked'}>
-									<span>{message.likes.length ? message.likes.length : ''}</span>
-									<span className="material-icons" onClick={e => this.likeChat(i)}>favorite</span>
+								<div className="icons">
+									{message.endorsement.length
+										? <span class="material-icons endorsement icon">
+											verified
+										</span>
+										: null}
+									<span className={`icon ${message.likes.length ? 'liked' : 'nobody-liked'}`}>
+										<span>{message.likes.length ? message.likes.length : ''}</span>
+										<span className="material-icons" onClick={e => this.likeChat(i)}>favorite</span>
+									</span>
 									{this.state.managing
-										? <Button
-											className="slide-delete-btn"
-											variant="outlined"
-											color="secondary"
-											onClick={e => this.deleteChat(i)}>Delete</Button>
+										? <span className="material-icons delete icon" onClick={e => this.deleteChat(e, i)}>
+											delete_forever
+										</span>
 										: null}
 								</div>
+
 							</div>
 							<div className="body" dangerouslySetInnerHTML={{ __html: md.render(message.body) }}></div>
 							<div className="info-bottom">
@@ -277,30 +296,20 @@ class ChatArea extends React.Component {
 				content = <div>something went wrong</div>
 		}
 
-		// if not on the home (list) page, show the back button
-		if (this.state.state !== "list") {
-			backButton = (
-				<div className="back-button" onClick={e => this.backToList()}>
-					<span className="material-icons">arrow_back_ios</span>
-				</div>
-			);
-		} else backButton = <div className="placeholder">&nbsp;</div>;
-
 
 		return (
 			<div className='chat-area'>
 				<div className="chat-area-title">
-					{backButton}
-					<div className="title">
-						{title}
-
-					</div>
-					<div>
-						<span className={`manage ${this.state.managing ? "managing" : ""}`}
-							onClick={this.changeManageStatus}>
-							<span className='material-icons icon'>settings</span>
-						</span>
-					</div>
+					{this.state.state !== "list"
+						? <div className="back-button" onClick={e => this.backToList()}>
+							<span className="material-icons">arrow_back_ios</span>
+						</div>
+						: <div className="placeholder">&nbsp;</div>}
+					<div className="title">{title}</div>
+					<span className={`manage ${this.state.managing ? "managing" : ""}`}
+						onClick={this.changeManageStatus}>
+						<span className='material-icons icon'>settings</span>
+					</span>
 				</div>
 				{content}
 			</div>

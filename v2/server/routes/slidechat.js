@@ -509,7 +509,7 @@ async function startApp() {
             };
             let newChat = {
                 time: time,
-                body: escape(req.body.body),
+                body: req.body.body,    // does not escape here, md renderer(markdown-it) will escape it
                 user: req.body.user,
                 likes: [],
                 endorsement: []
@@ -555,7 +555,7 @@ async function startApp() {
             let time = Date.now();
             let newChat = {
                 time: time,
-                body: escape(req.body.body),
+                body: req.body.body,        // does not escape here, md renderer(markdown-it) will escape it
                 user: req.body.user,
                 likes: [],
                 endorsement: []

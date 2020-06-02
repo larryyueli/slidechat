@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { Button, TextField } from '@material-ui/core';
 
-import { fullURL, baseURL } from './config';
+import { baseURL, fullURL } from './config';
 import './Profile.scss';
 
 
@@ -157,7 +157,7 @@ class Course extends Component {
         let slides = [];
         for (let j in this.props.course.slides) {
             let slide = this.props.course.slides[j];
-            let link = `${fullURL}/${slide.id}`;
+            let link = `${fullURL()}/${slide.id}`;
             slides.push(
                 <div key={j} className="slide-item">
                     <a className="slide-link" href={link}>{slide.filename}</a>
