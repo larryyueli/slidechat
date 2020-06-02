@@ -34,12 +34,14 @@ class Main extends Component {
                 pageNum: currentPage,
                 pageImg: `${serverURL}/api/slideImg?slideID=${this.state.id}&pageNum=${currentPage}`
             });
+            document.getElementById("pageNum").value = currentPage;
         }).catch(err => {
             console.error(err);
         });
 
         this.nextPage = this.nextPage.bind(this);
         this.prevPage = this.prevPage.bind(this);
+        this.gotoPage = this.gotoPage.bind(this);
     }
 
     // get chats under a question
@@ -60,6 +62,7 @@ class Main extends Component {
             return;
         }
         let newPageNum = this.state.pageNum + 1;
+        document.getElementById("pageNum").value = newPageNum;
         window.location.hash = newPageNum;
         this.fetchChatList(this.state.id, newPageNum);
         this.setState({
@@ -72,10 +75,31 @@ class Main extends Component {
      * Go to the previous page of slide, should fetch the url and the chat threads list of the new page 
      */
     prevPage() {
-        if (this.state.pageNum < 1) {
+        if (this.state.pageNum < 2) {
             return;
         }
         let newPageNum = this.state.pageNum - 1;
+        document.getElementById("pageNum").value = newPageNum;
+        window.location.hash = newPageNum;
+        this.fetchChatList(this.state.id, newPageNum);
+        this.setState({
+            pageImg: `${serverURL}/api/slideImg?slideID=${this.state.id}&pageNum=${newPageNum}`,
+            pageNum: newPageNum
+        });
+    }
+
+    gotoPage() {
+        let newPageNum = +document.getElementById("pageNum").value;
+        if (isNaN(newPageNum)) {
+            document.getElementById("pageNum").value = this.state.pageNum;
+            return;
+        }
+        if (newPageNum > this.state.pageTotal) {
+            newPageNum = this.state.pageTotal;
+        } else if (newPageNum < 1) {
+            newPageNum = 1;
+        }
+        document.getElementById("pageNum").value = newPageNum;
         window.location.hash = newPageNum;
         this.fetchChatList(this.state.id, newPageNum);
         this.setState({
@@ -86,22 +110,21 @@ class Main extends Component {
 
     render() {
         return (
-            <>
-                <div className="main">
-                    <Slides
-                        pageNum={this.state.pageNum}
-                        pageTotal={this.state.pageTotal}
-                        pageImg={this.state.pageImg}
-                        nextPage={this.nextPage}
-                        prevPage={this.prevPage} />
-                    <ChatArea
-                        chats={this.state.questions}
-                        slideID={this.state.id}
-                        pageNum={this.state.pageNum}
-                        fetchChatList={this.fetchChatList}
-                        ref="chatArea" />
-                </div>
-            </>
+            <div className="main">
+                <Slides
+                    pageNum={this.state.pageNum}
+                    pageTotal={this.state.pageTotal}
+                    pageImg={this.state.pageImg}
+                    nextPage={this.nextPage}
+                    prevPage={this.prevPage}
+                    gotoPage={this.gotoPage} />
+                <ChatArea
+                    chats={this.state.questions}
+                    slideID={this.state.id}
+                    pageNum={this.state.pageNum}
+                    fetchChatList={this.fetchChatList}
+                    ref="chatArea" />
+            </div>
         );
     }
 }

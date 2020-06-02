@@ -1,3 +1,5 @@
+@import "./palette.scss";
+
 .slide-container {
 	margin-top: 1rem;
 	text-align: center;
@@ -9,5 +11,25 @@
 
 	button {
 		margin: 1rem;
+	}
+
+	input {
+		width: 1.8rem;
+		background-color: $backgroundColour;
+		padding: 0.1rem;
+		font-size: 1em;
+		text-align: center;
+		border: 1px solid $backgroundColour;
+		border-radius: 0.25rem;
+
+		&:hover {
+			background-color: #e9e9e9;
+		}
+
+		&:focus {
+			outline: none;
+			border-color: black;
+			background-color: #e9e9e9;
+		}
 	}
 }
