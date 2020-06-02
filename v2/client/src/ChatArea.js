@@ -5,7 +5,7 @@ import markdownIt from 'markdown-it';
 import markdownItMathJax from 'markdown-it-mathjax';
 import highlight from 'highlight.js';
 
-import { baseURL } from './config';
+import { serverURL } from './config';
 import { formatTime, formatNames } from './util';
 import './ChatArea.scss';
 
@@ -65,7 +65,7 @@ class ChatArea extends React.Component {
 	}
 
 	sendNewQuestion() {
-		axios.post(`${baseURL}/api/addQuestion/`,
+		axios.post(`${serverURL}/api/addQuestion/`,
 			{
 				sid: this.props.slideID,
 				pageNum: this.props.pageNum,
@@ -82,7 +82,7 @@ class ChatArea extends React.Component {
 
 	// TO-DO
 	sendNewChat() {
-		axios.post(`${baseURL}/api/addChat/`,
+		axios.post(`${serverURL}/api/addChat/`,
 			{
 				sid: this.props.slideID,
 				pageNum: this.props.pageNum,
@@ -101,7 +101,7 @@ class ChatArea extends React.Component {
 	// TO-DO
 	// probably need a loading state here
 	fetchChatDetails(qid) {
-		axios.get(`${baseURL}/api/chats?slideID=${this.props.slideID}&pageNum=${this.props.pageNum}&qid=${qid}`).then(data => {
+		axios.get(`${serverURL}/api/chats?slideID=${this.props.slideID}&pageNum=${this.props.pageNum}&qid=${qid}`).then(data => {
 			this.setState({
 				state: "chat-details",
 				qid: qid,
@@ -114,7 +114,7 @@ class ChatArea extends React.Component {
 
 	// like, if the user is an instructor, endorse
 	likeChat(cid) {
-		axios.post(`${baseURL}/api/like/`, {
+		axios.post(`${serverURL}/api/like/`, {
 			sid: this.props.slideID,
 			pageNum: this.props.pageNum,
 			qid: this.state.qid,
@@ -139,7 +139,7 @@ class ChatArea extends React.Component {
 		let pageNum = this.props.pageNum;
 		if (!window.confirm(`Are you sure to delete "${title}"?`)) return e.stopPropagation();
 
-		axios.delete(`${baseURL}/api/question?sid=${sid}&qid=${qid}&pageNum=${pageNum}`, {
+		axios.delete(`${serverURL}/api/question?sid=${sid}&qid=${qid}&pageNum=${pageNum}`, {
 			data: { user: this.state.uid }
 		}).then(res => {
 			this.props.fetchChatList(this.props.slideID, this.props.pageNum);
@@ -154,7 +154,7 @@ class ChatArea extends React.Component {
 		let pageNum = this.props.pageNum;
 		if (!window.confirm(`Are you sure to delete this chat?`)) return e.stopPropagation();
 
-		axios.delete(`${baseURL}/api/chat?sid=${sid}&qid=${qid}&pageNum=${pageNum}&cid=${cid}`, {
+		axios.delete(`${serverURL}/api/chat?sid=${sid}&qid=${qid}&pageNum=${pageNum}&cid=${cid}`, {
 			data: { user: this.state.uid }
 		}).then(res => {
 			this.fetchChatDetails(this.state.qid);

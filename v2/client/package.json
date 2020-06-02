@@ -11,9 +11,8 @@
     "node-sass": "^4.14.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-pdf": "^4.1.0",
-    "react-scripts": "^3.4.0",
-    "styled-components": "^5.0.1"
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "^3.4.0"
   },
   "homepage": "/slidechat/",
   "scripts": {

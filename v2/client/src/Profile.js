@@ -1,148 +1,123 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Button, TextField } from '@material-ui/core';
 
-import { baseURL, fullURL } from './config';
+import { serverURL, fullURL } from './config';
 import './Profile.scss';
 
 
 /**
- * The main entrance of the application
- * It consists three main components: App bar, slides on the left, and chat area on the right
+ * The profile page for instructors (not for students for now)
+ * This page lists all the courses of the instructor and all the slides
  */
-class Profile extends Component {
-    constructor(props) {
-        super(props);
-        this.state = { uploading: false, uid: "lulingxi" };
+function Profile(props) {
+    let [courses, setCourses] = useState([]);
+    let uid = "lulingxi";
+    let newCourseRef;
 
-        this.fetchCourses = this.fetchCourses.bind(this);
-        this.createCourse = this.createCourse.bind(this);
-
-        this.fetchCourses();
-    }
-
-    // get course list from server
-    fetchCourses() {
-        axios.get(`${baseURL}/api/myCourses?id=${this.state.uid}`)
-            .then(res => {
-                this.setState({ courses: res.data });
-            }).catch(err => {
-                console.error(err);
-            });
-    }
-
-    createCourse() {
-        axios.post(`${baseURL}/api/createCourse`, {
-            user: this.state.uid,
-            course: this.newCourseRef.value,
-        }).then(data => {
-            this.fetchCourses();
-        }).catch(err => {
+    const fetchCourses = async () => {
+        try {
+            let res = await axios.get(`${serverURL}/api/myCourses?id=${uid}`);
+            setCourses(res.data);
+        } catch (err) {
             console.error(err);
-        });
-    }
-
-    render() {
-        let content = [];
-        for (let i in this.state.courses) {
-            content.push(
-                <Course
-                    course={this.state.courses[i]}
-                    key={i}
-                    fetchCourses={this.fetchCourses}
-                    uid={this.state.uid} />
-            );
         }
+    };
 
-        return (
-            <div className="profile">
-                <div className="title">My Courses</div>
-                {content}
-                <div className="createCourse-bar">
-                    <TextField
-                        variant='outlined'
-                        id={`new-course`}
-                        placeholder="Course Name"
-                        inputRef={ref => { this.newCourseRef = ref; }} />
-                    <Button id="fileSubmit" onClick={this.createCourse} variant="contained" color="primary">Create Course</Button>
-                </div>
-            </div>
-        );
+    const createCourse = async () => {
+        try {
+            await axios.post(`${serverURL}/api/createCourse`, {
+                user: uid,
+                course: newCourseRef.value,
+            })
+        } catch (err) {
+            console.error(err);
+        }
+        fetchCourses();
     }
+
+    useEffect(() => {
+        fetchCourses();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    return (
+        <div className="profile">
+            <div className="title">My Courses</div>
+            {courses.map(course =>
+                <Course
+                    course={course}
+                    key={course.cid}
+                    fetchCourses={fetchCourses}
+                    uid={uid} />
+            )}
+            <div className="createCourse-bar">
+                <TextField
+                    variant='outlined'
+                    id={`new-course`}
+                    placeholder="Course Name"
+                    inputRef={ref => { newCourseRef = ref }} />
+                <Button id="fileSubmit" onClick={createCourse} variant="contained" color="primary">Create Course</Button>
+            </div>
+        </div>
+    );
 }
 
-class Course extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            managing: false,
-        }
-        this.fileUpload = React.createRef();
+function Course(props) {
+    let [managing, setManaging] = useState(false);
+    let [uploading, setUploading] = useState(false);
+    let [addInstructorRes, setAddInstructorRes] = useState(null);
+    let fileUpload = React.createRef();
+    let newUserRef = React.createRef();
 
-        this.uploadPDF = this.uploadPDF.bind(this);
-        this.changeManageStatus = this.changeManageStatus.bind(this);
-    }
-
-    uploadPDF() {
-        this.setState({ uploading: true });
-        var formData = new FormData();
-        formData.append("cid", this.props.course.cid);
+    const uploadPDF = async () => {
+        let formData = new FormData();
+        formData.append("cid", props.course.cid);
         formData.append("anonymity", "anyone");
-        formData.append("user", this.props.uid);
-        formData.append("file", this.fileUpload.current.files[0]);
-        axios.post(`${baseURL}/api/addSlide/`,
-            formData
-        ).then(res => {
-            this.setState({ uploading: false });
-            this.props.fetchCourses();
-        }).catch(error => {
-            console.log(error);
-            this.setState({ uploading: false });
-            this.props.fetchCourses();
-        });
+        formData.append("user", props.uid);
+        formData.append("file", fileUpload.current.files[0]);
+        try {
+            setUploading(true);
+            await axios.post(`${serverURL}/api/addSlide/`, formData);
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setUploading(false);
+            props.fetchCourses();
+        }
     }
 
-    deleteSlide(filename, sid) {
+    const deleteSlide = async (filename, sid) => {
         if (!window.confirm(`Are you sure to delete "${filename}"?`)) return;
-
-        axios.delete(`${baseURL}/api/slide?sid=${sid}`, {
-            data: { user: this.props.uid }
-        }).then(res => {
-            this.props.fetchCourses();
-        }).catch(err => {
-            console.error(err);
-        });
+        try {
+            await axios.delete(`${serverURL}/api/slide?sid=${sid}`, { data: { user: props.uid } });
+        } catch (err) {
+            console.log(err);
+        } finally {
+            props.fetchCourses();
+        }
     }
 
-    addInstructor() {
-        axios.post(`${baseURL}/api/addInstructor`, {
-            user: this.props.uid,
-            course: this.props.course.cid,
-            newUser: this.newUserRef.value,
-        }).then(res => {
-            this.setState({
-                addInstructorRes: <div className="result-ok">Add instructor "{this.newUserRef.value}" successfully!</div>
+    const addInstructor = async () => {
+        try {
+            await axios.post(`${serverURL}/api/addInstructor`, {
+                user: props.uid,
+                course: props.course.cid,
+                newUser: newUserRef.current.value,
             });
-            this.newUserRef.value = "";
-            console.log("add instructor success");
-        }).catch(err => {
-            this.setState({
-                addInstructorRes: <div className="result-fail">Add instructor "{this.newUserRef.value}" failed!</div>
-            });
+            setAddInstructorRes(<div className="result-ok">Add instructor "{newUserRef.current.value}" successfully!</div>);
+        } catch (err) {
             console.error(err);
-        });
+            setAddInstructorRes(<div className="result-fail">Add instructor "{newUserRef.current.value}" failed!</div>);
+        }
     }
 
-    changeManageStatus() {
-        this.setState(pre => {
-            return {
-                addInstructorRes: null,
-                managing: !pre.managing
-            }
-        });
+    const changeManageStatus = () => {
+        setAddInstructorRes(null);
+        setManaging(!managing);
     }
 
-    copyToClipboard(str) {
+    const copyToClipboard = (str) => {
         const el = document.createElement('textarea');
         el.value = str;
         el.setAttribute('readonly', '');
@@ -151,68 +126,67 @@ class Course extends Component {
         el.select();
         document.execCommand('copy');
         document.body.removeChild(el);
-    };
+    }
 
-    render() {
-        let slides = [];
-        for (let j in this.props.course.slides) {
-            let slide = this.props.course.slides[j];
-            let link = `${fullURL()}/${slide.id}`;
-            slides.push(
-                <div key={j} className="slide-item">
-                    <a className="slide-link" href={link}>{slide.filename}</a>
-                    {this.state.managing
-                        ? <Button
-                            className="slide-delete-btn"
-                            variant="outlined"
-                            color="secondary"
-                            onClick={e => this.deleteSlide(slide.filename, slide.id)}>Delete</Button>
-                        : <Button
-                            variant="outlined"
-                            color="primary"
-                            onClick={e => this.copyToClipboard(link)}
-                        >Copy link</Button>}
-                </div>
-            );
-        }
+    return (
+        <div className="course">
+            <div className="title">
+                {props.course.name}
+                <span className={`manage ${managing ? "managing" : ""}`}
+                    onClick={changeManageStatus}>
+                    <span className='material-icons icon'>settings</span>
+                </span>
+            </div>
+            <div className="slides">{props.course.slides.map((slide) => {
+                let link = `${fullURL()}/${slide.id}`;
+                return (
+                    <div key={slide.id} className="slide-item">
+                        <a className="slide-link" href={link}>{slide.filename}</a>
+                        {managing
+                            ? <Button
+                                className="slide-delete-btn"
+                                variant="outlined"
+                                color="secondary"
+                                onClick={e => deleteSlide(slide.filename, slide.id)}>Delete</Button>
+                            : <Button
+                                variant="outlined"
+                                color="primary"
+                                onClick={e => copyToClipboard(link)}
+                            >Copy link</Button>}
+                    </div>
+                );
+            })}</div>
 
-        return (
-            <div className="course">
-                <div className="title">
-                    {this.props.course.name}
-                    <span className={`manage ${this.state.managing ? "managing" : ""}`}
-                        onClick={this.changeManageStatus}>
-                        <span className='material-icons icon'>settings</span>
-                    </span>
+            {managing
+                ? <div className="upload-bar">
+                    <input type="file" name="file" ref={fileUpload} />
+                    <Button
+                        onClick={uploadPDF}
+                        disabled={uploading}
+                        variant="contained"
+                        color="primary">Upload</Button>
                 </div>
-                <div className="slides">{slides}</div>
-                {this.state.managing ?
-                    <div className="upload-bar">
-                        <input type="file" name="file" ref={this.fileUpload} />
-                        <Button
-                            onClick={this.uploadPDF}
-                            disabled={this.state.uploading}
-                            variant="contained"
-                            color="primary">Upload</Button>
-                    </div> : null}
-                <div className="instructors"><strong>Instructors: </strong>{this.props.course.instructors.join(', ')}</div>
-                {this.state.managing ? <>
+                : null}
+
+            <div className="instructors"><strong>Instructors: </strong>{props.course.instructors.join(', ')}</div>
+            {managing
+                ? <>
                     <div className="addInstructor-bar">
                         <TextField
                             variant='outlined'
                             id={`new-instructor`}
                             placeholder="utorid"
-                            inputRef={ref => { this.newUserRef = ref; }} />
+                            inputRef={newUserRef} />
                         <Button id="fileSubmit"
                             variant="contained"
                             color="primary"
-                            onClick={e => this.addInstructor(this.props.course.cid)}>Add Instructor</Button>
+                            onClick={e => addInstructor(props.course.cid)}>Add Instructor</Button>
                     </div>
-                    {this.state.addInstructorRes}
-                </> : null
-                }
-            </div>
-        );
-    }
+                    {addInstructorRes}
+                </>
+                : null}
+        </div>
+    );
 }
+
 export default Profile;
