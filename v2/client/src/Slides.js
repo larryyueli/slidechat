@@ -1,7 +1,6 @@
 import React from 'react';
 import Button from '@material-ui/core/Button';
 
-import './Slides.scss';
 
 /**
  * Slides on the left of the screen

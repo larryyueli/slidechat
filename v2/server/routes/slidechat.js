@@ -168,7 +168,7 @@ async function startApp() {
     router.post('/api/addSlide', instructorAuth, async (req, res) => {
         try {
             if (req.body.cid.length != 24
-                || (["anyone", "UofT student", "nonymous"].indexOf(req.body.anonymity) < 0)
+                || (["anyone", "student", "nonymous"].indexOf(req.body.anonymity) < 0)
                 || !req.files.file
                 || !req.files.file.name.toLocaleLowerCase().endsWith('.pdf')) {
                 return res.status(400).send();
@@ -215,7 +215,6 @@ async function startApp() {
             }
             let updateRes = await slides.updateOne({ _id: objID }, {
                 $set: {
-                    pdfLocation: path.join(dir, req.files.file.name),
                     pages: pages,
                     pageTotal: imagePaths.length
                 }
@@ -350,44 +349,62 @@ async function startApp() {
 
     /**
      * get the courses the user joined, either as an instructor or a student
-     * also the list of slides of that each course
      * req body:
      *   id: userID
      */
     router.get('/api/myCourses', async (req, res) => {
         try {
-            let user = await users.findOne({ _id: req.query.id });
+            let user = await users.findOne({ _id: req.query.id }, { projection: { courses: 1 } });
             if (!user) return res.json([]);  // does not need to initialize here
+            res.json(user.courses);
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    });
 
-            let result = [];
-            for (let course of user.courses) {
-                let myCourse = await courses.findOne({ _id: ObjectID.createFromHexString(course.id) });
-                if (!myCourse) {
-                    console.log(`course ${course.id} not found`);
+    /**
+     * get the course information, the list of slides of the course
+     * req query:
+     *   id: courseID
+     */
+    router.get('/api/course', async (req, res) => {
+        try {
+            let course = await courses.findOne({ _id: ObjectID.createFromHexString(req.query.id) });
+            if (!course) throw { status: 404, error: "not found" };
+
+            let courseSlides = [];
+            for (let slideId of course.slides) {
+                let slideEntry = await slides.findOne({ _id: ObjectID.createFromHexString(slideId) },
+                    { projection: { filename: 1, description: 1 } });
+                if (!slideEntry) {
+                    console.log(`slide ${slideId} not found`);
                     continue;
                 }
-
-                let courseSlides = [];
-
-                // console.log(myCourse.slides);
-                for (let slideId of myCourse.slides) {
-                    let slideEntry = await slides.findOne({ _id: ObjectID.createFromHexString(slideId) },
-                        { projection: { filename: 1 } });
-                    if (!slideEntry) {
-                        console.log(`slide ${slideId} not found`);
-                        continue;
-                    }
-                    courseSlides.push({ filename: slideEntry.filename, id: slideId });
-                }
-                result.push({
-                    name: myCourse.name,
-                    instructors: myCourse.instructors,
-                    role: course.role,
-                    slides: courseSlides,
-                    cid: course.id
-                });
+                courseSlides.push({ id: slideId, filename: slideEntry.filename, description: slideEntry.description });
             }
-            res.json(result);
+            res.json({
+                name: course.name,
+                instructors: course.instructors,
+                role: course.role,
+                slides: courseSlides,
+                cid: course.id
+            });
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    });
+
+    /**
+     * get the metadata of a slide, such as filename and description
+     * req query:
+     *   id: slideId
+     */
+    router.get('/api/slideMeta', async (req, res) => {
+        try {
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.id) },
+                { projection: { filename: 1, description: 1, anonymity: 1 } });
+            if (!slide) return res.sendStatus(404);
+            res.json(slide);
         } catch (err) {
             errorHandler(res, err);
         }

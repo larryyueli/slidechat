@@ -1,19 +1,25 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { Button, TextField } from '@material-ui/core';
+import { Button, TextField, CircularProgress, Dialog, Select, MenuItem } from '@material-ui/core';
 
-import { serverURL, fullURL } from './config';
-import './Profile.scss';
+import { baseURL, serverURL, fullURL } from './config';
 
 
 /**
  * The profile page for instructors (not for students for now)
  * This page lists all the courses of the instructor and all the slides
  */
-function Profile(props) {
+export default function Profile(props) {
     let [courses, setCourses] = useState([]);
     let uid = "lulingxi";
     let newCourseRef;
+
+    // the useEffect dependency should be `uid` and it should not change, yet eslint does not understand and thus disabled
+    useEffect(() => {
+        fetchCourses();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const fetchCourses = async () => {
         try {
@@ -36,20 +42,14 @@ function Profile(props) {
         fetchCourses();
     }
 
-    useEffect(() => {
-        fetchCourses();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     return (
         <div className="profile">
             <div className="title">My Courses</div>
             {courses.map(course =>
-                <Course
-                    course={course}
-                    key={course.cid}
-                    fetchCourses={fetchCourses}
-                    uid={uid} />
+                <Course cid={course.id}
+                    role={course.role}
+                    uid={uid}
+                    key={course.id} />
             )}
             <div className="createCourse-bar">
                 <TextField
@@ -63,18 +63,38 @@ function Profile(props) {
     );
 }
 
-function Course(props) {
-    let [managing, setManaging] = useState(false);
-    let [uploading, setUploading] = useState(false);
-    let [addInstructorRes, setAddInstructorRes] = useState(null);
+function Course({ cid, role, uid }) {
+    const [course, setCourse] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [managing, setManaging] = useState(false);
+    const [uploading, setUploading] = useState(false);
+    const [addInstructorRes, setAddInstructorRes] = useState(null);
+    const [openModify, setOpenModify] = useState({ open: false });
     let fileUpload = React.createRef();
     let newUserRef = React.createRef();
 
+    const fetchCourse = async () => {
+        try {
+            let res = await axios.get(`${serverURL}/api/course?id=${cid}`);
+            setCourse(res.data);
+            setLoading(false);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    useEffect(() => {
+        fetchCourse();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     const uploadPDF = async () => {
+        if (fileUpload.current.files.length !== 1) return;
+
         let formData = new FormData();
-        formData.append("cid", props.course.cid);
+        formData.append("cid", cid);
         formData.append("anonymity", "anyone");
-        formData.append("user", props.uid);
+        formData.append("user", uid);
         formData.append("file", fileUpload.current.files[0]);
         try {
             setUploading(true);
@@ -83,32 +103,34 @@ function Course(props) {
             console.log(err);
         } finally {
             setUploading(false);
-            props.fetchCourses();
+            fetchCourse();
         }
     }
 
     const deleteSlide = async (filename, sid) => {
         if (!window.confirm(`Are you sure to delete "${filename}"?`)) return;
         try {
-            await axios.delete(`${serverURL}/api/slide?sid=${sid}`, { data: { user: props.uid } });
+            await axios.delete(`${serverURL}/api/slide?sid=${sid}`, { data: { user: uid } });
         } catch (err) {
             console.log(err);
         } finally {
-            props.fetchCourses();
+            fetchCourse();
         }
     }
 
     const addInstructor = async () => {
         try {
             await axios.post(`${serverURL}/api/addInstructor`, {
-                user: props.uid,
-                course: props.course.cid,
+                user: uid,
+                course: cid,
                 newUser: newUserRef.current.value,
             });
             setAddInstructorRes(<div className="result-ok">Add instructor "{newUserRef.current.value}" successfully!</div>);
         } catch (err) {
             console.error(err);
-            setAddInstructorRes(<div className="result-fail">Add instructor "{newUserRef.current.value}" failed!</div>);
+            setAddInstructorRes(<div className="result-fail">Add instructor failed!</div>);
+        } finally {
+            fetchCourse();
         }
     }
 
@@ -128,26 +150,41 @@ function Course(props) {
         document.body.removeChild(el);
     }
 
+    const modifySlide = (filename, sid) => {
+        setOpenModify({ open: true, filename: filename, sid: sid });
+    }
+
+    if (loading) return (<div className="course"><div className="loading"><CircularProgress /></div></div>);
+
     return (
         <div className="course">
             <div className="title">
-                {props.course.name}
-                <span className={`manage ${managing ? "managing" : ""}`}
-                    onClick={changeManageStatus}>
-                    <span className='material-icons icon'>settings</span>
-                </span>
+                {course.name}
+                {role === 'instructor'
+                    ? <span className={`manage ${managing ? "managing" : ""}`}
+                        onClick={changeManageStatus}>
+                        <span className='material-icons icon'>settings</span>
+                    </span>
+                    : <span>&nbsp;</span>}
             </div>
-            <div className="slides">{props.course.slides.map((slide) => {
+            <div className="slides">{course.slides.map((slide) => {
                 let link = `${fullURL()}/${slide.id}`;
                 return (
                     <div key={slide.id} className="slide-item">
                         <a className="slide-link" href={link}>{slide.filename}</a>
                         {managing
-                            ? <Button
-                                className="slide-delete-btn"
-                                variant="outlined"
-                                color="secondary"
-                                onClick={e => deleteSlide(slide.filename, slide.id)}>Delete</Button>
+                            ? <div className="btns">
+                                <Button
+                                    className="slide-delete-btn"
+                                    variant="outlined"
+                                    color="primary"
+                                    onClick={e => modifySlide(slide.filename, slide.id)}>Modify</Button>
+                                <Button
+                                    className="slide-delete-btn"
+                                    variant="outlined"
+                                    color="secondary"
+                                    onClick={e => deleteSlide(slide.filename, slide.id)}>Delete</Button>
+                            </div>
                             : <Button
                                 variant="outlined"
                                 color="primary"
@@ -165,10 +202,11 @@ function Course(props) {
                         disabled={uploading}
                         variant="contained"
                         color="primary">Upload</Button>
+                    {uploading ? <CircularProgress /> : null}
                 </div>
                 : null}
 
-            <div className="instructors"><strong>Instructors: </strong>{props.course.instructors.join(', ')}</div>
+            <div className="instructors"><strong>Instructors: </strong>{course.instructors.join(', ')}</div>
             {managing
                 ? <>
                     <div className="addInstructor-bar">
@@ -180,13 +218,149 @@ function Course(props) {
                         <Button id="fileSubmit"
                             variant="contained"
                             color="primary"
-                            onClick={e => addInstructor(props.course.cid)}>Add Instructor</Button>
+                            onClick={e => addInstructor(course.cid)}>Add Instructor</Button>
                     </div>
                     {addInstructorRes}
                 </>
+                : null}
+
+            {openModify.open
+                ? <SlideSetting open={openModify.open}
+                    onClose={_ => setOpenModify({ open: false })}
+                    filename={openModify.filename}
+                    sid={openModify.sid}
+                    uid={uid} />
                 : null}
         </div>
     );
 }
 
-export default Profile;
+
+function SlideSetting({ filename, sid, uid, open, onClose }) {
+    const [loading, setLoading] = useState(true);
+    const [uploading, setUploading] = useState(false);
+    const [settings, setSettings] = useState({});
+    const resultRef = React.createRef();
+    const titleRef = React.createRef();
+    const fileReupload = React.createRef();
+
+    useEffect(() => {
+        axios.get(`${serverURL}/api/slideMeta?id=${sid}`).then(res => {
+            setSettings(res.data);
+            setLoading(false);
+        }).catch(err => {
+            console.error(err);
+        });
+    }, [sid]);
+
+    const changeAnonymity = (e) => {
+        console.log(e.target.value);
+        axios.post(`${serverURL}/api/setAnonymity`, {
+            uid: uid,
+            sid: sid,
+            anonymity: e.target.value
+        }).then(res=>{
+            setResult(true, "changes saved");
+            setSettings({ ...settings, anonymity: e.target.value });
+        }).catch(err => {
+            console.log(err);
+            setResult(false, "update failed!");
+        });
+    }
+
+    const changeTitle = (e) => {
+        console.log(titleRef.current.value);
+        axios.post(`${serverURL}/api/setTitle`, {
+            uid: uid,
+            sid: sid,
+            anonymity: titleRef.current.value
+        }).then(res=>{
+            setResult(true, "changes saved");
+        }).catch(err => {
+            console.log(err);
+            setResult(false, "update failed!");
+        });
+    }
+
+    const reuploadFile = async (e) => {
+        if (fileReupload.current.files.length !== 1) return;
+        let formData = new FormData();
+        formData.append("sid", sid);
+        formData.append("user", uid);
+        formData.append("file", fileReupload.current.files[0]);
+        try {
+            setUploading(true);
+            await axios.post(`${serverURL}/api/addSlide/`, formData);
+            setResult(true, "changes saved");
+        } catch (err) {
+            console.log(err);
+            setResult(false, "update failed!");
+        }
+    }
+
+    const setResult = (success, message) => {
+        let node = resultRef.current;
+        node.innerText = message;
+        node.className = `result ${success ? "ok" : "fail"}`;
+        setTimeout(() => {
+            node.style = "opacity: 0;";
+        }, 1000)
+        setTimeout(() => {
+            node.innerText = "";
+            node.style = "";
+        }, 1500);
+    }
+
+    return (
+        <Dialog onClose={onClose} open={open}>
+            <div className="setting">
+                {loading
+                    ? <div style={{ textAlign: 'center' }}><CircularProgress /></div>
+                    : <>
+                        <div className="title">
+                            Setting: {filename}
+                            <span ref={resultRef}></span>
+                        </div>
+                        <div className="row">
+                            <span className="label">Anonymity:</span>
+                            <Select value={settings.anonymity}
+                                onChange={changeAnonymity}>
+                                <MenuItem value="anyone">Anyone</MenuItem>
+                                <MenuItem value="student">Student</MenuItem>
+                                <MenuItem value="nonymous">Non-anonymous</MenuItem>
+                            </Select>
+                        </div>
+                        <div className="row">
+                            <span className="label">Add a title:</span>
+                            <TextField
+                                className="title-input"
+                                placeholder="(at most 30 character)"
+                                inputProps={{ maxLength: 25 }}
+                                inputRef={titleRef} />
+                            <Button
+                                onClick={changeTitle}
+                                disabled={false}
+                                variant="contained"
+                                color="primary">Update</Button>
+                        </div>
+                        <div className="row">
+                            <span className="label">Re-upload PDF file:</span>
+                            <input type="file" name="file" ref={fileReupload} />
+                            <Button
+                                onClick={reuploadFile}
+                                disabled={false}
+                                variant="contained"
+                                color="primary">Upload</Button>
+                        </div>
+                        <div className="row">
+                            <span className="label">Reorder questions to match pages:</span>
+                            <Button
+                                href={`${baseURL}/profile/reorderQuestions/${sid}`}
+                                variant="contained"
+                                color="primary">Reorder</Button>
+                        </div>
+                    </>}
+            </div>
+        </Dialog>
+    );
+}

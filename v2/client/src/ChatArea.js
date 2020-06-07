@@ -7,7 +7,6 @@ import highlight from 'highlight.js';
 
 import { serverURL } from './config';
 import { formatTime, formatNames } from './util';
-import './ChatArea.scss';
 
 
 const md = markdownIt({

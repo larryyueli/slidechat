@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 import { baseURL } from './config';
-import './Appbar.scss';
 
 /**
  * App bar: consisting the logo and some menu buttons
