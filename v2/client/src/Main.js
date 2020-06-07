@@ -4,7 +4,6 @@ import axios from 'axios';
 import ChatArea from './ChatArea';
 import Slides from './Slides';
 import { serverURL } from './config';
-import './App.scss';
 
 /**
  * The main entrance of the application
@@ -14,11 +13,9 @@ class Main extends Component {
     constructor(props) {
         super(props);
         this.fetchChatList = this.fetchChatList.bind(this);
-        this.state = { pageNum: 1, questions: [], pageTotal: 1, pageImg: "default.png", };
 
-        let path = window.location.pathname.split("/");
-        this.state.id = path.pop();
-        if (!this.state.id) this.state.id = path.pop(); // handle URL like /slidechat/slideID/
+        // console.log(props.match);
+        this.state = { id: props.match.params.slideId, pageNum: 1, questions: [], pageTotal: 1, pageImg: "default.png" };
 
         axios.get(`${serverURL}/api/pageTotal?slideID=${this.state.id}`).then(data => {
             let currentPage = 1;

@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import AppBar from './Appbar.js'
 import Main from './Main.js';
 import Profile from './Profile.js';
+import ReorderQuestions from './ReorderQuestions.js';
 import { baseURL } from './config';
 
 
@@ -17,6 +18,7 @@ function App() {
             <AppBar />
             <Switch>
                 <Route path={`${baseURL}/profile`} exact component={Profile} />
+                <Route path={`${baseURL}/profile/reorderQuestions/:slideId`} component={ReorderQuestions} />
                 <Route path={`${baseURL}/:slideId`} component={Main} />
             </Switch>
         </Router>

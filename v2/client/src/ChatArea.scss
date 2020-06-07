@@ -150,6 +150,7 @@
 					align-items: center;
 					
 					.icon {
+						@include clickable();
 						margin: 0 0.3rem;
 					}
 
@@ -158,14 +159,12 @@
 					}
 
 					.liked {
-						@include clickable();
 						display: flex;
 						align-items: center;
 						color: $likeColour;
 					}
 	
 					.nobody-liked {
-						@include clickable();
 						display: flex;
 						align-items: center;
 						color: #cccccc;
@@ -173,6 +172,9 @@
 
 					.delete {
 						color: $secondary;
+						&:hover {
+							color: lighten($secondary, 10%);
+						}
 					}
 				}
 			}
