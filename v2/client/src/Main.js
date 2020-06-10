@@ -21,7 +21,7 @@ class Main extends Component {
             let currentPage = 1;
             if (window.location.hash) {
                 let n = +window.location.hash.substring(1);
-                if (n > 0 && n <= data.data.pageTotal) {
+                if (n > 0 && n <= data.data.pageTotal && Number.isInteger(n)) {
                     currentPage = n;
                 }
             }
@@ -87,7 +87,7 @@ class Main extends Component {
 
     gotoPage() {
         let newPageNum = +document.getElementById("pageNum").value;
-        if (isNaN(newPageNum)) {
+        if (!Number.isInteger(newPageNum)) {
             document.getElementById("pageNum").value = this.state.pageNum;
             return;
         }

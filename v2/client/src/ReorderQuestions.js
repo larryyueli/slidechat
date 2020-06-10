@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Button, CircularProgress } from '@material-ui/core';
 
-import { baseURL, serverURL } from './config';
+import { baseURL, serverURL, fullURL } from './config';
 import { range } from './util';
 
 export default function ReorderQuestions(props) {
+    const uid = "lulingxi";
     const sid = props.match.params.slideId;
     const [loading, setLoading] = useState(true);
     const [result, setResult] = useState(null);
@@ -15,18 +16,31 @@ export default function ReorderQuestions(props) {
         let fetchSlide = async () => {
             try {
                 let res = await axios.get(`${serverURL}/api/pageTotal?slideID=${sid}`);
-                let slide = { pageTotal: res.data.pageTotal, pages: [], unused: [] }
-                for (let i = 1; i <= slide.pageTotal; i++) {
+                let slide = { pageTotal: res.data.pageTotal, pages: [], unused: [] };
+                let i = 1;
+                for (; i <= slide.pageTotal; i++) {
                     let res = await axios.get(`${serverURL}/api/questions?slideID=${sid}&pageNum=${i}`);
                     let questions = { pageNum: i, questions: res.data };
                     questions.count = res.data.reduce((total, curr) => {
                         return total + (curr ? 1 : 0);
                     }, 0);
-                    slide.pages.push([questions]);
+                    if (questions.count === 0) {
+                        slide.pages.push([]);
+                    } else {
+                        slide.pages.push([questions]);
+                    }
                 }
 
-                // res = await axios.get(`${serverURL}/api/unusedQuestions?slideID=${sid}`);
-                // slide.unused = res.data;
+                res = await axios.get(`${serverURL}/api/unusedQuestions?id=${sid}`);
+                slide.unused = res.data;
+                for (; i <= slide.unused.length + slide.pageTotal; i++) {
+                    slide.unused[i - slide.pageTotal - 1].pageNum = i;
+                    slide.unused[i - slide.pageTotal - 1].count = slide.unused[i - slide.pageTotal - 1].questions.reduce((total, curr) => {
+                        return total + (curr ? 1 : 0);
+                    }, 0);
+                    console.log(slide.unused[i - slide.pageTotal - 1].questions);
+                }
+
                 setSlide(slide);
                 setLoading(false);
             } catch (err) {
@@ -77,7 +91,7 @@ export default function ReorderQuestions(props) {
 
         const slideCopy = { ...slide }
 
-        slideCopy.pages[to-1].push(slide.unused[index]);
+        slideCopy.pages[to - 1].push(slide.unused[index]);
         slideCopy.unused.splice(index, 1);
         console.log(slideCopy);
         setSlide(slideCopy);
@@ -88,6 +102,24 @@ export default function ReorderQuestions(props) {
         let list = range(0, len).map((i) => <li className="preview-item" key={i}>{page.questions[i].title}</li>);
         if (page.count > 5) list.push(<li className="preview-item">...</li>);
         return list;
+    }
+
+    const submitChanges = async () => {
+        try {
+            let questionOrder = [];
+            for (let page of slide.pages) {
+                let orders = []
+                for (let questions of page) {
+                    orders.push(questions.pageNum);
+                }
+                questionOrder.push(orders);
+            }
+            console.log(questionOrder);
+            await axios.post(`${serverURL}/api/reorderQuestions`, { questionOrder: questionOrder, sid: sid, user: uid });
+            window.location.href = `${fullURL()}/profile`;
+        } catch (err) {
+            console.error(err.request);
+        }
     }
 
     return (
@@ -141,15 +173,20 @@ export default function ReorderQuestions(props) {
                         </div>
                         <div className="right-side">
                             <div className="toolbox">
-                                <span>Unused questions:</span>
+                                <div className="title">Unused questions</div>
                                 {slide.unused.map((page, index) => {
-                                    return <div key={index}>
-                                        <span className="question-icon">
-                                            unused {page.pageNum}({page.count})
-                                    </span>
+                                    return <div className="unused-item" key={index}>
+                                        <div className='tooltip' key={index}>
+                                            <span className="question-icon">
+                                                unused {page.pageNum}({page.count})
+                                            </span>
+                                            <ul className="tooltip-text">{previewPage(page)}</ul>
+                                        </div>
+                                        <div className="input-row">
                                         <span>To page:</span>
                                         <input type="text" id={`add-${index}`} />
                                         <button onClick={e => addToPage(index)}>Add</button>
+                                        </div>
                                     </div>
                                 })}
                             </div>
@@ -157,7 +194,7 @@ export default function ReorderQuestions(props) {
                     </div>
                     <div className="button-row">
                         <Button variant='contained' href={`${baseURL}/profile`}>Abort</Button>
-                        <Button variant='contained' color='primary'>Submit</Button>
+                        <Button variant='contained' color='primary' onClick={e => submitChanges()}>Submit</Button>
                     </div>
                 </>}
         </div>

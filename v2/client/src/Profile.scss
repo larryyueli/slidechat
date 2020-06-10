@@ -1,6 +1,6 @@
 .profile {
 	width: 35rem;
-	max-width: 100%;
+	max-width: 90%;
 	margin: 3rem auto;
 
 	> .title {
@@ -178,6 +178,10 @@
 
 		.title-input {
 			width: 18rem;
+			margin-right: 1rem;
+		}
+
+		.MuiButton-root {
 			margin-right: 1rem;
 		}
 	}

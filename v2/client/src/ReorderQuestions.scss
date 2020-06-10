@@ -20,87 +20,119 @@
 		.MuiCircularProgress-root {
 			margin-left: 1rem;
 		}
-    }
-    
-    .container {
-        display: flex;
-        .left-side {
-            flex: 3;
-            min-width: 0;
+	}
 
-            .pages-list {
-                border: 1px solid #cccccc;
+	.container {
+		display: flex;
+		.left-side {
+			flex: 3;
+			min-width: 0;
 
-                .page-item {
-                    border: 1px solid #cccccc;
-                    padding: 0.5rem;
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
+			.pages-list {
+				border: 1px solid #cccccc;
 
-                    .page-item-left {
-                        display: flex;
-                        align-items: center;
+				.page-item {
+					border: 1px solid #cccccc;
+					padding: 0.5rem;
+					display: flex;
+					align-items: center;
+					justify-content: space-between;
 
-                        .thumbnail {
-                            max-height: 5rem;
-                            margin-right: 1rem;
-                        }
+					.page-item-left {
+						display: flex;
+						align-items: center;
 
-                        .tooltip {
-                            @include tooltip(20rem);
-                        }
-    
-                        .question-icon {
-                            margin: 0.25rem;
-                            padding: 0.25rem 0.5rem;
-                            border: 1px solid #cccccc;
-                            border-radius: 0.25rem;
-                        }
-                    }
+						.thumbnail {
+							max-height: 5rem;
+							margin-right: 1rem;
+						}
 
-                    .page-item-right {
-                        display: flex;
-                        align-items: center;
+						.tooltip {
+							@include tooltip(20rem);
+						}
 
-                        .tooltip {
-                            @include tooltip(15rem);
-                        }
+						.question-icon {
+							margin: 0.25rem;
+							padding: 0.25rem 0.5rem;
+							border: 1px solid #cccccc;
+							border-radius: 0.25rem;
+						}
+					}
 
-                        .btn {
-                            @include clickable();
-                            @include flexCenter();
-                            width: 2rem;
-                            height: 2rem;
-                            margin: 0 0.25rem;
-                            border-radius: 0.25rem;
-                            border: 1px solid #cccccc;
-                        }
-                    }
-                }
-            }
-        }
+					.page-item-right {
+						display: flex;
+						align-items: center;
 
-        .right-side {
-            flex: 1;
-            min-width: 0;
-            padding: 2rem;
-            
-            .toolbox {
-                position: sticky;
-                top: 2rem;
-                border: 1px solid #cccccc;
-            }
-        }
-    }
+						.tooltip {
+							@include tooltip(15rem);
+						}
 
-    .button-row {
-        text-align: center;
-        margin: 1rem 0;
-        .MuiButtonBase-root {
-            margin: 0 1rem;
-        }
-    }
+						.btn {
+							@include clickable();
+							@include flexCenter();
+							width: 2rem;
+							height: 2rem;
+							margin: 0 0.25rem;
+							border-radius: 0.25rem;
+							border: 1px solid #cccccc;
+						}
+					}
+				}
+			}
+		}
+
+		.right-side {
+			flex: 1;
+			min-width: 0;
+			padding: 2rem;
+
+			.toolbox {
+				position: sticky;
+				top: 2rem;
+				border: 1px solid #cccccc;
+                text-align: center;
+                box-shadow: 1px 1px 6px #cccccc;
+                border-radius: 0.5rem;
+
+				.title {
+					font-size: 1.3rem;
+					margin: 0.5rem 0;
+				}
+
+				.unused-item {
+					padding: 0.5rem;
+					border-top: 1px solid #cccccc;
+					border-bottom: 1px solid #cccccc;
+
+					.tooltip {
+						@include tooltip(15rem);
+						display: block;
+						.question-icon {
+							padding: 0.25rem 0.5rem;
+							border: 1px solid #cccccc;
+							border-radius: 0.25rem;
+						}
+					}
+
+					.input-row {
+                        margin: 0.5rem 0 0 0;
+                        input[type="text"] {
+                            margin-left: 0.5rem;
+							width: 3rem;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	.button-row {
+		text-align: center;
+		margin: 1rem 0;
+		.MuiButtonBase-root {
+			margin: 0 1rem;
+		}
+	}
 
 	.result-ok {
 		text-align: center;

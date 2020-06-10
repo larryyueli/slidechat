@@ -227,7 +227,6 @@ function Course({ cid, role, uid }) {
             {openModify.open
                 ? <SlideSetting open={openModify.open}
                     onClose={_ => setOpenModify({ open: false })}
-                    filename={openModify.filename}
                     sid={openModify.sid}
                     uid={uid} />
                 : null}
@@ -236,7 +235,7 @@ function Course({ cid, role, uid }) {
 }
 
 
-function SlideSetting({ filename, sid, uid, open, onClose }) {
+function SlideSetting({ sid, uid, open, onClose }) {
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
     const [settings, setSettings] = useState({});
@@ -254,31 +253,31 @@ function SlideSetting({ filename, sid, uid, open, onClose }) {
     }, [sid]);
 
     const changeAnonymity = (e) => {
-        console.log(e.target.value);
+        let resultNode = resultRef.current;
         axios.post(`${serverURL}/api/setAnonymity`, {
-            uid: uid,
+            user: uid,
             sid: sid,
             anonymity: e.target.value
-        }).then(res=>{
-            setResult(true, "changes saved");
+        }).then(res => {
+            setResult(resultNode, true, "changes saved");
             setSettings({ ...settings, anonymity: e.target.value });
         }).catch(err => {
             console.log(err);
-            setResult(false, "update failed!");
+            setResult(resultNode, false, "update failed!");
         });
     }
 
     const changeTitle = (e) => {
-        console.log(titleRef.current.value);
+        let resultNode = resultRef.current;
         axios.post(`${serverURL}/api/setTitle`, {
-            uid: uid,
+            user: uid,
             sid: sid,
-            anonymity: titleRef.current.value
-        }).then(res=>{
-            setResult(true, "changes saved");
+            title: titleRef.current.value
+        }).then(res => {
+            setResult(resultNode, true, "changes saved");
         }).catch(err => {
             console.log(err);
-            setResult(false, "update failed!");
+            setResult(resultNode, false, "update failed!");
         });
     }
 
@@ -288,18 +287,21 @@ function SlideSetting({ filename, sid, uid, open, onClose }) {
         formData.append("sid", sid);
         formData.append("user", uid);
         formData.append("file", fileReupload.current.files[0]);
+        let resultNode = resultRef.current;
         try {
             setUploading(true);
-            await axios.post(`${serverURL}/api/addSlide/`, formData);
-            setResult(true, "changes saved");
+            await axios.post(`${serverURL}/api/uploadNewSlide/`, formData);
+            setResult(resultNode, true, "changes saved");
+            setSettings({ ...settings, filename: formData.get("file").name });
         } catch (err) {
             console.log(err);
-            setResult(false, "update failed!");
+            setResult(resultNode, false, "update failed!");
+        } finally {
+            setUploading(false);
         }
     }
 
-    const setResult = (success, message) => {
-        let node = resultRef.current;
+    const setResult = (node, success, message) => {
         node.innerText = message;
         node.className = `result ${success ? "ok" : "fail"}`;
         setTimeout(() => {
@@ -318,7 +320,7 @@ function SlideSetting({ filename, sid, uid, open, onClose }) {
                     ? <div style={{ textAlign: 'center' }}><CircularProgress /></div>
                     : <>
                         <div className="title">
-                            Setting: {filename}
+                            Setting: {settings.filename}
                             <span ref={resultRef}></span>
                         </div>
                         <div className="row">
@@ -336,6 +338,7 @@ function SlideSetting({ filename, sid, uid, open, onClose }) {
                                 className="title-input"
                                 placeholder="(at most 30 character)"
                                 inputProps={{ maxLength: 25 }}
+                                defaultValue={settings.title}
                                 inputRef={titleRef} />
                             <Button
                                 onClick={changeTitle}
@@ -348,9 +351,10 @@ function SlideSetting({ filename, sid, uid, open, onClose }) {
                             <input type="file" name="file" ref={fileReupload} />
                             <Button
                                 onClick={reuploadFile}
-                                disabled={false}
+                                disabled={uploading}
                                 variant="contained"
                                 color="primary">Upload</Button>
+                            {uploading ? <CircularProgress size="2rem" /> : null}
                         </div>
                         <div className="row">
                             <span className="label">Reorder questions to match pages:</span>

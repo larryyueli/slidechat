@@ -11,10 +11,7 @@ const dbConfig = {
     useNewUrlParser: true,
 };
 
-const config = require('../config');
-const instructors = config.instructors;
-const dbURL = config.dbURL;
-const fileStorage = config.fileStorage;
+const { instructors, dbURL, fileStorage, convertOptions } = require('../config');
 
 function errorHandler(res, err) {
     if (err && err.status) {
@@ -36,7 +33,7 @@ function instructorAuth(req, res, next) {
 }
 
 function isNotValidPage(pageNum, pageTotal) {
-    if (isNaN(pageNum)
+    if (!Number.isInteger(+pageNum)
         || +pageNum < 1
         || +pageNum > pageTotal) {
         return true;
@@ -55,11 +52,15 @@ function notExistInList(index, list) {
     try {
         if (list[+index]) return false;
     } catch (err) {
-        console.log(err)
         return true;
     }
-    console.log(null)
     return true;
+}
+
+function questionCount(questions) {
+    return questions.reduce((total, curr) => {
+        return total + (curr ? 1 : 0);
+    }, 0);
 }
 
 async function startApp() {
@@ -125,7 +126,7 @@ async function startApp() {
      */
     router.post('/api/addInstructor', instructorAuth, async (req, res) => {
         try {
-            if (typeof req.body.newUser !== 'string') {
+            if (typeof req.body.newUser !== 'string' || !req.body.newUser) {
                 throw { status: 400, error: 'bad request' };
             }
             let course = await courses.findOne({ _id: ObjectID.createFromHexString(req.body.course) },
@@ -204,7 +205,8 @@ async function startApp() {
             // Step 3: convert to images
             let pdfImage = new PDFImage(path.join(dir, req.files.file.name), {
                 pdfFileBaseName: 'page',
-                outputDirectory: dir
+                outputDirectory: dir,
+                convertOptions: convertOptions
             });
             let imagePaths = await pdfImage.convertFile();
 
@@ -232,6 +234,246 @@ async function startApp() {
 
             console.log("pdf file processing complete")
             res.json({ id: id });
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    });
+
+    /**
+     * upload a new version of slide
+     * req body:
+     *   sid: the old slide id
+     *   user: instructor userID
+     * req.files:
+     *   file: *.pdf
+     */
+    router.post('/api/uploadNewSlide', instructorAuth, async (req, res) => {
+        try {
+            if (req.body.sid.length != 24
+                || !req.files.file
+                || !req.files.file.name.toLocaleLowerCase().endsWith('.pdf')) {
+                return res.status(400).send();
+            }
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
+
+            if (!slide) {
+                throw { status: 400, error: "slide not exist" };
+            } else if (false) {   // check in instructor's list TODO: UNSAFE
+                throw { status: 403, error: "Unauthorized" };
+            }
+
+            let dir = path.join(fileStorage, req.body.sid);
+            // overwrite if exists. should not happen: id is unique
+            if (fs.existsSync(dir)) {
+                await fs.promises.rmdir(dir, { recursive: true });
+            }
+            await fs.promises.mkdir(dir, { recursive: true });
+            console.log(`Saving files to: ${dir}`);
+
+            await req.files.file.mv(path.join(dir, req.files.file.name));
+
+            // Step 3: convert to images
+            let pdfImage = new PDFImage(path.join(dir, req.files.file.name), {
+                pdfFileBaseName: 'page',
+                outputDirectory: dir,
+                convertOptions: convertOptions
+            });
+            let imagePaths = await pdfImage.convertFile();
+
+            // Step 4: create the list of pages, update database
+            let pages = slide.pages;
+            let oldLength = pages.length;
+            let newLength = imagePaths.length;
+            let updateRes;
+            if (oldLength > newLength) {
+                let i = newLength
+                while (i < pages.length) {
+                    if (questionCount(pages[i].questions) === 0) {
+                        pages.splice(i, 1);
+                    } else {
+                        i++;
+                    }
+                }
+                updateRes = await slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) }, {
+                    $set: {
+                        pages: pages.slice(0, newLength),
+                        pageTotal: newLength,
+                        filename: req.files.file.name
+                    },
+                    $push: {
+                        unused: {
+                            $each: pages.slice(newLength), // your batch
+                        }
+                    }
+                });
+            } else {
+                let i = oldLength
+                while (i < newLength) {
+                    pages.push({ questions: [] });
+                    i++;
+                }
+                updateRes = await slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) }, {
+                    $set: {
+                        pages: pages,
+                        pageTotal: newLength,
+                        filename: req.files.file.name
+                    }
+                });
+            }
+
+            if (updateRes.result.n == 0) {
+                throw { status: 400, error: "upload new slide failed" };
+            }
+
+            console.log("pdf file processing complete")
+            res.send();
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    });
+
+    /**
+     * reorder the questions of a slide
+     * req body:
+     *   questionOrder: the order of questions
+     *   sid: the slide id
+     *   user: instructor userID
+     */
+    router.post('/api/reorderQuestions', instructorAuth, async (req, res) => {
+        try {
+            if (req.body.sid.length != 24) {
+                return res.status(400).send();
+            }
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
+
+            if (!slide) {
+                throw { status: 400, error: "slide not exist" };
+            } else if (false) {   // check in instructor's list TODO: UNSAFE
+                throw { status: 403, error: "Unauthorized" };
+            } else if (req.body.questionOrder.length != slide.pages.length) {
+                throw { status: 400, error: "length not match" };
+            }
+
+            let usedPage = {};
+            let newPages = [];
+            let unusedLength = 0;
+            if (slide.unused) {
+                unusedLength = slide.unused.length;
+            }
+            for (let orders of req.body.questionOrder) {
+                let newPage = { questions: [] };
+                for (let order of orders) {
+                    order -= 1;
+                    if (!Number.isInteger(order) || usedPage[order] || order >= unusedLength + slide.pages.length) {
+                        throw { status: 400, error: "Bad Request!" };
+                    }
+                    usedPage[order] = 1;
+                    if (order < slide.pages.length) {
+                        newPage.questions.push(...slide.pages[order].questions);
+                    } else {
+                        newPage.questions.push(...slide.unused[order - slide.pageTotal].questions);
+                        console.log(newPage.questions);
+                    }
+                }
+                newPages.push(newPage);
+            }
+
+            let newUnused = [];
+            for (let i = 0; i < slide.pages.length; i++) {
+                if (!usedPage[i] && questionCount(slide.pages[i].questions)) {
+                    newUnused.push(slide.pages[i]);
+                }
+            }
+            for (let i = 0; i < slide.unused.length; i++) {
+                if (!usedPage[i + slide.pages.length] && questionCount(slide.unused[i].questions)) {
+                    newUnused.push(slide.unused[i]);
+                }
+            }
+
+            let updateRes = await slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) }, {
+                $set: {
+                    pages: newPages,
+                    unused: newUnused
+                }
+            });
+
+            if (updateRes.result.n == 0) {
+                throw { status: 400, error: "change pages order failed" };
+            }
+
+            res.json({});
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    });
+
+    /**
+     * set title of a slide
+     * req body:
+     *   title: new title of the slide
+     *   sid: the slide id
+     *   user: instructor userID
+     */
+    router.post('/api/setTitle', instructorAuth, async (req, res) => {
+        try {
+            if (req.body.sid.length != 24) {
+                return res.status(400).send();
+            }
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
+
+            if (!slide) {
+                throw { status: 400, error: "slide not exist" };
+            } else if (false) {   // check in instructor's list TODO: UNSAFE
+                throw { status: 403, error: "Unauthorized" };
+            }
+            let updateRes = await slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) }, {
+                $set: {
+                    title: req.body.title,
+                }
+            });
+
+            if (updateRes.result.n == 0) {
+                throw { status: 400, error: "set title failed" };
+            }
+
+            res.json({});
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    });
+
+    /**
+     * set anonymity level of a slide
+     * req body:
+     *   anonymity: new anonymity level of the slide
+     *   sid: the slide id
+     *   user: instructor userID
+     */
+    router.post('/api/setAnonymity', instructorAuth, async (req, res) => {
+        try {
+            if (req.body.sid.length != 24
+                || (["anyone", "student", "nonymous"].indexOf(req.body.anonymity) < 0)) {
+                return res.status(400).send();
+            }
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
+
+            if (!slide) {
+                throw { status: 400, error: "slide not exist" };
+            } else if (false) {   // check in instructor's list TODO: UNSAFE
+                throw { status: 403, error: "Unauthorized" };
+            }
+
+            let updateRes = await slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) }, {
+                $set: {
+                    anonymity: req.body.anonymity,
+                }
+            });
+
+            if (updateRes.result.n == 0) {
+                throw { status: 400, error: "set anonymity failed" };
+            }
+
+            res.json({});
         } catch (err) {
             errorHandler(res, err);
         }
@@ -402,9 +644,34 @@ async function startApp() {
     router.get('/api/slideMeta', async (req, res) => {
         try {
             let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.id) },
-                { projection: { filename: 1, description: 1, anonymity: 1 } });
+                { projection: { filename: 1, title: 1, anonymity: 1 } });
             if (!slide) return res.sendStatus(404);
             res.json(slide);
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    });
+
+    /**
+     * get the unused questions of a slide
+     * req query:
+     *   id: slideId
+     */
+    router.get('/api/unusedQuestions', async (req, res) => {
+        try {
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.id) },
+                { projection: { unused: 1 } });
+            if (!slide) return res.sendStatus(404);
+            let result = slide.unused;
+            console.log(result);
+            for (let i = 0; i < result.length; i++) {
+                for (let question of result[i].questions) {
+                    if (question) {
+                        delete question.chats;
+                    }
+                }
+            }
+            res.json(result);
         } catch (err) {
             errorHandler(res, err);
         }
