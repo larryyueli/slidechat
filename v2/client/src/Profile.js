@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Button, TextField, CircularProgress, Dialog, Select, MenuItem } from '@material-ui/core';
 
@@ -12,7 +12,7 @@ import { baseURL, serverURL, fullURL } from './config';
 export default function Profile(props) {
     let [courses, setCourses] = useState([]);
     let uid = "lulingxi";
-    let newCourseRef;
+    let newCourseRef = useRef(null);
 
     // the useEffect dependency should be `uid` and it should not change, yet eslint does not understand and thus disabled
     useEffect(() => {
@@ -33,7 +33,7 @@ export default function Profile(props) {
         try {
             await axios.post(`${serverURL}/api/createCourse`, {
                 user: uid,
-                course: newCourseRef.value,
+                course: newCourseRef.current.value,
             })
         } catch (err) {
             console.error(err);
@@ -55,7 +55,7 @@ export default function Profile(props) {
                     variant='outlined'
                     id={`new-course`}
                     placeholder="Course Name"
-                    inputRef={ref => { newCourseRef = ref }} />
+                    inputRef={newCourseRef} />
                 <Button id="fileSubmit" onClick={createCourse} variant="contained" color="primary">Create Course</Button>
             </div>
         </div>
@@ -69,8 +69,8 @@ function Course({ cid, role, uid }) {
     const [uploading, setUploading] = useState(false);
     const [addInstructorRes, setAddInstructorRes] = useState(null);
     const [openModify, setOpenModify] = useState({ open: false });
-    let fileUpload = React.createRef();
-    let newUserRef = React.createRef();
+    let fileUpload = useRef(null);
+    let newUserRef = useRef(null);
 
     const fetchCourse = async () => {
         try {
@@ -238,9 +238,9 @@ function SlideSetting({ sid, uid, open, onClose }) {
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
     const [settings, setSettings] = useState({});
-    const resultRef = React.createRef();
-    const titleRef = React.createRef();
-    const fileReupload = React.createRef();
+    const resultRef = useRef(null);
+    const titleRef = useRef(null);
+    const fileReupload = useRef(null);
 
     useEffect(() => {
         axios.get(`${serverURL}/api/slideMeta?id=${sid}`).then(res => {
@@ -252,31 +252,29 @@ function SlideSetting({ sid, uid, open, onClose }) {
     }, [sid]);
 
     const changeAnonymity = (e) => {
-        let resultNode = resultRef.current;
         axios.post(`${serverURL}/api/setAnonymity`, {
             user: uid,
             sid: sid,
             anonymity: e.target.value
         }).then(res => {
-            setResult(resultNode, true, "changes saved");
+            setResult(true, "changes saved");
             setSettings({ ...settings, anonymity: e.target.value });
         }).catch(err => {
             console.log(err);
-            setResult(resultNode, false, "update failed!");
+            setResult(false, "update failed!");
         });
     }
 
     const changeTitle = (e) => {
-        let resultNode = resultRef.current;
         axios.post(`${serverURL}/api/setTitle`, {
             user: uid,
             sid: sid,
             title: titleRef.current.value
         }).then(res => {
-            setResult(resultNode, true, "changes saved");
+            setResult(true, "changes saved");
         }).catch(err => {
             console.log(err);
-            setResult(resultNode, false, "update failed!");
+            setResult(false, "update failed!");
         });
     }
 
@@ -286,21 +284,21 @@ function SlideSetting({ sid, uid, open, onClose }) {
         formData.append("sid", sid);
         formData.append("user", uid);
         formData.append("file", fileReupload.current.files[0]);
-        let resultNode = resultRef.current;
         try {
             setUploading(true);
             await axios.post(`${serverURL}/api/uploadNewSlide/`, formData);
-            setResult(resultNode, true, "changes saved");
+            setResult(true, "changes saved");
             setSettings({ ...settings, filename: formData.get("file").name });
         } catch (err) {
             console.log(err);
-            setResult(resultNode, false, "update failed!");
+            setResult(false, "update failed!");
         } finally {
             setUploading(false);
         }
     }
 
-    const setResult = (node, success, message) => {
+    const setResult = (success, message) => {
+        let node = resultRef.current;
         node.innerText = message;
         node.className = `result ${success ? "ok" : "fail"}`;
         setTimeout(() => {

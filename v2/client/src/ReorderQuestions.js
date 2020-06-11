@@ -3,7 +3,6 @@ import axios from 'axios';
 import { Button, CircularProgress } from '@material-ui/core';
 
 import { baseURL, serverURL, fullURL } from './config';
-import { range } from './util';
 
 export default function ReorderQuestions(props) {
     const uid = "lulingxi";
@@ -14,7 +13,7 @@ export default function ReorderQuestions(props) {
     useEffect(() => {
         let fetchSlide = async () => {
             try {
-                let res = await axios.get(`${serverURL}/api/pageTotal?slideID=${sid}`);
+                let res = await axios.get(`${serverURL}/api/slideInfo?slideID=${sid}`);
                 let slide = { pageTotal: res.data.pageTotal, pages: [], unused: [] };
                 let i = 1;
                 for (; i <= slide.pageTotal; i++) {
@@ -97,9 +96,10 @@ export default function ReorderQuestions(props) {
     }
 
     const previewPage = (page) => {
-        let len = Math.min(page.count, 5);
-        let list = range(0, len).map((i) => <li className="preview-item" key={i}>{page.questions[i].title}</li>);
-        if (page.count > 5) list.push(<li className="preview-item">...</li>);
+        let list = []
+        for (let i = 0; i < 5 && i < page.questions.length; i++) {
+            if (page.questions[i]) list.push(<li className="preview-item" key={i}>{page.questions[i].title}</li>);
+        }
         return list;
     }
 
@@ -182,9 +182,9 @@ export default function ReorderQuestions(props) {
                                             <ul className="tooltip-text">{previewPage(page)}</ul>
                                         </div>
                                         <div className="input-row">
-                                        <span>To page:</span>
-                                        <input type="text" id={`add-${index}`} />
-                                        <button onClick={e => addToPage(index)}>Add</button>
+                                            <span>To page:</span>
+                                            <input type="text" id={`add-${index}`} />
+                                            <button onClick={e => addToPage(index)}>Add</button>
                                         </div>
                                     </div>
                                 })}

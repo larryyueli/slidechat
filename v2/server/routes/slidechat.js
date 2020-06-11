@@ -690,16 +690,32 @@ async function startApp() {
     });
 
     /**
-     * get total number of pages of a slide
+     * download PDF file
+     * req body:
+     *   slideID: object ID of the slide
+     */
+    router.get('/api/downloadPdf', async (req, res) => {
+        try {
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.slideID) },
+                { projection: { filename: 1 } });
+            if (!slide) throw { status: 404, error: "slide not found" };
+            res.download(path.join(fileStorage, req.query.slideID, slide.filename));
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    });
+
+    /**
+     * get information of a slide, e.g. total number of pages, title
      * req body:
      *   slideID: object ID of a slide
      */
-    router.get('/api/pageTotal', async (req, res) => {
+    router.get('/api/slideInfo', async (req, res) => {
         try {
             let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.slideID) },
-                { projection: { pageTotal: 1 } });
+                { projection: { pageTotal: 1, title: 1 } });
             if (!slide) throw { status: 404, error: "slide not found" };
-            res.json({ pageTotal: slide.pageTotal });
+            res.json({ pageTotal: slide.pageTotal, title: slide.title });
         } catch (err) {
             errorHandler(res, err);
         }
