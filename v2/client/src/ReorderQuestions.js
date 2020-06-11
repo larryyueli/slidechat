@@ -9,7 +9,6 @@ export default function ReorderQuestions(props) {
     const uid = "lulingxi";
     const sid = props.match.params.slideId;
     const [loading, setLoading] = useState(true);
-    const [result, setResult] = useState(null);
     const [slide, setSlide] = useState({});
 
     useEffect(() => {
@@ -48,7 +47,7 @@ export default function ReorderQuestions(props) {
             }
         };
         fetchSlide();
-    }, []);
+    }, [sid]);
 
     const removeQuestions = (index) => {
         const slideCopy = { ...slide }
@@ -135,7 +134,7 @@ export default function ReorderQuestions(props) {
                                     <div className="page-item" key={index}>
                                         <div className="page-item-left">
                                             <span className="page-num">{index + 1}.</span>
-                                            <img className="thumbnail" src={`${serverURL}/api/slideImg?slideID=${sid}&pageNum=${index + 1}`} />
+                                            <img className="thumbnail" src={`${serverURL}/api/slideImg?slideID=${sid}&pageNum=${index + 1}`} alt="slideImg" />
                                             <span>Questions:</span>
                                             {qPages.map((page, i) => {
                                                 if (page.count === 0) return null;

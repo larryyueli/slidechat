@@ -198,8 +198,6 @@ async function startApp() {
                 await fs.promises.rmdir(dir, { recursive: true });
             }
             await fs.promises.mkdir(dir, { recursive: true });
-            console.log(`Saving files to: ${dir}`);
-
             await req.files.file.mv(path.join(dir, req.files.file.name));
 
             // Step 3: convert to images
@@ -211,14 +209,12 @@ async function startApp() {
             let imagePaths = await pdfImage.convertFile();
 
             // Step 4: create the list of pages, update database
-            let pages = [];
-            for (let i of imagePaths) {
-                pages.push({ questions: [] });
-            }
+            let pages = imagePaths.map((_) => { return { questions: [] } });
             let updateRes = await slides.updateOne({ _id: objID }, {
                 $set: {
                     pages: pages,
-                    pageTotal: imagePaths.length
+                    pageTotal: imagePaths.length,
+                    unused: []
                 }
             });
             if (updateRes.modifiedCount !== 1) {
@@ -232,7 +228,6 @@ async function startApp() {
                 throw "slide add to course failed";
             }
 
-            console.log("pdf file processing complete")
             res.json({ id: id });
         } catch (err) {
             errorHandler(res, err);
@@ -263,13 +258,11 @@ async function startApp() {
             }
 
             let dir = path.join(fileStorage, req.body.sid);
-            // overwrite if exists. should not happen: id is unique
+            // remove old slide
             if (fs.existsSync(dir)) {
                 await fs.promises.rmdir(dir, { recursive: true });
             }
             await fs.promises.mkdir(dir, { recursive: true });
-            console.log(`Saving files to: ${dir}`);
-
             await req.files.file.mv(path.join(dir, req.files.file.name));
 
             // Step 3: convert to images
@@ -286,7 +279,8 @@ async function startApp() {
             let newLength = imagePaths.length;
             let updateRes;
             if (oldLength > newLength) {
-                let i = newLength
+                // remove empty pages
+                let i = newLength;
                 while (i < pages.length) {
                     if (questionCount(pages[i].questions) === 0) {
                         pages.splice(i, 1);
@@ -307,10 +301,9 @@ async function startApp() {
                     }
                 });
             } else {
-                let i = oldLength
-                while (i < newLength) {
+                // add empty pages to new pages
+                for (let i = oldLength; i < newLength; i++) {
                     pages.push({ questions: [] });
-                    i++;
                 }
                 updateRes = await slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) }, {
                     $set: {
@@ -325,7 +318,6 @@ async function startApp() {
                 throw { status: 400, error: "upload new slide failed" };
             }
 
-            console.log("pdf file processing complete")
             res.send();
         } catch (err) {
             errorHandler(res, err);
@@ -663,7 +655,7 @@ async function startApp() {
                 { projection: { unused: 1 } });
             if (!slide) return res.sendStatus(404);
             let result = slide.unused;
-            console.log(result);
+            if (!result) return res.send([]);
             for (let i = 0; i < result.length; i++) {
                 for (let question of result[i].questions) {
                     if (question) {
