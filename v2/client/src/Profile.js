@@ -243,7 +243,7 @@ function SlideSetting({ sid, uid, open, onClose }) {
     const fileReupload = useRef(null);
 
     useEffect(() => {
-        axios.get(`${serverURL}/api/slideMeta?id=${sid}`).then(res => {
+        axios.get(`${serverURL}/api/slideInfo?slideID=${sid}`).then(res => {
             setSettings(res.data);
             setLoading(false);
         }).catch(err => {

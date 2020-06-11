@@ -15,6 +15,7 @@ function Main(props) {
     const [pageTotal, setPageTotal] = useState(0);
     const [page, setPage] = useState(1);
     const [title, setTitle] = useState("");
+    const [filename, setFilename] = useState("");
 
     useEffect(() => {
         axios.get(`${serverURL}/api/slideInfo?slideID=${sid}`).then(res => {
@@ -28,7 +29,8 @@ function Main(props) {
 
             setPage(currentPage);
             setPageTotal(res.data.pageTotal);
-            setTitle(res.data.title)
+            setTitle(res.data.title);
+            setFilename(res.data.filename);
             document.getElementById("pageNum").value = currentPage;
         }).catch(err => {
             console.error(err);
@@ -77,6 +79,7 @@ function Main(props) {
         <div className="main">
             <Slides
                 title={title}
+                filename={filename}
                 sid={sid}
                 pageNum={page}
                 pageTotal={pageTotal}

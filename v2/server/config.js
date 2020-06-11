@@ -1,18 +1,19 @@
 const os = require('os');
 const path = require('path');
+const querystring = require('querystring');
+const {dbUser, dbPsw, instructors} = require('./secrets');
+
+const escapedUser = querystring.escape(dbUser);
+const escapedPsw = querystring.escape(dbPsw);
 
 module.exports = {
     port: 10000,
 
-    dbURL: "mongodb://slidechat:V2Good!%40%23@localhost:27017/slidechat",
+    dbURL: `mongodb://${escapedUser}:${escapedPsw}@localhost:27017/slidechat`,
 
     fileStorage: path.join(os.homedir(), ".slidechat", "files"),
 
     convertOptions: { "-density": 150 },
 
-    instructors: [
-        "lulingxi",
-        "yaochen8",
-        "huakevi6"
-    ]
+    instructors: instructors
 }

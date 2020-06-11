@@ -629,16 +629,21 @@ async function startApp() {
     });
 
     /**
-     * get the metadata of a slide, such as filename and description
-     * req query:
-     *   id: slideId
+     * get information of a slide, e.g. total number of pages, filename, title, etc.
+     * req body:
+     *   slideID: object ID of a slide
      */
-    router.get('/api/slideMeta', async (req, res) => {
+    router.get('/api/slideInfo', async (req, res) => {
         try {
-            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.id) },
-                { projection: { filename: 1, title: 1, anonymity: 1 } });
-            if (!slide) return res.sendStatus(404);
-            res.json(slide);
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.slideID) },
+                { projection: { pages: 0 } });
+            if (!slide) throw { status: 404, error: "slide not found" };
+            res.json({
+                filename: slide.filename,
+                pageTotal: slide.pageTotal,
+                title: slide.title,
+                anonymity: slide.anonymity,
+            });
         } catch (err) {
             errorHandler(res, err);
         }
@@ -700,22 +705,6 @@ async function startApp() {
                 { projection: { filename: 1 } });
             if (!slide) throw { status: 404, error: "slide not found" };
             res.download(path.join(fileStorage, req.query.slideID, slide.filename));
-        } catch (err) {
-            errorHandler(res, err);
-        }
-    });
-
-    /**
-     * get information of a slide, e.g. total number of pages, title
-     * req body:
-     *   slideID: object ID of a slide
-     */
-    router.get('/api/slideInfo', async (req, res) => {
-        try {
-            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.slideID) },
-                { projection: { pageTotal: 1, title: 1 } });
-            if (!slide) throw { status: 404, error: "slide not found" };
-            res.json({ pageTotal: slide.pageTotal, title: slide.title });
         } catch (err) {
             errorHandler(res, err);
         }

@@ -14,6 +14,7 @@ export default function Slides(props) {
 	return (
 		<div className="slide-container">
 			<div className="title">{props.title}</div>
+			<div>(<a className="download-link" href={`${serverURL}/api/downloadPdf?slideID=${props.sid}`}>{props.filename}</a>)</div>			
 			<div>
 				<img src={props.pageTotal
 					? `${serverURL}/api/slideImg?slideID=${props.sid}&pageNum=${props.pageNum}`
@@ -22,7 +23,6 @@ export default function Slides(props) {
 			<Button variant="contained" disabled={prevBtnDisable} onClick={props.prevPage}>PREV</Button>
 			<Button variant="contained" disabled={nextBtnDisable} onClick={props.nextPage}>NEXT</Button>
 			<div>Page <input id="pageNum" type="text" defaultValue={props.pageNum} onBlur={props.gotoPage} /> of {props.pageTotal}</div>
-			<a className="download-link" href={`${serverURL}/api/downloadPdf?slideID=${props.sid}`}>download this pdf</a>
 		</div>
 	);
 }

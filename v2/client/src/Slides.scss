@@ -1,14 +1,15 @@
 .slide-container {
-	margin-top: 1rem;
+	margin: 1rem 0;
 	text-align: center;
 
 	.title {
-		font-size: 1.5rem;
+		font-size: 1.6rem;
 	}
 
 	.slide {
 		min-width: 80%;
 		max-width: 100%;
+		margin-top: 1rem;
 	}
 
 	button {
@@ -36,8 +37,6 @@
 	}
 
 	.download-link {
-		display: block;
-		margin: 2rem 0;
 		color: #aaaaaa;
 	}
 }
