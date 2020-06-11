@@ -16,7 +16,7 @@ export function formatTime(time) {
     } else if (elapsed < oneWeek) {
         return `${elapsed / oneDay >> 0} days ago`;
     } else {
-        let date = Date(time);
+        let date = new Date(time);
         return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
     }
 }

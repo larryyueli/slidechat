@@ -22,6 +22,25 @@
 		}
 	}
 
+	@mixin questions-preview-icon {
+		@include tooltip(15rem);
+		.tooltip-text {
+			text-align: left;
+			list-style: none;
+			li::before {
+				content: '-';
+				padding-right: 0.8rem;
+			}
+		}
+		.question-icon {
+			display: inline-block;
+			margin: 0 0.25rem;
+			padding: 0.25rem 0.5rem;
+			border: 1px solid #cccccc;
+			border-radius: 0.25rem;
+		}
+	}
+
 	.container {
 		display: flex;
 		.left-side {
@@ -48,14 +67,7 @@
 						}
 
 						.tooltip {
-							@include tooltip(20rem);
-						}
-
-						.question-icon {
-							margin: 0.25rem;
-							padding: 0.25rem 0.5rem;
-							border: 1px solid #cccccc;
-							border-radius: 0.25rem;
+							@include questions-preview-icon();
 						}
 					}
 
@@ -65,16 +77,15 @@
 
 						.tooltip {
 							@include tooltip(15rem);
-						}
-
-						.btn {
-							@include clickable();
-							@include flexCenter();
-							width: 2rem;
-							height: 2rem;
-							margin: 0 0.25rem;
-							border-radius: 0.25rem;
-							border: 1px solid #cccccc;
+							.reorder-btn {
+								@include clickable();
+								@include flexCenter();
+								width: 2rem;
+								height: 2rem;
+								margin: 0 0.25rem;
+								border-radius: 0.25rem;
+								border: 1px solid #cccccc;
+							}
 						}
 					}
 				}
@@ -90,9 +101,9 @@
 				position: sticky;
 				top: 2rem;
 				border: 1px solid #cccccc;
-                text-align: center;
-                box-shadow: 1px 1px 6px #cccccc;
-                border-radius: 0.5rem;
+				text-align: center;
+				box-shadow: 1px 1px 6px #cccccc;
+				border-radius: 0.5rem;
 
 				.title {
 					font-size: 1.3rem;
@@ -105,19 +116,14 @@
 					border-bottom: 1px solid #cccccc;
 
 					.tooltip {
-						@include tooltip(15rem);
+						@include questions-preview-icon();
 						display: block;
-						.question-icon {
-							padding: 0.25rem 0.5rem;
-							border: 1px solid #cccccc;
-							border-radius: 0.25rem;
-						}
 					}
 
 					.input-row {
-                        margin: 0.5rem 0 0 0;
-                        input[type="text"] {
-                            margin-left: 0.5rem;
+						margin: 0.5rem 0 0 0;
+						input[type='text'] {
+							margin-left: 0.5rem;
 							width: 3rem;
 						}
 					}

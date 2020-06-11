@@ -149,19 +149,19 @@ export default function ReorderQuestions(props) {
                                         </div>
                                         <div className="page-item-right">
                                             <span className="tooltip">
-                                                <span className="btn" onClick={e => removeQuestions(index)}>
+                                                <span className="reorder-btn" onClick={e => removeQuestions(index)}>
                                                     <span className="material-icons">close</span>
                                                 </span>
                                                 <span className="tooltip-text">Move questions to unused</span>
                                             </span>
                                             <span className="tooltip">
-                                                <span className="btn" onClick={e => shiftUp(index)}>
+                                                <span className="reorder-btn" onClick={e => shiftUp(index)}>
                                                     <span className="material-icons">arrow_upward</span>
                                                 </span>
                                                 <span className="tooltip-text">Delete questions on this page and shift all questions below up by 1 page</span>
                                             </span>
                                             <span className="tooltip">
-                                                <span className="btn" onClick={e => shiftDown(index)}>
+                                                <span className="reorder-btn" onClick={e => shiftDown(index)}>
                                                     <span className="material-icons">arrow_downward</span>
                                                 </span>
                                                 <span className="tooltip-text">Shift questions on this page and below down by 1 page</span>

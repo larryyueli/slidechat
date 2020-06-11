@@ -2,7 +2,7 @@ const os = require('os');
 const path = require('path');
 
 module.exports = {
-    port: 10002,
+    port: 10000,
 
     dbURL: "mongodb://slidechat:V2Good!%40%23@localhost:27017/slidechat",
 
