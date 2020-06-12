@@ -1,109 +1,97 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 import ChatArea from './ChatArea';
 import Slides from './Slides';
-import { baseURL } from './config';
-import './App.scss';
+import { serverURL } from './config';
 
 /**
- * The main entrance of the application
- * It consists three main components: App bar, slides on the left, and chat area on the right
+ * The main body of the application
+ * It consists two main components: slides on the left, and chat area on the right. Changing the page
+ * number will need to change both sides.
  */
-class Main extends Component {
-    constructor(props) {
-        super(props);
-        this.fetchChatList = this.fetchChatList.bind(this);
-        this.state = { pageNum: 1, questions: [], pageTotal: 1, pageImg: "default.png", };
+function Main(props) {
+    const sid = props.match.params.slideId;
+    const [pageTotal, setPageTotal] = useState(0);
+    const [page, setPage] = useState(1);
+    const [title, setTitle] = useState("");
+    const [filename, setFilename] = useState("");
 
-        let path = window.location.pathname.split("/");
-        this.state.id = path.pop();
-        if (!this.state.id) this.state.id = path.pop(); // handle URL like /slidechat/slideID/
-
-        axios.get(`${baseURL}/api/pageTotal?slideID=${this.state.id}`).then(data => {
+    useEffect(() => {
+        axios.get(`${serverURL}/api/slideInfo?slideID=${sid}`).then(res => {
             let currentPage = 1;
             if (window.location.hash) {
                 let n = +window.location.hash.substring(1);
-                if (n > 0 && n <= data.data.pageTotal) {
+                if (n > 0 && n <= res.data.pageTotal && Number.isInteger(n)) {
                     currentPage = n;
                 }
             }
-            this.fetchChatList(this.state.id, currentPage);
-            this.setState({
-                pageTotal: data.data.pageTotal,
-                pageNum: currentPage,
-                pageImg: `${baseURL}/api/slideImg?slideID=${this.state.id}&pageNum=${currentPage}`
-            });
+
+            setPage(currentPage);
+            setPageTotal(res.data.pageTotal);
+            setTitle(res.data.title);
+            setFilename(res.data.filename);
+            document.getElementById("pageNum").value = currentPage;
         }).catch(err => {
             console.error(err);
         });
-
-        this.nextPage = this.nextPage.bind(this);
-        this.prevPage = this.prevPage.bind(this);
-    }
-
-    // get chats under a question
-    fetchChatList(slideID, pageNum) {
-        this.refs.chatArea.setState({ state: "list" });
-        axios.get(`${baseURL}/api/questions?slideID=${slideID}&pageNum=${pageNum}`).then(data => {
-            this.setState({ questions: data.data });
-        }).catch(err => {
-            console.error(err);
-        });
-    }
+    }, [sid]);
 
     /**
      * Go to the next page of slide, should fetch the url and the chat threads list of the new page 
      */
-    nextPage() {
-        if (this.state.pageNum >= this.state.pageTotal) {
-            return;
-        }
-        let newPageNum = this.state.pageNum + 1;
+    const nextPage = () => {
+        if (page >= pageTotal) return;
+        let newPageNum = page + 1;
+        document.getElementById("pageNum").value = newPageNum;
         window.location.hash = newPageNum;
-        this.fetchChatList(this.state.id, newPageNum);
-        this.setState({
-            pageImg: `${baseURL}/api/slideImg?slideID=${this.state.id}&pageNum=${newPageNum}`,
-            pageNum: newPageNum
-        });
+        setPage(newPageNum);
     }
 
     /**
      * Go to the previous page of slide, should fetch the url and the chat threads list of the new page 
      */
-    prevPage() {
-        if (this.state.pageNum < 1) {
-            return;
-        }
-        let newPageNum = this.state.pageNum - 1;
+    const prevPage = () => {
+        if (page < 2) return;
+        let newPageNum = page - 1;
+        document.getElementById("pageNum").value = newPageNum;
         window.location.hash = newPageNum;
-        this.fetchChatList(this.state.id, newPageNum);
-        this.setState({
-            pageImg: `${baseURL}/api/slideImg?slideID=${this.state.id}&pageNum=${newPageNum}`,
-            pageNum: newPageNum
-        });
+        setPage(newPageNum);
     }
 
-    render() {
-        return (
-            <>
-                <div className="main">
-                    <Slides
-                        pageNum={this.state.pageNum}
-                        pageTotal={this.state.pageTotal}
-                        pageImg={this.state.pageImg}
-                        nextPage={this.nextPage}
-                        prevPage={this.prevPage} />
-                    <ChatArea
-                        chats={this.state.questions}
-                        slideID={this.state.id}
-                        pageNum={this.state.pageNum}
-                        fetchChatList={this.fetchChatList}
-                        ref="chatArea" />
-                </div>
-            </>
-        );
+    const gotoPage = () => {
+        let newPageNum = +document.getElementById("pageNum").value;
+        if (!Number.isInteger(newPageNum)) {
+            document.getElementById("pageNum").value = page;
+            return;
+        }
+        if (newPageNum > pageTotal) {
+            newPageNum = pageTotal;
+        } else if (newPageNum < 1) {
+            newPageNum = 1;
+        }
+        document.getElementById("pageNum").value = newPageNum;
+        window.location.hash = newPageNum;
+        setPage(newPageNum);
     }
+
+    return (
+        <div className="main">
+            <Slides
+                title={title}
+                filename={filename}
+                sid={sid}
+                pageNum={page}
+                pageTotal={pageTotal}
+                nextPage={nextPage}
+                prevPage={prevPage}
+                gotoPage={gotoPage} />
+            <ChatArea
+                sid={sid}
+                pageNum={page} />
+        </div>
+    );
 }
+
 
 export default Main;

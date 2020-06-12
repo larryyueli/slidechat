@@ -8,9 +8,10 @@ const compression = require('compression');
 const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
 
+const config = require('./config');
 const startSlidechat = require('./routes/slidechat');
 
-async function main() {
+let main = (async () => {
   const app = express();
   app.disable("x-powered-by");  // remove the HTTP header "X-powered-by: express"
 
@@ -27,10 +28,7 @@ async function main() {
 
   app.use((req, res) => res.status(404).send());
 
-  const port = 10004;
-  app.listen(port, function () {
-    console.log('App listening on port ' + port);
+  app.listen(config.port, function () {
+    console.log('App listening on port ' + config.port);
   });
-}
-
-main();
+})();

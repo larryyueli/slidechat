@@ -1,5 +1,6 @@
 @import './palette.scss';
 @import './util.scss';
+@import './github-gist.scss';
 
 .chat-area {
 	min-width: 0;
@@ -17,6 +18,9 @@
 		.title {
 			margin: 0 0.7rem;
 			@include ellipsis();
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
 		}
 
 		.back-button {
@@ -26,6 +30,37 @@
 
 			&:hover {
 				color: #aaaaaa;
+			}
+		}
+
+		.placeholder {
+			width: 2.4rem;
+		}
+
+		.manage {
+			@include clickable();
+			@include flexCenter();
+			height: 2.4rem;
+			width: 2.4rem;
+			color: black;
+			border-radius: 0.4rem;
+
+			.icon {
+				font-size: 1.5rem;
+				transition: transform 0.3s;
+			}
+
+			&:hover {
+				background-color: #e9e9e9;
+			}
+		}
+
+		.managing {
+			background-color: #e9e9e9;
+			box-shadow: inset 1px 1px 4px #aaaaaa;
+
+			.icon {
+				transform: rotate(120deg);
 			}
 		}
 	}
@@ -40,14 +75,34 @@
 		.chat {
 			padding: 1rem;
 			border-bottom: 1px solid #cccccc;
+			&:hover {
+				background: #fdfdfd;
+				cursor: pointer;
+			}
 
-			.title {
-				font-weight: 420;
-				@include ellipsis();
+			.title-row {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+
+				.title {
+					font-size: 1.2rem;
+					font-weight: 420;
+					@include ellipsis();
+				}
+
+				.icon {
+					user-select: none;
+					font-size: 1.3rem;
+					color: $secondary;
+					&:hover {
+						color: lighten($secondary, 10%);
+					}
+				}
 			}
 
 			.info {
-				@include sides();
+				@include flexSides();
 
 				.author {
 					flex: 1;
@@ -67,8 +122,8 @@
 
 	.chat-details {
 		.title {
-			font-size: 1.3rem;
-			padding: 1rem;
+			font-size: 1.4rem;
+			padding: 2rem 1rem 0 1rem;
 			overflow-wrap: anywhere;
 		}
 
@@ -78,7 +133,7 @@
 			overflow-wrap: anywhere;
 
 			.info {
-				@include sides();
+				@include flexSides();
 				font-size: 0.9rem;
 
 				.author {
@@ -90,16 +145,37 @@
 					color: #cccccc;
 				}
 
-				.liked {
-					@include clickable();
+				.icons {
 					display: flex;
 					align-items: center;
-					color: $likeColour;
-				}
+					
+					.icon {
+						@include clickable();
+						margin: 0 0.3rem;
+					}
 
-				.nobody-liked {
-					@include clickable();
-					color: #cccccc;
+					.endorsement {
+						color: $endorsementColour;
+					}
+
+					.liked {
+						display: flex;
+						align-items: center;
+						color: $likeColour;
+					}
+	
+					.nobody-liked {
+						display: flex;
+						align-items: center;
+						color: #cccccc;
+					}
+
+					.delete {
+						color: $secondary;
+						&:hover {
+							color: lighten($secondary, 10%);
+						}
+					}
 				}
 			}
 
@@ -110,6 +186,11 @@
 				.endorsement {
 					color: $endorsementColour;
 				}
+			}
+
+			p > code {
+				background-color: $codeBackground;
+				padding: 0.15rem;
 			}
 		}
 
@@ -153,9 +234,15 @@
 		.MuiTextField-root {
 			width: 100%;
 
-			.MuiOutlinedInput-input,
-			.MuiOutlinedInput-multiline {
+			.MuiOutlinedInput-input {
+				padding: 6px 6px 6px 14px;
+			}
+			.MuiInputBase-multiline {
 				padding: 6px;
+
+				.MuiOutlinedInput-input {
+					padding: 6px;
+				}
 			}
 		}
 	}

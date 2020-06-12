@@ -5,16 +5,18 @@
   "dependencies": {
     "@material-ui/core": "^4.2.0",
     "axios": "^0.19.2",
+    "highlight.js": "^10.0.3",
+    "markdown-it": "^11.0.0",
+    "markdown-it-mathjax": "^2.0.0",
     "node-sass": "^4.14.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-pdf": "^4.1.0",
-    "react-scripts": "^3.4.0",
-    "styled-components": "^5.0.1"
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "^3.4.0"
   },
   "homepage": "/slidechat/",
   "scripts": {
-    "start": "PORT=10005 react-scripts start",
+    "start": "PORT=10001 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

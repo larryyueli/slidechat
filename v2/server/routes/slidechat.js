@@ -1,7 +1,9 @@
-const express = require('express');
-const PDFImage = require("../lib/pdf-image").PDFImage;
 const fs = require('fs');
 const path = require('path');
+
+const express = require('express');
+const { escape } = require('html-escaper');
+const PDFImage = require("../lib/pdf-image").PDFImage;
 
 const { MongoClient, ObjectID } = require('mongodb');
 const dbConfig = {
@@ -9,9 +11,7 @@ const dbConfig = {
     useNewUrlParser: true,
 };
 
-const config = JSON.parse(fs.readFileSync('config.json'));
-const instructors = config.instructors;
-const dbURL = config.dbURL;
+const { instructors, dbURL, fileStorage, convertOptions } = require('../config');
 
 function errorHandler(res, err) {
     if (err && err.status) {
@@ -33,7 +33,7 @@ function instructorAuth(req, res, next) {
 }
 
 function isNotValidPage(pageNum, pageTotal) {
-    if (isNaN(pageNum)
+    if (!Number.isInteger(+pageNum)
         || +pageNum < 1
         || +pageNum > pageTotal) {
         return true;
@@ -52,11 +52,15 @@ function notExistInList(index, list) {
     try {
         if (list[+index]) return false;
     } catch (err) {
-        console.log(err)
         return true;
     }
-    console.log(null)
     return true;
+}
+
+function questionCount(questions) {
+    return questions.reduce((total, curr) => {
+        return total + (curr ? 1 : 0);
+    }, 0);
 }
 
 async function startApp() {
@@ -122,7 +126,7 @@ async function startApp() {
      */
     router.post('/api/addInstructor', instructorAuth, async (req, res) => {
         try {
-            if (typeof req.body.newUser !== 'string') {
+            if (typeof req.body.newUser !== 'string' || !req.body.newUser) {
                 throw { status: 400, error: 'bad request' };
             }
             let course = await courses.findOne({ _id: ObjectID.createFromHexString(req.body.course) },
@@ -132,14 +136,15 @@ async function startApp() {
 
             // add instructor to course
             let updateRes = await courses.updateOne({ _id: ObjectID.createFromHexString(req.body.course) },
-                { $push: { instructors: req.body.newUser } });
+                { $addToSet: { instructors: req.body.newUser } });
+
             if (updateRes.modifiedCount !== 1) {
                 throw `add instructor failed, modifiedCount = ${updateRes.modifiedCount}`;
             }
 
-            // add course to instructor's course list
+            // add course to instructor's course list, create user if not exist
             updateRes = await users.updateOne({ _id: req.body.newUser },
-                { $push: { courses: { role: "instructor", id: req.body.course } } },
+                { $addToSet: { courses: { role: "instructor", id: req.body.course } } },
                 { upsert: true });
 
             if (updateRes.modifiedCount === 0 && updateRes.upsertedCount === 0) {
@@ -164,7 +169,7 @@ async function startApp() {
     router.post('/api/addSlide', instructorAuth, async (req, res) => {
         try {
             if (req.body.cid.length != 24
-                || (["anyone", "UofT student", "nonymous"].indexOf(req.body.anonymity) < 0)
+                || (["anyone", "student", "nonymous"].indexOf(req.body.anonymity) < 0)
                 || !req.files.file
                 || !req.files.file.name.toLocaleLowerCase().endsWith('.pdf')) {
                 return res.status(400).send();
@@ -186,35 +191,30 @@ async function startApp() {
             // Step 2: use the id as the directory name, create a directory, move pdf to directory
             let objID = insertRes.ops[0]._id;
             let id = objID.toHexString();
-            let dir = path.join('files', id);
-            console.log(`Saving files to: ${dir}`);
-
+            let dir = path.join(fileStorage, id);
             // overwrite if exists. should not happen: id is unique
             if (fs.existsSync(dir)) {
                 console.log(`Directory ${id} already exists, overwriting...`);
-                fs.rmdirSync(dir, { recursive: true });
+                await fs.promises.rmdir(dir, { recursive: true });
             }
-            fs.mkdirSync(path.join('files', id));
-
+            await fs.promises.mkdir(dir, { recursive: true });
             await req.files.file.mv(path.join(dir, req.files.file.name));
 
             // Step 3: convert to images
             let pdfImage = new PDFImage(path.join(dir, req.files.file.name), {
                 pdfFileBaseName: 'page',
-                outputDirectory: dir
+                outputDirectory: dir,
+                convertOptions: convertOptions
             });
             let imagePaths = await pdfImage.convertFile();
 
             // Step 4: create the list of pages, update database
-            let pages = [];
-            for (let i of imagePaths) {
-                pages.push({ questions: [] });
-            }
+            let pages = imagePaths.map((_) => { return { questions: [] } });
             let updateRes = await slides.updateOne({ _id: objID }, {
                 $set: {
-                    pdfLocation: path.join(dir, req.files.file.name),
                     pages: pages,
-                    pageTotal: imagePaths.length
+                    pageTotal: imagePaths.length,
+                    unused: []
                 }
             });
             if (updateRes.modifiedCount !== 1) {
@@ -228,8 +228,244 @@ async function startApp() {
                 throw "slide add to course failed";
             }
 
-            console.log("pdf file processing complete")
             res.json({ id: id });
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    });
+
+    /**
+     * upload a new version of slide
+     * req body:
+     *   sid: the old slide id
+     *   user: instructor userID
+     * req.files:
+     *   file: *.pdf
+     */
+    router.post('/api/uploadNewSlide', instructorAuth, async (req, res) => {
+        try {
+            if (req.body.sid.length != 24
+                || !req.files.file
+                || !req.files.file.name.toLocaleLowerCase().endsWith('.pdf')) {
+                return res.status(400).send();
+            }
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
+
+            if (!slide) {
+                throw { status: 400, error: "slide not exist" };
+            } else if (false) {   // check in instructor's list TODO: UNSAFE
+                throw { status: 403, error: "Unauthorized" };
+            }
+
+            let dir = path.join(fileStorage, req.body.sid);
+            // remove old slide
+            if (fs.existsSync(dir)) {
+                await fs.promises.rmdir(dir, { recursive: true });
+            }
+            await fs.promises.mkdir(dir, { recursive: true });
+            await req.files.file.mv(path.join(dir, req.files.file.name));
+
+            // Step 3: convert to images
+            let pdfImage = new PDFImage(path.join(dir, req.files.file.name), {
+                pdfFileBaseName: 'page',
+                outputDirectory: dir,
+                convertOptions: convertOptions
+            });
+            let imagePaths = await pdfImage.convertFile();
+
+            // Step 4: create the list of pages, update database
+            let pages = slide.pages;
+            let oldLength = pages.length;
+            let newLength = imagePaths.length;
+            let updateRes;
+            if (oldLength > newLength) {
+                // remove empty pages
+                let i = newLength;
+                while (i < pages.length) {
+                    if (questionCount(pages[i].questions) === 0) {
+                        pages.splice(i, 1);
+                    } else {
+                        i++;
+                    }
+                }
+                updateRes = await slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) }, {
+                    $set: {
+                        pages: pages.slice(0, newLength),
+                        pageTotal: newLength,
+                        filename: req.files.file.name
+                    },
+                    $push: {
+                        unused: {
+                            $each: pages.slice(newLength), // your batch
+                        }
+                    }
+                });
+            } else {
+                // add empty pages to new pages
+                for (let i = oldLength; i < newLength; i++) {
+                    pages.push({ questions: [] });
+                }
+                updateRes = await slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) }, {
+                    $set: {
+                        pages: pages,
+                        pageTotal: newLength,
+                        filename: req.files.file.name
+                    }
+                });
+            }
+
+            if (updateRes.result.n == 0) {
+                throw { status: 400, error: "upload new slide failed" };
+            }
+
+            res.send();
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    });
+
+    /**
+     * reorder the questions of a slide
+     * req body:
+     *   questionOrder: the order of questions
+     *   sid: the slide id
+     *   user: instructor userID
+     */
+    router.post('/api/reorderQuestions', instructorAuth, async (req, res) => {
+        try {
+            if (req.body.sid.length != 24) {
+                return res.status(400).send();
+            }
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
+
+            if (!slide) {
+                throw { status: 400, error: "slide not exist" };
+            } else if (false) {   // check in instructor's list TODO: UNSAFE
+                throw { status: 403, error: "Unauthorized" };
+            } else if (req.body.questionOrder.length != slide.pages.length) {
+                throw { status: 400, error: "length not match" };
+            }
+
+            let usedPage = {};
+            let newPages = [];
+            let unusedLength = 0;
+            if (slide.unused) {
+                unusedLength = slide.unused.length;
+            }
+            for (let orders of req.body.questionOrder) {
+                let newPage = { questions: [] };
+                for (let order of orders) {
+                    order -= 1;
+                    if (!Number.isInteger(order) || usedPage[order] || order >= unusedLength + slide.pages.length) {
+                        throw { status: 400, error: "Bad Request!" };
+                    }
+                    usedPage[order] = 1;
+                    if (order < slide.pages.length) {
+                        newPage.questions.push(...slide.pages[order].questions);
+                    } else {
+                        newPage.questions.push(...slide.unused[order - slide.pageTotal].questions);
+                        console.log(newPage.questions);
+                    }
+                }
+                newPages.push(newPage);
+            }
+
+            let newUnused = [];
+            for (let i = 0; i < slide.pages.length; i++) {
+                if (!usedPage[i] && questionCount(slide.pages[i].questions)) {
+                    newUnused.push(slide.pages[i]);
+                }
+            }
+            for (let i = 0; i < slide.unused.length; i++) {
+                if (!usedPage[i + slide.pages.length] && questionCount(slide.unused[i].questions)) {
+                    newUnused.push(slide.unused[i]);
+                }
+            }
+
+            let updateRes = await slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) }, {
+                $set: {
+                    pages: newPages,
+                    unused: newUnused
+                }
+            });
+
+            if (updateRes.result.n == 0) {
+                throw { status: 400, error: "change pages order failed" };
+            }
+
+            res.json({});
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    });
+
+    /**
+     * set title of a slide
+     * req body:
+     *   title: new title of the slide
+     *   sid: the slide id
+     *   user: instructor userID
+     */
+    router.post('/api/setTitle', instructorAuth, async (req, res) => {
+        try {
+            if (req.body.sid.length != 24) {
+                return res.status(400).send();
+            }
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
+
+            if (!slide) {
+                throw { status: 400, error: "slide not exist" };
+            } else if (false) {   // check in instructor's list TODO: UNSAFE
+                throw { status: 403, error: "Unauthorized" };
+            }
+            let updateRes = await slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) }, {
+                $set: {
+                    title: req.body.title,
+                }
+            });
+
+            if (updateRes.result.n == 0) {
+                throw { status: 400, error: "set title failed" };
+            }
+
+            res.json({});
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    });
+
+    /**
+     * set anonymity level of a slide
+     * req body:
+     *   anonymity: new anonymity level of the slide
+     *   sid: the slide id
+     *   user: instructor userID
+     */
+    router.post('/api/setAnonymity', instructorAuth, async (req, res) => {
+        try {
+            if (req.body.sid.length != 24
+                || (["anyone", "student", "nonymous"].indexOf(req.body.anonymity) < 0)) {
+                return res.status(400).send();
+            }
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
+
+            if (!slide) {
+                throw { status: 400, error: "slide not exist" };
+            } else if (false) {   // check in instructor's list TODO: UNSAFE
+                throw { status: 403, error: "Unauthorized" };
+            }
+
+            let updateRes = await slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) }, {
+                $set: {
+                    anonymity: req.body.anonymity,
+                }
+            });
+
+            if (updateRes.result.n == 0) {
+                throw { status: 400, error: "set anonymity failed" };
+            }
+
+            res.json({});
         } catch (err) {
             errorHandler(res, err);
         }
@@ -249,19 +485,21 @@ async function startApp() {
     router.delete('/api/slide', instructorAuth, async (req, res) => {
         try {
             let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.sid) },
-                { projection: { pageTotal: 1, pages: 1 } });
+                { projection: { _id: 1 } });
             if (!slide) throw { status: 404, error: "slide not found" };
 
-            let updateRes = await courses.updateOne({},
-                { $pull: { slides: req.query.sid }});
+            let updateRes = await courses.updateMany({},
+                { $pull: { slides: req.query.sid } });
             if (updateRes.modifiedCount !== 1) {
-                throw "delete slide error";
+                throw `delete slide from course error: updateRes = ${updateRes}`;
             }
 
-            let removeRes = await slides.deleteOne({ _id: ObjectID.createFromHexString(req.query.sid)});
-            if (removeRes.deletedCount  !== 1) {
-                throw "delete slide error";
+            let removeRes = await slides.deleteOne({ _id: ObjectID.createFromHexString(req.query.sid) });
+            if (removeRes.deletedCount !== 1) {
+                throw `delete slide error: removeRes = ${removeRes}`;
             }
+
+            await fs.promises.rmdir(path.join(fileStorage, req.query.sid), { recursive: true });
 
             res.send();
         } catch (err) {
@@ -329,7 +567,7 @@ async function startApp() {
                 { $set: deleteQuery });
             if (updateRes.modifiedCount !== 1) {
                 throw "delete chat error";
-            } 
+            }
 
             res.send();
         } catch (err) {
@@ -345,43 +583,90 @@ async function startApp() {
 
     /**
      * get the courses the user joined, either as an instructor or a student
-     * also the list of slides of that each course
      * req body:
      *   id: userID
      */
     router.get('/api/myCourses', async (req, res) => {
         try {
-            let user = await users.findOne({ _id: req.query.id });
+            let user = await users.findOne({ _id: req.query.id }, { projection: { courses: 1 } });
             if (!user) return res.json([]);  // does not need to initialize here
+            res.json(user.courses);
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    });
 
-            let result = [];
-            console.log(user.courses);
-            for (let course of user.courses) {
-                let myCourse = await courses.findOne({ _id: ObjectID.createFromHexString(course.id) },
-                    { projection: { instructors: 0 } });
-                if (!myCourse) {
-                    console.log(`course ${course.id} not found`);
+    /**
+     * get the course information, the list of slides of the course
+     * req query:
+     *   id: courseID
+     */
+    router.get('/api/course', async (req, res) => {
+        try {
+            let course = await courses.findOne({ _id: ObjectID.createFromHexString(req.query.id) });
+            if (!course) throw { status: 404, error: "not found" };
+
+            let courseSlides = [];
+            for (let slideId of course.slides) {
+                let slideEntry = await slides.findOne({ _id: ObjectID.createFromHexString(slideId) },
+                    { projection: { filename: 1, description: 1 } });
+                if (!slideEntry) {
+                    console.log(`slide ${slideId} not found`);
                     continue;
                 }
+                courseSlides.push({ id: slideId, filename: slideEntry.filename, description: slideEntry.description });
+            }
+            res.json({
+                name: course.name,
+                instructors: course.instructors,
+                role: course.role,
+                slides: courseSlides,
+                cid: course.id
+            });
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    });
 
-                let courseSlides = [];
+    /**
+     * get information of a slide, e.g. total number of pages, filename, title, etc.
+     * req body:
+     *   slideID: object ID of a slide
+     */
+    router.get('/api/slideInfo', async (req, res) => {
+        try {
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.slideID) },
+                { projection: { pages: 0 } });
+            if (!slide) throw { status: 404, error: "slide not found" };
+            res.json({
+                filename: slide.filename,
+                pageTotal: slide.pageTotal,
+                title: slide.title,
+                anonymity: slide.anonymity,
+            });
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    });
 
-                // console.log(myCourse.slides);
-                for (let slideId of myCourse.slides) {
-                    let slideEntry = await slides.findOne({ _id: ObjectID.createFromHexString(slideId) },
-                        { projection: { filename: 1 } });
-                    if (!slideEntry) {
-                        console.log(`slide ${slideId} not found`);
-                        continue;
+    /**
+     * get the unused questions of a slide
+     * req query:
+     *   id: slideId
+     */
+    router.get('/api/unusedQuestions', async (req, res) => {
+        try {
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.id) },
+                { projection: { unused: 1 } });
+            if (!slide) return res.sendStatus(404);
+            let result = slide.unused;
+            if (!result) return res.send([]);
+            for (let i = 0; i < result.length; i++) {
+                for (let question of result[i].questions) {
+                    if (question) {
+                        delete question.chats;
                     }
-                    courseSlides.push({ filename: slideEntry.filename, id: slideId });
                 }
-                result.push({
-                    name: myCourse.name,
-                    role: course.role,
-                    slides: courseSlides,
-                    cid: course.id
-                });
             }
             res.json(result);
         } catch (err) {
@@ -403,25 +688,23 @@ async function startApp() {
             if (isNotValidPage(req.query.pageNum, slide.pageTotal)) {
                 throw { status: 400, error: "bad request" };
             }
-            res.sendFile(`page-${+req.query.pageNum - 1}.png`, {
-                root: path.join('files', req.query.slideID)
-            });
+            res.sendFile(path.join(fileStorage, req.query.slideID, `page-${+req.query.pageNum - 1}.png`));
         } catch (err) {
             errorHandler(res, err);
         }
     });
 
     /**
-     * get total number of pages of a slide
+     * download PDF file
      * req body:
-     *   slideID: object ID of a slide
+     *   slideID: object ID of the slide
      */
-    router.get('/api/pageTotal', async (req, res) => {
+    router.get('/api/downloadPdf', async (req, res) => {
         try {
             let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.slideID) },
-                { projection: { pageTotal: 1 } });
+                { projection: { filename: 1 } });
             if (!slide) throw { status: 404, error: "slide not found" };
-            res.json({ pageTotal: slide.pageTotal });
+            res.download(path.join(fileStorage, req.query.slideID, slide.filename));
         } catch (err) {
             errorHandler(res, err);
         }
@@ -502,12 +785,12 @@ async function startApp() {
                 status: "unsolved",
                 time: time,
                 chats: [],
-                title: req.body.title,
+                title: escape(req.body.title),
                 user: req.body.user
             };
             let newChat = {
                 time: time,
-                body: req.body.body,
+                body: req.body.body,    // does not escape here, md renderer(markdown-it) will escape it
                 user: req.body.user,
                 likes: [],
                 endorsement: []
@@ -553,7 +836,7 @@ async function startApp() {
             let time = Date.now();
             let newChat = {
                 time: time,
-                body: req.body.body,
+                body: req.body.body,        // does not escape here, md renderer(markdown-it) will escape it
                 user: req.body.user,
                 likes: [],
                 endorsement: []
@@ -604,7 +887,7 @@ async function startApp() {
                 insertLike[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.endorsement`] = req.body.user;
             }
             let updateRes = await slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) },
-                { $push: insertLike });
+                { $addToSet: insertLike });
 
             if (updateRes.modifiedCount !== 1) {
                 throw "like update error";

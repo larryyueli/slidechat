@@ -1,9 +1,6 @@
-@import './palette.scss';
-@import './util.scss';
-
 .appbar {
     position: static;
-    @include sides();
+    @include flexSides();
 	padding: 0.5rem 3rem;
 	color: #ffffff;
 	background-color: $primary;
@@ -17,6 +14,8 @@
 	}
 
 	.appbar-item {
+		color: #ffffff;
+		text-decoration: none;
 		margin: 0 0.5rem;
 		padding: 0.4rem;
 		border-radius: 0.4rem;

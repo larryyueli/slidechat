@@ -1,10 +1,11 @@
-let baseURL, fullURL;
+const baseURL = '/slidechat';
+const fullURL = () => `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}${baseURL}`;
+
+let serverURL;
 if (process.env.NODE_ENV === 'production') {
-    baseURL = "/slidechat";
-    fullURL = "/slidechat";
+    serverURL = '/slidechat';
 } else {
-    baseURL = "http://mcsapps.utm.utoronto.ca:10004/slidechat";
-    fullURL = "http://mcsapps.utm.utoronto.ca:10005/slidechat";
+    serverURL = "http://mcsapps.utm.utoronto.ca:10000/slidechat";
 }
 
-export { baseURL, fullURL }
+export { baseURL, fullURL, serverURL };

@@ -16,7 +16,7 @@ export function formatTime(time) {
     } else if (elapsed < oneWeek) {
         return `${elapsed / oneDay >> 0} days ago`;
     } else {
-        let date = Date(time);
+        let date = new Date(time);
         return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
     }
 }
@@ -34,4 +34,8 @@ export function formatNames(names) {
     } else {
         return 'error';
     }
+}
+
+export function range(start, end) {
+    return Array.from({ length: end - start }, (_, i) => start + i);
 }

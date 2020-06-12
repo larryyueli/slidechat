@@ -1,186 +1,367 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import { Button, TextField, CircularProgress, Dialog, Select, MenuItem } from '@material-ui/core';
 
-import { Button, TextField } from '@material-ui/core';
-
-import { fullURL, baseURL } from './config';
-
-import './Profile.scss';
+import { baseURL, serverURL, fullURL } from './config';
 
 
 /**
- * The main entrance of the application
- * It consists three main components: App bar, slides on the left, and chat area on the right
+ * The profile page for instructors (not for students for now)
+ * This page lists all the courses of the instructor and all the slides
  */
-class Profile extends Component {
-    constructor(props) {
-        super(props);
-        this.state = { uploading: false, uid: "lulingxi" };
+export default function Profile(props) {
+    let [courses, setCourses] = useState([]);
+    let uid = "lulingxi";
+    let newCourseRef = useRef(null);
 
-        this.fetchCourses = this.fetchCourses.bind(this);
-        this.createCourse = this.createCourse.bind(this);
+    // the useEffect dependency should be `uid` and it should not change, yet eslint does not understand and thus disabled
+    useEffect(() => {
+        fetchCourses();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-        this.fetchCourses();
-    }
-
-
-
-    // get course list from server
-    fetchCourses() {
-        axios.get(`${baseURL}/api/myCourses?id=${this.state.uid}`).then(data => {
-            this.setState({ courses: data.data });
-        }).catch(err => {
+    const fetchCourses = async () => {
+        try {
+            let res = await axios.get(`${serverURL}/api/myCourses?id=${uid}`);
+            setCourses(res.data);
+        } catch (err) {
             console.error(err);
-        });
-    }
-
-    createCourse() {
-        axios.post(`${baseURL}/api/createCourse`, {
-            user: this.state.uid,
-            course: this.newCourseRef.value,
-        }).then(data => {
-            this.fetchCourses();
-        }).catch(err => {
-            console.error(err);
-        });
-    }
-
-
-    render() {
-        let content = [];
-        console.log(this.state.courses);
-        for (let i in this.state.courses) {
-            content.push(
-                <Course
-                    course={this.state.courses[i]}
-                    key={i}
-                    fetchCourses={this.fetchCourses}
-                    uid={this.state.uid} />
-            );
         }
+    };
 
-
-        return (
-            <div className="profile">
-                <div className="title">My Courses</div>
-                {content}
-                <div className="createCourse-bar">
-                    <TextField
-                        variant='outlined'
-                        id={`new-course`}
-                        placeholder="Course Name"
-                        inputRef={ref => { this.newCourseRef = ref; }} />
-                    <Button id="fileSubmit" onClick={this.createCourse} variant="contained" color="primary">Create Course</Button>
-                </div>
-            </div>
-        );
+    const createCourse = async () => {
+        try {
+            await axios.post(`${serverURL}/api/createCourse`, {
+                user: uid,
+                course: newCourseRef.current.value,
+            })
+        } catch (err) {
+            console.error(err);
+        }
+        fetchCourses();
     }
+
+    return (
+        <div className="profile">
+            <div className="title">My Courses</div>
+            {courses.map(course =>
+                <Course cid={course.id}
+                    role={course.role}
+                    uid={uid}
+                    key={course.id} />
+            )}
+            <div className="createCourse-bar">
+                <TextField
+                    variant='outlined'
+                    id={`new-course`}
+                    placeholder="Course Name"
+                    inputRef={newCourseRef} />
+                <Button id="fileSubmit" onClick={createCourse} variant="contained" color="primary">Create Course</Button>
+            </div>
+        </div>
+    );
 }
 
-class Course extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            managing: false,
-        }
-        this.fileUpload = React.createRef();
+function Course({ cid, role, uid }) {
+    const [course, setCourse] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [managing, setManaging] = useState(false);
+    const [uploading, setUploading] = useState(false);
+    const [addInstructorRes, setAddInstructorRes] = useState(null);
+    const [openModify, setOpenModify] = useState({ open: false });
+    let fileUpload = useRef(null);
+    let newUserRef = useRef(null);
 
-        this.uploadPDF = this.uploadPDF.bind(this);
-        this.changeManageStatus = this.changeManageStatus.bind(this);
+    const fetchCourse = async () => {
+        try {
+            let res = await axios.get(`${serverURL}/api/course?id=${cid}`);
+            setCourse(res.data);
+            setLoading(false);
+        } catch (err) {
+            console.error(err);
+        }
     }
 
-    uploadPDF() {
-        this.setState({ uploading: true });
-        var formData = new FormData();
-        formData.append("cid", this.props.course.cid);
+    useEffect(() => {
+        fetchCourse();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const uploadPDF = async () => {
+        if (fileUpload.current.files.length !== 1) return;
+
+        let formData = new FormData();
+        formData.append("cid", cid);
         formData.append("anonymity", "anyone");
-        formData.append("user", this.props.uid);
-        console.log(this.fileUpload.current);
-        formData.append("file", this.fileUpload.current.files[0]);
-        axios.post(`${baseURL}/api/addSlide/`,
-            formData
-        ).then(response => {
-            console.log(response);
-            this.setState({ uploading: false });
-            this.props.fetchCourses();
-        }).catch(error => {
-            console.log(error);
-            this.setState({ uploading: false });
-            this.props.fetchCourses();
-        });
-    }
-
-    deleteSlide(sid) {
-        axios.delete(`${baseURL}/api/slide?sid=${sid}`, {
-            data: { user: this.props.uid }
-        }).then(data => {
-            this.props.fetchCourses();
-        }).catch(err => {
-            console.error(err);
-        });
-    }
-
-    addInstructor() {
-        axios.post(`${baseURL}/api/addInstructor`, {
-            user: this.props.uid,
-            course: this.props.course.cid,
-            newUser: this.newUserRef.value,
-        }).then(data => {
-            this.newUserRef.value = "";
-            console.log("add instructor success");
-        }).catch(err => {
-            console.error(err);
-        });
-    }
-
-
-    changeManageStatus() {
-        this.setState(pre => { return { managing: !pre.managing } });
-    }
-
-    render() {
-        let slides = [];
-        for (let j in this.props.course.slides) {
-            let slide = this.props.course.slides[j];
-            slides.push(
-                <div key={j} className="slide-item">
-                    <a className="slide-link" href={`${fullURL}/${slide.id}`}>{slide.filename}</a>
-                    {this.state.managing ? <Button
-                        className="slide-delete-btn"
-                        variant="outlined"
-                        color="secondary"
-                        onClick={e => this.deleteSlide(slide.id)}>Delete</Button> : null}
-                </div>
-            );
+        formData.append("user", uid);
+        formData.append("file", fileUpload.current.files[0]);
+        try {
+            setUploading(true);
+            await axios.post(`${serverURL}/api/addSlide/`, formData);
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setUploading(false);
+            fetchCourse();
         }
+    }
 
-        return (
-            <div className="course">
-                <div className="title">
-                    {this.props.course.name}
-                    <span className={`material-icons manage ${this.state.managing ? "managing" : ""}`} onClick={this.changeManageStatus}>settings</span>
-                </div>
-                <div className="slides">{slides}</div>
-                {this.state.managing ? <>
-                    <div className="upload-bar">
-                        <input type="file" name="file" ref={this.fileUpload} />
-                        <Button
-                            onClick={this.uploadPDF}
-                            disabled={this.state.uploading}
-                            variant="contained"
-                            color="primary">Upload</Button>
+    const deleteSlide = async (filename, sid) => {
+        if (!window.confirm(`Are you sure to delete "${filename}"?`)) return;
+        try {
+            await axios.delete(`${serverURL}/api/slide?sid=${sid}`, { data: { user: uid } });
+        } catch (err) {
+            console.log(err);
+        } finally {
+            fetchCourse();
+        }
+    }
+
+    const addInstructor = async () => {
+        try {
+            await axios.post(`${serverURL}/api/addInstructor`, {
+                user: uid,
+                course: cid,
+                newUser: newUserRef.current.value,
+            });
+            setAddInstructorRes(<div className="result-ok">Add instructor "{newUserRef.current.value}" successfully!</div>);
+        } catch (err) {
+            console.error(err);
+            setAddInstructorRes(<div className="result-fail">Add instructor failed!</div>);
+        } finally {
+            fetchCourse();
+        }
+    }
+
+    const changeManageStatus = () => {
+        setAddInstructorRes(null);
+        setManaging(!managing);
+    }
+
+    const copyToClipboard = (str) => {
+        const el = document.createElement('textarea');
+        el.value = str;
+        el.setAttribute('readonly', '');
+        el.style.visibility = false;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+    }
+
+    const modifySlide = (filename, sid) => {
+        setOpenModify({ open: true, filename: filename, sid: sid });
+    }
+
+    if (loading) return (<div className="course"><div className="loading"><CircularProgress /></div></div>);
+
+    return (
+        <div className="course">
+            <div className="title">
+                {course.name}
+                {role === 'instructor'
+                    ? <span className={`manage ${managing ? "managing" : ""}`}
+                        onClick={changeManageStatus}>
+                        <span className='material-icons icon'>settings</span>
+                    </span>
+                    : <span>&nbsp;</span>}
+            </div>
+            <div className="slides">{course.slides.map((slide) => {
+                let link = `${fullURL()}/${slide.id}`;
+                return (
+                    <div key={slide.id} className="slide-item">
+                        <a className="slide-link" href={link}>{slide.filename}</a>
+                        {managing
+                            ? <div className="btns">
+                                <Button
+                                    className="slide-delete-btn"
+                                    variant="outlined"
+                                    color="primary"
+                                    onClick={e => modifySlide(slide.filename, slide.id)}>Modify</Button>
+                                <Button
+                                    className="slide-delete-btn"
+                                    variant="outlined"
+                                    color="secondary"
+                                    onClick={e => deleteSlide(slide.filename, slide.id)}>Delete</Button>
+                            </div>
+                            : <Button
+                                variant="outlined"
+                                color="primary"
+                                onClick={e => copyToClipboard(link)}
+                            >Copy link</Button>}
                     </div>
+                );
+            })}</div>
+
+            {managing
+                ? <div className="upload-bar">
+                    <input type="file" name="file" ref={fileUpload} />
+                    <Button
+                        onClick={uploadPDF}
+                        disabled={uploading}
+                        variant="contained"
+                        color="primary">Upload</Button>
+                    {uploading ? <CircularProgress /> : null}
+                </div>
+                : null}
+
+            <div className="instructors"><strong>Instructors: </strong>{course.instructors.join(', ')}</div>
+            {managing
+                ? <>
                     <div className="addInstructor-bar">
                         <TextField
                             variant='outlined'
                             id={`new-instructor`}
                             placeholder="utorid"
-                            inputRef={ref => { this.newUserRef = ref; }} />
-                        <Button id="fileSubmit" variant="contained" color="primary" onClick={e => this.addInstructor(this.props.course.cid)}>Add Instructor</Button>
+                            inputRef={newUserRef} />
+                        <Button id="fileSubmit"
+                            variant="contained"
+                            color="primary"
+                            onClick={e => addInstructor(course.cid)}>Add Instructor</Button>
                     </div>
-                </> : null}
-            </div>
-        );
-    }
+                    {addInstructorRes}
+                </>
+                : null}
+
+            {openModify.open
+                ? <SlideSetting open={openModify.open}
+                    onClose={_ => setOpenModify({ open: false })}
+                    sid={openModify.sid}
+                    uid={uid} />
+                : null}
+        </div>
+    );
 }
-export default Profile;
+
+
+function SlideSetting({ sid, uid, open, onClose }) {
+    const [loading, setLoading] = useState(true);
+    const [uploading, setUploading] = useState(false);
+    const [settings, setSettings] = useState({});
+    const resultRef = useRef(null);
+    const titleRef = useRef(null);
+    const fileReupload = useRef(null);
+
+    useEffect(() => {
+        axios.get(`${serverURL}/api/slideInfo?slideID=${sid}`).then(res => {
+            setSettings(res.data);
+            setLoading(false);
+        }).catch(err => {
+            console.error(err);
+        });
+    }, [sid]);
+
+    const changeAnonymity = (e) => {
+        axios.post(`${serverURL}/api/setAnonymity`, {
+            user: uid,
+            sid: sid,
+            anonymity: e.target.value
+        }).then(res => {
+            setResult(true, "changes saved");
+            setSettings({ ...settings, anonymity: e.target.value });
+        }).catch(err => {
+            console.log(err);
+            setResult(false, "update failed!");
+        });
+    }
+
+    const changeTitle = (e) => {
+        axios.post(`${serverURL}/api/setTitle`, {
+            user: uid,
+            sid: sid,
+            title: titleRef.current.value
+        }).then(res => {
+            setResult(true, "changes saved");
+        }).catch(err => {
+            console.log(err);
+            setResult(false, "update failed!");
+        });
+    }
+
+    const reuploadFile = async (e) => {
+        if (fileReupload.current.files.length !== 1) return;
+        let formData = new FormData();
+        formData.append("sid", sid);
+        formData.append("user", uid);
+        formData.append("file", fileReupload.current.files[0]);
+        try {
+            setUploading(true);
+            await axios.post(`${serverURL}/api/uploadNewSlide/`, formData);
+            setResult(true, "changes saved");
+            setSettings({ ...settings, filename: formData.get("file").name });
+        } catch (err) {
+            console.log(err);
+            setResult(false, "update failed!");
+        } finally {
+            setUploading(false);
+        }
+    }
+
+    const setResult = (success, message) => {
+        let node = resultRef.current;
+        node.innerText = message;
+        node.className = `result ${success ? "ok" : "fail"}`;
+        setTimeout(() => {
+            node.style = "opacity: 0;";
+        }, 1000)
+        setTimeout(() => {
+            node.innerText = "";
+            node.style = "";
+        }, 1500);
+    }
+
+    return (
+        <Dialog onClose={onClose} open={open}>
+            <div className="setting">
+                {loading
+                    ? <div style={{ textAlign: 'center' }}><CircularProgress /></div>
+                    : <>
+                        <div className="title">
+                            Setting: {settings.filename}
+                            <span ref={resultRef}></span>
+                        </div>
+                        <div className="row">
+                            <span className="label">Anonymity:</span>
+                            <Select value={settings.anonymity}
+                                onChange={changeAnonymity}>
+                                <MenuItem value="anyone">Anyone</MenuItem>
+                                <MenuItem value="student">Student</MenuItem>
+                                <MenuItem value="nonymous">Non-anonymous</MenuItem>
+                            </Select>
+                        </div>
+                        <div className="row">
+                            <span className="label">Add a title:</span>
+                            <TextField
+                                className="title-input"
+                                placeholder="(at most 30 character)"
+                                inputProps={{ maxLength: 25 }}
+                                defaultValue={settings.title}
+                                inputRef={titleRef} />
+                            <Button
+                                onClick={changeTitle}
+                                disabled={false}
+                                variant="contained"
+                                color="primary">Update</Button>
+                        </div>
+                        <div className="row">
+                            <span className="label">Re-upload PDF file:</span>
+                            <input type="file" name="file" ref={fileReupload} />
+                            <Button
+                                onClick={reuploadFile}
+                                disabled={uploading}
+                                variant="contained"
+                                color="primary">Upload</Button>
+                            {uploading ? <CircularProgress size="2rem" /> : null}
+                        </div>
+                        <div className="row">
+                            <span className="label">Reorder questions to match pages:</span>
+                            <Button
+                                href={`${baseURL}/profile/reorderQuestions/${sid}`}
+                                variant="contained"
+                                color="primary">Reorder</Button>
+                        </div>
+                    </>}
+            </div>
+        </Dialog>
+    );
+}
