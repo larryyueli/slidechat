@@ -1,4 +1,5 @@
 const baseURL = '/slidechat';
+const instructorURL = '/prof';
 const fullURL = () => `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}${baseURL}`;
 
 let serverURL;
@@ -8,4 +9,4 @@ if (process.env.NODE_ENV === 'production') {
     serverURL = "http://mcsapps.utm.utoronto.ca:10001";
 }
 
-export { baseURL, fullURL, serverURL };
+export { baseURL, instructorURL, fullURL, serverURL };

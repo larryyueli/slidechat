@@ -2,27 +2,26 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Button, TextField, CircularProgress, Dialog, Select, MenuItem } from '@material-ui/core';
 
-import { baseURL, serverURL, fullURL } from './config';
+import { baseURL, serverURL, fullURL, instructorURL } from './config';
 
 
 /**
  * The profile page for instructors (not for students for now)
  * This page lists all the courses of the instructor and all the slides
  */
-export default function Profile(props) {
+export default function MyCourses(props) {
     let [courses, setCourses] = useState([]);
-    let uid = "lulingxi";
     let newCourseRef = useRef(null);
+    console.log(1);
 
-    // the useEffect dependency should be `uid` and it should not change, yet eslint does not understand and thus disabled
     useEffect(() => {
         fetchCourses();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        console.log("fetch");
     }, []);
 
     const fetchCourses = async () => {
         try {
-            let res = await axios.get(`${serverURL}/api/myCourses?id=${uid}`);
+            let res = await axios.get(`${serverURL}/api/myCourses`);
             setCourses(res.data);
         } catch (err) {
             console.error(err);
@@ -32,7 +31,6 @@ export default function Profile(props) {
     const createCourse = async () => {
         try {
             await axios.post(`${serverURL}/api/createCourse`, {
-                user: uid,
                 course: newCourseRef.current.value,
             })
         } catch (err) {
@@ -47,7 +45,6 @@ export default function Profile(props) {
             {courses.map(course =>
                 <Course cid={course.id}
                     role={course.role}
-                    uid={uid}
                     key={course.id} />
             )}
             <div className="createCourse-bar">
@@ -62,7 +59,7 @@ export default function Profile(props) {
     );
 }
 
-function Course({ cid, role, uid }) {
+function Course({ cid, role }) {
     const [course, setCourse] = useState(null);
     const [loading, setLoading] = useState(true);
     const [managing, setManaging] = useState(false);
@@ -93,7 +90,6 @@ function Course({ cid, role, uid }) {
         let formData = new FormData();
         formData.append("cid", cid);
         formData.append("anonymity", "anyone");
-        formData.append("user", uid);
         formData.append("file", fileUpload.current.files[0]);
         try {
             setUploading(true);
@@ -109,7 +105,7 @@ function Course({ cid, role, uid }) {
     const deleteSlide = async (filename, sid) => {
         if (!window.confirm(`Are you sure to delete "${filename}"?`)) return;
         try {
-            await axios.delete(`${serverURL}/api/slide?sid=${sid}`, { data: { user: uid } });
+            await axios.delete(`${serverURL}/api/slide?sid=${sid}`);
         } catch (err) {
             console.log(err);
         } finally {
@@ -120,7 +116,6 @@ function Course({ cid, role, uid }) {
     const addInstructor = async () => {
         try {
             await axios.post(`${serverURL}/api/addInstructor`, {
-                user: uid,
                 course: cid,
                 newUser: newUserRef.current.value,
             });
@@ -226,15 +221,14 @@ function Course({ cid, role, uid }) {
             {openModify.open
                 ? <SlideSetting open={openModify.open}
                     onClose={_ => setOpenModify({ open: false })}
-                    sid={openModify.sid}
-                    uid={uid} />
+                    sid={openModify.sid} />
                 : null}
         </div>
     );
 }
 
 
-function SlideSetting({ sid, uid, open, onClose }) {
+function SlideSetting({ sid, open, onClose }) {
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
     const [settings, setSettings] = useState({});
@@ -253,7 +247,6 @@ function SlideSetting({ sid, uid, open, onClose }) {
 
     const changeAnonymity = (e) => {
         axios.post(`${serverURL}/api/setAnonymity`, {
-            user: uid,
             sid: sid,
             anonymity: e.target.value
         }).then(res => {
@@ -267,7 +260,6 @@ function SlideSetting({ sid, uid, open, onClose }) {
 
     const changeTitle = (e) => {
         axios.post(`${serverURL}/api/setTitle`, {
-            user: uid,
             sid: sid,
             title: titleRef.current.value
         }).then(res => {
@@ -282,7 +274,6 @@ function SlideSetting({ sid, uid, open, onClose }) {
         if (fileReupload.current.files.length !== 1) return;
         let formData = new FormData();
         formData.append("sid", sid);
-        formData.append("user", uid);
         formData.append("file", fileReupload.current.files[0]);
         try {
             setUploading(true);
@@ -356,7 +347,7 @@ function SlideSetting({ sid, uid, open, onClose }) {
                         <div className="row">
                             <span className="label">Reorder questions to match pages:</span>
                             <Button
-                                href={`${baseURL}/profile/reorderQuestions/${sid}`}
+                                href={`${baseURL}${instructorURL}/reorderQuestions/${sid}`}
                                 variant="contained"
                                 color="primary">Reorder</Button>
                         </div>

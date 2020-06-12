@@ -1,7 +1,7 @@
 import React from 'react';
-// import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
-// import { baseURL } from './config';
+import { baseURL, instructorURL } from './config';
 
 /**
  * App bar: consisting the logo and some menu buttons
@@ -14,9 +14,9 @@ function AppBar() {
             </div>
             <div>
                 <span className='appbar-item'>Notification</span>
-                {/* <Link to={`${baseURL}/profile`} className='appbar-item'>
+                <Link to={`${baseURL}${instructorURL}`} className='appbar-item'>
                     My Courses
-                </Link> */}
+                </Link>
             </div>
         </div>
     );

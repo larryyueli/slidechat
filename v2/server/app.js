@@ -24,7 +24,7 @@ let main = (async () => {
   app.use(fileUpload());
 
   const slidechat = await startSlidechat();
-  app.use('/slidechat', slidechat);
+  app.use('/', slidechat);
 
   app.use((req, res) => res.status(404).send());
 

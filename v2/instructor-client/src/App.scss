@@ -2,9 +2,8 @@
 @import './util.scss';
 
 @import './Appbar.scss';
-@import './ChatArea.scss';
-@import './github-gist.scss';
-@import './Slides.scss';
+@import './MyCourses.scss';
+@import './ReorderQuestions.scss';
 
 body {
 	margin: 0;
@@ -19,19 +18,4 @@ body {
 code {
 	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
 		monospace;
-}
-
-@media (min-width: 768px) {
-	.main {
-		display: grid;
-		grid-template-columns: 2fr 1fr;
-		grid-template-rows: auto;
-		height: calc(100vh - 4rem);
-		/* 2rem line height + 0.5rem padding * 2 + 1rem margin */
-	}
-
-	.chat-area {
-		overflow-y: auto;
-		border-left: 1px solid $dividerColour;
-	}
 }
