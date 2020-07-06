@@ -39,3 +39,11 @@ export function formatNames(names) {
 export function range(start, end) {
     return Array.from({ length: end - start }, (_, i) => start + i);
 }
+
+export function randInt(max) {
+    return Math.floor(Math.random() * max);
+}
+
+export function getRandomName(names) {
+    return `anonymous ${names[randInt(names.length)]}`;
+}
