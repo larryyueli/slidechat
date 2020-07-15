@@ -44,6 +44,6 @@ export function randInt(max) {
     return Math.floor(Math.random() * max);
 }
 
-export function getRandomName(names) {
-    return `anonymous ${names[randInt(names.length)]}`;
+export function getRandomName() {
+    return `anonymous ${nameList[randInt(nameList.length)]}`;
 }
