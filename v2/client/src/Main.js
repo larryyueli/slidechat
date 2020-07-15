@@ -3,7 +3,8 @@ import axios from 'axios';
 
 import ChatArea from './ChatArea';
 import Slides from './Slides';
-import { serverURL } from './config';
+import { serverURL, baseURL } from './config';
+import { getCookie } from './util'
 
 /**
  * The main body of the application
@@ -16,9 +17,19 @@ function Main(props) {
     const [page, setPage] = useState(1);
     const [title, setTitle] = useState("");
     const [filename, setFilename] = useState("");
+    const [protectLevel, setProtectLevel] = useState("");
 
     useEffect(() => {
         axios.get(`${serverURL}/api/slideInfo?slideID=${sid}`).then(res => {
+            if (res.data.anonymity === "anyone") {
+                setProtectLevel("");
+            } else {
+                if (getCookie("isLogin")) {
+                    setProtectLevel("/p");
+                } else {
+                    window.location.href = `${baseURL}/p/login/${sid}#${window.location.hash}`;
+                }
+            }
             let currentPage = 1;
             if (window.location.hash) {
                 let n = +window.location.hash.substring(1);
@@ -83,12 +94,14 @@ function Main(props) {
                 sid={sid}
                 pageNum={page}
                 pageTotal={pageTotal}
+                protectLevel={protectLevel}
                 nextPage={nextPage}
                 prevPage={prevPage}
                 gotoPage={gotoPage} />
             <ChatArea
                 sid={sid}
-                pageNum={page} />
+                pageNum={page}
+                protectLevel={protectLevel} />
         </div>
     );
 }

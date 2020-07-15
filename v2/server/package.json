@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "nodemon app.js",
-    "dev": "DEV=1 nodemon app.js",
+    "dev": "DEV='1' nodemon app.js",
     "build": "npm run build-c && npm run build-i",
     "build-c":"mkdir client-build; cd ../client && npm run build && cp -r build/* ../server/client-build/ && cd ../server",
     "build-i":  "mkdir instructor-client-build; cd ../instructor-client && npm run build && cp -r build/* ../server/instructor-client-build/ && cd ../server"

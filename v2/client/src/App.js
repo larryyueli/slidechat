@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 import AppBar from './Appbar.js'
 import Main from './Main.js';
+import Login from './Login'
+import Landing from './Landing'
 import { baseURL } from './config';
 
 
@@ -15,7 +17,9 @@ function App() {
         <Router>
             <AppBar />
             <Switch>
+                <Route path={`${baseURL}/p/login/:slideId`} component={Login} />
                 <Route path={`${baseURL}/:slideId`} component={Main} />
+                <Route path={`${baseURL}/`} component={Landing} />
             </Switch>
         </Router>
     );

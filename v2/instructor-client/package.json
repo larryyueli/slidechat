@@ -14,7 +14,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1"
   },
-  "homepage": "/slidechat/prof",
+  "homepage": "/slidechat/p/prof",
   "scripts": {
     "start": "PORT=10004 react-scripts start",
     "build": "react-scripts build",

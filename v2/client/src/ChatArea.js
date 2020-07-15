@@ -6,7 +6,7 @@ import markdownItMathJax from 'markdown-it-mathjax';
 import highlight from 'highlight.js';
 
 import { serverURL } from './config';
-import { formatTime, formatNames } from './util';
+import { formatTime, formatNames, getUserName, isInstructor } from './util';
 
 
 const md = markdownIt({
@@ -34,21 +34,21 @@ export default function ChatArea(props) {
 	const [chatDetails, setChatDetails] = useState([]);
 	const [qid, setQid] = useState(-1);
 	const [managing, setManaging] = useState(false);
-	const uid = "yaochen8"; // TODO
+	const userName = getUserName();
 	const titleRef = useRef(null);
 	const bodyRef = useRef(null);
 	const chatRef = useRef(null);
 
 	// fetch questions when page is changed
 	useEffect(() => {
-		axios.get(`${serverURL}/api/questions?slideID=${props.sid}&pageNum=${props.pageNum}`)
+		axios.get(`${serverURL}${props.protectLevel}/api/questions?slideID=${props.sid}&pageNum=${props.pageNum}`)
 			.then(res => {
 				setState("list");
 				setQuestions(res.data);
 			}).catch(err => {
 				console.error(err);
 			});
-	}, [props.sid, props.pageNum]);
+	}, [props.sid, props.pageNum, props.protectLevel]);
 
 	// render math in chat details
 	useEffect(() => {
@@ -64,12 +64,12 @@ export default function ChatArea(props) {
 	}
 
 	const sendNewQuestion = () => {
-		axios.post(`${serverURL}/api/addQuestion/`, {
+		axios.post(`${serverURL}${props.protectLevel}/api/addQuestion/`, {
 			sid: props.sid,
 			pageNum: props.pageNum,
 			title: titleRef.current.value,
 			body: bodyRef.current.value,
-			user: uid
+			user: userName
 		}).then(res => {
 			backToList();
 		}).catch(err => {
@@ -78,12 +78,12 @@ export default function ChatArea(props) {
 	}
 
 	const sendNewChat = () => {
-		axios.post(`${serverURL}/api/addChat/`, {
+		axios.post(`${serverURL}${props.protectLevel}/api/addChat/`, {
 			sid: props.sid,
 			pageNum: props.pageNum,
 			qid: qid,
 			body: chatRef.current.value,
-			user: uid
+			user: userName
 		}).then(res => {
 			chatRef.current.value = "";
 			fetchChatDetails(qid);
@@ -93,7 +93,7 @@ export default function ChatArea(props) {
 	}
 
 	const fetchChatList = async () => {
-		axios.get(`${serverURL}/api/questions?slideID=${props.sid}&pageNum=${props.pageNum}`).then(res => {
+		axios.get(`${serverURL}${props.protectLevel}/api/questions?slideID=${props.sid}&pageNum=${props.pageNum}`).then(res => {
 			setQuestions(res.data);
 		}).catch(err => {
 			console.error(err);
@@ -101,7 +101,7 @@ export default function ChatArea(props) {
 	}
 
 	const fetchChatDetails = (qid) => {
-		axios.get(`${serverURL}/api/chats?slideID=${props.sid}&pageNum=${props.pageNum}&qid=${qid}`).then(res => {
+		axios.get(`${serverURL}${props.protectLevel}/api/chats?slideID=${props.sid}&pageNum=${props.pageNum}&qid=${qid}`).then(res => {
 			setQid(qid);
 			setChatDetails(res.data);
 			setState("chat-details");
@@ -112,12 +112,12 @@ export default function ChatArea(props) {
 
 	// like, if the user is an instructor, endorse
 	const likeChat = (cid) => {
-		axios.post(`${serverURL}/api/like/`, {
+		axios.post(`${serverURL}${props.protectLevel}/api/like/`, {
 			sid: props.sid,
 			pageNum: props.pageNum,
 			qid: qid,
 			cid: cid,
-			user: "yaochen8",
+			user: userName,
 		}).then(res => {
 			fetchChatDetails(qid);
 		}).catch(err => {
@@ -133,8 +133,8 @@ export default function ChatArea(props) {
 	const deleteQuestion = (e, qid) => {
 		if (!window.confirm(`Are you sure to delete "${questions[qid].title}"?`)) return e.stopPropagation();
 
-		axios.delete(`${serverURL}/api/question?sid=${props.sid}&qid=${qid}&pageNum=${props.pageNum}`, {
-			data: { user: uid }
+		axios.delete(`${serverURL}/p/api/question?sid=${props.sid}&qid=${qid}&pageNum=${props.pageNum}`, {
+			data: { user: userName }
 		}).then(res => {
 			backToList();
 		}).catch(err => {
@@ -145,8 +145,8 @@ export default function ChatArea(props) {
 	const deleteChat = (e, cid) => {
 		if (!window.confirm(`Are you sure to delete this chat?`)) return e.stopPropagation();
 
-		axios.delete(`${serverURL}/api/chat?sid=${props.sid}&qid=${qid}&pageNum=${props.pageNum}&cid=${cid}`, {
-			data: { user: uid }
+		axios.delete(`${serverURL}/p/api/chat?sid=${props.sid}&qid=${qid}&pageNum=${props.pageNum}&cid=${cid}`, {
+			data: { user: userName }
 		}).then(res => {
 			fetchChatDetails(qid);
 		}).catch(err => {
@@ -295,10 +295,12 @@ export default function ChatArea(props) {
 					</div>
 					: <div className="placeholder">&nbsp;</div>}
 				<div className="title">{title}</div>
-				<span className={`manage ${managing ? "managing" : ""}`}
-					onClick={changeManageStatus}>
-					<span className='material-icons icon'>settings</span>
-				</span>
+				{isInstructor()
+					? <span className={`manage ${managing ? "managing" : ""}`}
+						onClick={changeManageStatus}>
+						<span className='material-icons icon'>settings</span>
+					</span>
+					: <div className="placeholder">&nbsp;</div>}
 			</div>
 			{content}
 		</div>
