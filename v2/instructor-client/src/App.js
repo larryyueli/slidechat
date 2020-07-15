@@ -12,6 +12,9 @@ import { baseURL, instructorURL } from './config';
  * It consists three main components: App bar, slides on the left, and chat area on the right
  */
 function App() {
+    let date = new Date();
+    date.setTime(date.getTime() + (30 * 24 * 60 * 60 * 1000));
+    document.cookie = "isI=yes; expires=" + date.toUTCString() + "; path=/;";
     return (
         <Router>
             <AppBar />

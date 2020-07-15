@@ -5,6 +5,20 @@ const { ObjectID } = require('mongodb');
 const { instructors, fileStorage } = require('../config');
 const { isNotValidPage, notExistInList, errorHandler } = require('./util');
 
+function userAuth(req, res, next) {
+    if (process.env.DEV) {
+        req.uid = instructors[0];
+        next();
+    } else if (req.headers.utorid == undefined) {
+        res.status(401).send("Unauthorized");
+        console.error(`User auth failed`);
+    } else {
+        // Get user info from shibboleth: req.headers.utorid, req.headers.http_mail, req.headers.origin
+        req.uid = req.headers.utorid;
+        next();
+    }
+}
+
 function commonAPI(db) {
     let router = express.Router();
 
@@ -45,6 +59,10 @@ function commonAPI(db) {
         }
     });
 
+    router.get('/p/api/verifyLogin', userAuth, async (req, res) => {
+        res.json({ uid: req.uid });
+    });
+
     /**
      * get information of a slide, e.g. total number of pages, filename, title, etc.
      * req body:
@@ -67,41 +85,17 @@ function commonAPI(db) {
     });
 
     /**
-     * get the unused questions of a slide
-     * req query:
-     *   id: slideId
-     */
-    router.get('/api/unusedQuestions', async (req, res) => {
-        try {
-            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.id) },
-                { projection: { unused: 1 } });
-            if (!slide) return res.sendStatus(404);
-            let result = slide.unused;
-            if (!result) return res.send([]);
-            for (let i = 0; i < result.length; i++) {
-                for (let question of result[i].questions) {
-                    if (question) {
-                        delete question.chats;
-                    }
-                }
-            }
-            res.json(result);
-        } catch (err) {
-            errorHandler(res, err);
-        }
-    });
-
-    /**
      * get slide image
      * req body:
      *   slideID: object ID of the slide
      *   pageNum: integer range from from 1 to pageTotal (inclusive)
      */
-    router.get('/api/slideImg', async (req, res) => {
+    const getSlideImg = async (req, res) => {
         try {
             let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.slideID) },
-                { projection: { _id: true } });
+                { projection: { _id: true, anonymity: true, pageTotal: true } });
             if (!slide) throw { status: 404, error: "slide not found" };
+            if (slide.anonymity != "anyone" && !req.uid) throw { status: 401, error: "Unauthorized" };
             if (isNotValidPage(req.query.pageNum, slide.pageTotal)) {
                 throw { status: 400, error: "bad request" };
             }
@@ -109,6 +103,13 @@ function commonAPI(db) {
         } catch (err) {
             errorHandler(res, err);
         }
+    }
+    router.get('/api/slideImg', async (req, res) => {
+        req.uid = undefined;
+        getSlideImg(req, res);
+    });
+    router.get('/p/api/slideImg', userAuth, async (req, res) => {
+        getSlideImg(req, res);
     });
 
     /**
@@ -116,15 +117,23 @@ function commonAPI(db) {
      * req body:
      *   slideID: object ID of the slide
      */
-    router.get('/api/downloadPdf', async (req, res) => {
+    const getDownloadPdf = async (req, res) => {
         try {
             let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.slideID) },
-                { projection: { filename: 1 } });
+                { projection: { filename: true, anonymity: true } });
             if (!slide) throw { status: 404, error: "slide not found" };
+            if (slide.anonymity != "anyone" && !req.uid) throw { status: 401, error: "Unauthorized" };
             res.download(path.join(fileStorage, req.query.slideID, slide.filename));
         } catch (err) {
             errorHandler(res, err);
         }
+    }
+    router.get('/api/downloadPdf', async (req, res) => {
+        req.uid = undefined;
+        getDownloadPdf(req, res);
+    });
+    router.get('/p/api/downloadPdf', userAuth, async (req, res) => {
+        getDownloadPdf(req, res);
     });
 
     /**
@@ -133,11 +142,12 @@ function commonAPI(db) {
      *   slideID: object ID of a slide
      *   pageNum: integer range from from 1 to pageTotal (inclusive)
      */
-    router.get('/api/questions', async (req, res) => {
+    const getQuestions = async (req, res) => {
         try {
             let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.slideID) },
-                { projection: { pages: 1 } });
+                { projection: { pages: true, pageTotal: true, anonymity: true } });
             if (!slide) throw { status: 404, error: "slide not found" };
+            if (slide.anonymity != "anyone" && !req.uid) throw { status: 401, error: "Unauthorized" };
             if (isNotValidPage(req.query.pageNum, slide.pageTotal)) {
                 throw { status: 400, error: "bad request" };
             }
@@ -151,6 +161,13 @@ function commonAPI(db) {
         } catch (err) {
             errorHandler(res, err);
         }
+    }
+    router.get('/api/questions', async (req, res) => {
+        req.uid = undefined;
+        getQuestions(req, res);
+    });
+    router.get('/p/api/questions', userAuth, async (req, res) => {
+        getQuestions(req, res);
     });
 
     /**
@@ -160,11 +177,12 @@ function commonAPI(db) {
      *   pageNum: integer range from from 1 to pageTotal (inclusive)
      *   qid: question index, integer range from from 0 to questions.length (exclusive)
      */
-    router.get('/api/chats', async (req, res) => {
+    const getChats = async (req, res) => {
         try {
             let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.slideID) },
-                { projection: { pages: 1 } });
+                { projection: { pages: true, anonymity: true } });
             if (!slide) throw { status: 404, error: "slide not found" };
+            if (slide.anonymity != "anyone" && !req.uid) throw { status: 401, error: "Unauthorized" };
             if (isNotValidPage(req.query.pageNum, slide.pageTotal)
                 || notExistInList(req.query.qid, slide.pages[+req.query.pageNum - 1].questions)) {
                 throw { status: 400, error: "bad request" };
@@ -173,6 +191,13 @@ function commonAPI(db) {
         } catch (err) {
             errorHandler(res, err);
         }
+    }
+    router.get('/api/chats', async (req, res) => {
+        req.uid = undefined;
+        getChats(req, res);
+    });
+    router.get('/p/api/chats', userAuth, async (req, res) => {
+        getChats(req, res);
     });
 
 
@@ -185,11 +210,12 @@ function commonAPI(db) {
      *   body: question body
      *   user: userID
      */
-    router.post('/api/addQuestion', async (req, res) => {
+    const postAddQuestion = async (req, res) => {
         try {
             let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) },
-                { projection: { pageTotal: 1 } });
+                { projection: { pageTotal: true, anonymity: true } });
             if (!slide) throw { status: 404, error: "slide not found" };
+            if (slide.anonymity != "anyone" && !req.uid) throw { status: 401, error: "Unauthorized" };
             if (isNotValidPage(req.body.pageNum, slide.pageTotal)
                 || typeof req.body.title !== 'string'
                 || typeof req.body.body !== 'string'
@@ -226,6 +252,13 @@ function commonAPI(db) {
         } catch (err) {
             errorHandler(res, err);
         }
+    }
+    router.post('/api/addQuestion', async (req, res) => {
+        req.uid = undefined;
+        postAddQuestion(req, res);
+    });
+    router.post('/p/api/addQuestion', userAuth, async (req, res) => {
+        postAddQuestion(req, res);
     });
 
 
@@ -238,11 +271,12 @@ function commonAPI(db) {
      *   body: message body
      *   user: userID
      */
-    router.post('/api/addChat', async (req, res) => {
+    const postAddChat = async (req, res) => {
         try {
             let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) },
-                { projection: { pageTotal: 1, pages: 1 } });
+                { projection: { pageTotal: true, pages: true, anonymity: true } });
             if (!slide) throw { status: 404, error: "slide not found" };
+            if (slide.anonymity != "anyone" && !req.uid) throw { status: 401, error: "Unauthorized" };
             if (isNotValidPage(req.body.pageNum, slide.pageTotal)
                 || notExistInList(req.body.qid, slide.pages[+req.body.pageNum - 1].questions)
                 || typeof req.body.body !== 'string'
@@ -274,6 +308,13 @@ function commonAPI(db) {
         } catch (err) {
             errorHandler(res, err);
         }
+    }
+    router.post('/api/addChat', async (req, res) => {
+        req.uid = undefined;
+        postAddChat(req, res);
+    });
+    router.post('/p/api/addChat', userAuth, async (req, res) => {
+        postAddChat(req, res);
     });
 
     /**
@@ -285,11 +326,12 @@ function commonAPI(db) {
      *   pageNum: page number
      *   user: userID
      */
-    router.post('/api/like', async (req, res) => {
+    const postLike = async (req, res) => {
         try {
             let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) },
-                { projection: { pageTotal: 1, pages: 1 } });
+                { projection: { pageTotal: true, pages: true, anonymity: true } });
             if (!slide) throw { status: 404, error: "slide not found" };
+            if (slide.anonymity != "anyone" && !req.uid) throw { status: 401, error: "Unauthorized" };
             if (isNotValidPage(req.body.pageNum, slide.pageTotal)
                 || notExistInList(req.body.qid, slide.pages[+req.body.pageNum - 1].questions)
                 || notExistInList(req.body.cid, slide.pages[+req.body.pageNum - 1].questions[req.body.qid].chats)) {
@@ -298,10 +340,10 @@ function commonAPI(db) {
 
             let insertLike = {}; // cannot use template string on the left hand side
             // if instructor, add to endorsement, else add to likes
-            if (instructors.indexOf(req.body.user) < 0) {
-                insertLike[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.likes`] = req.body.user;
-            } else {
+            if (req.uid && instructors.indexOf(req.uid) >= 0) {
                 insertLike[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.endorsement`] = req.body.user;
+            } else {
+                insertLike[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.likes`] = req.body.user;
             }
             let updateRes = await slides.updateOne({ _id: ObjectID.createFromHexString(req.body.sid) },
                 { $addToSet: insertLike });
@@ -314,6 +356,13 @@ function commonAPI(db) {
         } catch (err) {
             errorHandler(res, err);
         }
+    }
+    router.post('/api/like', async (req, res) => {
+        req.uid = undefined;
+        postLike(req, res);
+    });
+    router.post('/p/api/like', userAuth, async (req, res) => {
+        postLike(req, res);
     });
 
     return router;

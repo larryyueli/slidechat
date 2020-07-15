@@ -22,7 +22,7 @@ export default function SlideSettings({ sid, open, onClose }) {
     }, [sid]);
 
     const changeAnonymity = (e) => {
-        axios.post(`${serverURL}/api/setAnonymity`, {
+        axios.post(`${serverURL}/p/api/setAnonymity`, {
             sid: sid,
             anonymity: e.target.value
         }).then(res => {
@@ -35,7 +35,7 @@ export default function SlideSettings({ sid, open, onClose }) {
     }
 
     const changeTitle = (e) => {
-        axios.post(`${serverURL}/api/setTitle`, {
+        axios.post(`${serverURL}/p/api/setTitle`, {
             sid: sid,
             title: titleRef.current.value
         }).then(res => {
@@ -53,7 +53,7 @@ export default function SlideSettings({ sid, open, onClose }) {
         formData.append("file", fileReupload.current.files[0]);
         try {
             setUploading(true);
-            await axios.post(`${serverURL}/api/uploadNewSlide/`, formData);
+            await axios.post(`${serverURL}/p/api/uploadNewSlide/`, formData);
             setResult(true, "changes saved");
             setSettings({ ...settings, filename: formData.get("file").name });
         } catch (err) {

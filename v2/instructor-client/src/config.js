@@ -1,5 +1,5 @@
 const baseURL = '/slidechat';
-const instructorURL = '/prof';
+const instructorURL = '/p/prof';
 const fullURL = () => `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}${baseURL}`;
 
 let serverURL;

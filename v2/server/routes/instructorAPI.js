@@ -5,7 +5,7 @@ const PDFImage = require("../lib/pdf-image").PDFImage;
 const { ObjectID } = require('mongodb');
 
 const { instructorURL, instructors, fileStorage, convertOptions } = require('../config');
-const { isNotValidPage, notExistInList, errorHandler } = require('./util');
+const { isNotValidPage, notExistInList, errorHandler, questionCount } = require('./util');
 
 
 function instructorAuth(req, res, next) {
@@ -33,6 +33,10 @@ function instructorAPI(db) {
         res.sendFile('index.html', { root: 'instructor-client-build' });
     });
 
+    router.get(`${instructorURL}/reorderQuestions/:slideID([A-Fa-f0-9]+)`, instructorAuth, (req, res) => {
+        res.sendFile('index.html', { root: 'instructor-client-build' });
+    });
+
     router.use(instructorURL, instructorAuth, express.static('instructor-client-build'));
 
     /**
@@ -40,7 +44,7 @@ function instructorAPI(db) {
      * req body:
      *   id: userID
      */
-    router.get('/api/myCourses', instructorAuth, async (req, res) => {
+    router.get('/p/api/myCourses', instructorAuth, async (req, res) => {
         try {
             let user = await users.findOne({ _id: req.uid }, { projection: { courses: 1 } });
             if (!user) return res.json([]);  // does not need to initialize here
@@ -51,11 +55,36 @@ function instructorAPI(db) {
     });
 
     /**
+     * get the unused questions of a slide
+     * req query:
+     *   id: slideId
+     */
+    router.get('/p/api/unusedQuestions', instructorAuth, async (req, res) => {
+        try {
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.id) },
+                { projection: { unused: 1 } });
+            if (!slide) return res.sendStatus(404);
+            let result = slide.unused;
+            if (!result) return res.send([]);
+            for (let i = 0; i < result.length; i++) {
+                for (let question of result[i].questions) {
+                    if (question) {
+                        delete question.chats;
+                    }
+                }
+            }
+            res.json(result);
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    });
+
+    /**
      * create a new course
      * req body:
      *   course: course name
      */
-    router.post('/api/createCourse', instructorAuth, async (req, res) => {
+    router.post('/p/api/createCourse', instructorAuth, async (req, res) => {
         try {
             let insertRes = await courses.insertOne({
                 name: req.body.course,
@@ -87,7 +116,7 @@ function instructorAPI(db) {
      *   newUser: userID
      *   course: object ID of a course
      */
-    router.post('/api/addInstructor', instructorAuth, async (req, res) => {
+    router.post('/p/api/addInstructor', instructorAuth, async (req, res) => {
         try {
             if (typeof req.body.newUser !== 'string' || !req.body.newUser) {
                 throw { status: 400, error: 'bad request' };
@@ -128,7 +157,7 @@ function instructorAPI(db) {
      * req.files:
      *   file: *.pdf
      */
-    router.post('/api/addSlide', instructorAuth, async (req, res) => {
+    router.post('/p/api/addSlide', instructorAuth, async (req, res) => {
         try {
             if (req.body.cid.length != 24
                 || (["anyone", "student", "nonymous"].indexOf(req.body.anonymity) < 0)
@@ -203,7 +232,7 @@ function instructorAPI(db) {
      * req.files:
      *   file: *.pdf
      */
-    router.post('/api/uploadNewSlide', instructorAuth, async (req, res) => {
+    router.post('/p/api/uploadNewSlide', instructorAuth, async (req, res) => {
         try {
             if (req.body.sid.length != 24
                 || !req.files.file
@@ -291,7 +320,7 @@ function instructorAPI(db) {
      *   questionOrder: the order of questions
      *   sid: the slide id
      */
-    router.post('/api/reorderQuestions', instructorAuth, async (req, res) => {
+    router.post('/p/api/reorderQuestions', instructorAuth, async (req, res) => {
         try {
             if (req.body.sid.length != 24) {
                 return res.status(400).send();
@@ -365,7 +394,7 @@ function instructorAPI(db) {
      *   title: new title of the slide
      *   sid: the slide id
      */
-    router.post('/api/setTitle', instructorAuth, async (req, res) => {
+    router.post('/p/api/setTitle', instructorAuth, async (req, res) => {
         try {
             if (req.body.sid.length != 24) {
                 return res.status(400).send();
@@ -399,7 +428,7 @@ function instructorAPI(db) {
      *   anonymity: new anonymity level of the slide
      *   sid: the slide id
      */
-    router.post('/api/setAnonymity', instructorAuth, async (req, res) => {
+    router.post('/p/api/setAnonymity', instructorAuth, async (req, res) => {
         try {
             if (req.body.sid.length != 24
                 || (["anyone", "student", "nonymous"].indexOf(req.body.anonymity) < 0)) {
@@ -439,7 +468,7 @@ function instructorAPI(db) {
      * req query:
      *   sid: slide object ID
      */
-    router.delete('/api/slide', instructorAuth, async (req, res) => {
+    router.delete('/p/api/slide', instructorAuth, async (req, res) => {
         try {
             let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.sid) },
                 { projection: { _id: 1 } });
@@ -471,7 +500,7 @@ function instructorAPI(db) {
      *   pageNum: page number, integer range from from 1 to pageTotal (inclusive)
      *   qid: question index, integer range from from 0 to questions.length (exclusive)
      */
-    router.delete('/api/question', instructorAuth, async (req, res) => {
+    router.delete('/p/api/question', instructorAuth, async (req, res) => {
         try {
             let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.sid) },
                 { projection: { pageTotal: 1, pages: 1 } });
@@ -503,7 +532,7 @@ function instructorAPI(db) {
      *   qid: question index, integer range from from 0 to questions.length (exclusive)
      *   c
      */
-    router.delete('/api/chat', instructorAuth, async (req, res) => {
+    router.delete('/p/api/chat', instructorAuth, async (req, res) => {
         try {
             let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.sid) },
                 { projection: { pageTotal: 1, pages: 1 } });

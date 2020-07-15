@@ -9,7 +9,7 @@ const escapedPsw = querystring.escape(dbPsw);
 module.exports = {
     port: 10001,
 
-    instructorURL: '/prof',
+    instructorURL: '/p/prof',
 
     dbURL: `mongodb://${escapedUser}:${escapedPsw}@localhost:27017/slidechat`,
 

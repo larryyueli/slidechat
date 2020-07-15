@@ -1,0 +1,28 @@
+.landing{
+    margin: 1rem 0;
+    text-align: center;
+    // @include flexCenter();
+    .text{
+        width: 50%;
+        margin-top: 5rem;
+        margin-left: 25%;
+        font-size: 1.5rem;
+        
+        div{
+            margin: 1rem 0;
+        }
+    }
+
+    .demoButton{
+        text-transform: none;
+        font-size: 1.5rem;
+        padding: 0 2rem;
+        margin-top: 3rem;
+    }
+
+    .instructorButton{
+        text-transform: none;
+        font-size: 0.7rem;
+        margin-top: 2rem;
+    }
+}

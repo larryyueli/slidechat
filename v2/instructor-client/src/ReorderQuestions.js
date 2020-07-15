@@ -17,7 +17,7 @@ export default function ReorderQuestions(props) {
                 let slide = { pageTotal: res.data.pageTotal, pages: [], unused: [] };
                 let i = 1;
                 for (; i <= slide.pageTotal; i++) {
-                    let res = await axios.get(`${serverURL}/api/questions?slideID=${sid}&pageNum=${i}`);
+                    let res = await axios.get(`${serverURL}/p/api/questions?slideID=${sid}&pageNum=${i}`);
                     let questions = { pageNum: i, questions: res.data };
                     questions.count = res.data.reduce((total, curr) => {
                         return total + (curr ? 1 : 0);
@@ -29,7 +29,7 @@ export default function ReorderQuestions(props) {
                     }
                 }
 
-                res = await axios.get(`${serverURL}/api/unusedQuestions?id=${sid}`);
+                res = await axios.get(`${serverURL}/p/api/unusedQuestions?id=${sid}`);
                 slide.unused = res.data;
                 for (; i <= slide.unused.length + slide.pageTotal; i++) {
                     slide.unused[i - slide.pageTotal - 1].pageNum = i;
@@ -114,8 +114,8 @@ export default function ReorderQuestions(props) {
                 questionOrder.push(orders);
             }
             console.log(questionOrder);
-            await axios.post(`${serverURL}/api/reorderQuestions`, { questionOrder: questionOrder, sid: sid, user: uid });
-            window.location.href = `${fullURL()}/profile`;
+            await axios.post(`${serverURL}/p/api/reorderQuestions`, { questionOrder: questionOrder, sid: sid, user: uid });
+            window.location.href = `${fullURL()}/p/prof`;
         } catch (err) {
             console.error(err.request);
         }
@@ -192,7 +192,7 @@ export default function ReorderQuestions(props) {
                         </div>
                     </div>
                     <div className="button-row">
-                        <Button variant='contained' href={`${baseURL}/profile`}>Abort</Button>
+                        <Button variant='contained' href={`${fullURL()}/p/prof`}>Abort</Button>
                         <Button variant='contained' color='primary' onClick={e => submitChanges()}>Submit</Button>
                     </div>
                 </>}
