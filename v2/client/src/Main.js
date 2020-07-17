@@ -17,18 +17,17 @@ function Main(props) {
     const [page, setPage] = useState(1);
     const [title, setTitle] = useState("");
     const [filename, setFilename] = useState("");
-    const [protectLevel, setProtectLevel] = useState("");
+    const [protectLevel, setProtectLevel] = useState("unknown");
 
     useEffect(() => {
         axios.get(`${serverURL}/api/slideInfo?slideID=${sid}`).then(res => {
             if (res.data.anonymity === "anyone") {
                 setProtectLevel("");
             } else {
-                if (getCookie("isLogin")) {
-                    setProtectLevel("/p");
-                } else {
+                if (!getCookie("isLogin")) {
                     window.location.href = `${baseURL}/p/login/${sid}#${window.location.hash}`;
                 }
+                setProtectLevel("/p");
             }
             let currentPage = 1;
             if (window.location.hash) {
@@ -55,19 +54,6 @@ function Main(props) {
         document.getElementById("pageNum").value = newPageNum;
         window.location.hash = newPageNum;
         setPage(newPageNum);
-        axios.get(`${serverURL}/api/hasAudio?slideID=${sid}&pageNum=${newPageNum}`).then(res => {
-            let audio = document.getElementById("slideAudio");
-            audio.pause();
-            if (res.data.audio) {
-                audio.src = `${serverURL}${protectLevel}/api/slideAudio?slideID=${sid}&pageNum=${newPageNum}`;
-                audio.controls = true;
-            } else {
-                audio.controls = false;
-            }
-        }).catch(err => {
-            console.error(err);
-        });
-        
     }
 
     /**

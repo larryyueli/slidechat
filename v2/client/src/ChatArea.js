@@ -5,7 +5,7 @@ import markdownIt from 'markdown-it';
 import markdownItMathJax from 'markdown-it-mathjax';
 import highlight from 'highlight.js';
 
-import { serverURL } from './config';
+import { serverURL, baseURL } from './config';
 import { formatTime, formatNames, getUserName, isInstructor } from './util';
 
 
@@ -43,11 +43,15 @@ export default function ChatArea(props) {
 
 	// fetch questions when page is changed
 	useEffect(() => {
+		if (props.protectLevel === "unknown") return;
 		axios.get(`${serverURL}${props.protectLevel}/api/questions?slideID=${props.sid}&pageNum=${props.pageNum}`)
 			.then(res => {
 				setState("list");
 				setQuestions(res.data);
 			}).catch(err => {
+				if (err.response.status === '401') {
+					window.location.href = `${baseURL}/p/login/${props.sid}#${window.location.hash}`;
+				}
 				console.error(err);
 			});
 	}, [props.sid, props.pageNum, props.protectLevel]);

@@ -1,11 +1,15 @@
 import { baseURL } from './config';
+import React from 'react';
+import { Redirect } from 'react-router-dom';
 
-function Login(props) {
-    // let date = new Date();
-    // date.setTime(date.getTime() + (60 * 1000));
-    // document.cookie = "isLogin=yes; expires=" + date.toUTCString() + "; path=/";
+/**
+ * This is a dummy log in page, visiting this page will trigger the UTORID login,
+ * and thus when it page is retrieved, the user already passed the UTORID login.
+ * 
+ * We then redirect the users to the page they were visiting.
+ * @param {*} props 
+ */
+export default function Login(props) {
     document.cookie = "isLogin=yes; path=/";
-    window.location.href = `${baseURL}/${props.match.params.slideId}#${window.location.hash}`;
+    return <Redirect to={`${baseURL}/${props.match.params.slideId}#${window.location.hash}`} />
 }
-
-export default Login;
