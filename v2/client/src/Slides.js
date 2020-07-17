@@ -19,6 +19,8 @@ export default function Slides(props) {
 				<img src={props.pageTotal
 					? `${serverURL}${props.protectLevel}/api/slideImg?slideID=${props.sid}&pageNum=${props.pageNum}`
 					: "default.png"} alt="slide" className="slide" />
+				<audio controls className="slideAudio" id="slideAudio">
+				</audio>
 			</div>
 			<Button variant="contained" disabled={prevBtnDisable} onClick={props.prevPage}>PREV</Button>
 			<Button variant="contained" disabled={nextBtnDisable} onClick={props.nextPage}>NEXT</Button>

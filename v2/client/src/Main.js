@@ -38,15 +38,37 @@ function Main(props) {
                 }
             }
 
-            setPage(currentPage);
             setPageTotal(res.data.pageTotal);
             setTitle(res.data.title);
             setFilename(res.data.filename);
-            document.getElementById("pageNum").value = currentPage;
+            applyPage(currentPage);
         }).catch(err => {
             console.error(err);
         });
     }, [sid]);
+
+    /**
+     * apply the new page number
+     * @param {*} newPageNum 
+     */
+    const applyPage = (newPageNum) => {
+        document.getElementById("pageNum").value = newPageNum;
+        window.location.hash = newPageNum;
+        setPage(newPageNum);
+        axios.get(`${serverURL}/api/hasAudio?slideID=${sid}&pageNum=${newPageNum}`).then(res => {
+            let audio = document.getElementById("slideAudio");
+            audio.pause();
+            if (res.data.audio) {
+                audio.src = `${serverURL}${protectLevel}/api/slideAudio?slideID=${sid}&pageNum=${newPageNum}`;
+                audio.controls = true;
+            } else {
+                audio.controls = false;
+            }
+        }).catch(err => {
+            console.error(err);
+        });
+        
+    }
 
     /**
      * Go to the next page of slide, should fetch the url and the chat threads list of the new page 
@@ -54,9 +76,7 @@ function Main(props) {
     const nextPage = () => {
         if (page >= pageTotal) return;
         let newPageNum = page + 1;
-        document.getElementById("pageNum").value = newPageNum;
-        window.location.hash = newPageNum;
-        setPage(newPageNum);
+        applyPage(newPageNum);
     }
 
     /**
@@ -65,9 +85,7 @@ function Main(props) {
     const prevPage = () => {
         if (page < 2) return;
         let newPageNum = page - 1;
-        document.getElementById("pageNum").value = newPageNum;
-        window.location.hash = newPageNum;
-        setPage(newPageNum);
+        applyPage(newPageNum);
     }
 
     const gotoPage = () => {
@@ -81,9 +99,7 @@ function Main(props) {
         } else if (newPageNum < 1) {
             newPageNum = 1;
         }
-        document.getElementById("pageNum").value = newPageNum;
-        window.location.hash = newPageNum;
-        setPage(newPageNum);
+        applyPage(newPageNum);
     }
 
     return (

@@ -113,6 +113,62 @@ function commonAPI(db) {
     });
 
     /**
+     * get slide audio
+     * req body:
+     *   slideID: object ID of the slide
+     *   pageNum: integer range from from 1 to pageTotal (inclusive)
+     */
+    const getSlideAudio = async (req, res) => {
+        try {
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.slideID) },
+                { projection: { _id: true, anonymity: true, pageTotal: true, pages: true } });
+            if (!slide) throw { status: 404, error: "slide not found" };
+            if (slide.anonymity != "anyone" && !req.uid) throw { status: 401, error: "Unauthorized" };
+            if (isNotValidPage(req.query.pageNum, slide.pageTotal)) {
+                throw { status: 400, error: "bad request" };
+            }
+            // console.log(slide.audio);
+            // console.log(path.join(fileStorage, req.query.slideID, req.query.pageNum, slide.audio));
+            res.sendFile(path.join(fileStorage, req.query.slideID, req.query.pageNum, slide.pages[+req.query.pageNum - 1].audio));
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    }
+    router.get('/api/slideAudio', async (req, res) => {
+        req.uid = undefined;
+        getSlideAudio(req, res);
+    });
+    router.get('/p/api/slideAudio', userAuth, async (req, res) => {
+        getSlideAudio(req, res);
+    });
+
+    /**
+     * send {audio : true} iff the asking page has audio attached
+     * req body:
+     *   slideID: object ID of the slide
+     *   pageNum: integer range from from 1 to pageTotal (inclusive)
+     */
+    router.get('/api/hasAudio', async (req, res) => {
+        try {
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.slideID) },
+                { projection: { _id: true, pageTotal: true, audio: true, pages:true } });
+            if (!slide) throw { status: 404, error: "slide not found" };
+            if (isNotValidPage(req.query.pageNum, slide.pageTotal)) {
+                throw { status: 400, error: "bad request" };
+            }
+            let response = {};
+            if (slide.pages[+req.query.pageNum - 1].audio){
+                response.audio = true;
+            }else{
+                response.audio = false;
+            }
+            res.json(response);
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    });
+
+    /**
      * download PDF file
      * req body:
      *   slideID: object ID of the slide

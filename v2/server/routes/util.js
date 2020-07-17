@@ -1,5 +1,6 @@
 function errorHandler(res, err) {
     if (err && err.status) {
+        console.log(err.error)
         return res.status(err.status).send({ error: err.error });
     } else {
         console.error(err);

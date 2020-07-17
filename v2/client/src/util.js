@@ -45,14 +45,16 @@ export function randInt(max) {
 }
 
 export function getRandomName() {
+    let nameList = ["name"];
     return `anonymous ${nameList[randInt(nameList.length)]}`;
 }
 
 export function getCookie(cookieName){
     let cookies = document.cookie.split('; ');
     for (let cookie of cookies) {
-        if (cookie.indexOf(cookieName) === 0) {
-            return cookie.substring(cookieName.length + 1);
+        let pair = cookie.split('=');
+        if (pair[0] === cookieName) {
+            return pair[1];
         }
     }
     return null;
@@ -64,7 +66,7 @@ export function getUserName(){
     if (name){
         return name;
     }
-    name = "anonymous name";
+    name = getRandomName();
     let date = new Date();
     date.setTime(date.getTime() + (365 * 24 * 60 * 60 * 1000));
     document.cookie = cookieName + "=" + name + "; expires=" + date.toUTCString() + "; path=/;";
