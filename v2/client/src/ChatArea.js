@@ -6,7 +6,7 @@ import markdownItMathJax from 'markdown-it-mathjax';
 import highlight from 'highlight.js';
 
 import { serverURL, baseURL } from './config';
-import { formatTime, formatNames, getUserName, isInstructor } from './util';
+import { formatTime, formatNames, getUserName, isInstructor, getCookie } from './util';
 
 
 const md = markdownIt({
@@ -44,14 +44,14 @@ export default function ChatArea(props) {
 	// fetch questions when page is changed
 	useEffect(() => {
 		if (props.protectLevel === "unknown") return;
+		if (props.protectLevel && !getCookie("isLogin")) {
+			window.location.href = `${baseURL}/p/login/${props.sid}/${window.location.hash.substring(1)}`;
+		}
 		axios.get(`${serverURL}${props.protectLevel}/api/questions?slideID=${props.sid}&pageNum=${props.pageNum}`)
 			.then(res => {
 				setState("list");
 				setQuestions(res.data);
 			}).catch(err => {
-				if (err.response.status === '401') {
-					window.location.href = `${baseURL}/p/login/${props.sid}#${window.location.hash}`;
-				}
 				console.error(err);
 			});
 	}, [props.sid, props.pageNum, props.protectLevel]);

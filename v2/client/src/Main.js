@@ -25,7 +25,7 @@ function Main(props) {
                 setProtectLevel("");
             } else {
                 if (!getCookie("isLogin")) {
-                    window.location.href = `${baseURL}/p/login/${sid}#${window.location.hash}`;
+                    window.location.href = `${baseURL}/p/login/${sid}/${window.location.hash.substring(1)}`;
                 }
                 setProtectLevel("/p");
             }

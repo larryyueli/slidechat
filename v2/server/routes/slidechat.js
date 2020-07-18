@@ -26,10 +26,10 @@ async function startSlidechat() {
     router.use(instructorAPI(db));
     router.use(commonAPI(db));
 
-    router.get('/', (req, res) => res.sendFile('index.html', { root: 'client-build' }));
-
-    router.get('/p/login/:slideID([A-Fa-f0-9]+)/', (req, res) => { res.sendFile('index.html', { root: 'client-build' }); });
-    router.get('/:slideID([A-Fa-f0-9]+)/', (req, res) => { res.sendFile('index.html', { root: 'client-build' }); });
+    router.get(/^\/p\/login\/[A-Fa-f0-9]+\/?/, (req, res) => { res.sendFile('login.html', { root: 'static' }); });
+    
+    // router.get('/', (req, res) => res.sendFile('index.html', { root: 'client-build' }));
+    router.get(/^\/([A-Fa-f0-9]+\/?)?$/, (req, res) => { res.sendFile('index.html', { root: 'client-build' }); });
 
     router.use(express.static('client-build'));
 
