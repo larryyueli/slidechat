@@ -60,6 +60,16 @@ export function getCookie(cookieName){
     return null;
 }
 
+export function deleteCookie(cookieName) {
+    let cookies = document.cookie.split('; ');
+    for (let cookie of cookies) {
+        let pair = cookie.split('=');
+        if (pair[0] === cookieName) {
+            document.cookie = cookieName + "=;path=/;";
+        }
+    }
+}
+
 export function getUserName(){
     let cookieName = "userName";
     let name = getCookie(cookieName);

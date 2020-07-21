@@ -362,6 +362,47 @@ function instructorAPI(db) {
     });
 
     /**
+     * delete audio to page
+     * req query:
+     *   sid: object ID of the slide
+     *   pageNum: integer range from from 1 to pageTotal (inclusive)
+     */
+    router.delete('/p/api/audio', instructorAuth, async (req, res) => {
+        try {
+            if (req.query.sid.length != 24) {
+                return res.status(400).send();
+            }
+            let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.sid) });
+
+            if (!slide) {
+                throw { status: 400, error: "slide not exist" };
+            }
+            if (isNotValidPage(req.query.pageNum, slide.pageTotal)) {
+                throw { status: 400, error: "bad request" };
+            }
+
+            let dir = path.join(fileStorage, req.query.sid, req.query.pageNum);
+            // remove old audio
+            if (fs.existsSync(dir)) {
+                await fs.promises.rmdir(dir, { recursive: true });
+            }
+
+            let updateQuery = {};
+            updateQuery[`pages.${req.query.pageNum - 1}.audio`] = null;
+            let updateRes = await slides.updateOne({ _id: ObjectID.createFromHexString(req.query.sid) }, {
+                $set: updateQuery
+            });
+            if (updateRes.modifiedCount !== 1) {
+                throw "audio upload failed";
+            }
+
+            res.send();
+        } catch (err) {
+            errorHandler(res, err);
+        }
+    });
+
+    /**
      * reorder the questions of a slide
      * req body:
      *   questionOrder: the order of questions

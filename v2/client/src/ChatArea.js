@@ -38,8 +38,6 @@ export default function ChatArea(props) {
 	const titleRef = useRef(null);
 	const bodyRef = useRef(null);
 	const chatRef = useRef(null);
-	const [uploading, setUploading] = useState(false);
-	const fileUpload = useRef(null);
 
 	// fetch questions when page is changed
 	useEffect(() => {
@@ -160,44 +158,12 @@ export default function ChatArea(props) {
 		});
 	}
 
-	const uploadAudio = async () => {
-		if (fileUpload.current.files.length !== 1) return;
-
-		let formData = new FormData();
-		formData.append("sid", props.sid);
-		formData.append("pageNum", props.pageNum);
-		formData.append("file", fileUpload.current.files[0]);
-		try {
-			setUploading(true);
-			await axios.post(`${serverURL}/p/api/audio/`, formData);
-		} catch (err) {
-			console.log(err);
-		} finally {
-			setUploading(false);
-			let audio = document.getElementById("slideAudio");
-			audio.src = `${serverURL}${props.protectLevel}/api/slideAudio?slideID=${props.sid}&pageNum=${props.pageNum}`;
-			audio.controls = true;
-		}
-	}
-
 	let content, title;
 	switch (state) {
 		case "list":	// list of all chat threads
 			title = "Discussion";
 
 			let chats = [
-				isInstructor() && managing
-					? <div className="audio-btn-row" key={-2}>
-						<input type="file" name="file" ref={fileUpload} />
-						<Button
-							onClick={uploadAudio}
-							disabled={uploading}
-							variant="contained"
-							color="primary">Upload Audio</Button>
-						{uploading ? <CircularProgress /> : null}
-					</div>
-					: <div></div>
-				,
 				<div className="new-chat-btn-row" key={-1}>
 					<Button variant="contained" color="primary" onClick={createNewChat}>
 						Ask a new question
