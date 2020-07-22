@@ -60,7 +60,7 @@ export default function Slides(props) {
 	};
 
 	const deleteAudio = async () => {
-		if (!window.confirm(`Are you sure to delete this chat?`)) return;
+		if (!window.confirm(`Are you sure to delete this audio?`)) return;
 
 		axios
 			.delete(`${serverURL}/p/api/audio?sid=${props.sid}&pageNum=${props.pageNum}`)

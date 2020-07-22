@@ -262,7 +262,8 @@ function commonAPI(db) {
 			) {
 				throw { status: 400, error: 'bad request' };
 			}
-			res.json(slide.pages[+req.query.pageNum - 1].questions[req.query.qid].chats);
+			res.json({ chats: slide.pages[+req.query.pageNum - 1].questions[req.query.qid].chats, 
+				drawing: slide.pages[+req.query.pageNum - 1].questions[req.query.qid].drawing});
 		} catch (err) {
 			errorHandler(res, err);
 		}
@@ -283,6 +284,7 @@ function commonAPI(db) {
 	 *   title: question title
 	 *   body: question body
 	 *   user: userID
+	 *   drawing(optional): the drawing for the question
 	 */
 	const postAddQuestion = async (req, res) => {
 		try {
@@ -301,12 +303,21 @@ function commonAPI(db) {
 				throw { status: 400, error: 'bad request' };
 			}
 
+			for (let line of req.body.drawing) {
+				for (let i = 0; i < line.length - 1; i ++) {
+					if (!Number.isInteger(line[i])) {
+						throw { status: 400, error: 'bad request' };
+					}
+				}
+			}
+
 			let time = Date.now();
 			let newQuestion = {
 				status: 'unsolved',
 				time: time,
 				chats: [],
 				title: escape(req.body.title),
+				drawing: req.body.drawing,
 				user: req.body.user,
 			};
 			let newChat = {
