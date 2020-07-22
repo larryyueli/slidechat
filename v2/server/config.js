@@ -7,7 +7,7 @@ const escapedUser = querystring.escape(dbUser);
 const escapedPsw = querystring.escape(dbPsw);
 
 module.exports = {
-    port: 10000,
+    port: 10001,
 
     instructorURL: '/p/prof',
 

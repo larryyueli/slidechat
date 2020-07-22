@@ -25,10 +25,10 @@
 
 @mixin tooltip($width) {
 	position: relative;
-	
+
 	.tooltip-text {
 		opacity: 0;
-		visibility: hidden;	// need this so that hovering over transparent text does not trigger it
+		visibility: hidden; // need this so that hovering over transparent text does not trigger it
 
 		position: absolute;
 		z-index: 1;
@@ -46,20 +46,20 @@
 		border-radius: 0.5rem;
 
 		&::after {
-			content: " ";
+			content: ' ';
 			position: absolute;
 			top: 100%;
 			left: 50%;
-			margin-left: -1rem;	// 0.5rem for width + 0.5rem for padding
+			margin-left: -1rem; // 0.5rem for width + 0.5rem for padding
 			border-width: 0.5rem;
 			border-style: solid;
 			border-color: black transparent transparent transparent;
-		  }
+		}
 	}
 
 	&:hover .tooltip-text {
 		transition: opacity 0.5s;
-		transition-delay: 0.5s;;
+		transition-delay: 0.5s;
 		opacity: 1;
 		visibility: visible;
 	}
@@ -79,10 +79,7 @@
 	text-decoration: none;
 	user-select: none;
 	&:hover {
-		background-color: adjust-color(
-			$color: $primary,
-			$alpha: -0.85
-		);
+		background-color: adjust-color($color: $primary, $alpha: -0.85);
 	}
 	margin-right: 0.5rem;
 }

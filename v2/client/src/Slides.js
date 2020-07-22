@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Button from '@material-ui/core/Button';
 import axios from 'axios';
 
+import SlideOverlay from './SlideOverlay';
 import { serverURL } from './config';
 
 
@@ -31,9 +32,12 @@ export default function Slides(props) {
 			<div className="title">{props.title}</div>
 			<div>(<a className="download-link" href={`${serverURL}${props.protectLevel}/api/downloadPdf?slideID=${props.sid}`}>{props.filename}</a>)</div>
 			<div>
-				<img src={props.pageTotal
-					? `${serverURL}${props.protectLevel}/api/slideImg?slideID=${props.sid}&pageNum=${props.pageNum}`
-					: "default.png"} alt="slide" className="slide" />
+				<div className="slide-wrapper">
+					<img id="slide-img" src={props.pageTotal
+						? `${serverURL}${props.protectLevel}/api/slideImg?slideID=${props.sid}&pageNum=${props.pageNum}`
+						: "default.png"} alt="slide" className="slide" />
+					{props.drawing ? <SlideOverlay /> : null}
+				</div>
 				<audio className="slideAudio"
 					controls={audioSrc ? true : false}
 					src={audioSrc}>

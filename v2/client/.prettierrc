@@ -1,0 +1,12 @@
+# config file for VS Code formatter plugin: Prettier
+trailingComma: "es5"
+printWidth: 120
+tabWidth: 4
+useTabs: true
+semi: true
+singleQuote: false
+jsxSingleQuote: false
+bracketSpacing: true
+jsxBracketSameLine: true
+arrowParens: "always"
+endOfLine: "lf"

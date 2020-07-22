@@ -99,7 +99,8 @@ function Main(props) {
                 protectLevel={protectLevel}
                 nextPage={nextPage}
                 prevPage={prevPage}
-                gotoPage={gotoPage} />
+                gotoPage={gotoPage}
+                drawing={true} />
             <ChatArea
                 sid={sid}
                 pageNum={page}

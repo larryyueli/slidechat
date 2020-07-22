@@ -196,7 +196,7 @@ export default function ChatArea(props) {
 							color="primary">Upload Audio</Button>
 						{uploading ? <CircularProgress /> : null}
 					</div>
-					: <div></div>
+					: <div key={-2}></div>
 				,
 				<div className="new-chat-btn-row" key={-1}>
 					<Button variant="contained" color="primary" onClick={createNewChat}>

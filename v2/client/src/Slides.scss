@@ -6,13 +6,37 @@
 		font-size: 1.6rem;
 	}
 
-	.slide {
+	.slide-wrapper {
 		min-width: 80%;
 		max-width: 100%;
 		margin-top: 1rem;
+		position: relative;
+
+		.slide {
+			width: 100%;
+		}
+
+		.slide-overlay {
+			position: absolute;
+			top: 0;
+			left: 0;
+			background-color: #00ff0010;
+			width: 100%;
+		}
+
+		.drawing-controls {
+			display: flex;
+			justify-content: center;
+
+			& > span {
+				background-color: #cccccc;
+				padding: 0.2rem;
+				margin: 0 0.5rem;
+			}
+		}
 	}
 
-	.slideAudio{
+	.slideAudio {
 		width: 80%;
 		outline: none;
 	}

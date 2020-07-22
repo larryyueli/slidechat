@@ -1,12 +1,10 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
-import AppBar from './Appbar.js'
+import AppBar from './Appbar.js';
 import Main from './Main.js';
-import Login from './Login'
-import Landing from './Landing'
+import Landing from './Landing';
 import { baseURL } from './config';
-
 
 /**
  * The main entrance of the application
@@ -23,6 +21,5 @@ function App() {
         </Router>
     );
 }
-
 
 export default App;
