@@ -21,7 +21,6 @@ export default class SlideOverlay extends React.Component {
 		this.canvas.height = slide.clientHeight;
 		this.canvas.style.bottom = slide.clientHeight;
 		this.setupCtx();
-		this.clearCanvas();
 		this.redraw();
 	}
 
@@ -49,6 +48,7 @@ export default class SlideOverlay extends React.Component {
 	}
 
 	redraw() {
+		this.clearCanvas();
 		for (let line of this.lines) {
 			this.ctx.beginPath();
 			this.ctx.moveTo(
@@ -67,6 +67,7 @@ export default class SlideOverlay extends React.Component {
 	}
 
 	drawingOnMouseDown(e) {
+		if (this.state.readOnly) return;
 		this.lines.push([
 			((e.offsetX / this.canvas.width) * resolution) >> 0,
 			((e.offsetY / this.canvas.height) * resolution) >> 0,
@@ -75,6 +76,7 @@ export default class SlideOverlay extends React.Component {
 	}
 
 	drawingOnMouseMove(e) {
+		if (this.state.readOnly) return;
 		if (!this.isDrawing) return;
 		let lastLine = this.lines[this.lines.length - 1];
 		lastLine.push(((e.offsetX / this.canvas.width) * resolution) >> 0);
@@ -99,7 +101,6 @@ export default class SlideOverlay extends React.Component {
 
 	undo(e) {
 		this.lines.pop();
-		this.clearCanvas();
 		this.redraw();
 	}
 

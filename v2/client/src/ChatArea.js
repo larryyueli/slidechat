@@ -66,6 +66,8 @@ export default function ChatArea(props) {
 
 	const createNewChat = () => {
 		setState('new-chat');
+		props.setSlideDrawing(false);
+		setDrawing(false);
 	};
 
 	const sendNewQuestion = () => {
@@ -124,6 +126,7 @@ export default function ChatArea(props) {
 				setChatDetails(res.data.chats);
 				setState('chat-details');
 				if (res.data.drawing) {
+					props.setSlideDrawing(true);
 					props.canvasComponentRef.current.setState({ readOnly: true });
 					props.canvasComponentRef.current.lines = res.data.drawing;
 					props.canvasComponentRef.current.redraw();
@@ -194,7 +197,6 @@ export default function ChatArea(props) {
 
 	const startDrawing = (e) => {
 		setDrawing(true);
-		props.canvasComponentRef.current.setState({ readOnly: false });
 		props.setSlideDrawing(true);
 	};
 

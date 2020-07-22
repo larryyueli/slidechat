@@ -68,6 +68,7 @@ function Main(props) {
 		if (page >= pageTotal) return;
 		let newPageNum = page + 1;
 		applyPage(newPageNum);
+		setSlideDrawing(false);
 	};
 
 	/**
@@ -77,6 +78,7 @@ function Main(props) {
 		if (page < 2) return;
 		let newPageNum = page - 1;
 		applyPage(newPageNum);
+		setSlideDrawing(false);
 	};
 
 	const gotoPage = () => {
