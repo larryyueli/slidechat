@@ -12,23 +12,23 @@ const config = require('./config');
 const startSlidechat = require('./routes/slidechat');
 
 let main = (async () => {
-  const app = express();
-  app.disable("x-powered-by");  // remove the HTTP header "X-powered-by: express"
+	const app = express();
+	app.disable('x-powered-by'); // remove the HTTP header "X-powered-by: express"
 
-  app.use(compression());
-  app.use(cors());
-  app.use(morgan('dev'));
-  app.use(bodyParser.json()); // support json encoded bodies
-  app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
-  app.use(cookieParser());
-  app.use(fileUpload());
+	app.use(compression());
+	app.use(cors());
+	app.use(morgan('dev'));
+	app.use(bodyParser.json()); // support json encoded bodies
+	app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+	app.use(cookieParser());
+	app.use(fileUpload());
 
-  const slidechat = await startSlidechat();
-  app.use('/', slidechat);
+	const slidechat = await startSlidechat();
+	app.use('/', slidechat);
 
-  app.use((req, res) => res.status(404).send());
+	app.use((req, res) => res.status(404).send());
 
-  app.listen(config.port, function () {
-    console.log('App listening on port ' + config.port);
-  });
+	app.listen(config.port, function () {
+		console.log('App listening on port ' + config.port);
+	});
 })();

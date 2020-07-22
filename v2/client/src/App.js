@@ -11,15 +11,15 @@ import { baseURL } from './config';
  * It consists three main components: App bar, slides on the left, and chat area on the right
  */
 function App() {
-    return (
-        <Router>
-            <AppBar />
-            <Switch>
-                <Route path={`${baseURL}/:slideId`} component={Main} />
-                <Route path={`${baseURL}/`} component={Landing} />
-            </Switch>
-        </Router>
-    );
+	return (
+		<Router>
+			<AppBar />
+			<Switch>
+				<Route path={`${baseURL}/:slideId`} component={Main} />
+				<Route path={`${baseURL}/`} component={Landing} />
+			</Switch>
+		</Router>
+	);
 }
 
 export default App;

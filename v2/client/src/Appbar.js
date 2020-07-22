@@ -1,25 +1,22 @@
 import React from 'react';
-// import { Link } from 'react-router-dom';
 
-// import { baseURL } from './config';
+import { baseURL } from './config';
 
 /**
  * App bar: consisting the logo and some menu buttons
  */
 function AppBar() {
-    return (
-        <div className='appbar'>
-            <div className="appbar-logo">
-                SlideChat
-            </div>
-            <div>
-                <span className='appbar-item'>Notification</span>
-                {/* <Link to={`${baseURL}/profile`} className='appbar-item'>
-                    My Courses
-                </Link> */}
-            </div>
-        </div>
-    );
+	return (
+		<div className='appbar'>
+			<div className='appbar-logo'>SlideChat</div>
+			<div>
+				<span className='appbar-item'>Notification</span>
+				{/* <a className="appbar-item" href={`${baseURL}/p/prof`}>
+					My Courses
+				</a> */}
+			</div>
+		</div>
+	);
 }
 
 export default AppBar;

@@ -65,7 +65,8 @@
 		}
 	}
 
-	.new-chat-btn-row, .audio-btn-row {
+	.new-chat-btn-row,
+	.audio-btn-row {
 		text-align: center;
 		padding: 1rem 0;
 		border-bottom: 1px solid #cccccc;
@@ -148,7 +149,7 @@
 				.icons {
 					display: flex;
 					align-items: center;
-					
+
 					.icon {
 						@include clickable();
 						margin: 0 0.3rem;
@@ -163,7 +164,7 @@
 						align-items: center;
 						color: $likeColour;
 					}
-	
+
 					.nobody-liked {
 						display: flex;
 						align-items: center;

@@ -1,6 +1,6 @@
 .appbar {
-    position: static;
-    @include flexSides();
+	position: static;
+	@include flexSides();
 	padding: 0.5rem 3rem;
 	color: #ffffff;
 	background-color: $primary;

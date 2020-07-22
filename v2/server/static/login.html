@@ -1,20 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Login</title>
+	</head>
 
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-</head>
-
-<body>
-    <script>
-        let expires = new Date();
-        expires.setTime(expires.getTime() + (15 * 60 * 1000));
-        document.cookie = "isLogin=yes; path=/; expires=" + expires.toUTCString() + ";";
-        // Our login URL right now should be /slidechat/p/login/slideId/pageNum
-        let items = window.location.pathname.split('/');
-        window.location.href = `/${items[1]}/${items[4]}#${items[5]}`;
-    </script>
-</body>
-
+	<body>
+		<script>
+			let expires = new Date();
+			expires.setTime(expires.getTime() + 15 * 60 * 1000);
+			document.cookie = 'isLogin=yes; path=/; expires=' + expires.toUTCString() + ';';
+			// Our login URL right now should be /slidechat/p/login/slideId/pageNum
+			let items = window.location.pathname.split('/');
+			window.location.href = `/${items[1]}/${items[4]}#${items[5]}`;
+		</script>
+	</body>
 </html>
