@@ -228,6 +228,16 @@
 			font-size: 1.5rem;
 		}
 
+		.add-drawing-btn {
+			display: inline-flex;
+			align-items: center;
+			padding: 0.5rem;
+			text-transform: uppercase;
+			&:hover {
+				background-color: #00000008;
+			}
+		}
+
 		button {
 			margin: 0.5rem 0.5rem;
 		}

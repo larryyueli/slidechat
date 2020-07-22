@@ -10,6 +10,7 @@ export default class SlideOverlay extends React.Component {
 		super(props);
 		this.isDrawing = false;
 		this.lines = [];
+		this.state = { readOnly: false };
 		this.canvasRef = createRef(null);
 		this.canvas = null;
 		this.ctx = null;
@@ -81,12 +82,12 @@ export default class SlideOverlay extends React.Component {
 		let len = lastLine.length;
 		this.ctx.beginPath();
 		this.ctx.moveTo(
-			(lastLine[len - 4] / resolution) * this.canvas.width,
-			(lastLine[len - 3] / resolution) * this.canvas.height
+			((lastLine[len - 4] / resolution) * this.canvas.width) >> 0,
+			((lastLine[len - 3] / resolution) * this.canvas.height) >> 0
 		);
 		this.ctx.lineTo(
-			(lastLine[len - 2] / resolution) * this.canvas.width,
-			(lastLine[len - 1] / resolution) * this.canvas.height
+			((lastLine[len - 2] / resolution) * this.canvas.width) >> 0,
+			((lastLine[len - 1] / resolution) * this.canvas.height) >> 0
 		);
 		this.ctx.stroke();
 		this.ctx.closePath();
@@ -115,10 +116,12 @@ export default class SlideOverlay extends React.Component {
 		return (
 			<>
 				<canvas className='slide-overlay' ref={this.canvasRef}></canvas>
-				<div className='drawing-controls'>
-					<span onClick={(e) => this.undo(e)}>Undo</span>
-					<span onClick={(e) => this.clear(e)}>Clear</span>
-				</div>
+				{this.state.readOnly ? null : (
+					<div className='drawing-controls'>
+						<span onClick={(e) => this.undo(e)}>Undo</span>
+						<span onClick={(e) => this.clear(e)}>Clear</span>
+					</div>
+				)}
 			</>
 		);
 	}

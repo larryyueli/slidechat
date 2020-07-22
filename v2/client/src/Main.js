@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
 import ChatArea from './ChatArea';
@@ -18,6 +18,8 @@ function Main(props) {
 	const [title, setTitle] = useState('');
 	const [filename, setFilename] = useState('');
 	const [protectLevel, setProtectLevel] = useState('unknown');
+	const [slideDrawing, setSlideDrawing] = useState(false);
+	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
 
 	useEffect(() => {
 		axios
@@ -103,9 +105,16 @@ function Main(props) {
 				nextPage={nextPage}
 				prevPage={prevPage}
 				gotoPage={gotoPage}
-				drawing={true}
+				drawing={slideDrawing}
+				canvasComponentRef={canvasComponentRef}
 			/>
-			<ChatArea sid={sid} pageNum={page} protectLevel={protectLevel} />
+			<ChatArea
+				sid={sid}
+				pageNum={page}
+				protectLevel={protectLevel}
+				canvasComponentRef={canvasComponentRef}
+				setSlideDrawing={setSlideDrawing}
+			/>
 		</div>
 	);
 }

@@ -22,7 +22,7 @@
 			position: absolute;
 			top: 0;
 			left: 0;
-			background-color: #00ff0010;
+			background-color: #00ff0008;
 			width: 100%;
 		}
 
@@ -31,6 +31,7 @@
 			justify-content: center;
 
 			& > span {
+				@include clickable();
 				background-color: #cccccc;
 				padding: 0.2rem;
 				margin: 0 0.5rem;

@@ -32,6 +32,7 @@ export default function ChatArea(props) {
 	const [chatDetails, setChatDetails] = useState([]);
 	const [qid, setQid] = useState(-1);
 	const [managing, setManaging] = useState(false);
+	const [drawing, setDrawing] = useState(false);
 	const userName = getUserName();
 	const titleRef = useRef(null);
 	const bodyRef = useRef(null);
@@ -68,6 +69,7 @@ export default function ChatArea(props) {
 	};
 
 	const sendNewQuestion = () => {
+		let canvasData = drawing ? props.canvasComponentRef.current.lines : undefined;
 		axios
 			.post(`${serverURL}${props.protectLevel}/api/addQuestion/`, {
 				sid: props.sid,
@@ -75,6 +77,7 @@ export default function ChatArea(props) {
 				title: titleRef.current.value,
 				body: bodyRef.current.value,
 				user: userName,
+				drawing: canvasData,
 			})
 			.then((res) => {
 				backToList();
@@ -120,6 +123,11 @@ export default function ChatArea(props) {
 				setQid(qid);
 				setChatDetails(res.data);
 				setState('chat-details');
+				if (res.data.drawing) {
+					props.canvasComponentRef.current.setState({ readOnly: true });
+					props.canvasComponentRef.current.lines = res.data.drawing;
+					props.canvasComponentRef.current.redraw();
+				}
 			})
 			.catch((err) => {
 				console.error(err);
@@ -147,7 +155,10 @@ export default function ChatArea(props) {
 	// onClick handler for back button to go back to the chat list
 	const backToList = () => {
 		fetchChatList()
-			.then(() => setState('list'))
+			.then(() => {
+				setState('list');
+				props.setSlideDrawing(false);
+			})
 			.catch((err) => console.error(err));
 	};
 
@@ -179,6 +190,19 @@ export default function ChatArea(props) {
 			.catch((err) => {
 				console.error(err);
 			});
+	};
+
+	const startDrawing = (e) => {
+		setDrawing(true);
+		props.canvasComponentRef.current.setState({ readOnly: false });
+		props.setSlideDrawing(true);
+	};
+
+	const cancelDrawing = (e) => {
+		setDrawing(false);
+		console.log(props.canvasComponentRef.current.lines);
+		props.canvasComponentRef.current.clear();
+		props.setSlideDrawing(false);
 	};
 
 	let content, title;
@@ -240,6 +264,17 @@ export default function ChatArea(props) {
 							placeholder='Describe your question in more details'
 							inputRef={bodyRef}
 						/>
+					</div>
+					<div>
+						{drawing ? (
+							<span onClick={cancelDrawing} className='add-drawing-btn'>
+								cancel drawing
+							</span>
+						) : (
+							<span onClick={startDrawing} className='add-drawing-btn'>
+								Add some drawing to slide&nbsp;<span className='material-icons'>edit</span>
+							</span>
+						)}
 					</div>
 					<div>
 						<Button variant='contained' color='primary' onClick={sendNewQuestion}>

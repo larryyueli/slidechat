@@ -8,7 +8,7 @@ let serverURL;
 if (process.env.NODE_ENV === 'production') {
 	serverURL = '/slidechat';
 } else {
-	serverURL = 'http://mcsapps.utm.utoronto.ca:10003';
+	serverURL = 'http://mcsapps.utm.utoronto.ca:10001';
 }
 
 export { baseURL, fullURL, serverURL };

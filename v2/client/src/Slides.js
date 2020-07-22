@@ -116,13 +116,11 @@ export default function Slides(props) {
 		<div className='slide-container'>
 			<div className='title'>{props.title}</div>
 			<div>
-				(
 				<a
 					className='download-link'
 					href={`${serverURL}${props.protectLevel}/api/downloadPdf?slideID=${props.sid}`}>
 					{props.filename}
 				</a>
-				)
 			</div>
 			<div>
 				<div className='slide-wrapper'>
@@ -136,7 +134,7 @@ export default function Slides(props) {
 						alt='slide'
 						className='slide'
 					/>
-					{props.drawing ? <SlideOverlay /> : null}
+					{props.drawing ? <SlideOverlay ref={props.canvasComponentRef} /> : null}
 				</div>
 				<div className='audio-row'>{audioRow}</div>
 			</div>
