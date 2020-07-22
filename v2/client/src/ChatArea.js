@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Button, TextField, CircularProgress } from '@material-ui/core';
+import { Button, TextField } from '@material-ui/core';
 import markdownIt from 'markdown-it';
 import markdownItMathJax from 'markdown-it-mathjax';
 import highlight from 'highlight.js';
@@ -118,7 +118,7 @@ export default function ChatArea(props) {
 			.get(`${serverURL}${props.protectLevel}/api/chats?slideID=${props.sid}&pageNum=${props.pageNum}&qid=${qid}`)
 			.then((res) => {
 				setQid(qid);
-				setChatDetails(res.data);
+				setChatDetails(res.data.chats);
 				setState('chat-details');
 			})
 			.catch((err) => {
