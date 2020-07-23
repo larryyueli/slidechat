@@ -6,7 +6,7 @@ import markdownItMathJax from 'markdown-it-mathjax';
 import highlight from 'highlight.js';
 
 import { serverURL, baseURL } from './config';
-import { formatTime, formatNames, getUserName, isInstructor, getCookie } from './util';
+import { formatTime, formatNames, getUserName, getIsInstructor, getCookie } from './util';
 
 const md = markdownIt({
 	breaks: true,
@@ -37,6 +37,7 @@ export default function ChatArea(props) {
 	const titleRef = useRef(null);
 	const bodyRef = useRef(null);
 	const chatRef = useRef(null);
+	const isInstructor = getIsInstructor();
 
 	// fetch questions when page is changed
 	useEffect(() => {
@@ -137,7 +138,23 @@ export default function ChatArea(props) {
 			});
 	};
 
-	// like, if the user is an instructor, endorse
+	const endorseChat = (cid) => {
+		axios
+			.post(`${serverURL}/p/api/endorse/`, {
+				sid: props.sid,
+				pageNum: props.pageNum,
+				qid: qid,
+				cid: cid,
+			})
+			.then((res) => {
+				fetchChatDetails(qid);
+			})
+			.catch((err) => {
+				console.error(err);
+			});
+	};
+
+	// like
 	const likeChat = (cid) => {
 		axios
 			.post(`${serverURL}${props.protectLevel}/api/like/`, {
@@ -182,7 +199,7 @@ export default function ChatArea(props) {
 	};
 
 	const deleteChat = (e, cid) => {
-		e.stopPropagation()
+		e.stopPropagation();
 		if (!window.confirm(`Are you sure to delete this chat?`)) return;
 
 		axios
@@ -317,7 +334,13 @@ export default function ChatArea(props) {
 							</div>
 							<div className='icons'>
 								{message.endorsement.length ? (
-									<span className='material-icons endorsement icon'>verified</span>
+									<span className='material-icons endorsed icon' onClick={(e) => endorseChat(i)}>
+										verified
+									</span>
+								) : isInstructor ? (
+									<span className='material-icons not-endorsed icon' onClick={(e) => endorseChat(i)}>
+										verified
+									</span>
 								) : null}
 								<span className={`icon ${message.likes.length ? 'liked' : 'nobody-liked'}`}>
 									<span>{message.likes.length ? message.likes.length : ''}</span>
@@ -363,7 +386,7 @@ export default function ChatArea(props) {
 					<div className='placeholder'>&nbsp;</div>
 				)}
 				<div className='title'>{title}</div>
-				{isInstructor() ? (
+				{isInstructor ? (
 					<span className={`manage ${managing ? 'managing' : ''}`} onClick={changeManageStatus}>
 						<span className='material-icons icon'>settings</span>
 					</span>

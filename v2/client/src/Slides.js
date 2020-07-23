@@ -4,7 +4,7 @@ import axios from 'axios';
 
 import SlideOverlay from './SlideOverlay';
 import { serverURL } from './config';
-import { isInstructor, randInt } from './util';
+import { getIsInstructor, randInt } from './util';
 
 /**
  * Slides on the left of the screen
@@ -73,7 +73,7 @@ export default function Slides(props) {
 	};
 
 	let audioRow;
-	if (isInstructor()) {
+	if (getIsInstructor()) {
 		if (audioSrc) {
 			audioRow = (
 				<>

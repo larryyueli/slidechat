@@ -262,8 +262,10 @@ function commonAPI(db) {
 			) {
 				throw { status: 400, error: 'bad request' };
 			}
-			res.json({ chats: slide.pages[+req.query.pageNum - 1].questions[req.query.qid].chats, 
-				drawing: slide.pages[+req.query.pageNum - 1].questions[req.query.qid].drawing});
+			res.json({
+				chats: slide.pages[+req.query.pageNum - 1].questions[req.query.qid].chats,
+				drawing: slide.pages[+req.query.pageNum - 1].questions[req.query.qid].drawing,
+			});
 		} catch (err) {
 			errorHandler(res, err);
 		}
@@ -304,7 +306,7 @@ function commonAPI(db) {
 			}
 
 			for (let line of req.body.drawing) {
-				for (let i = 0; i < line.length - 1; i ++) {
+				for (let i = 0; i < line.length - 1; i++) {
 					if (!Number.isInteger(line[i])) {
 						throw { status: 400, error: 'bad request' };
 					}
@@ -414,7 +416,7 @@ function commonAPI(db) {
 	});
 
 	/**
-	 * add a new chat to question
+	 * like a chat
 	 * req body:
 	 *   sid: slide id
 	 *   qid: question index
@@ -429,7 +431,10 @@ function commonAPI(db) {
 				{ projection: { pageTotal: true, pages: true, anonymity: true } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
-			if (slide.anonymity != 'anyone' && !req.uid) throw { status: 401, error: 'Unauthorized' };
+			if (slide.anonymity !== 'anyone') {
+				if (!req.uid) throw { status: 401, error: 'Unauthorized' };
+				req.body.user = req.uid;
+			}
 			if (
 				isNotValidPage(req.body.pageNum, slide.pageTotal) ||
 				notExistInList(req.body.qid, slide.pages[+req.body.pageNum - 1].questions) ||
@@ -439,19 +444,24 @@ function commonAPI(db) {
 			}
 
 			let insertLike = {}; // cannot use template string on the left hand side
-			// if instructor, add to endorsement, else add to likes
-			if (req.uid && instructors.indexOf(req.uid) >= 0) {
-				insertLike[
-					`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.endorsement`
-				] = req.body.user;
+			insertLike[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.likes`] =
+				req.body.user;
+
+			// if anonymous, randomly generated username may repeat, so it does not make
+			// sense to only allow one like per name. So everyone can like as many times 
+			// as they want
+			let updateRes;
+			if (slide.anonymity !== 'anyone') {
+				updateRes = await slides.updateOne(
+					{ _id: ObjectID.createFromHexString(req.body.sid) },
+					{ $addToSet: insertLike }
+				);
 			} else {
-				insertLike[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.likes`] =
-					req.body.user;
+				updateRes = await slides.updateOne(
+					{ _id: ObjectID.createFromHexString(req.body.sid) },
+					{ $push: insertLike }
+				);
 			}
-			let updateRes = await slides.updateOne(
-				{ _id: ObjectID.createFromHexString(req.body.sid) },
-				{ $addToSet: insertLike }
-			);
 
 			if (updateRes.modifiedCount !== 1) {
 				throw 'like update error';

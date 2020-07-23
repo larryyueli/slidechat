@@ -83,7 +83,7 @@ export function getUserName() {
 	return name;
 }
 
-export function isInstructor() {
+export function getIsInstructor() {
 	let cookieName = 'isI';
 	if (getCookie(cookieName) === 'yes') {
 		return true;

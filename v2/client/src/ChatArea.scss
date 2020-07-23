@@ -155,8 +155,12 @@
 						margin: 0 0.3rem;
 					}
 
-					.endorsement {
+					.endorsed {
 						color: $endorsementColour;
+					}
+
+					.not-endorsed {
+						color: #cccccc;
 					}
 
 					.liked {

@@ -706,6 +706,60 @@ function instructorAPI(db) {
 		}
 	});
 
+	/**
+	 * endorse a chat (if already endorsed by the user, then revoke endorsement)
+	 * req body:
+	 *   sid: slide id
+	 *   qid: question index
+	 *   cid: chat index
+	 *   pageNum: page number
+	 */
+	router.post('/p/api/endorse', instructorAuth, async (req, res) => {
+		try {
+			let slide = await slides.findOne(
+				{ _id: ObjectID.createFromHexString(req.body.sid) },
+				{ projection: { pageTotal: true, pages: true, anonymity: true } }
+			);
+			if (!slide) throw { status: 404, error: 'slide not found' };
+			if (
+				isNotValidPage(req.body.pageNum, slide.pageTotal) ||
+				notExistInList(req.body.qid, slide.pages[+req.body.pageNum - 1].questions) ||
+				notExistInList(req.body.cid, slide.pages[+req.body.pageNum - 1].questions[req.body.qid].chats)
+			) {
+				throw { status: 400, error: 'bad request' };
+			}
+
+			let updateEndorse = {}; // cannot use template string on the left hand side
+			updateEndorse[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.endorsement`] =
+				req.uid;
+			let updateRes;
+
+			// endorse if not already endorsed, otherwise revoke the endorsement
+			if (
+				slide.pages[+req.body.pageNum - 1].questions[req.body.qid].chats[req.body.cid].endorsement.indexOf(
+					req.uid
+				) < 0
+			) {
+				updateRes = await slides.updateOne(
+					{ _id: ObjectID.createFromHexString(req.body.sid) },
+					{ $addToSet: updateEndorse }
+				);
+			} else {
+				updateRes = await slides.updateOne(
+					{ _id: ObjectID.createFromHexString(req.body.sid) },
+					{ $pull: updateEndorse }
+				);
+			}
+
+			if (updateRes.modifiedCount !== 1) {
+				throw 'endorse update error';
+			}
+			res.send();
+		} catch (err) {
+			errorHandler(res, err);
+		}
+	});
+
 	return router;
 }
 
