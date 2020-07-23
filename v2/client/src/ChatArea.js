@@ -166,7 +166,8 @@ export default function ChatArea(props) {
 	};
 
 	const deleteQuestion = (e, qid) => {
-		if (!window.confirm(`Are you sure to delete "${questions[qid].title}"?`)) return e.stopPropagation();
+		e.stopPropagation();
+		if (!window.confirm(`Are you sure to delete "${questions[qid].title}"?`)) return;
 
 		axios
 			.delete(`${serverURL}/p/api/question?sid=${props.sid}&qid=${qid}&pageNum=${props.pageNum}`, {
@@ -181,7 +182,8 @@ export default function ChatArea(props) {
 	};
 
 	const deleteChat = (e, cid) => {
-		if (!window.confirm(`Are you sure to delete this chat?`)) return e.stopPropagation();
+		e.stopPropagation()
+		if (!window.confirm(`Are you sure to delete this chat?`)) return;
 
 		axios
 			.delete(`${serverURL}/p/api/chat?sid=${props.sid}&qid=${qid}&pageNum=${props.pageNum}&cid=${cid}`, {
