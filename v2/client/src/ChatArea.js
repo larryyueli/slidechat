@@ -322,7 +322,7 @@ export default function ChatArea(props) {
 
 				let endorsements =
 					message.endorsement && message.endorsement.length > 0 ? (
-						<div className='endorsement'>{`endorsed by ${formatNames(message.endorsement)}`}</div>
+						<div className='endorsement'>{`Endorsed by ${formatNames(message.endorsement)}`}</div>
 					) : null;
 
 				chatsList.push(

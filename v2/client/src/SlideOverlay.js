@@ -29,6 +29,7 @@ export default class SlideOverlay extends React.Component {
 		this.ctx.lineWidth = (this.canvas.width / 100) >> 0;
 		this.ctx.strokeStyle = 'red';
 		this.ctx.lineCap = 'round';
+		this.ctx.lineJoin = 'round';
 	}
 
 	componentDidMount() {

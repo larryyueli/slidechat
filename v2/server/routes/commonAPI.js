@@ -1,5 +1,6 @@
 const path = require('path');
 const express = require('express');
+const { escape } = require('html-escaper');
 const { ObjectID } = require('mongodb');
 
 const { instructors, fileStorage } = require('../config');
@@ -8,6 +9,7 @@ const { isNotValidPage, notExistInList, errorHandler } = require('./util');
 function userAuth(req, res, next) {
 	if (process.env.DEV) {
 		req.uid = instructors[0];
+		req.realName = 'Totooria Helmold';
 		next();
 	} else if (req.headers.utorid == undefined) {
 		res.status(401).send('Unauthorized');
@@ -15,6 +17,7 @@ function userAuth(req, res, next) {
 	} else {
 		// Get user info from shibboleth: req.headers.utorid, req.headers.http_mail, req.headers.origin
 		req.uid = req.headers.utorid;
+		req.realName = req.headers.http_cn;
 		next();
 	}
 }
@@ -305,10 +308,12 @@ function commonAPI(db) {
 				throw { status: 400, error: 'bad request' };
 			}
 
-			for (let line of req.body.drawing) {
-				for (let i = 0; i < line.length - 1; i++) {
-					if (!Number.isInteger(line[i])) {
-						throw { status: 400, error: 'bad request' };
+			if (req.body.drawing) {
+				for (let line of req.body.drawing) {
+					for (let i = 0; i < line.length - 1; i++) {
+						if (!Number.isInteger(line[i])) {
+							throw { status: 400, error: 'bad request' };
+						}
 					}
 				}
 			}
@@ -320,12 +325,12 @@ function commonAPI(db) {
 				chats: [],
 				title: escape(req.body.title),
 				drawing: req.body.drawing,
-				user: req.body.user,
+				user: slide.anonymity === 'nonymous' ? req.realName : req.body.user,
 			};
 			let newChat = {
 				time: time,
 				body: req.body.body, // does not escape here, md renderer(markdown-it) will escape it
-				user: req.body.user,
+				user: slide.anonymity === 'nonymous' ? req.realName : req.body.user,
 				likes: [],
 				endorsement: [],
 			};
@@ -384,7 +389,7 @@ function commonAPI(db) {
 			let newChat = {
 				time: time,
 				body: req.body.body, // does not escape here, md renderer(markdown-it) will escape it
-				user: req.body.user,
+				user: slide.anonymity === 'nonymous' ? req.realName : req.body.user,
 				likes: [],
 				endorsement: [],
 			};
@@ -431,10 +436,7 @@ function commonAPI(db) {
 				{ projection: { pageTotal: true, pages: true, anonymity: true } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
-			if (slide.anonymity !== 'anyone') {
-				if (!req.uid) throw { status: 401, error: 'Unauthorized' };
-				req.body.user = req.uid;
-			}
+			if (slide.anonymity !== 'anyone' && !req.uid) throw { status: 401, error: 'Unauthorized' };
 			if (
 				isNotValidPage(req.body.pageNum, slide.pageTotal) ||
 				notExistInList(req.body.qid, slide.pages[+req.body.pageNum - 1].questions) ||
@@ -443,19 +445,30 @@ function commonAPI(db) {
 				throw { status: 400, error: 'bad request' };
 			}
 
+			let name = slide.anonymity === 'nonymous' ? req.realName : req.body.user;
 			let insertLike = {}; // cannot use template string on the left hand side
-			insertLike[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.likes`] =
-				req.body.user;
+			insertLike[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.likes`] = name;
 
 			// if anonymous, randomly generated username may repeat, so it does not make
-			// sense to only allow one like per name. So everyone can like as many times 
+			// sense to only allow one like per name. So everyone can like as many times
 			// as they want
 			let updateRes;
 			if (slide.anonymity !== 'anyone') {
-				updateRes = await slides.updateOne(
-					{ _id: ObjectID.createFromHexString(req.body.sid) },
-					{ $addToSet: insertLike }
-				);
+				// like if not yet liked, otherwise unlike
+				if (
+					slide.pages[req.body.pageNum - 1].questions[req.body.qid].chats[req.body.cid].likes.indexOf(name) <
+					0
+				) {
+					updateRes = await slides.updateOne(
+						{ _id: ObjectID.createFromHexString(req.body.sid) },
+						{ $addToSet: insertLike }
+					);
+				} else {
+					updateRes = await slides.updateOne(
+						{ _id: ObjectID.createFromHexString(req.body.sid) },
+						{ $pull: insertLike }
+					);
+				}
 			} else {
 				updateRes = await slides.updateOne(
 					{ _id: ObjectID.createFromHexString(req.body.sid) },

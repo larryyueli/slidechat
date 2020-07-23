@@ -10,13 +10,15 @@ const { isNotValidPage, notExistInList, errorHandler, questionCount } = require(
 function instructorAuth(req, res, next) {
 	if (process.env.DEV) {
 		req.uid = instructors[0];
+		req.realName = "Rorolina Frixell";
 		next();
 	} else if (req.headers.utorid == undefined || instructors.indexOf(req.headers.utorid) < 0) {
 		res.status(401).send('Unauthorized');
 		console.error(`Instructor auth failed: ${req.headers.utorid}`);
 	} else {
-		// Get user info from shibboleth: req.headers.utorid, req.headers.http_mail, req.headers.origin
+		// Get user info from shibboleth: req.headers.utorid, req.headers.http_mail, req.headers.origin, req.http_cn
 		req.uid = req.headers.utorid;
+		req.realName = req.headers.http_cn;
 		next();
 	}
 }
@@ -731,13 +733,13 @@ function instructorAPI(db) {
 
 			let updateEndorse = {}; // cannot use template string on the left hand side
 			updateEndorse[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.endorsement`] =
-				req.uid;
+				req.realName;
 			let updateRes;
 
 			// endorse if not already endorsed, otherwise revoke the endorsement
 			if (
 				slide.pages[+req.body.pageNum - 1].questions[req.body.qid].chats[req.body.cid].endorsement.indexOf(
-					req.uid
+					req.realName
 				) < 0
 			) {
 				updateRes = await slides.updateOne(
