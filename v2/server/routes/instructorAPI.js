@@ -7,7 +7,7 @@ const { ObjectID } = require('mongodb');
 const { fileStorage, convertOptions } = require('../config');
 const { isNotValidPage, notExistInList, errorHandler, questionCount } = require('./util');
 
-function instructorAPI(db, instructorAuth) {
+function instructorAPI(db, instructorAuth, isInstructor) {
 	let router = express.Router();
 
 	const users = db.collection('users');
@@ -103,6 +103,10 @@ function instructorAPI(db, instructorAuth) {
 			);
 			if (!course) throw { status: 404, error: 'course not found' };
 			if (course.instructors.indexOf(req.session.uid) < 0) throw { status: 401, error: 'Unauthorized' };
+
+			if (!isInstructor(req.body.newUser)) {
+				throw { status: 403, error: 'new user is not an instructor' };
+			}
 
 			// add instructor to course
 			let updateRes = await courses.updateOne(

@@ -70,7 +70,13 @@ export default function Course({ cid, role }) {
 			);
 		} catch (err) {
 			console.error(err);
-			setAddInstructorRes(<div className='result-fail'>Add instructor failed!</div>);
+			if (err.response && err.response.status === 403) {
+				setAddInstructorRes(
+					<div className='result-fail'>{`User "${newUserRef.current.value}" is not registered as an instructor in SlideChat server. If you insist to add this user, please contact the admin of SlideChat server.`}</div>
+				);
+			} else {
+				setAddInstructorRes(<div className='result-fail'>Add instructor failed!</div>);
+			}
 		} finally {
 			fetchCourse();
 		}

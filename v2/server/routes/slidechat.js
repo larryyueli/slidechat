@@ -1,4 +1,6 @@
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
 const { MongoClient } = require('mongodb');
 const dbConfig = {
 	useUnifiedTopology: true,
@@ -6,10 +8,14 @@ const dbConfig = {
 };
 
 const { baseURL, dbURL, instructorURL } = require('../config');
-const { instructors } = require('../secrets');
 const instructorAPI = require('./instructorAPI');
 const commonAPI = require('./commonAPI');
 
+let instructors = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'instructorList.json')));
+
+/**
+ * Middleware for checking if the user is logged in as an instructor
+ */
 function instructorAuth(req, res, next) {
 	if (process.env.NODE_ENV !== 'production') {
 		req.session.uid = instructors[0];
@@ -17,11 +23,33 @@ function instructorAuth(req, res, next) {
 		next();
 	} else if (!req.session.uid) {
 		res.redirect(`${baseURL}/p/login/prof`);
-	} else if (instructors.indexOf(req.session.uid) < 0) {
+	} else if (!isInstructor(req.session.uid)) {
 		res.status(401).send(`User ${req.session.uid} is not an instructor. This incident will be reported.`);
 		console.error(`Instructor auth failed: ${req.session.uid}`);
 	} else {
 		next();
+	}
+}
+
+/**
+ * Check if an uid is in instructor list. If it is not found in the current list,
+ * reload instructorList.json and re-check.
+ * @param {String} uid
+ */
+function isInstructor(uid) {
+	if (instructors.indexOf(uid) >= 0) {
+		return true;
+	} else {
+		let tmp;
+		try {
+			tmp = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'instructorList.json')));
+		} catch (err) {
+			console.error('load instructor list error');
+			console.log(err);
+			return false;
+		}
+		instructors = tmp;
+		return instructors.indexOf(uid) >= 0;
 	}
 }
 
@@ -39,7 +67,7 @@ async function startSlidechat() {
 	console.log('connected to database');
 	const db = dbClient.db('slidechat');
 
-	router.use(instructorAPI(db, instructorAuth));
+	router.use(instructorAPI(db, instructorAuth, isInstructor));
 	router.use(commonAPI(db));
 
 	if (process.env.NODE_ENV === 'development') {
