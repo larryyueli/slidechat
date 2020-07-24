@@ -17,13 +17,12 @@ export default function Slides(props) {
 	const fileUpload = useRef(null);
 
 	useEffect(() => {
-		if (props.protectLevel === 'unknown') return;
 		axios
 			.get(`${serverURL}/api/hasAudio?slideID=${props.sid}&pageNum=${props.pageNum}`)
 			.then((res) => {
 				if (res.data.audio) {
 					setAudioSrc(
-						`${serverURL}${props.protectLevel}/api/slideAudio?slideID=${props.sid}&pageNum=${
+						`${serverURL}/api/slideAudio?slideID=${props.sid}&pageNum=${
 							props.pageNum
 						}&random=${randInt(10000)}`
 					);
@@ -34,7 +33,7 @@ export default function Slides(props) {
 			.catch((err) => {
 				console.error(err);
 			});
-	}, [props.protectLevel, props.pageNum]);
+	}, [props.pageNum]);
 
 	const uploadAudio = async () => {
 		if (fileUpload.current.files.length !== 1) return;
@@ -45,14 +44,14 @@ export default function Slides(props) {
 		formData.append('file', fileUpload.current.files[0]);
 		try {
 			setUploading(true);
-			await axios.post(`${serverURL}/p/api/audio/`, formData);
+			await axios.post(`${serverURL}/api/audio/`, formData);
 		} catch (err) {
 			console.log(err);
 		} finally {
 			setUploading(false);
 			document.getElementById('file').value = '';
 			setAudioSrc(
-				`${serverURL}${props.protectLevel}/api/slideAudio?slideID=${props.sid}&pageNum=${
+				`${serverURL}/api/slideAudio?slideID=${props.sid}&pageNum=${
 					props.pageNum
 				}&random=${randInt(10000)}`
 			);
@@ -63,7 +62,7 @@ export default function Slides(props) {
 		if (!window.confirm(`Are you sure to delete this audio?`)) return;
 
 		axios
-			.delete(`${serverURL}/p/api/audio?sid=${props.sid}&pageNum=${props.pageNum}`)
+			.delete(`${serverURL}/api/audio?sid=${props.sid}&pageNum=${props.pageNum}`)
 			.then((res) => {
 				setAudioSrc('');
 			})
@@ -118,8 +117,8 @@ export default function Slides(props) {
 			<div>
 				<a
 					className='download-link'
-					href={`${serverURL}${props.protectLevel}/api/downloadPdf?slideID=${props.sid}`}>
-					{props.filename}
+					href={`${serverURL}/api/downloadPdf?slideID=${props.sid}`}>
+					(Download {props.filename})
 				</a>
 			</div>
 			<div>
@@ -128,7 +127,7 @@ export default function Slides(props) {
 						id='slide-img'
 						src={
 							props.pageTotal
-								? `${serverURL}${props.protectLevel}/api/slideImg?slideID=${props.sid}&pageNum=${props.pageNum}`
+								? `${serverURL}/api/slideImg?slideID=${props.sid}&pageNum=${props.pageNum}`
 								: 'default.png'
 						}
 						alt='slide'

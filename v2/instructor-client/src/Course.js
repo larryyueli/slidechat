@@ -39,7 +39,7 @@ export default function Course({ cid, role }) {
 		formData.append('file', fileUpload.current.files[0]);
 		try {
 			setUploading(true);
-			await axios.post(`${serverURL}/p/api/addSlide/`, formData);
+			await axios.post(`${serverURL}/api/addSlide/`, formData);
 		} catch (err) {
 			console.log(err);
 		} finally {
@@ -51,7 +51,7 @@ export default function Course({ cid, role }) {
 	const deleteSlide = async (filename, sid) => {
 		if (!window.confirm(`Are you sure to delete "${filename}"?`)) return;
 		try {
-			await axios.delete(`${serverURL}/p/api/slide?sid=${sid}`);
+			await axios.delete(`${serverURL}/api/slide?sid=${sid}`);
 		} catch (err) {
 			console.log(err);
 		} finally {
@@ -61,7 +61,7 @@ export default function Course({ cid, role }) {
 
 	const addInstructor = async () => {
 		try {
-			await axios.post(`${serverURL}/p/api/addInstructor`, {
+			await axios.post(`${serverURL}/api/addInstructor`, {
 				course: cid,
 				newUser: newUserRef.current.value,
 			});

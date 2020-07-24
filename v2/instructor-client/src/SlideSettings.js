@@ -26,7 +26,7 @@ export default function SlideSettings({ sid, open, onClose }) {
 
 	const changeAnonymity = (e) => {
 		axios
-			.post(`${serverURL}/p/api/setAnonymity`, {
+			.post(`${serverURL}/api/setAnonymity`, {
 				sid: sid,
 				anonymity: e.target.value,
 			})
@@ -42,7 +42,7 @@ export default function SlideSettings({ sid, open, onClose }) {
 
 	const changeTitle = (e) => {
 		axios
-			.post(`${serverURL}/p/api/setTitle`, {
+			.post(`${serverURL}/api/setTitle`, {
 				sid: sid,
 				title: titleRef.current.value,
 			})
@@ -62,7 +62,7 @@ export default function SlideSettings({ sid, open, onClose }) {
 		formData.append('file', fileReupload.current.files[0]);
 		try {
 			setUploading(true);
-			await axios.post(`${serverURL}/p/api/uploadNewSlide/`, formData);
+			await axios.post(`${serverURL}/api/uploadNewSlide/`, formData);
 			setResult(true, 'changes saved');
 			setSettings({ ...settings, filename: formData.get('file').name });
 		} catch (err) {
@@ -102,9 +102,9 @@ export default function SlideSettings({ sid, open, onClose }) {
 						<div className='row'>
 							<span className='label'>Anonymity:</span>
 							<Select value={settings.anonymity} onChange={changeAnonymity}>
-								<MenuItem value='anyone'>Anyone</MenuItem>
-								<MenuItem value='student'>Student</MenuItem>
-								<MenuItem value='nonymous'>Non-anonymous</MenuItem>
+								<MenuItem value='anyone'>No login required</MenuItem>
+								<MenuItem value='student'>Login required, anonymous chat</MenuItem>
+								<MenuItem value='nonymous'>Login required, non-anonymous chat</MenuItem>
 							</Select>
 						</div>
 						<div className='row'>

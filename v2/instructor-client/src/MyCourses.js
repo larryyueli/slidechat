@@ -19,7 +19,7 @@ export default function MyCourses(props) {
 
 	const fetchCourses = async () => {
 		try {
-			let res = await axios.get(`${serverURL}/p/api/myCourses`);
+			let res = await axios.get(`${serverURL}/api/myCourses`);
 			setCourses(res.data);
 		} catch (err) {
 			console.error(err);
@@ -28,7 +28,7 @@ export default function MyCourses(props) {
 
 	const createCourse = async () => {
 		try {
-			await axios.post(`${serverURL}/p/api/createCourse`, {
+			await axios.post(`${serverURL}/api/createCourse`, {
 				course: newCourseRef.current.value,
 			});
 		} catch (err) {

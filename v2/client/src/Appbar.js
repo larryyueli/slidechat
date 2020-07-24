@@ -11,7 +11,7 @@ function AppBar() {
 			<div className='appbar-logo'>SlideChat</div>
 			<div>
 				<span className='appbar-item'>Notification</span>
-				{/* <a className="appbar-item" href={`${baseURL}/p/prof`}>
+				{/* <a className="appbar-item" href={`${baseURL}/prof`}>
 					My Courses
 				</a> */}
 			</div>

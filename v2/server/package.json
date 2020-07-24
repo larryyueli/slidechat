@@ -3,23 +3,27 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon app.js",
-    "dev": "DEV=1 nodemon app.js",
+    "start": "PORT=10001 nodemon app",
+    "prod": "PORT=10000 NODE_ENV=production nodemon app",
+    "deploy": "npx pm2 start --env production",
     "build": "npm run build-c && npm run build-i",
-    "build-c":"GENERATE_SOURCEMAP=false rm -rf client-build; mkdir client-build; cd ../client && npm run build && cp -r build/* ../server/client-build/ && cd ../server",
-    "build-i":  "GENERATE_SOURCEMAP=false rm -rf instructor-client-build; mkdir instructor-client-build; cd ../instructor-client && npm run build && cp -r build/* ../server/instructor-client-build/ && cd ../server"
+    "build-c": "GENERATE_SOURCEMAP=false rm -rf client-build; mkdir client-build; cd ../client && npm run build && cp -r build/* ../server/client-build/ && cd ../server",
+    "build-i": "GENERATE_SOURCEMAP=false rm -rf instructor-client-build; mkdir instructor-client-build; cd ../instructor-client && npm run build && cp -r build/* ../server/instructor-client-build/ && cd ../server"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
+    "connect-mongodb-session": "^2.3.3",
     "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
     "express": "^4.16.1",
     "express-fileupload": "^1.1.7-alpha.3",
+    "express-session": "^1.17.1",
     "html-escaper": "^3.0.0",
     "mongodb": "^3.5.7",
     "morgan": "^1.9.1",
-    "pdf-image": "^2.0.0"
+    "pdf-image": "^2.0.0",
+    "pm2": "^4.4.0"
   },
   "devDependencies": {
     "axios": "^0.19.2",

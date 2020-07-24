@@ -17,7 +17,6 @@ function Main(props) {
 	const [page, setPage] = useState(1);
 	const [title, setTitle] = useState('');
 	const [filename, setFilename] = useState('');
-	const [protectLevel, setProtectLevel] = useState('unknown');
 	const [slideDrawing, setSlideDrawing] = useState(false);
 	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
 
@@ -25,14 +24,13 @@ function Main(props) {
 		axios
 			.get(`${serverURL}/api/slideInfo?slideID=${sid}`)
 			.then((res) => {
-				if (res.data.anonymity === 'anyone') {
-					setProtectLevel('');
+				if (res.data.anonymity !== 'anyone' && !res.data.loginStatus) {
+					window.location.href = `${serverURL}/p/login/${sid}/${window.location.hash.substring(1)}`;
 				} else {
-					if (!getCookie('isLogin')) {
-						window.location.href = `${baseURL}/p/login/${sid}/${window.location.hash.substring(1)}`;
-					}
-					setProtectLevel('/p');
+					return res;
 				}
+			})
+			.then((res) => {
 				let currentPage = 1;
 				if (window.location.hash) {
 					let n = +window.location.hash.substring(1);
@@ -103,7 +101,6 @@ function Main(props) {
 				sid={sid}
 				pageNum={page}
 				pageTotal={pageTotal}
-				protectLevel={protectLevel}
 				nextPage={nextPage}
 				prevPage={prevPage}
 				gotoPage={gotoPage}
@@ -113,7 +110,6 @@ function Main(props) {
 			<ChatArea
 				sid={sid}
 				pageNum={page}
-				protectLevel={protectLevel}
 				canvasComponentRef={canvasComponentRef}
 				setSlideDrawing={setSlideDrawing}
 			/>
