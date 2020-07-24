@@ -153,8 +153,7 @@ function instructorAPI(db, instructorAuth) {
 
 			if (!course) {
 				throw { status: 400, error: 'course not exist' };
-			} else if (false) {
-				// check in instructor's list TODO: UNSAFE
+			} else if (course.instructors.indexOf(req.session.uid)) {
 				throw { status: 403, error: 'Unauthorized' };
 			}
 

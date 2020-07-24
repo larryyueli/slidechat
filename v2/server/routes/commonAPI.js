@@ -1,6 +1,5 @@
 const path = require('path');
 const express = require('express');
-const { escape } = require('html-escaper');
 const { ObjectID } = require('mongodb');
 
 const { fileStorage } = require('../config');
@@ -268,7 +267,7 @@ function commonAPI(db) {
 				status: 'unsolved',
 				time: time,
 				chats: [],
-				title: escape(req.body.title),
+				title: req.body.title,
 				drawing: req.body.drawing,
 				user: slide.anonymity === 'nonymous' ? req.session.realName : req.body.user,
 			};
