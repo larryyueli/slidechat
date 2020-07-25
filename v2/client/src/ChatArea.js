@@ -6,7 +6,7 @@ import markdownItMathJax from 'markdown-it-mathjax';
 import highlight from 'highlight.js';
 
 import { serverURL } from './config';
-import { formatTime, formatNames, getUserName, getIsInstructor } from './util';
+import { formatTime, formatNames, getUserName } from './util';
 
 const md = markdownIt({
 	breaks: true,
@@ -37,7 +37,6 @@ export default function ChatArea(props) {
 	const titleRef = useRef(null);
 	const bodyRef = useRef(null);
 	const chatRef = useRef(null);
-	const isInstructor = getIsInstructor();
 
 	// fetch questions when page is changed
 	useEffect(() => {
@@ -333,7 +332,7 @@ export default function ChatArea(props) {
 									<span className='material-icons endorsed icon' onClick={(e) => endorseChat(i)}>
 										verified
 									</span>
-								) : isInstructor ? (
+								) : props.isInstructor ? (
 									<span className='material-icons not-endorsed icon' onClick={(e) => endorseChat(i)}>
 										verified
 									</span>
@@ -382,7 +381,7 @@ export default function ChatArea(props) {
 					<div className='placeholder'>&nbsp;</div>
 				)}
 				<div className='title'>{title}</div>
-				{isInstructor ? (
+				{props.isInstructor ? (
 					<span className={`manage ${managing ? 'managing' : ''}`} onClick={changeManageStatus}>
 						<span className='material-icons icon'>settings</span>
 					</span>

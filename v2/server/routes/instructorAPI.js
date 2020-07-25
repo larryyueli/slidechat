@@ -153,7 +153,10 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 			) {
 				return res.status(400).send();
 			}
-			let course = await courses.findOne({ _id: ObjectID.createFromHexString(req.body.cid) });
+			let course = await courses.findOne(
+				{ _id: ObjectID.createFromHexString(req.body.cid) },
+				{ projection: { _id: 1, instructors: 1 } }
+			);
 
 			if (!course) {
 				throw { status: 400, error: 'course not exist' };
@@ -163,6 +166,7 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 
 			// Step 1: insert into database to get a ObjectID
 			let insertRes = await slides.insertOne({
+				course: course._id,
 				filename: req.files.file.name,
 				anonymity: req.body.anonymity,
 			});
@@ -237,11 +241,12 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 				return res.status(400).send();
 			}
 			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
-
 			if (!slide) {
 				throw { status: 400, error: 'slide not exist' };
-			} else if (false) {
-				// check in instructor's list TODO: UNSAFE
+			}
+
+			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
+			if (course.instructors.indexOf(req.session.uid) < 0) {
 				throw { status: 403, error: 'Unauthorized' };
 			}
 
@@ -336,11 +341,14 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 				return res.status(400).send();
 			}
 			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
-
 			if (!slide) {
 				throw { status: 400, error: 'slide not exist' };
 			}
-			if (isNotValidPage(req.body.pageNum, slide.pageTotal)) {
+
+			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
+			if (course.instructors.indexOf(req.session.uid) < 0) {
+				throw { status: 403, error: 'Unauthorized' };
+			} else if (isNotValidPage(req.body.pageNum, slide.pageTotal)) {
 				throw { status: 400, error: 'bad request' };
 			}
 
@@ -356,9 +364,7 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 			updateQuery[`pages.${req.body.pageNum - 1}.audio`] = req.files.file.name;
 			let updateRes = await slides.updateOne(
 				{ _id: ObjectID.createFromHexString(req.body.sid) },
-				{
-					$set: updateQuery,
-				}
+				{ $set: updateQuery }
 			);
 			if (updateRes.modifiedCount !== 1) {
 				throw 'audio upload failed';
@@ -382,11 +388,14 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 				return res.status(400).send();
 			}
 			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.sid) });
-
 			if (!slide) {
 				throw { status: 400, error: 'slide not exist' };
 			}
-			if (isNotValidPage(req.query.pageNum, slide.pageTotal)) {
+
+			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
+			if (course.instructors.indexOf(req.session.uid) < 0) {
+				throw { status: 403, error: 'Unauthorized' };
+			} else if (isNotValidPage(req.query.pageNum, slide.pageTotal)) {
 				throw { status: 400, error: 'bad request' };
 			}
 
@@ -400,9 +409,7 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 			updateQuery[`pages.${req.query.pageNum - 1}.audio`] = null;
 			let updateRes = await slides.updateOne(
 				{ _id: ObjectID.createFromHexString(req.query.sid) },
-				{
-					$set: updateQuery,
-				}
+				{ $set: updateQuery }
 			);
 			if (updateRes.modifiedCount !== 1) {
 				throw 'audio upload failed';
@@ -429,8 +436,10 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 
 			if (!slide) {
 				throw { status: 400, error: 'slide not exist' };
-			} else if (false) {
-				// check in instructor's list TODO: UNSAFE
+			}
+
+			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
+			if (course.instructors.indexOf(req.session.uid) < 0) {
 				throw { status: 403, error: 'Unauthorized' };
 			} else if (req.body.questionOrder.length != slide.pages.length) {
 				throw { status: 400, error: 'length not match' };
@@ -503,11 +512,12 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 				return res.status(400).send();
 			}
 			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
-
 			if (!slide) {
 				throw { status: 400, error: 'slide not exist' };
-			} else if (false) {
-				// check in instructor's list TODO: UNSAFE
+			}
+
+			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
+			if (course.instructors.indexOf(req.session.uid) < 0) {
 				throw { status: 403, error: 'Unauthorized' };
 			}
 			let updateRes = await slides.updateOne(
@@ -544,18 +554,16 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 
 			if (!slide) {
 				throw { status: 400, error: 'slide not exist' };
-			} else if (false) {
-				// check in instructor's list TODO: UNSAFE
+			}
+
+			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
+			if (course.instructors.indexOf(req.session.uid) < 0) {
 				throw { status: 403, error: 'Unauthorized' };
 			}
 
 			let updateRes = await slides.updateOne(
 				{ _id: ObjectID.createFromHexString(req.body.sid) },
-				{
-					$set: {
-						anonymity: req.body.anonymity,
-					},
-				}
+				{ $set: { anonymity: req.body.anonymity } }
 			);
 
 			if (updateRes.result.n == 0) {
@@ -582,9 +590,14 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 		try {
 			let slide = await slides.findOne(
 				{ _id: ObjectID.createFromHexString(req.query.sid) },
-				{ projection: { _id: 1 } }
+				{ projection: { _id: 1, course: 1 } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
+
+			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
+			if (course.instructors.indexOf(req.session.uid) < 0) {
+				throw { status: 403, error: 'Unauthorized' };
+			}
 
 			let updateRes = await courses.updateMany({}, { $pull: { slides: req.query.sid } });
 			if (updateRes.modifiedCount !== 1) {
@@ -615,9 +628,15 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 		try {
 			let slide = await slides.findOne(
 				{ _id: ObjectID.createFromHexString(req.query.sid) },
-				{ projection: { pageTotal: 1, pages: 1 } }
+				{ projection: { pageTotal: 1, pages: 1, course: 1 } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
+
+			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
+			if (course.instructors.indexOf(req.session.uid) < 0) {
+				throw { status: 403, error: 'Unauthorized' };
+			}
+
 			if (
 				isNotValidPage(req.query.pageNum, slide.pageTotal) ||
 				notExistInList(req.query.qid, slide.pages[+req.query.pageNum - 1].questions)
@@ -653,9 +672,15 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 		try {
 			let slide = await slides.findOne(
 				{ _id: ObjectID.createFromHexString(req.query.sid) },
-				{ projection: { pageTotal: 1, pages: 1 } }
+				{ projection: { pageTotal: 1, pages: 1, course: 1 } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
+
+			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
+			if (course.instructors.indexOf(req.session.uid) < 0) {
+				throw { status: 403, error: 'Unauthorized' };
+			}
+
 			if (
 				isNotValidPage(req.query.pageNum, slide.pageTotal) ||
 				notExistInList(req.query.qid, slide.pages[+req.query.pageNum - 1].questions) ||
@@ -692,9 +717,15 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 		try {
 			let slide = await slides.findOne(
 				{ _id: ObjectID.createFromHexString(req.body.sid) },
-				{ projection: { pageTotal: true, pages: true, anonymity: true } }
+				{ projection: { pageTotal: 1, pages: 1, anonymity: 1, course: 1 } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
+
+			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
+			if (course.instructors.indexOf(req.session.uid) < 0) {
+				throw { status: 403, error: 'Unauthorized' };
+			}
+
 			if (
 				isNotValidPage(req.body.pageNum, slide.pageTotal) ||
 				notExistInList(req.body.qid, slide.pages[+req.body.pageNum - 1].questions) ||

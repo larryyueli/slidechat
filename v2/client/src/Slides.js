@@ -4,7 +4,7 @@ import axios from 'axios';
 
 import SlideOverlay from './SlideOverlay';
 import { serverURL } from './config';
-import { getIsInstructor, randInt } from './util';
+import { randInt } from './util';
 
 /**
  * Slides on the left of the screen
@@ -22,9 +22,9 @@ export default function Slides(props) {
 			.then((res) => {
 				if (res.data.audio) {
 					setAudioSrc(
-						`${serverURL}/api/slideAudio?slideID=${props.sid}&pageNum=${
-							props.pageNum
-						}&random=${randInt(10000)}`
+						`${serverURL}/api/slideAudio?slideID=${props.sid}&pageNum=${props.pageNum}&random=${randInt(
+							10000
+						)}`
 					);
 				} else {
 					setAudioSrc('');
@@ -51,9 +51,7 @@ export default function Slides(props) {
 			setUploading(false);
 			document.getElementById('file').value = '';
 			setAudioSrc(
-				`${serverURL}/api/slideAudio?slideID=${props.sid}&pageNum=${
-					props.pageNum
-				}&random=${randInt(10000)}`
+				`${serverURL}/api/slideAudio?slideID=${props.sid}&pageNum=${props.pageNum}&random=${randInt(10000)}`
 			);
 		}
 	};
@@ -72,7 +70,7 @@ export default function Slides(props) {
 	};
 
 	let audioRow;
-	if (getIsInstructor()) {
+	if (props.isInstructor) {
 		if (audioSrc) {
 			audioRow = (
 				<>
@@ -115,9 +113,7 @@ export default function Slides(props) {
 		<div className='slide-container'>
 			<div className='title'>{props.title}</div>
 			<div>
-				<a
-					className='download-link'
-					href={`${serverURL}/api/downloadPdf?slideID=${props.sid}`}>
+				<a className='download-link' href={`${serverURL}/api/downloadPdf?slideID=${props.sid}`}>
 					(Download {props.filename})
 				</a>
 			</div>

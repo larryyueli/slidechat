@@ -3,8 +3,7 @@ import axios from 'axios';
 
 import ChatArea from './ChatArea';
 import Slides from './Slides';
-import { serverURL, baseURL } from './config';
-import { getCookie } from './util';
+import { serverURL } from './config';
 
 /**
  * The main body of the application
@@ -18,6 +17,7 @@ function Main(props) {
 	const [title, setTitle] = useState('');
 	const [filename, setFilename] = useState('');
 	const [slideDrawing, setSlideDrawing] = useState(false);
+	const [isInstructor, setIsInstructor] = useState(false);
 	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
 
 	useEffect(() => {
@@ -39,6 +39,7 @@ function Main(props) {
 					}
 				}
 
+				if (res.data.isInstructor) setIsInstructor(true);
 				setPageTotal(res.data.pageTotal);
 				setTitle(res.data.title);
 				setFilename(res.data.filename);
@@ -106,12 +107,14 @@ function Main(props) {
 				gotoPage={gotoPage}
 				drawing={slideDrawing}
 				canvasComponentRef={canvasComponentRef}
+				isInstructor={isInstructor}
 			/>
 			<ChatArea
 				sid={sid}
 				pageNum={page}
 				canvasComponentRef={canvasComponentRef}
 				setSlideDrawing={setSlideDrawing}
+				isInstructor={isInstructor}
 			/>
 		</div>
 	);

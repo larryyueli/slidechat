@@ -67,10 +67,7 @@ async function startSlidechat() {
 	console.log('connected to database');
 	const db = dbClient.db('slidechat');
 
-	router.use(instructorAPI(db, instructorAuth, isInstructor));
-	router.use(commonAPI(db));
-
-	if (process.env.NODE_ENV === 'development') {
+	if (process.env.NODE_ENV !== 'production') {
 		router.use('/', (req, res, next) => {
 			req.session.uid = instructors[0];
 			req.session.realName = 'Totooria Helmold';
@@ -84,6 +81,9 @@ async function startSlidechat() {
 			res.json(req.session);
 		});
 	}
+	
+	router.use(instructorAPI(db, instructorAuth, isInstructor));
+	router.use(commonAPI(db));
 
 	router.get(/^\/p\/login\//, (req, res) => {
 		// login is already handled by Shibboleth when arrives here

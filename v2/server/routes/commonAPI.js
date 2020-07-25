@@ -58,12 +58,15 @@ function commonAPI(db) {
 				{ projection: { pages: 0 } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
+			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
+			console.log(req.session)
 			res.json({
 				filename: slide.filename,
 				pageTotal: slide.pageTotal,
 				title: slide.title,
 				anonymity: slide.anonymity,
 				loginStatus: req.session.uid,
+				isInstructor: course.instructors.indexOf(req.session.uid) >= 0,
 			});
 		} catch (err) {
 			errorHandler(res, err);
