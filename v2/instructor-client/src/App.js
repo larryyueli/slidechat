@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import AppBar from './Appbar.js';
 import MyCourses from './MyCourses';
 import ReorderQuestions from './ReorderQuestions';
+import Logout from './Logout';
 import { baseURL, instructorURL } from './config';
 
 /**
@@ -18,6 +19,7 @@ function App() {
 		<Router>
 			<AppBar />
 			<Switch>
+				<Route path={`${baseURL}/logout`} exact component={Logout} />
 				<Route path={`${baseURL}${instructorURL}`} exact component={MyCourses} />
 				<Route path={`${baseURL}${instructorURL}/reorderQuestions/:slideId`} component={ReorderQuestions} />
 			</Switch>

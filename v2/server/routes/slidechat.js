@@ -7,7 +7,7 @@ const dbConfig = {
 	useNewUrlParser: true,
 };
 
-const { baseURL, dbURL, instructorURL } = require('../config');
+const { baseURL, dbURL, instructorURL, cookieName } = require('../config');
 const instructorAPI = require('./instructorAPI');
 const commonAPI = require('./commonAPI');
 
@@ -81,9 +81,6 @@ async function startSlidechat() {
 			res.json(req.session);
 		});
 	}
-	
-	router.use(instructorAPI(db, instructorAuth, isInstructor));
-	router.use(commonAPI(db));
 
 	router.get(/^\/p\/login\//, (req, res) => {
 		// login is already handled by Shibboleth when arrives here
@@ -105,6 +102,18 @@ async function startSlidechat() {
 			res.redirect(`${baseURL}/${path[3]}#${path[4]}`);
 		}
 	});
+
+	router.get('/api/logout', (req, res) => {
+		req.session.destroy((err) => {
+			if (err) {
+				console.error(err);
+				res.status(500).send();
+			} else res.clearCookie(cookieName).send();
+		});
+	});
+
+	router.use(instructorAPI(db, instructorAuth, isInstructor));
+	router.use(commonAPI(db));
 
 	router.get(instructorURL, instructorAuth, (req, res) => {
 		res.sendFile('index.html', { root: 'instructor-client-build' });

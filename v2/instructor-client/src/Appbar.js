@@ -15,6 +15,9 @@ function AppBar() {
 				<Link to={`${baseURL}${instructorURL}`} className='appbar-item'>
 					My Courses
 				</Link>
+				<Link className='appbar-item' to={`${baseURL}/logout`}>
+					Logout
+				</Link>
 			</div>
 		</div>
 	);

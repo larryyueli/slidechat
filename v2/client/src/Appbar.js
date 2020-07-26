@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import { baseURL } from './config';
 
@@ -14,6 +15,9 @@ function AppBar() {
 				{/* <a className="appbar-item" href={`${baseURL}/prof`}>
 					My Courses
 				</a> */}
+				<Link className='appbar-item' to={`${baseURL}/logout`}>
+					Logout
+				</Link>
 			</div>
 		</div>
 	);

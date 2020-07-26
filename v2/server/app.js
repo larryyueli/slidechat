@@ -17,8 +17,7 @@ const startSlidechat = require('./routes/slidechat');
 const {
 	PORT = 10000,
 	NODE_ENV = 'development',
-	SESS_NAME = '_SlideChatSess',
-	SESS_MAX_AGE = 365 * 24 * 60 * 60 * 1000, // 365 days
+	SESS_MAX_AGE = 60 * 24 * 60 * 60 * 1000, // 60 days
 } = process.env;
 
 const sessStore = new MongoSessStore({
@@ -43,7 +42,7 @@ let main = (async () => {
 
 	app.use(
 		session({
-			name: SESS_NAME,
+			name: config.cookieName,
 			saveUninitialized: false,
 			resave: true,
 			rolling: false,

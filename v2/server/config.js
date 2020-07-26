@@ -11,6 +11,8 @@ module.exports = {
 
 	instructorURL: '/prof',
 
+	cookieName: '_SlideChatSess',
+
 	dbURL: `mongodb://${escapedUser}:${escapedPsw}@localhost:27017/slidechat`,
 
 	fileStorage: path.join(os.homedir(), '.slidechat', 'files'),
