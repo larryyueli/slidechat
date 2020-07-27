@@ -138,6 +138,10 @@
 		.MuiButtonBase-root {
 			margin: 0 1rem;
 		}
+		.primary {
+			background-color: $primary;
+			color: white;
+		}
 	}
 
 	.result-ok {

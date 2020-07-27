@@ -94,7 +94,7 @@ export default function Slides(props) {
 			audioRow = (
 				<>
 					<input type='file' id='file' className='file' ref={fileUpload} />
-					<Button variant='contained' color='primary' onClick={uploadAudio} disabled={uploading}>
+					<Button variant='contained' onClick={uploadAudio} disabled={uploading}>
 						Upload Audio
 					</Button>
 					{uploading ? <CircularProgress /> : null}
@@ -133,12 +133,14 @@ export default function Slides(props) {
 				</div>
 				<div className='audio-row'>{audioRow}</div>
 			</div>
-			<Button variant='contained' disabled={prevBtnDisable} onClick={props.prevPage}>
-				PREV
-			</Button>
-			<Button variant='contained' disabled={nextBtnDisable} onClick={props.nextPage}>
-				NEXT
-			</Button>
+			<div className="flip-page-btns">
+				<Button variant='contained' disabled={prevBtnDisable} onClick={props.prevPage}>
+					PREV
+				</Button>
+				<Button variant='contained' disabled={nextBtnDisable} onClick={props.nextPage}>
+					NEXT
+				</Button>
+			</div>
 			<div>
 				Page <input id='pageNum' type='text' defaultValue={props.pageNum} onBlur={props.gotoPage} /> of{' '}
 				{props.pageTotal}

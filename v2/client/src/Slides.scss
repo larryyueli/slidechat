@@ -54,8 +54,14 @@
 			@include clickable();
 			color: white;
 			font-size: 1.5rem;
-			padding: 0.2rem;
+			padding: 0.3rem;
+			margin: 0.1rem;
 			border-radius: 0.5rem;
+		}
+
+		button {
+			background-color: $primary;
+			color: white;
 		}
 
 		.progress {
@@ -78,9 +84,13 @@
 		}
 	}
 
-	button {
-		margin: 1rem;
+	.flip-page-btns{
+		button {
+			margin: 1rem;
+			background-color: $gray;
+		}
 	}
+	
 
 	input {
 		width: 1.8rem;

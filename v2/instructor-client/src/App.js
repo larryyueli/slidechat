@@ -20,8 +20,8 @@ function App() {
 			<AppBar />
 			<Switch>
 				<Route path={`${baseURL}/logout`} exact component={Logout} />
-				<Route path={`${baseURL}${instructorURL}`} exact component={MyCourses} />
 				<Route path={`${baseURL}${instructorURL}/reorderQuestions/:slideId`} component={ReorderQuestions} />
+				<Route path={`${baseURL}${instructorURL}`} component={MyCourses} />
 			</Switch>
 		</Router>
 	);

@@ -228,7 +228,7 @@ export default function ChatArea(props) {
 
 			let chats = [
 				<div className='new-chat-btn-row' key={-1}>
-					<Button variant='contained' color='primary' onClick={createNewChat}>
+					<Button variant='contained' onClick={createNewChat}>
 						Ask a new question
 					</Button>
 				</div>,
