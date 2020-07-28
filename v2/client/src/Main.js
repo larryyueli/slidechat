@@ -16,6 +16,7 @@ function Main(props) {
 	const [page, setPage] = useState(1);
 	const [title, setTitle] = useState('');
 	const [filename, setFilename] = useState('');
+	const [drawable, setDrawable] = useState(false);
 	const [slideDrawing, setSlideDrawing] = useState(false);
 	const [isInstructor, setIsInstructor] = useState(false);
 	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
@@ -43,6 +44,11 @@ function Main(props) {
 				setPageTotal(res.data.pageTotal);
 				setTitle(res.data.title);
 				setFilename(res.data.filename);
+				if (res.data.drawable) {
+					setDrawable(true);
+				} else {
+					setDrawable(false);
+				}
 				applyPage(currentPage);
 			})
 			.catch((err) => {
@@ -115,6 +121,7 @@ function Main(props) {
 				canvasComponentRef={canvasComponentRef}
 				setSlideDrawing={setSlideDrawing}
 				isInstructor={isInstructor}
+				drawable={drawable}
 			/>
 		</div>
 	);

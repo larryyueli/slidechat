@@ -30,9 +30,15 @@ function questionCount(questions) {
 	}, 0);
 }
 
+function LessFormalName(name){
+	let worlds = name.split(" ");
+	return worlds[0] + " " + worlds[worlds.length - 1][0].toUpperCase() + '.'
+}
+
 module.exports = {
 	errorHandler,
 	isNotValidPage,
 	notExistInList,
 	questionCount,
+	LessFormalName,
 };

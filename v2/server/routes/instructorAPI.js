@@ -5,7 +5,7 @@ const PDFImage = require('../lib/pdf-image').PDFImage;
 const { ObjectID } = require('mongodb');
 
 const { fileStorage, convertOptions } = require('../config');
-const { isNotValidPage, notExistInList, errorHandler, questionCount } = require('./util');
+const { isNotValidPage, notExistInList, errorHandler, questionCount, LessFormalName } = require('./util');
 
 function instructorAPI(db, instructorAuth, isInstructor) {
 	let router = express.Router();
@@ -169,6 +169,7 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 				course: course._id,
 				filename: req.files.file.name,
 				anonymity: req.body.anonymity,
+				drawable: true,
 			});
 
 			// Step 2: use the id as the directory name, create a directory, move pdf to directory
@@ -576,6 +577,43 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 		}
 	});
 
+	/**
+	 * set drawable of a slide
+	 * req body:
+	 *   drawable: the slide is drawable or not
+	 *   sid: the slide id
+	 */
+	router.post('/api/setDrawable', instructorAuth, async (req, res) => {
+		try {
+			if (req.body.sid.length != 24 || [true, false].indexOf(req.body.drawable) < 0) {
+				return res.status(400).send();
+			}
+			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
+
+			if (!slide) {
+				throw { status: 400, error: 'slide not exist' };
+			}
+
+			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
+			if (course.instructors.indexOf(req.session.uid) < 0) {
+				throw { status: 403, error: 'Unauthorized' };
+			}
+
+			let updateRes = await slides.updateOne(
+				{ _id: ObjectID.createFromHexString(req.body.sid) },
+				{ $set: { drawable: req.body.drawable } }
+			);
+
+			if (updateRes.result.n == 0) {
+				throw { status: 400, error: 'set drawable failed' };
+			}
+
+			res.json({});
+		} catch (err) {
+			errorHandler(res, err);
+		}
+	});
+
 	// router.post('/api/testPDF', (req, res) => {
 	//     console.log(req.files.file.name);
 	//     res.send();
@@ -736,13 +774,13 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 
 			let updateEndorse = {}; // cannot use template string on the left hand side
 			updateEndorse[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.endorsement`] =
-				req.session.realName;
+				LessFormalName(req.session.realName);
 			let updateRes;
 
 			// endorse if not already endorsed, otherwise revoke the endorsement
 			if (
 				slide.pages[+req.body.pageNum - 1].questions[req.body.qid].chats[req.body.cid].endorsement.indexOf(
-					req.session.realName
+					LessFormalName(req.session.realName)
 				) < 0
 			) {
 				updateRes = await slides.updateOne(
