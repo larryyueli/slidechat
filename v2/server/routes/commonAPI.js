@@ -66,6 +66,7 @@ function commonAPI(db) {
 				anonymity: slide.anonymity,
 				loginUser: shortName(req.session.realName),
 				isInstructor: course.instructors.indexOf(req.session.uid) >= 0,
+				drawable: slide.drawable,
 			});
 		} catch (err) {
 			errorHandler(res, err);
@@ -271,12 +272,12 @@ function commonAPI(db) {
 				chats: [],
 				title: req.body.title,
 				drawing: req.body.drawing,
-				user: slide.anonymity === 'nonymous' ? req.session.realName : req.body.user,
+				user: slide.anonymity === 'nonymous' ? shortName(req.session.realName) : req.body.user,
 			};
 			let newChat = {
 				time: time,
 				body: req.body.body, // does not escape here, md renderer(markdown-it) will escape it
-				user: slide.anonymity === 'nonymous' ? req.session.realName : req.body.user,
+				user: slide.anonymity === 'nonymous' ? shortName(req.session.realName) : req.body.user,
 				likes: [],
 				endorsement: [],
 			};
@@ -328,7 +329,7 @@ function commonAPI(db) {
 			let newChat = {
 				time: time,
 				body: req.body.body, // does not escape here, md renderer(markdown-it) will escape it
-				user: slide.anonymity === 'nonymous' ? req.session.realName : req.body.user,
+				user: slide.anonymity === 'nonymous' ? shortName(req.session.realName) : req.body.user,
 				likes: [],
 				endorsement: [],
 			};
@@ -377,7 +378,7 @@ function commonAPI(db) {
 				throw { status: 400, error: 'bad request' };
 			}
 
-			let name = slide.anonymity === 'nonymous' ? req.session.realName : req.body.user;
+			let name = slide.anonymity === 'nonymous' ? shortName(req.session.realName) : req.body.user;
 			let insertLike = {}; // cannot use template string on the left hand side
 			insertLike[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.likes`] = name;
 

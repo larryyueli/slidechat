@@ -30,6 +30,7 @@ function questionCount(questions) {
 	}, 0);
 }
 
+
 function shortName(name) {
 	if (!name) return undefined;
 	let splittedName = name.split(' ');

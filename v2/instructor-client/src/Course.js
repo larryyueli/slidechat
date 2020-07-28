@@ -160,7 +160,7 @@ export default function Course({ cid, role }) {
 
 			{managing ? (
 				<div className='upload-bar'>
-					<input type='file' name='file' ref={fileUpload} />
+					<input type='file' name='file' ref={fileUpload} accept='.pdf'/>
 					<Button onClick={uploadPDF} disabled={uploading} variant='contained' color='primary'>
 						Upload
 					</Button>

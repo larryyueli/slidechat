@@ -121,7 +121,7 @@ export default function ChatArea(props) {
 				setQid(qid);
 				setChatDetails(res.data.chats);
 				setState('chat-details');
-				if (res.data.drawing) {
+				if (res.data.drawing && props.drawable) {
 					props.setSlideDrawing(true);
 					props.canvasComponentRef.current.setState({ readOnly: true });
 					props.canvasComponentRef.current.lines = res.data.drawing;
@@ -281,17 +281,20 @@ export default function ChatArea(props) {
 							inputRef={bodyRef}
 						/>
 					</div>
-					<div>
-						{drawing ? (
-							<span onClick={cancelDrawing} className='add-drawing-btn'>
-								cancel drawing
-							</span>
-						) : (
-							<span onClick={startDrawing} className='add-drawing-btn'>
-								Add some drawing to slide&nbsp;<span className='material-icons'>edit</span>
-							</span>
-						)}
-					</div>
+					{props.drawable ? (<div>
+							{drawing ? (
+								<span onClick={cancelDrawing} className='add-drawing-btn'>
+									cancel drawing
+								</span>
+							) : (
+									<span onClick={startDrawing} className='add-drawing-btn'>
+										Add some drawing to slide&nbsp;<span className='material-icons'>edit</span>
+									</span>
+								)}
+						</div>)
+							: (<div></div>)
+					}
+
 					<div>
 						<Button variant='contained' color='primary' onClick={sendNewQuestion}>
 							Send
@@ -378,16 +381,16 @@ export default function ChatArea(props) {
 						<span className='material-icons'>arrow_back_ios</span>
 					</div>
 				) : (
-					<div className='placeholder'>&nbsp;</div>
-				)}
+						<div className='placeholder'>&nbsp;</div>
+					)}
 				<div className='title'>{title}</div>
 				{props.isInstructor ? (
 					<span className={`manage ${managing ? 'managing' : ''}`} onClick={changeManageStatus}>
 						<span className='material-icons icon'>settings</span>
 					</span>
 				) : (
-					<div className='placeholder'>&nbsp;</div>
-				)}
+						<div className='placeholder'>&nbsp;</div>
+					)}
 			</div>
 			{content}
 		</div>

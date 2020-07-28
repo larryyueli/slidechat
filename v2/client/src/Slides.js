@@ -75,7 +75,7 @@ export default function Slides(props) {
 		if (audioSrc) {
 			audioRow = (
 				<>
-					<input type='file' id='file' className='file' ref={fileUpload} />
+					<input type='file' id='file' className='file' ref={fileUpload} accept='.mp3' />
 					{uploading ? (
 						<CircularProgress size='1.5rem' className='progress' />
 					) : (
@@ -94,7 +94,7 @@ export default function Slides(props) {
 		} else {
 			audioRow = (
 				<>
-					<input type='file' id='file' className='file' ref={fileUpload} />
+					<input type='file' id='file' className='file' ref={fileUpload} accept='.mp3' />
 					<Button variant='contained' onClick={uploadAudio} disabled={uploading}>
 						Upload Audio
 					</Button>
@@ -132,7 +132,6 @@ export default function Slides(props) {
 					/>
 					{props.drawing ? <SlideOverlay ref={props.canvasComponentRef} /> : null}
 				</div>
-				<div className='audio-row'>{audioRow}</div>
 			</div>
 			<div className='flip-page-btns'>
 				<Button variant='contained' disabled={prevBtnDisable} onClick={props.prevPage}>
@@ -146,6 +145,7 @@ export default function Slides(props) {
 				Page <input id='pageNum' type='text' defaultValue={props.pageNum} onBlur={props.gotoPage} /> of{' '}
 				{props.pageTotal}
 			</div>
+			<div className='audio-row'>{audioRow}</div>
 		</div>
 	);
 }

@@ -40,6 +40,22 @@ export default function SlideSettings({ sid, open, onClose }) {
 			});
 	};
 
+	const changeDrawable = (e) => {
+		axios
+			.post(`${serverURL}/api/setDrawable`, {
+				sid: sid,
+				drawable: e.target.value,
+			})
+			.then((res) => {
+				setResult(true, 'changes saved');
+				setSettings({ ...settings, drawable: e.target.value });
+			})
+			.catch((err) => {
+				console.log(err);
+				setResult(false, 'update failed!');
+			});
+	};
+
 	const changeTitle = (e) => {
 		axios
 			.post(`${serverURL}/api/setTitle`, {
@@ -105,6 +121,13 @@ export default function SlideSettings({ sid, open, onClose }) {
 								<MenuItem value='anyone'>No login required</MenuItem>
 								<MenuItem value='student'>Login required, anonymous chat</MenuItem>
 								<MenuItem value='nonymous'>Login required, non-anonymous chat</MenuItem>
+							</Select>
+						</div>
+						<div className='row'>
+							<span className='label'>Drawing:</span>
+							<Select value={settings.drawable} onChange={changeDrawable}>
+								<MenuItem value={true}>On</MenuItem>
+								<MenuItem value={false}>Off</MenuItem>
 							</Select>
 						</div>
 						<div className='row'>
