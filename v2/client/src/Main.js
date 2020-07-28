@@ -3,6 +3,7 @@ import axios from 'axios';
 
 import ChatArea from './ChatArea';
 import Slides from './Slides';
+import AppBar from './Appbar';
 import { serverURL } from './config';
 
 /**
@@ -95,27 +96,30 @@ function Main(props) {
 	};
 
 	return (
-		<div className='main'>
-			<Slides
-				title={title}
-				filename={filename}
-				sid={sid}
-				pageNum={page}
-				pageTotal={pageTotal}
-				nextPage={nextPage}
-				prevPage={prevPage}
-				gotoPage={gotoPage}
-				drawing={slideDrawing}
-				canvasComponentRef={canvasComponentRef}
-				isInstructor={isInstructor}
-			/>
-			<ChatArea
-				sid={sid}
-				pageNum={page}
-				canvasComponentRef={canvasComponentRef}
-				setSlideDrawing={setSlideDrawing}
-				isInstructor={isInstructor}
-			/>
+		<div>
+			<AppBar buttons={true} />
+			<div className='main'>
+				<Slides
+					title={title}
+					filename={filename}
+					sid={sid}
+					pageNum={page}
+					pageTotal={pageTotal}
+					nextPage={nextPage}
+					prevPage={prevPage}
+					gotoPage={gotoPage}
+					drawing={slideDrawing}
+					canvasComponentRef={canvasComponentRef}
+					isInstructor={isInstructor}
+				/>
+				<ChatArea
+					sid={sid}
+					pageNum={page}
+					canvasComponentRef={canvasComponentRef}
+					setSlideDrawing={setSlideDrawing}
+					isInstructor={isInstructor}
+				/>
+			</div>
 		</div>
 	);
 }

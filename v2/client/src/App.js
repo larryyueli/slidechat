@@ -14,7 +14,6 @@ import { baseURL } from './config';
 function App() {
 	return (
 		<Router>
-			<AppBar />
 			<Switch>
 				<Route path={`${baseURL}/logout`} component={Logout} />
 				<Route path={`${baseURL}/:slideId`} component={Main} />
