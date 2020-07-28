@@ -33,6 +33,7 @@ export default function Slides(props) {
 			.catch((err) => {
 				console.error(err);
 			});
+		// eslint-disable-next-line
 	}, [props.pageNum]);
 
 	const uploadAudio = async () => {
@@ -133,7 +134,7 @@ export default function Slides(props) {
 				</div>
 				<div className='audio-row'>{audioRow}</div>
 			</div>
-			<div className="flip-page-btns">
+			<div className='flip-page-btns'>
 				<Button variant='contained' disabled={prevBtnDisable} onClick={props.prevPage}>
 					PREV
 				</Button>

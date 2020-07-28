@@ -30,9 +30,21 @@ function questionCount(questions) {
 	}, 0);
 }
 
+function shortName(name) {
+	if (!name) return undefined;
+	let splittedName = name.split(' ');
+	return splittedName
+		.map((part, index) => {
+			if (index === 0) return part;
+			else return part[0] + '.';
+		})
+		.join(' ');
+}
+
 module.exports = {
 	errorHandler,
 	isNotValidPage,
 	notExistInList,
 	questionCount,
+	shortName,
 };

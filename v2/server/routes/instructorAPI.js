@@ -5,7 +5,7 @@ const PDFImage = require('../lib/pdf-image').PDFImage;
 const { ObjectID } = require('mongodb');
 
 const { fileStorage, convertOptions } = require('../config');
-const { isNotValidPage, notExistInList, errorHandler, questionCount } = require('./util');
+const { isNotValidPage, notExistInList, errorHandler, questionCount, shortName } = require('./util');
 
 function instructorAPI(db, instructorAuth, isInstructor) {
 	let router = express.Router();
@@ -20,8 +20,16 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 	router.get('/api/myCourses', instructorAuth, async (req, res) => {
 		try {
 			let user = await users.findOne({ _id: req.session.uid }, { projection: { courses: 1 } });
-			if (!user) return res.json([]); // does not need to initialize here
-			res.json(user.courses);
+			if (!user) {
+				return res.json({
+					user: shortName(req.session.realName),
+					courses: [],
+				});
+			} // does not need to initialize here
+			res.json({
+				user: shortName(req.session.realName),
+				courses: user.courses,
+			});
 		} catch (err) {
 			errorHandler(res, err);
 		}

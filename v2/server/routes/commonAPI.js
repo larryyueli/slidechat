@@ -3,7 +3,7 @@ const express = require('express');
 const { ObjectID } = require('mongodb');
 
 const { fileStorage } = require('../config');
-const { isNotValidPage, notExistInList, errorHandler } = require('./util');
+const { isNotValidPage, notExistInList, errorHandler, shortName } = require('./util');
 
 function commonAPI(db) {
 	let router = express.Router();
@@ -64,7 +64,7 @@ function commonAPI(db) {
 				pageTotal: slide.pageTotal,
 				title: slide.title,
 				anonymity: slide.anonymity,
-				loginStatus: req.session.uid,
+				loginUser: shortName(req.session.realName),
 				isInstructor: course.instructors.indexOf(req.session.uid) >= 0,
 			});
 		} catch (err) {

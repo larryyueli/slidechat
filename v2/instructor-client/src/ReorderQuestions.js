@@ -2,17 +2,20 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Button, CircularProgress } from '@material-ui/core';
 
+import AppBar from './AppBar';
 import { serverURL, fullURL } from './config';
 
 export default function ReorderQuestions(props) {
 	const sid = props.match.params.slideId;
 	const [loading, setLoading] = useState(true);
 	const [slide, setSlide] = useState({});
+	const [user, setUser] = useState('');
 
 	useEffect(() => {
 		let fetchSlide = async () => {
 			try {
 				let res = await axios.get(`${serverURL}/api/slideInfo?slideID=${sid}`);
+				setUser(res.data.loginUser);
 				let slide = { pageTotal: res.data.pageTotal, pages: [], unused: [] };
 				let i = 1;
 				for (; i <= slide.pageTotal; i++) {
@@ -131,102 +134,109 @@ export default function ReorderQuestions(props) {
 	};
 
 	return (
-		<div className='reorder-page'>
-			<div className='title'>Reorder Questions</div>
-			{loading ? (
-				<div className='subtitle'>
-					<CircularProgress />
-				</div>
-			) : (
-				<>
-					<div className='subtitle'>You can rearrange the questions to match pages here</div>
-					<div className='container'>
-						<div className='left-side'>
-							<div className='pages-list'>
-								{slide.pages.map((qPages, index) => (
-									<div className='page-item' key={index}>
-										<div className='page-item-left'>
-											<span className='page-num'>{index + 1}.</span>
-											<img
-												className='thumbnail'
-												src={`${serverURL}/api/slideImg?slideID=${sid}&pageNum=${index + 1}`}
-												alt='slideImg'
-											/>
-											<span>Questions:</span>
-											{qPages.map((page, i) => {
-												if (page.count === 0) return null;
-												return (
-													<span className='tooltip' key={i}>
-														<span className='question-icon'>
-															page {page.pageNum}({page.count})
+		<>
+			<AppBar user={user} />
+			<div className='reorder-page'>
+				<div className='title'>Reorder Questions</div>
+				{loading ? (
+					<div className='subtitle'>
+						<CircularProgress />
+					</div>
+				) : (
+					<>
+						<div className='subtitle'>You can rearrange the questions to match pages here</div>
+						<div className='container'>
+							<div className='left-side'>
+								<div className='pages-list'>
+									{slide.pages.map((qPages, index) => (
+										<div className='page-item' key={index}>
+											<div className='page-item-left'>
+												<span className='page-num'>{index + 1}.</span>
+												<img
+													className='thumbnail'
+													src={`${serverURL}/api/slideImg?slideID=${sid}&pageNum=${
+														index + 1
+													}`}
+													alt='slideImg'
+												/>
+												<span>Questions:</span>
+												{qPages.map((page, i) => {
+													if (page.count === 0) return null;
+													return (
+														<span className='tooltip' key={i}>
+															<span className='question-icon'>
+																page {page.pageNum}({page.count})
+															</span>
+															<ul className='tooltip-text'>{previewPage(page)}</ul>
 														</span>
-														<ul className='tooltip-text'>{previewPage(page)}</ul>
+													);
+												})}
+											</div>
+											<div className='page-item-right'>
+												<span className='tooltip'>
+													<span
+														className='reorder-btn'
+														onClick={(e) => removeQuestions(index)}>
+														<span className='material-icons'>close</span>
 													</span>
-												);
-											})}
-										</div>
-										<div className='page-item-right'>
-											<span className='tooltip'>
-												<span className='reorder-btn' onClick={(e) => removeQuestions(index)}>
-													<span className='material-icons'>close</span>
+													<span className='tooltip-text'>Move questions to unused</span>
 												</span>
-												<span className='tooltip-text'>Move questions to unused</span>
-											</span>
-											<span className='tooltip'>
-												<span className='reorder-btn' onClick={(e) => shiftUp(index)}>
-													<span className='material-icons'>arrow_upward</span>
+												<span className='tooltip'>
+													<span className='reorder-btn' onClick={(e) => shiftUp(index)}>
+														<span className='material-icons'>arrow_upward</span>
+													</span>
+													<span className='tooltip-text'>
+														Delete questions on this page and shift all questions below up
+														by 1 page
+													</span>
 												</span>
-												<span className='tooltip-text'>
-													Delete questions on this page and shift all questions below up by 1
-													page
+												<span className='tooltip'>
+													<span className='reorder-btn' onClick={(e) => shiftDown(index)}>
+														<span className='material-icons'>arrow_downward</span>
+													</span>
+													<span className='tooltip-text'>
+														Shift questions on this page and below down by 1 page
+													</span>
 												</span>
-											</span>
-											<span className='tooltip'>
-												<span className='reorder-btn' onClick={(e) => shiftDown(index)}>
-													<span className='material-icons'>arrow_downward</span>
-												</span>
-												<span className='tooltip-text'>
-													Shift questions on this page and below down by 1 page
-												</span>
-											</span>
-										</div>
-									</div>
-								))}
-							</div>
-						</div>
-						<div className='right-side'>
-							<div className='toolbox'>
-								<div className='title'>Unused questions</div>
-								{slide.unused.map((page, index) => {
-									return (
-										<div className='unused-item' key={index}>
-											<div className='tooltip' key={index}>
-												<span className='question-icon'>
-													unused {page.pageNum}({page.count})
-												</span>
-												<ul className='tooltip-text'>{previewPage(page)}</ul>
-											</div>
-											<div className='input-row'>
-												<span>To page:</span>
-												<input type='text' id={`add-${index}`} />
-												<button onClick={(e) => addToPage(index)}>Add</button>
 											</div>
 										</div>
-									);
-								})}
+									))}
+								</div>
+							</div>
+							<div className='right-side'>
+								<div className='toolbox'>
+									<div className='title'>Unused questions</div>
+									{slide.unused.map((page, index) => {
+										return (
+											<div className='unused-item' key={index}>
+												<div className='tooltip' key={index}>
+													<span className='question-icon'>
+														unused {page.pageNum}({page.count})
+													</span>
+													<ul className='tooltip-text'>{previewPage(page)}</ul>
+												</div>
+												<div className='input-row'>
+													<span>To page:</span>
+													<input type='text' id={`add-${index}`} />
+													<button onClick={(e) => addToPage(index)}>Add</button>
+												</div>
+											</div>
+										);
+									})}
+								</div>
 							</div>
 						</div>
-					</div>
-					<div className='button-row'>
-						<Button variant='contained' href={`${fullURL()}/prof`}>
-							Abort
-						</Button>
-						<Button variant='contained' className="primary" onClick={(e) => submitChanges()}>
-							Submit
-						</Button>
-					</div>
-				</>
-			)}
-		</div>
+						<div className='button-row'>
+							<Button variant='contained' href={`${fullURL()}/prof`}>
+								Abort
+							</Button>
+							<Button variant='contained' className='primary' onClick={(e) => submitChanges()}>
+								Submit
+							</Button>
+						</div>
+					</>
+				)}
+			</div>
+		</>
 	);
 }

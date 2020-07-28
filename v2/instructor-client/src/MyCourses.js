@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Button, TextField } from '@material-ui/core';
 
+import AppBar from './AppBar';
 import Course from './Course';
 import { serverURL } from './config';
 
@@ -11,6 +12,7 @@ import { serverURL } from './config';
  */
 export default function MyCourses(props) {
 	let [courses, setCourses] = useState([]);
+	let [user, setUser] = useState('');
 	let newCourseRef = useRef(null);
 
 	useEffect(() => {
@@ -20,7 +22,8 @@ export default function MyCourses(props) {
 	const fetchCourses = async () => {
 		try {
 			let res = await axios.get(`${serverURL}/api/myCourses`);
-			setCourses(res.data);
+			setUser(res.data.user);
+			setCourses(res.data.courses);
 		} catch (err) {
 			console.error(err);
 		}
@@ -38,17 +41,20 @@ export default function MyCourses(props) {
 	};
 
 	return (
-		<div className='profile'>
-			<div className='title'>My Courses</div>
-			{courses.map((course) => (
-				<Course cid={course.id} role={course.role} key={course.id} />
-			))}
-			<div className='createCourse-bar'>
-				<TextField variant='outlined' id={`new-course`} placeholder='Course Name' inputRef={newCourseRef} />
-				<Button id='fileSubmit' onClick={createCourse} variant='contained' color='primary'>
-					Create Course
-				</Button>
+		<>
+			<AppBar user={user} />
+			<div className='profile'>
+				<div className='title'>My Courses</div>
+				{courses.map((course) => (
+					<Course cid={course.id} role={course.role} key={course.id} />
+				))}
+				<div className='createCourse-bar'>
+					<TextField variant='outlined' id={`new-course`} placeholder='Course Name' inputRef={newCourseRef} />
+					<Button id='fileSubmit' onClick={createCourse} variant='contained' color='primary'>
+						Create Course
+					</Button>
+				</div>
 			</div>
-		</div>
+		</>
 	);
 }

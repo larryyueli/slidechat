@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import ChatArea from './ChatArea';
 import Slides from './Slides';
-import AppBar from './Appbar';
+import AppBar from './AppBar';
 import { serverURL } from './config';
 
 /**
@@ -19,13 +19,14 @@ function Main(props) {
 	const [filename, setFilename] = useState('');
 	const [slideDrawing, setSlideDrawing] = useState(false);
 	const [isInstructor, setIsInstructor] = useState(false);
+	const [user, setUser] = useState('');
 	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
 
 	useEffect(() => {
 		axios
 			.get(`${serverURL}/api/slideInfo?slideID=${sid}`)
 			.then((res) => {
-				if (res.data.anonymity !== 'anyone' && !res.data.loginStatus) {
+				if (res.data.anonymity !== 'anyone' && !res.data.loginUser) {
 					window.location.href = `${serverURL}/p/login/${sid}/${window.location.hash.substring(1)}`;
 				} else {
 					return res;
@@ -40,6 +41,7 @@ function Main(props) {
 					}
 				}
 
+				if (res.data.loginUser) setUser(res.data.loginUser);
 				if (res.data.isInstructor) setIsInstructor(true);
 				setPageTotal(res.data.pageTotal);
 				setTitle(res.data.title);
@@ -97,7 +99,7 @@ function Main(props) {
 
 	return (
 		<div>
-			<AppBar buttons={true} />
+			<AppBar user={user} loginURL={`${serverURL}/p/login/${sid}/${page}`} />
 			<div className='main'>
 				<Slides
 					title={title}
