@@ -59,56 +59,18 @@ export default function Slides(props) {
 
 	const deleteAudio = async () => {
 		if (!window.confirm(`Are you sure to delete this audio?`)) return;
-
+		setUploading(true);
 		axios
 			.delete(`${serverURL}/api/audio?sid=${props.sid}&pageNum=${props.pageNum}`)
 			.then((res) => {
 				setAudioSrc('');
+				setUploading(false);
 			})
 			.catch((err) => {
 				console.error(err);
+				setUploading(false);
 			});
 	};
-
-	let audioRow;
-	if (props.isInstructor) {
-		if (audioSrc) {
-			audioRow = (
-				<>
-					<input type='file' id='file' className='file' ref={fileUpload} accept='.mp3' />
-					{uploading ? (
-						<CircularProgress size='1.5rem' className='progress' />
-					) : (
-						<span className='material-icons upload icon' onClick={uploadAudio}>
-							publish
-						</span>
-					)}
-					<audio className='slideAudio' id='slideAudio' controls={true} src={audioSrc}>
-						Your browser does not support the audio element.
-					</audio>
-					<span className='material-icons delete icon' onClick={deleteAudio}>
-						delete_forever
-					</span>
-				</>
-			);
-		} else {
-			audioRow = (
-				<>
-					<input type='file' id='file' className='file' ref={fileUpload} accept='.mp3' />
-					<Button variant='contained' onClick={uploadAudio} disabled={uploading}>
-						Upload Audio
-					</Button>
-					{uploading ? <CircularProgress /> : null}
-				</>
-			);
-		}
-	} else {
-		audioRow = (
-			<audio className='slideAudio' controls={audioSrc ? true : false} src={audioSrc}>
-				Your browser does not support the audio element.
-			</audio>
-		);
-	}
 
 	return (
 		<div className='slide-container'>
@@ -118,34 +80,51 @@ export default function Slides(props) {
 					(Download {props.filename})
 				</a>
 			</div>
-			<div>
-				<div className='slide-wrapper'>
-					<img
-						id='slide-img'
-						src={
-							props.pageTotal
-								? `${serverURL}/api/slideImg?slideID=${props.sid}&pageNum=${props.pageNum}`
-								: 'default.png'
-						}
-						alt='slide'
-						className='slide'
-					/>
-					{props.drawing ? <SlideOverlay ref={props.canvasComponentRef} /> : null}
+			<div className='slide-wrapper'>
+				<img
+					id='slide-img'
+					src={
+						props.pageTotal
+							? `${serverURL}/api/slideImg?slideID=${props.sid}&pageNum=${props.pageNum}`
+							: 'default.png'
+					}
+					alt='slide'
+					className='slide'
+				/>
+				{props.drawing ? <SlideOverlay ref={props.canvasComponentRef} /> : null}
+
+				<div className='flip-page-btns'>
+					<Button variant='contained' disabled={prevBtnDisable} onClick={props.prevPage}>
+						PREV
+					</Button>
+					<Button variant='contained' disabled={nextBtnDisable} onClick={props.nextPage}>
+						NEXT
+					</Button>
 				</div>
+				<div>
+					Page <input id='pageNum' type='text' defaultValue={props.pageNum} onBlur={props.gotoPage} /> of{' '}
+					{props.pageTotal}
+				</div>
+
+				<audio className='slide-audio' controls={audioSrc ? true : false} src={audioSrc}>
+					Your browser does not support the audio element.
+				</audio>
+
+				{props.isInstructor ? (
+					<div class='audio-instructor'>
+						<input type='file' id='file' className='file' ref={fileUpload} accept='.mp3' />
+						<Button variant='contained' onClick={uploadAudio} disabled={uploading} className='upload'>
+							{audioSrc ? 'Replace' : 'Upload'} Audio
+						</Button>
+						{uploading ? <CircularProgress /> : null}
+						{audioSrc ? (
+							<Button variant='contained' onClick={deleteAudio} disabled={uploading} className='delete'>
+								Delete Audio
+							</Button>
+						) : null}
+					</div>
+				) : null}
 			</div>
-			<div className='flip-page-btns'>
-				<Button variant='contained' disabled={prevBtnDisable} onClick={props.prevPage}>
-					PREV
-				</Button>
-				<Button variant='contained' disabled={nextBtnDisable} onClick={props.nextPage}>
-					NEXT
-				</Button>
-			</div>
-			<div>
-				Page <input id='pageNum' type='text' defaultValue={props.pageNum} onBlur={props.gotoPage} /> of{' '}
-				{props.pageTotal}
-			</div>
-			<div className='audio-row'>{audioRow}</div>
 		</div>
 	);
 }

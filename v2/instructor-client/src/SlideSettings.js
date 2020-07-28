@@ -125,7 +125,7 @@ export default function SlideSettings({ sid, open, onClose }) {
 						</div>
 						<div className='row'>
 							<span className='label'>Drawing:</span>
-							<Select value={settings.drawable} onChange={changeDrawable}>
+							<Select value={Boolean(settings.drawable)} onChange={changeDrawable}>
 								<MenuItem value={true}>On</MenuItem>
 								<MenuItem value={false}>Off</MenuItem>
 							</Select>
@@ -156,7 +156,7 @@ export default function SlideSettings({ sid, open, onClose }) {
 							<Button
 								href={`${baseURL}${instructorURL}/reorderQuestions/${sid}`}
 								variant='contained'
-								color='primary'>
+								className='reorder-btn'>
 								Reorder
 							</Button>
 						</div>

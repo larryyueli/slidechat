@@ -85,6 +85,9 @@
 			button {
 				background-color: $primary;
 				color: white;
+				&:disabled {
+					background-color: $disabled;
+				}
 			}
 		}
 
@@ -178,6 +181,14 @@
 
 		.MuiButton-root {
 			margin-right: 1rem;
+		}
+
+		button, .reorder-btn {
+			background-color: $primary;
+			color: white;
+			&:disabled {
+				background-color: $disabled;
+			}
 		}
 	}
 }

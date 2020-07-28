@@ -47,11 +47,7 @@ function Main(props) {
 				setPageTotal(res.data.pageTotal);
 				setTitle(res.data.title);
 				setFilename(res.data.filename);
-				if (res.data.drawable) {
-					setDrawable(true);
-				} else {
-					setDrawable(false);
-				}
+				setDrawable(Boolean(res.data.drawable));
 				applyPage(currentPage);
 			})
 			.catch((err) => {

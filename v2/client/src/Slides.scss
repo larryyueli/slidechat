@@ -32,36 +32,24 @@
 			& > span {
 				@include clickable();
 				background-color: #cccccc;
-				padding: 0.2rem;
-				margin: 0 0.5rem;
+				padding: 0.3rem;
+				margin: 0.5rem;
+				border-radius: 0.2rem;
+				box-shadow: 1px 2px 3px #aaaaaa;
 			}
+		}
+		.slide-audio {
+			width: 100%;
+			outline: none;
 		}
 	}
 
-	.audio-row {
+	.audio-instructor {
 		@include flexCenter();
-
-		.slideAudio {
-			max-width: 80%;
-			outline: none;
-		}
+		margin: 0 auto;
 
 		.file {
 			width: 13rem;
-		}
-
-		.icon {
-			@include clickable();
-			color: white;
-			font-size: 1.5rem;
-			padding: 0.3rem;
-			margin: 0.1rem;
-			border-radius: 0.5rem;
-		}
-
-		button {
-			background-color: $primary;
-			color: white;
 		}
 
 		.progress {
@@ -71,26 +59,29 @@
 
 		.upload {
 			background-color: $primary;
-			&:hover {
-				background-color: lighten($primary, 10%);
+			color: white;
+			margin: 0 0.5rem;
+			&:disabled {
+				background-color: $disabled;
 			}
 		}
 
 		.delete {
 			background-color: $secondary;
-			&:hover {
-				background-color: lighten($secondary, 10%);
+			color: white;
+			margin: 0 0.5rem;
+			&:disabled {
+				background-color: $disabled;
 			}
 		}
 	}
 
-	.flip-page-btns{
+	.flip-page-btns {
 		button {
-			margin: 1rem;
+			margin: 0.5rem 1rem;
 			background-color: $gray;
 		}
 	}
-	
 
 	input {
 		width: 1.8rem;
