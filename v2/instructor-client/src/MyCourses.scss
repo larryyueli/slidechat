@@ -82,6 +82,10 @@
 			.MuiCircularProgress-root {
 				margin-left: 1rem;
 			}
+			button {
+				background-color: $primary;
+				color: white;
+			}
 		}
 
 		.addInstructor-bar {
@@ -96,6 +100,10 @@
 				.MuiOutlinedInput-multiline {
 					padding: 6px;
 				}
+			}
+			button {
+				background-color: $primary;
+				color: white;
 			}
 		}
 
@@ -122,6 +130,11 @@
 			.MuiOutlinedInput-multiline {
 				padding: 6px;
 			}
+		}
+
+		button {
+			background-color: $primary;
+			color: white;
 		}
 	}
 }

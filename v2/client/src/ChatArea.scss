@@ -65,11 +65,14 @@
 		}
 	}
 
-	.new-chat-btn-row,
-	.audio-btn-row {
+	.new-chat-btn-row {
 		text-align: center;
 		padding: 1rem 0;
 		border-bottom: 1px solid #cccccc;
+		button {
+			background-color: $primary;
+			color: white;
+		}
 	}
 
 	.chat-list {
@@ -216,6 +219,10 @@
 				.MuiOutlinedInput-multiline {
 					padding: 6px;
 				}
+			}
+
+			button {
+				background-color: $primary;
 			}
 		}
 	}

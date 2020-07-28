@@ -18,11 +18,17 @@
 		font-size: 1.5rem;
 		padding: 0 2rem;
 		margin-top: 3rem;
+		background-color: $primary;
+		color: white;
+		&:hover {
+			background-color: $primary;
+		}
 	}
 
 	.instructorButton {
 		text-transform: none;
 		font-size: 0.7rem;
 		margin-top: 2rem;
+		background-color: $gray;
 	}
 }

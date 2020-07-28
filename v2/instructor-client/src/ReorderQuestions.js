@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Button, CircularProgress } from '@material-ui/core';
 
-import { baseURL, serverURL, fullURL } from './config';
+import { serverURL, fullURL } from './config';
 
 export default function ReorderQuestions(props) {
-	const uid = 'lulingxi';
 	const sid = props.match.params.slideId;
 	const [loading, setLoading] = useState(true);
 	const [slide, setSlide] = useState({});
@@ -124,7 +123,6 @@ export default function ReorderQuestions(props) {
 			await axios.post(`${serverURL}/api/reorderQuestions`, {
 				questionOrder: questionOrder,
 				sid: sid,
-				user: uid,
 			});
 			window.location.href = `${fullURL()}/prof`;
 		} catch (err) {
@@ -223,7 +221,7 @@ export default function ReorderQuestions(props) {
 						<Button variant='contained' href={`${fullURL()}/prof`}>
 							Abort
 						</Button>
-						<Button variant='contained' color='primary' onClick={(e) => submitChanges()}>
+						<Button variant='contained' className="primary" onClick={(e) => submitChanges()}>
 							Submit
 						</Button>
 					</div>

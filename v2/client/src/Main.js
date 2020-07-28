@@ -3,6 +3,7 @@ import axios from 'axios';
 
 import ChatArea from './ChatArea';
 import Slides from './Slides';
+import AppBar from './Appbar';
 import { serverURL } from './config';
 
 /**
