@@ -28,13 +28,20 @@ sessStore.on('error', (err) => {
 	console.error(err);
 });
 
+morgan.token('id', (req) => {
+	if (req.session) return req.session.uid;
+});
+morgan.token('body', (req) => {
+	return JSON.stringify(req.body);
+})
+
 let main = (async () => {
 	const app = express();
 	app.disable('x-powered-by'); // remove the HTTP header "X-powered-by: express"
 
 	app.use(compression());
 	if (NODE_ENV !== 'production') app.use(cors());
-	app.use(morgan(':remote-addr :method :url :status :res[content-length] - :response-time ms'));
+	app.use(morgan(':id :method :url :body :status :res[content-length] - :response-time ms'));
 	app.use(bodyParser.json()); // support json encoded bodies
 	app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 	app.use(cookieParser());
