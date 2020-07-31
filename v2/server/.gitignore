@@ -2,8 +2,5 @@
 /client-build
 /instructor-client-build
 
-/files/*/*.pdf
-/files/*/*.png
-
 # misc
 .DS_Store

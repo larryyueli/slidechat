@@ -33,8 +33,8 @@ let main = (async () => {
 	app.disable('x-powered-by'); // remove the HTTP header "X-powered-by: express"
 
 	app.use(compression());
-	app.use(cors());
-	app.use(morgan('dev'));
+	if (NODE_ENV !== 'production') app.use(cors());
+	app.use(morgan(':remote-addr :method :url :status :res[content-length] - :response-time ms'));
 	app.use(bodyParser.json()); // support json encoded bodies
 	app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 	app.use(cookieParser());

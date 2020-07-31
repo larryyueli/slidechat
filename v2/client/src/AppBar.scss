@@ -1,7 +1,10 @@
 .appbar {
 	position: static;
 	@include flexSides();
-	padding: 0.5rem 3rem;
+	padding: 0.5rem 0.5rem;
+	@media (min-width: 768px) {
+		padding: 0.5rem 3rem;
+	}
 	color: #ffffff;
 	background-color: $primary;
 	box-shadow: 0 3px 10px #aaaaaa;
@@ -9,8 +12,9 @@
 
 	.appbar-logo {
 		font-size: 1.5rem;
-		line-height: 2rem;
 		font-weight: 500;
+		height: 2.5rem;
+		width: auto;
 	}
 
 	.appbar-item {

@@ -18,6 +18,4 @@ module.exports = {
 	fileStorage: path.join(os.homedir(), '.slidechat', 'files'),
 
 	convertOptions: { '-density': 150 },
-
-	instructors: instructors,
 };
