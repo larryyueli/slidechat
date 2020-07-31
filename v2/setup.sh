@@ -1,20 +1,10 @@
-cd client
 npm i
-npm run build
-
-cd ../instructor-client
-npm i
-npm run build
-
-cd ../server
-npm i
+cd client && npm i && cd ..
+cd instructor-client && npm i & cd ..
 
 # default location to store pdf files
 mkdir -p ~/.slidechat/files
 
-mkdir client-build
-cp ../client/build/* client-build/
-mkdir instructor-client-build
-cp ../instructor-client/* instructor-client-build/
+npm run build
 
-npm start
+npm run deploy

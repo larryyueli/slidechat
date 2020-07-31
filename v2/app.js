@@ -12,7 +12,7 @@ const MongoSessStore = require('connect-mongodb-session')(session);
 
 const config = require('./config');
 const secrets = require('./secrets');
-const startSlidechat = require('./routes/slidechat');
+const startSlideChat = require('./routes/slidechat');
 
 const {
 	PORT = 10000,
@@ -59,7 +59,7 @@ let main = (async () => {
 		})
 	);
 
-	const slidechat = await startSlidechat();
+	const slidechat = await startSlideChat();
 	app.use('/', slidechat);
 
 	app.use((req, res) => res.status(404).send());

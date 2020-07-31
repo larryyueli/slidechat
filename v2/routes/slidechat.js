@@ -11,7 +11,8 @@ const { baseURL, dbURL, instructorURL, cookieName } = require('../config');
 const instructorAPI = require('./instructorAPI');
 const commonAPI = require('./commonAPI');
 
-let instructors = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'instructorList.json')));
+const instructorListPath = path.join(__dirname, '..', 'instructorList.json');
+let instructors = JSON.parse(fs.readFileSync(instructorListPath));
 
 /**
  * Middleware for checking if the user is logged in as an instructor
@@ -42,7 +43,7 @@ function isInstructor(uid) {
 	} else {
 		let tmp;
 		try {
-			tmp = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'instructorList.json')));
+			tmp = JSON.parse(fs.readFileSync(instructorListPath));
 		} catch (err) {
 			console.error('load instructor list error');
 			console.log(err);
@@ -53,7 +54,7 @@ function isInstructor(uid) {
 	}
 }
 
-async function startSlidechat() {
+async function startSlideChat() {
 	const router = express.Router();
 
 	let dbClient;
@@ -112,24 +113,24 @@ async function startSlidechat() {
 		});
 	});
 
+	// APIs
 	router.use(instructorAPI(db, instructorAuth, isInstructor));
 	router.use(commonAPI(db));
 
+	// Routes
 	router.get(instructorURL, instructorAuth, (req, res) => {
-		res.sendFile('index.html', { root: 'instructor-client-build' });
+		res.sendFile('index.html', { root: 'instructor-client/build' });
 	});
 	// front-end route
 	router.get(`${instructorURL}/reorderQuestions/:slideID([A-Fa-f0-9]+)`, instructorAuth, (req, res) => {
-		res.sendFile('index.html', { root: 'instructor-client-build' });
+		res.sendFile('index.html', { root: 'instructor-client/build' });
 	});
-
-	router.use(instructorURL, instructorAuth, express.static('instructor-client-build'));
+	router.use(instructorURL, instructorAuth, express.static('instructor-client/build'));
 
 	router.get(/^\/([A-Fa-f0-9]+\/?)?$/, (req, res) => {
-		res.sendFile('index.html', { root: 'client-build' });
+		res.sendFile('index.html', { root: 'client/build' });
 	});
-
-	router.use(express.static('client-build'));
+	router.use(express.static('client/build'));
 
 	router.use((req, res) => res.status(404).send());
 
@@ -137,4 +138,4 @@ async function startSlidechat() {
 	return router;
 }
 
-module.exports = startSlidechat;
+module.exports = startSlideChat;
