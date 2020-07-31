@@ -2,11 +2,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './App.scss';
 import App from './App';
-import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(<App />, document.getElementById('root'));
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+if (window.navigator.serviceWorker) {
+	window.addEventListener('load', () => {
+		navigator.serviceWorker
+			.register(`${process.env.PUBLIC_URL}/serviceWorker.js`)
+			.then((reg) => console.log(`service worker registered with scope "${reg.scope}"`))
+			.catch((err) => console.error(err));
+	});
+} else {
+	console.log('service worker not supported');
+}
