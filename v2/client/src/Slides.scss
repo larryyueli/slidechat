@@ -38,6 +38,17 @@
 				box-shadow: 1px 2px 3px #aaaaaa;
 			}
 		}
+
+		.flip-page-overlay {
+			position: absolute;
+			top: 0;
+			left: 0;
+			// background-color: #ff000008;
+			display: grid;
+			grid-template-columns: 1fr 1fr 1fr;
+			width: 100%;
+		}
+
 		.slide-audio {
 			width: 100%;
 			outline: none;

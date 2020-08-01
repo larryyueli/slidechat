@@ -19,7 +19,6 @@ export default class SlideOverlay extends React.Component {
 	resize(slide) {
 		this.canvas.width = slide.clientWidth;
 		this.canvas.height = slide.clientHeight;
-		this.canvas.style.bottom = slide.clientHeight;
 		this.setupCtx();
 		this.redraw();
 	}

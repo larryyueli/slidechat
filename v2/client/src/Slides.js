@@ -3,6 +3,7 @@ import { Button, CircularProgress } from '@material-ui/core';
 import axios from 'axios';
 
 import SlideOverlay from './SlideOverlay';
+import SlideFlipOverlay from './SlideFlipOverlay';
 import { serverURL } from './config';
 import { randInt } from './util';
 
@@ -91,7 +92,16 @@ export default function Slides(props) {
 					alt='slide'
 					className='slide'
 				/>
-				{props.drawing ? <SlideOverlay ref={props.canvasComponentRef} /> : null}
+				{props.drawing ? (
+					<SlideOverlay ref={props.canvasComponentRef} />
+				) : (
+					<SlideFlipOverlay
+						prevBtnDisable={prevBtnDisable}
+						nextBtnDisable={nextBtnDisable}
+						prevPage={props.prevPage}
+						nextPage={props.nextPage}
+					/>
+				)}
 
 				<div className='flip-page-btns'>
 					<Button variant='contained' disabled={prevBtnDisable} onClick={props.prevPage}>
@@ -111,7 +121,7 @@ export default function Slides(props) {
 				</audio>
 
 				{props.isInstructor ? (
-					<div class='audio-instructor'>
+					<div className='audio-instructor'>
 						<input type='file' id='file' className='file' ref={fileUpload} accept='.mp3' />
 						<Button variant='contained' onClick={uploadAudio} disabled={uploading} className='upload'>
 							{audioSrc ? 'Replace' : 'Upload'} Audio
