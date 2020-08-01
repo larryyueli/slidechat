@@ -70,6 +70,12 @@ export function deleteCookie(cookieName) {
 	}
 }
 
+export function setUserName(name) {
+	let date = new Date();
+	date.setTime(date.getTime() + 365 * 24 * 60 * 60 * 1000);
+	document.cookie = 'userName' + '=' + name + '; expires=' + date.toUTCString() + '; path=/;';
+}
+
 export function getUserName() {
 	let cookieName = 'userName';
 	let name = getCookie(cookieName);
@@ -77,9 +83,7 @@ export function getUserName() {
 		return name;
 	}
 	name = getRandomName();
-	let date = new Date();
-	date.setTime(date.getTime() + 365 * 24 * 60 * 60 * 1000);
-	document.cookie = cookieName + '=' + name + '; expires=' + date.toUTCString() + '; path=/;';
+	setUserName(name);
 	return name;
 }
 
