@@ -73,7 +73,7 @@ export function deleteCookie(cookieName) {
 export function setUserName(name) {
 	let date = new Date();
 	date.setTime(date.getTime() + 365 * 24 * 60 * 60 * 1000);
-	document.cookie = 'userName' + '=' + name + '; expires=' + date.toUTCString() + '; path=/;';
+	document.cookie = 'userName'.concat('=', name, '; expires=', date.toUTCString(), '; path=/;');
 }
 
 export function getUserName() {

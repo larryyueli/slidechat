@@ -40,6 +40,10 @@ export default class SlideOverlay extends React.Component {
 		this.canvas.addEventListener('mousemove', (e) => this.drawingOnMouseMove(e));
 		this.canvas.addEventListener('mouseup', (e) => this.drawingOnMouseUp(e));
 
+		this.canvas.addEventListener('touchend', (e) => { this.touchend(e); });
+		this.canvas.addEventListener('touchmove', (e) => { this.touchmove(e); });
+		this.canvas.addEventListener('touchstart', (e) => { this.touchstart(e); });
+
 		const slide = document.getElementById('slide-img');
 		if (slide.complete) {
 			this.resize(slide);
@@ -67,6 +71,21 @@ export default class SlideOverlay extends React.Component {
 		}
 	}
 
+	applyLineChange(lastLine){
+		let len = lastLine.length;
+		this.ctx.beginPath();
+		this.ctx.moveTo(
+			((lastLine[len - 4] / resolution) * this.canvas.width) >> 0,
+			((lastLine[len - 3] / resolution) * this.canvas.height) >> 0
+		);
+		this.ctx.lineTo(
+			((lastLine[len - 2] / resolution) * this.canvas.width) >> 0,
+			((lastLine[len - 1] / resolution) * this.canvas.height) >> 0
+		);
+		this.ctx.stroke();
+		this.ctx.closePath();
+	}
+
 	drawingOnMouseDown(e) {
 		if (this.state.readOnly) return;
 		this.lines.push([
@@ -82,22 +101,45 @@ export default class SlideOverlay extends React.Component {
 		let lastLine = this.lines[this.lines.length - 1];
 		lastLine.push(((e.offsetX / this.canvas.width) * resolution) >> 0);
 		lastLine.push(((e.offsetY / this.canvas.height) * resolution) >> 0);
-		let len = lastLine.length;
-		this.ctx.beginPath();
-		this.ctx.moveTo(
-			((lastLine[len - 4] / resolution) * this.canvas.width) >> 0,
-			((lastLine[len - 3] / resolution) * this.canvas.height) >> 0
-		);
-		this.ctx.lineTo(
-			((lastLine[len - 2] / resolution) * this.canvas.width) >> 0,
-			((lastLine[len - 1] / resolution) * this.canvas.height) >> 0
-		);
-		this.ctx.stroke();
-		this.ctx.closePath();
+		this.applyLineChange(lastLine);
 	}
 
 	drawingOnMouseUp(e) {
 		this.isDrawing = false;
+	}
+
+	touchend(e){
+		if (this.isDrawing && e.touches.length === 0){
+			this.isDrawing = false;
+		}
+	}
+
+	touchmove(e){
+		if (this.state.readOnly) return;
+		if (!this.isDrawing) return;
+		let touch = e.touches[0];
+		let rect = this.canvas.getBoundingClientRect();
+		let offsetX = touch.clientX - rect.left;
+		let offsetY = touch.clientY - rect.top;
+
+		let lastLine = this.lines[this.lines.length - 1];
+		lastLine.push(((offsetX / this.canvas.width) * resolution) >> 0);
+		lastLine.push(((offsetY / this.canvas.height) * resolution) >> 0);
+		this.applyLineChange(lastLine);
+	}
+
+	touchstart(e){
+		e.preventDefault();
+		if (this.state.readOnly || this.isDrawing) return;
+		this.isDrawing = true;
+		let touch = e.touches[0];
+		let rect = this.canvas.getBoundingClientRect();
+		let offsetX = touch.clientX - rect.left;
+		let offsetY = touch.clientY - rect.top;
+		this.lines.push([
+			((offsetX / this.canvas.width) * resolution) >> 0,
+			((offsetY / this.canvas.height) * resolution) >> 0,
+		]);
 	}
 
 	undo(e) {

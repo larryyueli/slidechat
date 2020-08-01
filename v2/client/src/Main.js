@@ -35,7 +35,7 @@ function Main(props) {
 				}
 			})
 			.then((res) => {
-				setIsAnyone(res.data.anonymity == 'anyone');
+				setIsAnyone(res.data.anonymity === 'anyone');
 				let currentPage = 1;
 				if (window.location.hash) {
 					let n = +window.location.hash.substring(1);

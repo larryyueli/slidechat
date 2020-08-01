@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Button, CircularProgress } from '@material-ui/core';
 import axios from 'axios';
 
-import SlideOverlay from './SlideOverlay';
+import SlideDrawingOverlay from './SlideDrawingOverlay';
 import { serverURL } from './config';
 import { randInt } from './util';
 
@@ -91,7 +91,7 @@ export default function Slides(props) {
 					alt='slide'
 					className='slide'
 				/>
-				{props.drawing ? <SlideOverlay ref={props.canvasComponentRef} /> : null}
+				{props.drawing ? <SlideDrawingOverlay ref={props.canvasComponentRef} /> : null}
 
 				<div className='flip-page-btns'>
 					<Button variant='contained' disabled={prevBtnDisable} onClick={props.prevPage}>
