@@ -27,6 +27,7 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 				});
 			} // does not need to initialize here
 			res.json({
+				uid: req.session.uid,
 				user: shortName(req.session.realName),
 				courses: user.courses,
 			});
@@ -712,7 +713,6 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 	 *   sid: slide object ID
 	 *   pageNum: page number, integer range from from 1 to pageTotal (inclusive)
 	 *   qid: question index, integer range from from 0 to questions.length (exclusive)
-	 *   c
 	 */
 	router.delete('/api/chat', instructorAuth, async (req, res) => {
 		try {

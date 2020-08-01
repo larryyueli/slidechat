@@ -43,10 +43,76 @@ export function range(start, end) {
 export function randInt(max) {
 	return Math.floor(Math.random() * max);
 }
-
+const nameList = [
+	'Alchemist',
+	'Archer',
+	'Archimage',
+	'Assassin',
+	'Astrologist',
+	'Bard',
+	'Berserker',
+	'Blacksmith',
+	'Blue Mage',
+	'Bounty Hunter',
+	'Caster',
+	'Cook',
+	'Dancer',
+	'Dark Knight',
+	'Demon Hunter',
+	'Dragon Rider',
+	'Dragonborn',
+	'Dragoon',
+	'Druid',
+	'Duelist',
+	'Enchanter',
+	'Engineer',
+	'Fighter',
+	'Fisherman',
+	'Gladiator',
+	'Guardian',
+	'Gunblader',
+	'Gunner',
+	'Herbalist',
+	'Hunter',
+	'Inquisitor',
+	'Joker',
+	'Knight',
+	'Lancer',
+	'Machinist',
+	'Mage',
+	'Merchant',
+	'Miner',
+	'Mobile Suit',
+	'Monk',
+	'Necromancer',
+	'Ninja',
+	'NPC',
+	'Paladin',
+	'Pegasus Rider',
+	'Pirate',
+	'Priest',
+	'Prophet',
+	'Puppeteer',
+	'Red Mage',
+	'Rider',
+	'Rogue',
+	'Rune Saber',
+	'Saber',
+	'Sage',
+	'Samurai',
+	'Scholar',
+	'Shaman',
+	'Sorcerer',
+	'Summoner',
+	'Warlock',
+	'Warrior',
+	'White Mage',
+	'Witch Doctor',
+	'Witch',
+	'Wizard',
+];
 export function getRandomName() {
-	let nameList = ['name'];
-	return `anonymous ${nameList[randInt(nameList.length)]}`;
+	return `Anonymous ${nameList[randInt(nameList.length)]}`;
 }
 
 export function getCookie(cookieName) {
@@ -70,27 +136,17 @@ export function deleteCookie(cookieName) {
 	}
 }
 
-export function setUserName(name) {
-	let date = new Date();
-	date.setTime(date.getTime() + 365 * 24 * 60 * 60 * 1000);
-	document.cookie = 'userName'.concat('=', name, '; expires=', date.toUTCString(), '; path=/;');
+const nameKey = 'SlideChat_DispName';
+export function setDisplayName(name) {
+	window.localStorage.setItem(nameKey, name);
 }
 
-export function getUserName() {
-	let cookieName = 'userName';
-	let name = getCookie(cookieName);
+export function getDisplayName() {
+	let name = window.localStorage.getItem(nameKey);
 	if (name) {
 		return name;
 	}
 	name = getRandomName();
-	setUserName(name);
+	setDisplayName(name);
 	return name;
-}
-
-export function getIsInstructor() {
-	let cookieName = 'isI';
-	if (getCookie(cookieName) === 'yes') {
-		return true;
-	}
-	return false;
 }

@@ -18,7 +18,9 @@
 	}
 
 	.appbar-items {
-		@include flexSides();
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
 		.appbar-item {
 			color: #ffffff;
 			text-decoration: none;
@@ -30,29 +32,6 @@
 				background-color: #ffffff20;
 			}
 		}
-
-		.anonymous-name-bar{
-			text-align: center;
-			&:hover {
-				background-color: $primary;
-			}
-
-			input{
-				width: 10rem;
-				text-align: center;
-				padding: 0.2rem 0;
-				background-color: lighten($primary, 5%);
-				border: 0px;
-
-				&:hover {
-					background-color: lighten($primary, 10%);
-				}
-
-				&:focus {
-					background-color: lighten($primary, 10%);
-				}
-			}
-		}
 	}
 
 	.dropdown {
@@ -61,20 +40,57 @@
 		.dropdown-content {
 			display: none;
 			position: absolute;
-			left: 0;
+			right: 0;
 			top: 2rem;
 			background-color: $backgroundColour;
 			min-width: 100%;
 			box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-			z-index: 1;
+			z-index: 1000;
+			color: black;
+
 			.dropdown-item {
 				color: black;
-				padding: 1rem 1.3rem;
+				padding: 0.5rem 1.3rem;
 				text-decoration: none;
 				display: block;
 				text-align: left;
+			}
+
+			.clickable {
+				padding: 1rem 1.3rem;
 				&:hover {
 					background-color: #f1f1f1;
+				}
+			}
+
+			.input-label {
+				padding: 0.5rem 1.3rem 0 1.3rem;
+			}
+
+			.anonymous-name-bar {
+				display: flex;
+				input {
+					flex: 1;
+					min-width: 5rem;
+					padding: 0 0.5rem;
+					border: 1px solid #666666;
+					border-radius: 0.5rem;
+					outline: none;
+				}
+
+				.icon {
+					@include clickable();
+					padding: 0.5rem;
+					border: 1px solid #666666;
+					border-radius: 0.5rem;
+					margin-left: 1rem;
+				}
+			}
+
+			.error {
+				color: $secondary;
+				&.ok {
+					display: none;
 				}
 			}
 		}

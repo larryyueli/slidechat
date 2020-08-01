@@ -20,8 +20,9 @@ function Main(props) {
 	const [drawable, setDrawable] = useState(false);
 	const [slideDrawing, setSlideDrawing] = useState(false);
 	const [isInstructor, setIsInstructor] = useState(false);
-	const [user, setUser] = useState('');
-	const [isAnyone, setIsAnyone] = useState(true);
+	const [uid, setUid] = useState('');
+	const [username, setUsername] = useState('');
+	const [anonymity, setAnonymity] = useState('anyone');
 	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
 
 	useEffect(() => {
@@ -35,7 +36,6 @@ function Main(props) {
 				}
 			})
 			.then((res) => {
-				setIsAnyone(res.data.anonymity === 'anyone');
 				let currentPage = 1;
 				if (window.location.hash) {
 					let n = +window.location.hash.substring(1);
@@ -44,7 +44,11 @@ function Main(props) {
 					}
 				}
 
-				if (res.data.loginUser) setUser(res.data.loginUser);
+				setAnonymity(res.data.anonymity);
+				if (res.data.loginUser) {
+					setUid(res.data.loginUser);
+					setUsername(res.data.username);
+				}
 				if (res.data.isInstructor) setIsInstructor(true);
 				setPageTotal(res.data.pageTotal);
 				setTitle(res.data.title);
@@ -103,7 +107,12 @@ function Main(props) {
 
 	return (
 		<>
-			<AppBar user={user} loginURL={`${serverURL}/p/login/${sid}/${page}`} isAnyone={isAnyone}/>
+			<AppBar
+				anonymity={anonymity}
+				uid={uid}
+				username={username}
+				loginURL={`${serverURL}/p/login/${sid}/${page}`}
+			/>
 			<div className='main'>
 				<Slides
 					title={title}

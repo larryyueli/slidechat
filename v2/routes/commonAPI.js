@@ -64,7 +64,8 @@ function commonAPI(db) {
 				pageTotal: slide.pageTotal,
 				title: slide.title,
 				anonymity: slide.anonymity,
-				loginUser: shortName(req.session.realName),
+				loginUser: req.session.uid,
+				username: shortName(req.session.realName),
 				isInstructor: course.instructors.indexOf(req.session.uid) >= 0,
 				drawable: slide.drawable,
 			});

@@ -6,7 +6,7 @@ import markdownItMathJax from 'markdown-it-mathjax';
 import highlight from 'highlight.js';
 
 import { serverURL } from './config';
-import { formatTime, formatNames, getUserName } from './util';
+import { formatTime, formatNames, getDisplayName } from './util';
 
 const md = markdownIt({
 	breaks: true,
@@ -33,7 +33,6 @@ export default function ChatArea(props) {
 	const [qid, setQid] = useState(-1);
 	const [managing, setManaging] = useState(false);
 	const [drawing, setDrawing] = useState(false);
-	const userName = getUserName();
 	const titleRef = useRef(null);
 	const bodyRef = useRef(null);
 	const chatRef = useRef(null);
@@ -74,7 +73,7 @@ export default function ChatArea(props) {
 				pageNum: props.pageNum,
 				title: titleRef.current.value,
 				body: bodyRef.current.value,
-				user: userName,
+				user: getDisplayName(),
 				drawing: canvasData,
 			})
 			.then((res) => {
@@ -92,7 +91,7 @@ export default function ChatArea(props) {
 				pageNum: props.pageNum,
 				qid: qid,
 				body: chatRef.current.value,
-				user: userName,
+				user: getDisplayName(),
 			})
 			.then((res) => {
 				chatRef.current.value = '';
@@ -157,7 +156,7 @@ export default function ChatArea(props) {
 				pageNum: props.pageNum,
 				qid: qid,
 				cid: cid,
-				user: userName,
+				user: getDisplayName(),
 			})
 			.then((res) => {
 				fetchChatDetails(qid);
@@ -182,9 +181,7 @@ export default function ChatArea(props) {
 		if (!window.confirm(`Are you sure to delete "${questions[qid].title}"?`)) return;
 
 		axios
-			.delete(`${serverURL}/api/question?sid=${props.sid}&qid=${qid}&pageNum=${props.pageNum}`, {
-				data: { user: userName },
-			})
+			.delete(`${serverURL}/api/question?sid=${props.sid}&qid=${qid}&pageNum=${props.pageNum}`)
 			.then((res) => {
 				backToList();
 			})
@@ -198,9 +195,7 @@ export default function ChatArea(props) {
 		if (!window.confirm(`Are you sure to delete this chat?`)) return;
 
 		axios
-			.delete(`${serverURL}/api/chat?sid=${props.sid}&qid=${qid}&pageNum=${props.pageNum}&cid=${cid}`, {
-				data: { user: userName },
-			})
+			.delete(`${serverURL}/api/chat?sid=${props.sid}&qid=${qid}&pageNum=${props.pageNum}&cid=${cid}`)
 			.then((res) => {
 				fetchChatDetails(qid);
 			})
