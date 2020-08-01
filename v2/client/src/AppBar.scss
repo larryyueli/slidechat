@@ -17,15 +17,41 @@
 		width: auto;
 	}
 
-	.appbar-item {
-		color: #ffffff;
-		text-decoration: none;
-		margin: 0 0.5rem;
-		padding: 0.4rem;
-		border-radius: 0.4rem;
+	.appbar-items {
+		@include flexSides();
+		.appbar-item {
+			color: #ffffff;
+			text-decoration: none;
+			margin: 0 0.5rem;
+			padding: 0.4rem;
+			border-radius: 0.4rem;
 
-		&:hover {
-			background-color: #ffffff20;
+			&:hover {
+				background-color: #ffffff20;
+			}
+		}
+
+		.anonymous-name-bar{
+			text-align: center;
+			&:hover {
+				background-color: $primary;
+			}
+
+			input{
+				width: 10rem;
+				text-align: center;
+				padding: 0.2rem 0;
+				background-color: lighten($primary, 5%);
+				border: 0px;
+
+				&:hover {
+					background-color: lighten($primary, 10%);
+				}
+
+				&:focus {
+					background-color: lighten($primary, 10%);
+				}
+			}
 		}
 	}
 

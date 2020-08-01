@@ -21,6 +21,7 @@ function Main(props) {
 	const [slideDrawing, setSlideDrawing] = useState(false);
 	const [isInstructor, setIsInstructor] = useState(false);
 	const [user, setUser] = useState('');
+	const [isAnyone, setIsAnyone] = useState(true);
 	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
 
 	useEffect(() => {
@@ -34,6 +35,7 @@ function Main(props) {
 				}
 			})
 			.then((res) => {
+				setIsAnyone(res.data.anonymity == 'anyone');
 				let currentPage = 1;
 				if (window.location.hash) {
 					let n = +window.location.hash.substring(1);
@@ -101,7 +103,7 @@ function Main(props) {
 
 	return (
 		<>
-			<AppBar user={user} loginURL={`${serverURL}/p/login/${sid}/${page}`} />
+			<AppBar user={user} loginURL={`${serverURL}/p/login/${sid}/${page}`} isAnyone={isAnyone}/>
 			<div className='main'>
 				<Slides
 					title={title}
