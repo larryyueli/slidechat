@@ -2,10 +2,21 @@ const CACHE_PREFIX = 'slidechat-client';
 const CACHE_NAME = `${CACHE_PREFIX}-v1`;
 const self = this;
 
-const cachePattern = /^(?!chrome-extension).*(?:\.css|\.js|\.ico|\.woff2|\.html|default\.png|logo\.png)$/;
+const baseURL = '/slidechat';
+const cachePattern = /^(?!chrome-extension).*(?:\.css|\.js|\.ico|\.woff2|\.html)$/;
+
 self.addEventListener('install', (e) => {
 	console.log('service worker installed');
 	self.skipWaiting();
+	e.waitUntil(
+		caches.open(CACHE_NAME).then((cache) => {
+			cache.addAll([
+				`${baseURL}/imgs/logo.png`,
+				`${baseURL}/imgs/loading.png`,
+				`${baseURL}/imgs/disconnected.png`,
+			]);
+		})
+	);
 });
 
 self.addEventListener('activate', (e) => {

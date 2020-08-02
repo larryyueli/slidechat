@@ -53,7 +53,7 @@ export default function Slides(props) {
 				console.error(err);
 			});
 		// eslint-disable-next-line
-	}, [props.pageNum]);
+	}, [props.pageTotal, props.pageNum]);
 
 	const uploadAudio = async () => {
 		if (fileUpload.current.files.length !== 1) return;
