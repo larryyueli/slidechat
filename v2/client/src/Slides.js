@@ -7,6 +7,8 @@ import SlideFlipOverlay from './SlideFlipOverlay';
 import { serverURL } from './config';
 import { randInt } from './util';
 
+const loadingImg = process.env.PUBLIC_URL + '/imgs/loading.png';
+const disconnectedImg = process.env.PUBLIC_URL + '/imgs/disconnected.png';
 /**
  * Slides on the left of the screen
  */
@@ -15,9 +17,25 @@ export default function Slides(props) {
 	let nextBtnDisable = props.pageNum === props.pageTotal;
 	let prevBtnDisable = props.pageNum === 1;
 	const [uploading, setUploading] = useState(false);
+	const [img, setImg] = useState(loadingImg);
 	const fileUpload = useRef(null);
 
 	useEffect(() => {
+		setImg(loadingImg);
+		if (!props.pageTotal) return;
+		fetch(`${serverURL}/api/slideImg?slideID=${props.sid}&pageNum=${props.pageNum}`)
+			.then((res) => {
+				if (!res.ok) throw res.statusText;
+				return res.blob();
+			})
+			.then((blob) => {
+				const src = URL.createObjectURL(blob);
+				setImg(src);
+			})
+			.catch((err) => {
+				console.error(err);
+				setImg(disconnectedImg);
+			});
 		axios
 			.get(`${serverURL}/api/hasAudio?slideID=${props.sid}&pageNum=${props.pageNum}`)
 			.then((res) => {
@@ -82,16 +100,7 @@ export default function Slides(props) {
 				</a>
 			</div>
 			<div className='slide-wrapper'>
-				<img
-					id='slide-img'
-					src={
-						props.pageTotal
-							? `${serverURL}/api/slideImg?slideID=${props.sid}&pageNum=${props.pageNum}`
-							: 'default.png'
-					}
-					alt='slide'
-					className='slide'
-				/>
+				<img id='slide-img' src={img} alt='slide' className='slide' />
 				{props.drawing ? (
 					<SlideDrawingOverlay ref={props.canvasComponentRef} />
 				) : (
