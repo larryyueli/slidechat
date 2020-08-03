@@ -37,22 +37,20 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
 	// console.log(`service worker fetch: ${e.request.url}`);
-	if (cachePattern.test(e.request.url)) {
-		// cache first, need to change cache name to update cache
-		e.respondWith(
-			caches.open(CACHE_NAME).then((cache) => {
-				return cache.match(e.request).then((cachedRes) => {
-					return (
-						cachedRes ||
-						fetch(e.request).then((networkRes) => {
-							cache.put(e.request, networkRes.clone());
-							return networkRes;
-						})
-					);
-				});
-			})
-		);
-	} else {
-		e.respondWith(fetch(e.request));
-	}
+	// cache first, need to change cache name to update cache
+	e.respondWith(
+		caches.open(CACHE_NAME).then((cache) => {
+			return cache.match(e.request).then((cachedRes) => {
+				if (cachedRes) return cachedRes;
+				if (cachePattern.test(e.request.url)) {
+					fetch(e.request).then((networkRes) => {
+						cache.put(e.request, networkRes.clone());
+						return networkRes;
+					});
+				} else {
+					return fetch(e.request);
+				}
+			});
+		})
+	);
 });
