@@ -13,15 +13,14 @@ const disconnectedImg = process.env.PUBLIC_URL + '/imgs/disconnected.png';
  * Slides on the left of the screen
  */
 export default function Slides(props) {
-	let [audioSrc, setAudioSrc] = useState('');
-	let nextBtnDisable = props.pageNum === props.pageTotal;
-	let prevBtnDisable = props.pageNum === 1;
+	const [audioSrc, setAudioSrc] = useState('');
+	const [nextDisable, setNextDisable] = useState(true);
+	const [prevDisable, setPrevDisable] = useState(true);
 	const [uploading, setUploading] = useState(false);
 	const [img, setImg] = useState(loadingImg);
 	const fileUpload = useRef(null);
 
 	useEffect(() => {
-		setImg(loadingImg);
 		if (!props.pageTotal) return;
 		fetch(`${serverURL}/api/slideImg?slideID=${props.sid}&pageNum=${props.pageNum}`)
 			.then((res) => {
@@ -31,10 +30,14 @@ export default function Slides(props) {
 			.then((blob) => {
 				const src = URL.createObjectURL(blob);
 				setImg(src);
+				setNextDisable(props.pageNum === props.pageTotal);
+				setPrevDisable(props.pageNum === 1);
 			})
 			.catch((err) => {
 				console.error(err);
 				setImg(disconnectedImg);
+				setNextDisable(props.pageNum === props.pageTotal);
+				setPrevDisable(props.pageNum === 1);
 			});
 		axios
 			.get(`${serverURL}/api/hasAudio?slideID=${props.sid}&pageNum=${props.pageNum}`)
@@ -91,6 +94,16 @@ export default function Slides(props) {
 			});
 	};
 
+	const nextPage = (e) => {
+		setNextDisable(true);
+		props.nextPage();
+	}
+
+	const prevPage = (e) => {
+		setPrevDisable(true);
+		props.prevPage();
+	}
+
 	return (
 		<div className='slide-container'>
 			<div className='title'>{props.title}</div>
@@ -105,18 +118,18 @@ export default function Slides(props) {
 					<SlideDrawingOverlay ref={props.canvasComponentRef} />
 				) : (
 					<SlideFlipOverlay
-						prevBtnDisable={prevBtnDisable}
-						nextBtnDisable={nextBtnDisable}
-						prevPage={props.prevPage}
-						nextPage={props.nextPage}
+						prevBtnDisable={prevDisable}
+						nextBtnDisable={nextDisable}
+						prevPage={prevPage}
+						nextPage={nextPage}
 					/>
 				)}
 
 				<div className='flip-page-btns'>
-					<Button variant='contained' disabled={prevBtnDisable} onClick={props.prevPage}>
+					<Button variant='contained' disabled={prevDisable} onClick={prevPage}>
 						PREV
 					</Button>
-					<Button variant='contained' disabled={nextBtnDisable} onClick={props.nextPage}>
+					<Button variant='contained' disabled={nextDisable} onClick={nextPage}>
 						NEXT
 					</Button>
 				</div>
