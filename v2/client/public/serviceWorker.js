@@ -43,7 +43,7 @@ self.addEventListener('fetch', (e) => {
 			return cache.match(e.request).then((cachedRes) => {
 				if (cachedRes) return cachedRes;
 				if (cachePattern.test(e.request.url)) {
-					fetch(e.request).then((networkRes) => {
+					return fetch(e.request).then((networkRes) => {
 						cache.put(e.request, networkRes.clone());
 						return networkRes;
 					});

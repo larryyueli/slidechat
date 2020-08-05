@@ -211,7 +211,6 @@ export default function ChatArea(props) {
 
 	const cancelDrawing = (e) => {
 		setDrawing(false);
-		console.log(props.canvasComponentRef.current.lines);
 		props.canvasComponentRef.current.clear();
 		props.setSlideDrawing(false);
 	};
@@ -237,11 +236,18 @@ export default function ChatArea(props) {
 					<div className='chat' key={i} onClick={(e) => fetchChatDetails(i)}>
 						<div className='title-row'>
 							<div className='title'>{questions[i].title}</div>
-							{managing ? (
-								<span className='material-icons icon' onClick={(e) => deleteQuestion(e, i)}>
-									delete_forever
-								</span>
-							) : null}
+							<div className='icons'>
+								{questions[i].status === 'solved' ? (
+									<span className='material-icons endorsed icon' onClick={(e) => endorseChat(i)}>
+										verified
+									</span>
+								) : null}
+								{managing ? (
+									<span className='material-icons delete icon' onClick={(e) => deleteQuestion(e, i)}>
+										delete_forever
+									</span>
+								) : null}
+							</div>
 						</div>
 						<div className='info'>
 							<div className='author'>{questions[i].user}</div>
@@ -276,19 +282,21 @@ export default function ChatArea(props) {
 							inputRef={bodyRef}
 						/>
 					</div>
-					{props.drawable ? (<div>
+					{props.drawable ? (
+						<div>
 							{drawing ? (
 								<span onClick={cancelDrawing} className='add-drawing-btn'>
 									cancel drawing
 								</span>
 							) : (
-									<span onClick={startDrawing} className='add-drawing-btn'>
-										Add some drawing to slide&nbsp;<span className='material-icons'>edit</span>
-									</span>
-								)}
-						</div>)
-							: (<div></div>)
-					}
+								<span onClick={startDrawing} className='add-drawing-btn'>
+									Add some drawing to slide&nbsp;<span className='material-icons'>edit</span>
+								</span>
+							)}
+						</div>
+					) : (
+						<div></div>
+					)}
 
 					<div>
 						<Button variant='contained' color='primary' onClick={sendNewQuestion}>
@@ -341,7 +349,7 @@ export default function ChatArea(props) {
 										favorite
 									</span>
 								</span>
-								{managing ? (
+								{managing && i > 0 ? (
 									<span className='material-icons delete icon' onClick={(e) => deleteChat(e, i)}>
 										delete_forever
 									</span>
@@ -376,16 +384,16 @@ export default function ChatArea(props) {
 						<span className='material-icons'>arrow_back_ios</span>
 					</div>
 				) : (
-						<div className='placeholder'>&nbsp;</div>
-					)}
+					<div className='placeholder'>&nbsp;</div>
+				)}
 				<div className='title'>{title}</div>
 				{props.isInstructor ? (
 					<span className={`manage ${managing ? 'managing' : ''}`} onClick={changeManageStatus}>
 						<span className='material-icons icon'>settings</span>
 					</span>
 				) : (
-						<div className='placeholder'>&nbsp;</div>
-					)}
+					<div className='placeholder'>&nbsp;</div>
+				)}
 			</div>
 			{content}
 		</div>

@@ -95,9 +95,21 @@
 					@include ellipsis();
 				}
 
+				.icons {
+					display: flex;
+					align-items: center;
+				}
+
 				.icon {
 					user-select: none;
-					font-size: 1.3rem;
+					margin: 0 0.3rem;
+				}
+
+				.endorsed {
+					color: $endorsementColour;
+				}
+
+				.delete {
 					color: $secondary;
 					&:hover {
 						color: lighten($secondary, 10%);

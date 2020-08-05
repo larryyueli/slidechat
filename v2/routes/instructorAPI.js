@@ -709,10 +709,13 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 
 	/**
 	 * Delete a chat
+	 * Deleting 0-th chat (question body) of a question is not allowed due to it contains
+	 * the time the question is created
 	 * req query:
 	 *   sid: slide object ID
 	 *   pageNum: page number, integer range from from 1 to pageTotal (inclusive)
 	 *   qid: question index, integer range from from 0 to questions.length (exclusive)
+	 *   cid: chat index
 	 */
 	router.delete('/api/chat', instructorAuth, async (req, res) => {
 		try {
@@ -728,6 +731,7 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 			}
 
 			if (
+				+req.query.cid === 0 ||
 				isNotValidPage(req.query.pageNum, slide.pageTotal) ||
 				notExistInList(req.query.qid, slide.pages[+req.query.pageNum - 1].questions) ||
 				notExistInList(req.query.cid, slide.pages[+req.query.pageNum - 1].questions[req.query.qid].chats)
@@ -780,25 +784,48 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 				throw { status: 400, error: 'bad request' };
 			}
 
+			const endorseName = shortName(req.session.realName);
 			let updateEndorse = {}; // cannot use template string on the left hand side
-			updateEndorse[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.endorsement`] =
-				shortName(req.session.realName);
+			updateEndorse[
+				`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.endorsement`
+			] = endorseName;
 			let updateRes;
 
 			// endorse if not already endorsed, otherwise revoke the endorsement
 			if (
-				slide.pages[+req.body.pageNum - 1].questions[req.body.qid].chats[req.body.cid].endorsement.indexOf(
-					shortName(req.session.realName)
-				) < 0
+				slide.pages[+req.body.pageNum - 1].questions[req.body.qid].chats[req.body.cid].endorsement.includes(
+					endorseName
+				)
 			) {
-				updateRes = await slides.updateOne(
-					{ _id: ObjectID.createFromHexString(req.body.sid) },
-					{ $addToSet: updateEndorse }
-				);
+				const chats = slide.pages[+req.body.pageNum - 1].questions[req.body.qid].chats;
+				let needSetUnsolved = true;
+				setUnsolvedLoop: for (let i of chats) {
+					for (let j of i.endorsement) {
+						if (j !== endorseName) {
+							needSetUnsolved = false;
+							break setUnsolvedLoop;
+						}
+					}
+				}
+				if (needSetUnsolved) {
+					const setUnsolved = {};
+					setUnsolved[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.status`] = 'unsolved';
+					updateRes = await slides.updateOne(
+						{ _id: ObjectID.createFromHexString(req.body.sid) },
+						{ $pull: updateEndorse, $set: setUnsolved }
+					);
+				} else {
+					updateRes = await slides.updateOne(
+						{ _id: ObjectID.createFromHexString(req.body.sid) },
+						{ $pull: updateEndorse }
+					);
+				}
 			} else {
+				const setSolved = {};
+				setSolved[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.status`] = 'solved';
 				updateRes = await slides.updateOne(
 					{ _id: ObjectID.createFromHexString(req.body.sid) },
-					{ $pull: updateEndorse }
+					{ $addToSet: updateEndorse, $set: setSolved }
 				);
 			}
 
