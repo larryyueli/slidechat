@@ -190,6 +190,7 @@ function commonAPI(db) {
 			let result = slide.pages[+req.query.pageNum - 1].questions;
 			for (let question of result) {
 				if (question) {
+					question.create = question.chats[0].time;
 					delete question.chats;
 				}
 			}
@@ -221,6 +222,7 @@ function commonAPI(db) {
 				throw { status: 400, error: 'bad request' };
 			}
 			res.json({
+				title: slide.pages[+req.query.pageNum - 1].questions[req.query.qid].title,
 				chats: slide.pages[+req.query.pageNum - 1].questions[req.query.qid].chats,
 				drawing: slide.pages[+req.query.pageNum - 1].questions[req.query.qid].drawing,
 			});

@@ -23,6 +23,15 @@ const md = markdownIt({
 });
 md.use(markdownItMathJax());
 
+function sortQuestions(unsorted, sorting) {
+	let questions = unsorted.filter((a) => a != null);
+	if (sorting === 'update') {
+		return questions.sort((a, b) => b.time - a.time);
+	} else if (sorting === 'create') {
+		return questions.sort((a, b) => b.create - a.create);
+	}
+}
+
 /**
  * This is the chat area on the right of the page.
  */
@@ -31,8 +40,10 @@ export default function ChatArea(props) {
 	const [questions, setQuestions] = useState([]);
 	const [chatDetails, setChatDetails] = useState([]);
 	const [qid, setQid] = useState(-1);
+	const [questionTitle, setQuestionTitle] = useState('');
 	const [managing, setManaging] = useState(false);
 	const [drawing, setDrawing] = useState(false);
+	const [sorting, setSorting] = useState('update');
 	const titleRef = useRef(null);
 	const bodyRef = useRef(null);
 	const chatRef = useRef(null);
@@ -43,11 +54,12 @@ export default function ChatArea(props) {
 			.get(`${serverURL}/api/questions?slideID=${props.sid}&pageNum=${props.pageNum}`)
 			.then((res) => {
 				setState('list');
-				setQuestions(res.data);
+				setQuestions(sortQuestions(res.data, sorting));
 			})
 			.catch((err) => {
 				console.error(err);
 			});
+		// eslint-disable-next-line
 	}, [props.sid, props.pageNum]);
 
 	// render math in chat details
@@ -106,11 +118,18 @@ export default function ChatArea(props) {
 		axios
 			.get(`${serverURL}/api/questions?slideID=${props.sid}&pageNum=${props.pageNum}`)
 			.then((res) => {
-				setQuestions(res.data);
+				setQuestions(sortQuestions(res.data, sorting));
 			})
 			.catch((err) => {
 				console.error(err);
 			});
+	};
+
+	const applySort = (newSort) => {
+		if (newSort !== sorting) {
+			setQuestions(sortQuestions(questions, newSort));
+			setSorting(newSort);
+		}
 	};
 
 	const fetchChatDetails = (qid) => {
@@ -118,6 +137,7 @@ export default function ChatArea(props) {
 			.get(`${serverURL}/api/chats?slideID=${props.sid}&pageNum=${props.pageNum}&qid=${qid}`)
 			.then((res) => {
 				setQid(qid);
+				setQuestionTitle(res.data.title);
 				setChatDetails(res.data.chats);
 				setState('chat-details');
 				if (res.data.drawing && props.drawable) {
@@ -226,24 +246,32 @@ export default function ChatArea(props) {
 						Ask a new question
 					</Button>
 				</div>,
+				<div className='sort-select-row' key={-2}>
+					sort by:
+					<span className={sorting === 'update' ? 'selected' : ''} onClick={(e) => applySort('update')}>
+						Last update
+					</span>
+					<span className={sorting === 'create' ? 'selected' : ''} onClick={(e) => applySort('create')}>
+						Creation
+					</span>
+				</div>,
 			];
 
 			for (let i = 0; i < questions.length; i++) {
 				if (!questions[i]) {
 					continue;
 				}
+				let id = questions[i].id;
 				chats.push(
-					<div className='chat' key={i} onClick={(e) => fetchChatDetails(i)}>
+					<div className='chat' key={i} onClick={(e) => fetchChatDetails(id)}>
 						<div className='title-row'>
 							<div className='title'>{questions[i].title}</div>
 							<div className='icons'>
 								{questions[i].status === 'solved' ? (
-									<span className='material-icons endorsed icon' onClick={(e) => endorseChat(i)}>
-										verified
-									</span>
+									<span className='material-icons endorsed icon'>verified</span>
 								) : null}
 								{managing ? (
-									<span className='material-icons delete icon' onClick={(e) => deleteQuestion(e, i)}>
+									<span className='material-icons delete icon' onClick={(e) => deleteQuestion(e, id)}>
 										delete_forever
 									</span>
 								) : null}
@@ -309,7 +337,7 @@ export default function ChatArea(props) {
 
 		// the content of the chat thread
 		case 'chat-details':
-			title = questions[qid].title;
+			title = questionTitle;
 			let chatsList = [
 				<div className='title' key={-2}>
 					{title}

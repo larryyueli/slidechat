@@ -75,6 +75,20 @@
 		}
 	}
 
+	.sort-select-row {
+		margin: 1rem;
+		text-align: right;
+		text-transform: uppercase;
+		color: #aaaaaa;
+		span {
+			@include clickable();
+			margin-left: 1rem;
+			&.selected {
+				color: #000000;
+			}
+		}
+	}
+
 	.chat-list {
 		.chat {
 			padding: 1rem;
