@@ -48,6 +48,14 @@ export default function ChatArea(props) {
 	const bodyRef = useRef(null);
 	const chatRef = useRef(null);
 
+	// when first mounting, if the URL contains questions number, go to the question
+	useEffect(() => {
+		if (props.qid !== undefined) {
+			fetchChatDetails(props.qid);
+		}
+		// eslint-disable-next-line
+	}, [props.qid]);
+
 	// fetch questions when page is changed
 	useEffect(() => {
 		axios
@@ -140,6 +148,7 @@ export default function ChatArea(props) {
 				setQuestionTitle(res.data.title);
 				setChatDetails(res.data.chats);
 				setState('chat-details');
+				window.history.replaceState(null, null, `#${props.pageNum}-${qid}`);
 				if (res.data.drawing && props.drawable) {
 					props.setSlideDrawing(true);
 					props.canvasComponentRef.current.setState({ readOnly: true });
@@ -192,6 +201,7 @@ export default function ChatArea(props) {
 			.then(() => {
 				setState('list');
 				props.setSlideDrawing(false);
+				window.history.replaceState(null, null, `#${props.pageNum}`);
 			})
 			.catch((err) => console.error(err));
 	};

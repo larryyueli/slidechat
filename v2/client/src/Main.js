@@ -23,6 +23,7 @@ function Main(props) {
 	const [uid, setUid] = useState('');
 	const [username, setUsername] = useState('');
 	const [anonymity, setAnonymity] = useState('anyone');
+	const [qid, setQid] = useState(undefined);
 	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
 
 	useEffect(() => {
@@ -37,10 +38,13 @@ function Main(props) {
 			})
 			.then((res) => {
 				let currentPage = 1;
-				if (window.location.hash) {
-					let n = +window.location.hash.substring(1);
-					if (n > 0 && n <= res.data.pageTotal && Number.isInteger(n)) {
+				let questionId;
+				let m = window.location.hash.match(/^#(\d+)(-(\d+))?$/);
+				if (m) {
+					let n = +m[1];
+					if (n <= res.data.pageTotal) {
 						currentPage = n;
+						questionId = m[3];
 					}
 				}
 
@@ -54,7 +58,9 @@ function Main(props) {
 				setTitle(res.data.title);
 				setFilename(res.data.filename);
 				setDrawable(Boolean(res.data.drawable));
-				applyPage(currentPage);
+				document.getElementById('pageNum').value = currentPage;
+				setPage(currentPage);
+				if (questionId) setQid(questionId);
 			})
 			.catch((err) => {
 				console.error(err);
@@ -67,7 +73,7 @@ function Main(props) {
 	 */
 	const applyPage = (newPageNum) => {
 		document.getElementById('pageNum').value = newPageNum;
-		window.location.hash = newPageNum;
+		window.history.replaceState(null, null, `#${newPageNum}`);
 		setPage(newPageNum);
 	};
 
@@ -134,6 +140,7 @@ function Main(props) {
 					setSlideDrawing={setSlideDrawing}
 					isInstructor={isInstructor}
 					drawable={drawable}
+					qid={qid}
 				/>
 			</div>
 		</>
