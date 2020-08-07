@@ -37,9 +37,7 @@ function commonAPI(db) {
 			res.json({
 				name: course.name,
 				instructors: course.instructors,
-				role: course.role,
 				slides: courseSlides,
-				cid: course.id,
 			});
 		} catch (err) {
 			errorHandler(res, err);
@@ -48,7 +46,7 @@ function commonAPI(db) {
 
 	/**
 	 * get information of a slide, e.g. total number of pages, filename, title, etc.
-	 * req body:
+	 * req query:
 	 *   slideID: object ID of a slide
 	 */
 	router.get('/api/slideInfo', async (req, res) => {
@@ -76,7 +74,7 @@ function commonAPI(db) {
 
 	/**
 	 * get slide image
-	 * req body:
+	 * req query:
 	 *   slideID: object ID of the slide
 	 *   pageNum: integer range from from 1 to pageTotal (inclusive)
 	 */
@@ -99,7 +97,7 @@ function commonAPI(db) {
 
 	/**
 	 * get slide audio
-	 * req body:
+	 * req query:
 	 *   slideID: object ID of the slide
 	 *   pageNum: integer range from from 1 to pageTotal (inclusive)
 	 */
@@ -125,7 +123,7 @@ function commonAPI(db) {
 
 	/**
 	 * send {audio : true} iff the asking page has audio attached
-	 * req body:
+	 * req query:
 	 *   slideID: object ID of the slide
 	 *   pageNum: integer range from from 1 to pageTotal (inclusive)
 	 */
@@ -153,7 +151,7 @@ function commonAPI(db) {
 
 	/**
 	 * download PDF file
-	 * req body:
+	 * req query:
 	 *   slideID: object ID of the slide
 	 */
 	router.get('/api/downloadPdf', async (req, res) => {
@@ -172,7 +170,7 @@ function commonAPI(db) {
 
 	/**
 	 * get question list of a page
-	 * req body:
+	 * req query:
 	 *   slideID: object ID of a slide
 	 *   pageNum: integer range from from 1 to pageTotal (inclusive)
 	 */

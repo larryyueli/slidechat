@@ -7,12 +7,23 @@ const dbConfig = {
 	useNewUrlParser: true,
 };
 
-const { baseURL, dbURL, instructorURL, cookieName } = require('../config');
+const { baseURL, dbURL, cookieName } = require('../config');
 const instructorAPI = require('./instructorAPI');
 const commonAPI = require('./commonAPI');
 
 const instructorListPath = path.join(__dirname, '..', 'instructorList.json');
-let instructors = JSON.parse(fs.readFileSync(instructorListPath));
+
+function readInstructors() {
+	try {
+		return JSON.parse(fs.readFileSync(instructorListPath));
+	} catch (err) {
+		console.error('Warning: Failed to load instructor list, it is set to an empty array');
+		return [];
+	}
+}
+let instructors = readInstructors();
+
+const instructorURL = '/prof';
 
 /**
  * Middleware for checking if the user is logged in as an instructor
@@ -41,15 +52,7 @@ function isInstructor(uid) {
 	if (instructors.indexOf(uid) >= 0) {
 		return true;
 	} else {
-		let tmp;
-		try {
-			tmp = JSON.parse(fs.readFileSync(instructorListPath));
-		} catch (err) {
-			console.error('load instructor list error');
-			console.log(err);
-			return false;
-		}
-		instructors = tmp;
+		instructors = readInstructors();
 		return instructors.indexOf(uid) >= 0;
 	}
 }

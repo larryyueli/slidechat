@@ -7,4 +7,5 @@ mkdir -p ~/.slidechat/files
 
 npm run build
 
-npm run deploy
+echo
+echo 'You are all almost done! Check out our GitHub Wiki for how to deploy this app or start developing.'

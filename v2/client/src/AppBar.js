@@ -35,7 +35,9 @@ function AppBar(props) {
 
 	return (
 		<div className='appbar'>
-			<img className='appbar-logo' src={`${baseURL}/imgs/logo.png`} alt='SlideChat' />
+			<Link to={`${baseURL}/`}>
+				<img className='appbar-logo' src={`${baseURL}/imgs/logo.png`} alt='SlideChat' />
+			</Link>
 			<div className='appbar-items'>
 				{/* <span className='appbar-item'>Notification</span> */}
 				<ClickAwayListener onClickAway={(e) => setUserDropDown('')}>
