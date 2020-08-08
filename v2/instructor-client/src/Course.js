@@ -5,15 +5,17 @@ import { Button, TextField, CircularProgress } from '@material-ui/core';
 import SlideSettings from './SlideSettings';
 import { serverURL, fullURL } from './config';
 
-export default function Course({ cid, role }) {
+export default function Course({ cid, role, fetchCourses }) {
 	const [course, setCourse] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [managing, setManaging] = useState(false);
+	const [renaming, setRenaming] = useState(false);
 	const [uploading, setUploading] = useState(false);
 	const [addInstructorRes, setAddInstructorRes] = useState(null);
 	const [openModify, setOpenModify] = useState({ open: false });
 	const fileUpload = useRef(null);
 	const newUserRef = useRef(null);
+	const nameRef = useRef(null);
 
 	const fetchCourse = async () => {
 		try {
@@ -85,6 +87,7 @@ export default function Course({ cid, role }) {
 	const changeManageStatus = () => {
 		setAddInstructorRes(null);
 		setManaging(!managing);
+		setRenaming(false);
 	};
 
 	const copyToClipboard = (str) => {
@@ -102,6 +105,34 @@ export default function Course({ cid, role }) {
 		setOpenModify({ open: true, filename: filename, sid: sid });
 	};
 
+	const ChangeCoursename = () => {
+		axios
+			.post(`${serverURL}/api/updateCourseName`, {
+				cid: cid,
+				name: nameRef.current.value,
+			})
+			.then((res) => {
+				fetchCourse();
+				setRenaming(false)
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	};
+
+	const deleteCourse = () => {
+		if (!window.confirm(`Are you sure to delete course ${course.name}?`)) return;
+
+		axios
+			.delete(`${serverURL}/api/course?cid=${cid}`)
+			.then((res) => {
+				fetchCourses();
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	};
+
 	if (loading)
 		return (
 			<div className='course'>
@@ -114,14 +145,30 @@ export default function Course({ cid, role }) {
 	return (
 		<div className='course'>
 			<div className='title'>
-				{course.name}
+				{managing ? (renaming ? <div className='title-name'>
+					<TextField
+						placeholder='Course Name'
+						defaultValue={course.name}
+						inputRef={nameRef}
+					/>
+					<span className='material-icons icon confirm' onClick={ChangeCoursename}>check</span>
+				</div> : <div className='title-name'>
+						{course.name}
+						<span className='material-icons icon rename' onClick={() => { setRenaming(true) }}>create</span>
+					</div>) : <span>{course.name}</span>}
+
 				{role === 'instructor' ? (
-					<span className={`manage ${managing ? 'managing' : ''}`} onClick={changeManageStatus}>
-						<span className='material-icons icon'>settings</span>
-					</span>
+					<div className='manage-icons'>
+						{managing ? <span className='material-icons delete icon' onClick={deleteCourse}>
+							delete_forever
+						</span> : null}
+						<span className={`manage ${managing ? 'managing' : ''}`} onClick={changeManageStatus}>
+							<span className='material-icons icon'>settings</span>
+						</span>
+					</div>
 				) : (
-					<span>&nbsp;</span>
-				)}
+						<span>&nbsp;</span>
+					)}
 			</div>
 			<div className='slides'>
 				{course.slides.map((slide) => {
@@ -149,10 +196,10 @@ export default function Course({ cid, role }) {
 									</Button>
 								</div>
 							) : (
-								<Button variant='outlined' color='primary' onClick={(e) => copyToClipboard(link)}>
-									Copy link
-								</Button>
-							)}
+									<Button variant='outlined' color='primary' onClick={(e) => copyToClipboard(link)}>
+										Copy link
+									</Button>
+								)}
 						</div>
 					);
 				})}
@@ -160,7 +207,7 @@ export default function Course({ cid, role }) {
 
 			{managing ? (
 				<div className='upload-bar'>
-					<input type='file' name='file' ref={fileUpload} accept='.pdf'/>
+					<input type='file' name='file' ref={fileUpload} accept='.pdf' />
 					<Button onClick={uploadPDF} disabled={uploading} variant='contained' color='primary'>
 						Upload
 					</Button>

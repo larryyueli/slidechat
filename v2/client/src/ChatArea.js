@@ -86,6 +86,10 @@ export default function ChatArea(props) {
 	};
 
 	const sendNewQuestion = () => {
+		if (!titleRef.current.value) {
+			window.alert(`Question title can't be empty.`);
+			return;
+		}
 		let canvasData = drawing ? props.canvasComponentRef.current.lines : undefined;
 		axios
 			.post(`${serverURL}/api/addQuestion/`, {
@@ -105,6 +109,9 @@ export default function ChatArea(props) {
 	};
 
 	const sendNewChat = () => {
+		if (!chatRef.current.value){
+			return;
+		}
 		axios
 			.post(`${serverURL}/api/addChat/`, {
 				sid: props.sid,
@@ -206,12 +213,12 @@ export default function ChatArea(props) {
 			.catch((err) => console.error(err));
 	};
 
-	const deleteQuestion = (e, qid) => {
+	const deleteQuestion = (e, question) => {
 		e.stopPropagation();
-		if (!window.confirm(`Are you sure to delete "${questions[qid].title}"?`)) return;
+		if (!window.confirm(`Are you sure to delete "${question.title}"?`)) return;
 
 		axios
-			.delete(`${serverURL}/api/question?sid=${props.sid}&qid=${qid}&pageNum=${props.pageNum}`)
+			.delete(`${serverURL}/api/question?sid=${props.sid}&qid=${question.id}&pageNum=${props.pageNum}`)
 			.then((res) => {
 				backToList();
 			})
@@ -281,7 +288,7 @@ export default function ChatArea(props) {
 									<span className='material-icons endorsed icon'>verified</span>
 								) : null}
 								{managing ? (
-									<span className='material-icons delete icon' onClick={(e) => deleteQuestion(e, id)}>
+									<span className='material-icons delete icon' onClick={(e) => deleteQuestion(e, questions[i])}>
 										delete_forever
 									</span>
 								) : null}

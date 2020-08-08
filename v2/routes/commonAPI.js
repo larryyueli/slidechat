@@ -245,13 +245,14 @@ function commonAPI(db) {
 		try {
 			let slide = await slides.findOne(
 				{ _id: ObjectID.createFromHexString(req.body.sid) },
-				{ projection: { pageTotal: true, anonymity: true } }
+				{ projection: { pageTotal: true, anonymity: true, pages: true } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
 			if (slide.anonymity != 'anyone' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
 			if (
 				isNotValidPage(req.body.pageNum, slide.pageTotal) ||
 				typeof req.body.title !== 'string' ||
+				!req.body.title ||
 				typeof req.body.body !== 'string' ||
 				typeof req.body.user !== 'string'
 			) {
@@ -268,6 +269,7 @@ function commonAPI(db) {
 				}
 			}
 
+			let id = slide.pages[req.body.pageNum - 1].questions.length;
 			let time = Date.now();
 			let newQuestion = {
 				status: 'unsolved',
@@ -276,6 +278,7 @@ function commonAPI(db) {
 				title: req.body.title,
 				drawing: req.body.drawing,
 				user: slide.anonymity === 'nonymous' ? shortName(req.session.realName) : req.body.user,
+				id: id,
 			};
 			let newChat = {
 				time: time,
@@ -323,6 +326,7 @@ function commonAPI(db) {
 				isNotValidPage(req.body.pageNum, slide.pageTotal) ||
 				notExistInList(req.body.qid, slide.pages[+req.body.pageNum - 1].questions) ||
 				typeof req.body.body !== 'string' ||
+				!req.body.body ||
 				typeof req.body.user !== 'string'
 			) {
 				throw { status: 400, error: 'bad request' };

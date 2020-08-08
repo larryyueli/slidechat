@@ -31,6 +31,9 @@ export default function MyCourses(props) {
 
 	const createCourse = async () => {
 		try {
+			if (!newCourseRef.current.value){
+				return;
+			}
 			await axios.post(`${serverURL}/api/createCourse`, {
 				course: newCourseRef.current.value,
 			});
@@ -46,7 +49,7 @@ export default function MyCourses(props) {
 			<div className='profile'>
 				<div className='title'>My Courses</div>
 				{courses.map((course) => (
-					<Course cid={course.id} role={course.role} key={course.id} />
+					<Course cid={course.id} role={course.role} key={course.id} fetchCourses={fetchCourses}/>
 				))}
 				<div className='createCourse-bar'>
 					<TextField variant='outlined' id={`new-course`} placeholder='Course Name' inputRef={newCourseRef} />

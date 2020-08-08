@@ -70,6 +70,10 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 	 */
 	router.post('/api/createCourse', instructorAuth, async (req, res) => {
 		try {
+			if (typeof req.body.course !== 'string' || !req.body.course) {
+				throw { status: 400, error: 'bad request' };
+			}
+
 			let insertRes = await courses.insertOne({
 				name: req.body.course,
 				instructors: [req.session.uid],
@@ -90,6 +94,88 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 
 			console.log(`created course: ${req.body.course}`);
 			res.json({ id: courseID });
+		} catch (err) {
+			errorHandler(res, err);
+		}
+	});
+
+	/**
+	 * change a course name
+	 * req body:
+	 *   name: course name
+	 * 	 cid: object ID of a course
+	 */
+	router.post('/api/updateCourseName', instructorAuth, async (req, res) => {
+		try {
+			if (
+				req.body.cid.length != 24 || 
+				typeof req.body.name !== 'string' || 
+				!req.body.name
+			) {
+				throw { status: 400, error: 'bad request' };
+			}
+
+			let course = await courses.findOne(
+				{ _id: ObjectID.createFromHexString(req.body.cid) },
+				{ projection: { instructors: 1 } }
+			);
+			if (!course) throw { status: 404, error: 'course not found' };
+			if (course.instructors.indexOf(req.session.uid) < 0) throw { status: 401, error: 'Unauthorized' };
+
+			let updateRes = await courses.updateOne(
+				{ _id: ObjectID.createFromHexString(req.body.cid) },
+				{
+					$set: {
+						name: req.body.name,
+					},
+				}
+			);
+
+			if (updateRes.result.n == 0) {
+				throw { status: 400, error: 'update course name failed' };
+			}
+
+			res.send();
+		} catch (err) {
+			errorHandler(res, err);
+		}
+	});
+
+	/**
+	 * delete a course
+	 * req query:
+	 * 	 cid: object ID of a course
+	 */
+	router.delete('/api/course', instructorAuth, async (req, res) => {
+		try {
+			if (req.query.cid.length != 24) {
+				throw { status: 400, error: 'bad request' };
+			}
+
+			let course = await courses.findOne(
+				{ _id: ObjectID.createFromHexString(req.query.cid) },
+				{ projection: { instructors: 1 } }
+			);
+			if (!course) throw { status: 404, error: 'course not found' };
+			if (course.instructors.indexOf(req.session.uid) < 0) throw { status: 401, error: 'Unauthorized' };
+
+			for (let instructor of course.instructors){
+				let updateRes = await users.updateOne(
+					{ _id: instructor },
+					{ $pull: { courses: {id: req.query.cid } } }
+				);
+
+				if (updateRes.modifiedCount === 0) {
+					throw 'delete course failed';
+				}
+			}
+
+			let removeRes = await courses.deleteOne({ _id: ObjectID.createFromHexString(req.query.cid) });
+			if (removeRes.deletedCount !== 1) {
+				throw `delete course error: removeRes = ${removeRes}`;
+			}
+
+			res.send();
 		} catch (err) {
 			errorHandler(res, err);
 		}
