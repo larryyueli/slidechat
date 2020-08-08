@@ -3,7 +3,7 @@
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
-		"start": "PORT=10003 nodemon app",
+		"start": "PORT=10001 nodemon app",
 		"prod": "PORT=10000 NODE_ENV=production nodemon app",
 		"deploy": "npx pm2 start --env production",
 		"build": "npm run build-c && npm run build-i",
@@ -11,7 +11,6 @@
 		"build-i": "cd instructor-client && GENERATE_SOURCEMAP=false npm run build && cd .."
 	},
 	"dependencies": {
-		"@material-ui/core": "^4.2.0",
 		"axios": "^0.19.2",
 		"body-parser": "^1.19.0",
 		"compression": "^1.7.4",
@@ -21,18 +20,19 @@
 		"express": "^4.16.1",
 		"express-fileupload": "^1.1.7-alpha.3",
 		"express-session": "^1.17.1",
+		"mongodb": "^3.5.7",
+		"morgan": "^1.9.1",
+		"pm2": "^4.4.0"
+	},
+	"devDependencies": {
+		"@material-ui/core": "^4.2.0",
 		"highlight.js": "^10.0.3",
 		"markdown-it": "^11.0.0",
 		"markdown-it-mathjax": "^2.0.0",
-		"mongodb": "^3.5.7",
-		"morgan": "^1.9.1",
 		"node-sass": "^4.14.1",
-		"pm2": "^4.4.0",
 		"react": "^16.8.6",
 		"react-dom": "^16.8.6",
-		"react-router-dom": "^5.2.0"
-	},
-	"devDependencies": {
+		"react-router-dom": "^5.2.0",
 		"nodemon": "^2.0.4"
 	}
 }
