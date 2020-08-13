@@ -5,6 +5,9 @@ import { Button, TextField, CircularProgress } from '@material-ui/core';
 import SlideSettings from './SlideSettings';
 import { serverURL, fullURL } from './config';
 
+/**
+ * A block contain information about one course
+ */
 export default function Course({ cid, role, fetchCourses }) {
 	const [course, setCourse] = useState(null);
 	const [loading, setLoading] = useState(true);
@@ -17,6 +20,9 @@ export default function Course({ cid, role, fetchCourses }) {
 	const newUserRef = useRef(null);
 	const nameRef = useRef(null);
 
+	/**
+	 * fetch course information from server
+	 */
 	const fetchCourse = async () => {
 		try {
 			let res = await axios.get(`${serverURL}/api/course?id=${cid}`);
@@ -32,6 +38,9 @@ export default function Course({ cid, role, fetchCourses }) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
+	/**
+	 * upload PDF to server to create new slide
+	 */
 	const uploadPDF = async () => {
 		if (fileUpload.current.files.length !== 1) return;
 
@@ -50,6 +59,11 @@ export default function Course({ cid, role, fetchCourses }) {
 		}
 	};
 
+	/**
+	 * delete a slide
+	 * @param {*} filename slide name
+	 * @param {*} sid slide ID
+	 */
 	const deleteSlide = async (filename, sid) => {
 		if (!window.confirm(`Are you sure to delete "${filename}"?`)) return;
 		try {
@@ -61,6 +75,9 @@ export default function Course({ cid, role, fetchCourses }) {
 		}
 	};
 
+	/**
+	 * add an instructor to this course
+	 */
 	const addInstructor = async () => {
 		try {
 			await axios.post(`${serverURL}/api/addInstructor`, {
@@ -84,12 +101,19 @@ export default function Course({ cid, role, fetchCourses }) {
 		}
 	};
 
+	/**
+	 * change managing to opposite value
+	 */
 	const changeManageStatus = () => {
 		setAddInstructorRes(null);
 		setManaging(!managing);
 		setRenaming(false);
 	};
 
+	/**
+	 * copy string to clipboard
+	 * @param {*} str string want to copy
+	 */
 	const copyToClipboard = (str) => {
 		const el = document.createElement('textarea');
 		el.value = str;
@@ -101,10 +125,18 @@ export default function Course({ cid, role, fetchCourses }) {
 		document.body.removeChild(el);
 	};
 
+	/**
+	 * open modify window for given slide
+	 * @param {*} filename slide filename
+	 * @param {*} sid slide ID
+	 */
 	const modifySlide = (filename, sid) => {
 		setOpenModify({ open: true, filename: filename, sid: sid });
 	};
 
+	/**
+	 * change course name to value in nameRef
+	 */
 	const ChangeCoursename = () => {
 		axios
 			.post(`${serverURL}/api/updateCourseName`, {
@@ -120,6 +152,9 @@ export default function Course({ cid, role, fetchCourses }) {
 			});
 	};
 
+	/**
+	 * delete this course
+	 */
 	const deleteCourse = () => {
 		if (!window.confirm(`Are you sure to delete course ${course.name}?`)) return;
 

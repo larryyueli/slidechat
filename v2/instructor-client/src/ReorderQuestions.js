@@ -5,6 +5,9 @@ import { Button, CircularProgress } from '@material-ui/core';
 import AppBar from './AppBar';
 import { serverURL, fullURL } from './config';
 
+/**
+ * Page used to reorder questions
+ */
 export default function ReorderQuestions(props) {
 	const sid = props.match.params.slideId;
 	const [loading, setLoading] = useState(true);
@@ -18,7 +21,7 @@ export default function ReorderQuestions(props) {
 				setUser(res.data.loginUser);
 				let slide = { pageTotal: res.data.pageTotal, pages: [], unused: [] };
 				let i = 1;
-				for (; i <= slide.pageTotal; i++) {
+				for (; i <= slide.pageTotal; i++) { // fetch all questions
 					let res = await axios.get(`${serverURL}/api/questions?slideID=${sid}&pageNum=${i}`);
 					let questions = { pageNum: i, questions: res.data };
 					questions.count = res.data.reduce((total, curr) => {
@@ -52,6 +55,10 @@ export default function ReorderQuestions(props) {
 		fetchSlide();
 	}, [sid]);
 
+	/**
+	 * move a set of questions to unused questions
+	 * @param {*} index page index
+	 */
 	const removeQuestions = (index) => {
 		const slideCopy = { ...slide };
 		for (let i of slide.pages[index]) {
@@ -61,6 +68,10 @@ export default function ReorderQuestions(props) {
 		setSlide(slideCopy);
 	};
 
+	/**
+	 * move all questions below selected page to the prev page
+	 * @param {*} index start page index
+	 */
 	const shiftUp = (index) => {
 		const slideCopy = { ...slide };
 		for (let i of slide.pages[index]) {
@@ -74,6 +85,10 @@ export default function ReorderQuestions(props) {
 		setSlide(slideCopy);
 	};
 
+	/**
+	 * move all questions below selected page to the next page
+	 * @param {*} index start page index
+	 */
 	const shiftDown = (index) => {
 		const slideCopy = { ...slide };
 		for (let i of slide.pages[slide.pageTotal - 1]) {
@@ -87,6 +102,10 @@ export default function ReorderQuestions(props) {
 		setSlide(slideCopy);
 	};
 
+	/**
+	 * add unused questions at index to page given in `add-${index}`
+	 * @param {*} index unused questions index
+	 */
 	const addToPage = (index) => {
 		let to = +document.getElementById(`add-${index}`).value;
 		if (!Number.isInteger(to) || to < 1 || to > slide.pageTotal) return;
@@ -99,6 +118,11 @@ export default function ReorderQuestions(props) {
 		setSlide(slideCopy);
 	};
 
+	/**
+	 * return the preview of given page
+	 * @param {*} page 
+	 * @returns preview
+	 */
 	const previewPage = (page) => {
 		let list = [];
 		for (let i = 0; i < 5 && i < page.questions.length; i++) {
@@ -112,6 +136,9 @@ export default function ReorderQuestions(props) {
 		return list;
 	};
 
+	/**
+	 * upload the new order to server
+	 */
 	const submitChanges = async () => {
 		try {
 			let questionOrder = [];

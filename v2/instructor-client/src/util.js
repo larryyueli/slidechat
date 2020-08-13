@@ -1,3 +1,8 @@
+/**
+ * return the format time
+ * @param {number} time
+ * @return {String}
+ */
 export function formatTime(time) {
 	let now = Date.now();
 
@@ -21,6 +26,11 @@ export function formatTime(time) {
 	}
 }
 
+/**
+ * return the format name
+ * @param {String} names
+ * @return {String}
+ */
 export function formatNames(names) {
 	let len = names.length;
 	if (len === 1) {
@@ -36,14 +46,29 @@ export function formatNames(names) {
 	}
 }
 
+/**
+ * return an array contain numbers from start to end
+ * @param {number} start
+ * @param {number} end
+ * @return {Array[number]} number array
+ */
 export function range(start, end) {
 	return Array.from({ length: end - start }, (_, i) => start + i);
 }
 
+/**
+ * return an random integer from 0 to max
+ * @param {number} max
+ * @returns {number}
+ */
 export function getRandomNumber(max) {
 	return Math.floor(Math.random() * max);
 }
 
+/**
+ * return a random anonymous name
+ * @returns {String}
+ */
 export function getRandomName(names) {
 	return `anonymous ${names[getRandomNumber(names.length)]}`;
 }

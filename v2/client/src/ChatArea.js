@@ -23,6 +23,12 @@ const md = markdownIt({
 });
 md.use(markdownItMathJax());
 
+/**
+ * Sort the given question list
+ * @param {*} unsorted question list
+ * @param {String} sorting sorting method (update/create)
+ * @returns the sorted question list
+ */
 function sortQuestions(unsorted, sorting) {
 	let questions = unsorted.filter((a) => a != null);
 	if (sorting === 'update') {
@@ -75,16 +81,25 @@ export default function ChatArea(props) {
 		if (state === 'chat-details') window.MathJax.typeset();
 	});
 
+	/**
+	 * change managing to opposite value
+	 */
 	const changeManageStatus = () => {
 		setManaging(!managing);
 	};
 
+	/**
+	 * go to create new chat ui
+	 */
 	const createNewChat = () => {
 		setState('new-chat');
 		props.setSlideDrawing(false);
 		setDrawing(false);
 	};
 
+	/**
+	 * send new question to server
+	 */
 	const sendNewQuestion = () => {
 		if (!titleRef.current.value) {
 			window.alert(`Question title can't be empty.`);
@@ -108,6 +123,9 @@ export default function ChatArea(props) {
 			});
 	};
 
+	/**
+	 * send new chat to server
+	 */
 	const sendNewChat = () => {
 		if (!chatRef.current.value){
 			return;
@@ -129,6 +147,9 @@ export default function ChatArea(props) {
 			});
 	};
 
+	/**
+	 * fetch question list from server
+	 */
 	const fetchChatList = async () => {
 		axios
 			.get(`${serverURL}/api/questions?slideID=${props.sid}&pageNum=${props.pageNum}`)
@@ -140,6 +161,10 @@ export default function ChatArea(props) {
 			});
 	};
 
+	/**
+	 * apply new sorting method
+	 * @param {String} newSort new sorting method (update/create)
+	 */
 	const applySort = (newSort) => {
 		if (newSort !== sorting) {
 			setQuestions(sortQuestions(questions, newSort));
@@ -147,6 +172,10 @@ export default function ChatArea(props) {
 		}
 	};
 
+	/**
+	 * fetch chat list from server
+	 * @param {number} qid question ID
+	 */
 	const fetchChatDetails = (qid) => {
 		axios
 			.get(`${serverURL}/api/chats?slideID=${props.sid}&pageNum=${props.pageNum}&qid=${qid}`)
@@ -168,6 +197,10 @@ export default function ChatArea(props) {
 			});
 	};
 
+	/**
+	 * endorse chat and send to server
+	 * @param {number} cid chat ID
+	 */
 	const endorseChat = (cid) => {
 		axios
 			.post(`${serverURL}/api/endorse/`, {
@@ -184,7 +217,10 @@ export default function ChatArea(props) {
 			});
 	};
 
-	// like
+	/**
+	 * like chat and send to server
+	 * @param {number} cid chat ID
+	 */
 	const likeChat = (cid) => {
 		axios
 			.post(`${serverURL}/api/like/`, {
@@ -202,7 +238,9 @@ export default function ChatArea(props) {
 			});
 	};
 
-	// onClick handler for back button to go back to the chat list
+	/**
+	 *  onClick handler for back button to go back to the chat list
+	 */
 	const backToList = () => {
 		fetchChatList()
 			.then(() => {
@@ -213,6 +251,11 @@ export default function ChatArea(props) {
 			.catch((err) => console.error(err));
 	};
 
+	/**
+	 * delete a question
+	 * @param {*} e onClick event
+	 * @param {*} question question to delete
+	 */
 	const deleteQuestion = (e, question) => {
 		e.stopPropagation();
 		if (!window.confirm(`Are you sure to delete "${question.title}"?`)) return;
@@ -227,6 +270,11 @@ export default function ChatArea(props) {
 			});
 	};
 
+	/**
+	 * delete a chat
+	 * @param {*} e onClick event
+	 * @param {number} cid chat ID
+	 */
 	const deleteChat = (e, cid) => {
 		e.stopPropagation();
 		if (!window.confirm(`Are you sure to delete this chat?`)) return;
@@ -241,11 +289,19 @@ export default function ChatArea(props) {
 			});
 	};
 
+	/**
+	 * start drawing
+	 * @param {*} e onClick event
+	 */
 	const startDrawing = (e) => {
 		setDrawing(true);
 		props.setSlideDrawing(true);
 	};
 
+	/**
+	 * cancel drawing
+	 * @param {*} e onClick event
+	 */
 	const cancelDrawing = (e) => {
 		setDrawing(false);
 		props.canvasComponentRef.current.clear();

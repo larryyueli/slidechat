@@ -19,6 +19,9 @@ export default function MyCourses(props) {
 		fetchCourses();
 	}, []);
 
+	/**
+	 * fetch course list from server
+	 */
 	const fetchCourses = async () => {
 		try {
 			let res = await axios.get(`${serverURL}/api/myCourses`);
@@ -29,6 +32,9 @@ export default function MyCourses(props) {
 		}
 	};
 
+	/**
+	 * create a new course
+	 */
 	const createCourse = async () => {
 		try {
 			if (!newCourseRef.current.value){

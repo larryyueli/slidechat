@@ -8,7 +8,7 @@ import { baseURL } from './config';
 
 /**
  * The main entrance of the application
- * It consists three main components: App bar, slides on the left, and chat area on the right
+ * Switch to Logout, Main, Landing page based on URL
  */
 function App() {
 	return (

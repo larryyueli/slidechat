@@ -4,6 +4,9 @@ import { Button, TextField, CircularProgress, Dialog, Select, MenuItem } from '@
 
 import { baseURL, serverURL, instructorURL } from './config';
 
+/**
+ * block used to change slide settings
+ */
 export default function SlideSettings({ sid, open, onClose }) {
 	const [loading, setLoading] = useState(true);
 	const [uploading, setUploading] = useState(false);
@@ -24,6 +27,10 @@ export default function SlideSettings({ sid, open, onClose }) {
 			});
 	}, [sid]);
 
+	/**
+	 * upload new anonymity to server
+	 * @param {*} e onChange event
+	 */
 	const changeAnonymity = (e) => {
 		axios
 			.post(`${serverURL}/api/setAnonymity`, {
@@ -40,6 +47,10 @@ export default function SlideSettings({ sid, open, onClose }) {
 			});
 	};
 
+	/**
+	 * upload new drawable to server
+	 * @param {*} e onChange event
+	 */
 	const changeDrawable = (e) => {
 		axios
 			.post(`${serverURL}/api/setDrawable`, {
@@ -56,6 +67,10 @@ export default function SlideSettings({ sid, open, onClose }) {
 			});
 	};
 
+	/**
+	 * upload new title to server
+	 * @param {*} e onClick event
+	 */
 	const changeTitle = (e) => {
 		axios
 			.post(`${serverURL}/api/setTitle`, {
@@ -71,6 +86,10 @@ export default function SlideSettings({ sid, open, onClose }) {
 			});
 	};
 
+	/**
+	 * upload new slide PDF to server
+	 * @param {*} e onClick event
+	 */
 	const reuploadFile = async (e) => {
 		if (fileReupload.current.files.length !== 1) return;
 		let formData = new FormData();
@@ -89,6 +108,11 @@ export default function SlideSettings({ sid, open, onClose }) {
 		}
 	};
 
+	/**
+	 * set the display result
+	 * @param {Boolean} success
+	 * @param {String} message 
+	 */
 	const setResult = (success, message) => {
 		let node = resultRef.current;
 		node.innerText = message;
@@ -145,7 +169,7 @@ export default function SlideSettings({ sid, open, onClose }) {
 						</div>
 						<div className='row'>
 							<span className='label'>Re-upload PDF file:</span>
-							<input type='file' name='file' ref={fileReupload} />
+							<input type='file' name='file' ref={fileReupload} accept='.pdf'/>
 							<Button onClick={reuploadFile} disabled={uploading} variant='contained' color='primary'>
 								Upload
 							</Button>

@@ -58,6 +58,9 @@ export default function Slides(props) {
 		// eslint-disable-next-line
 	}, [props.pageTotal, props.pageNum]);
 
+	/**
+	 * upload audio to server
+	 */
 	const uploadAudio = async () => {
 		if (fileUpload.current.files.length !== 1) return;
 
@@ -79,6 +82,9 @@ export default function Slides(props) {
 		}
 	};
 
+	/**
+	 * delete the audio on this page
+	 */
 	const deleteAudio = async () => {
 		if (!window.confirm(`Are you sure to delete this audio?`)) return;
 		setUploading(true);
@@ -94,11 +100,19 @@ export default function Slides(props) {
 			});
 	};
 
+	/**
+	 * go to next page
+	 * @param {*} e onClick event
+	 */
 	const nextPage = (e) => {
 		setNextDisable(true);
 		props.nextPage();
 	}
 
+	/**
+	 * go to prev page
+	 * @param {*} e onClick event
+	 */
 	const prevPage = (e) => {
 		setPrevDisable(true);
 		props.prevPage();

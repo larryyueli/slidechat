@@ -15,6 +15,10 @@ function AppBar(props) {
 	const [name, setName] = useState(getDisplayName());
 	const [inputInvalid, setInputInvalid] = useState('ok');
 
+	/**
+	 * update input value and check if input is valid
+	 * @param {onChange} e input change event
+	 */
 	const setNewName = (e) => {
 		let input = e.target.value;
 		if (input.length > 30 || !input.match(NAME_FORMAT)) {
@@ -25,6 +29,10 @@ function AppBar(props) {
 		setName(input);
 	};
 
+	/**
+	 * update displayName iff newName is valid
+	 * @param {String} newName 
+	 */
 	const confirmName = (newName) => {
 		if (newName > 30 || !newName.match(NAME_FORMAT)) {
 			setName(getDisplayName());
@@ -39,7 +47,6 @@ function AppBar(props) {
 				<img className='appbar-logo' src={`${baseURL}/imgs/logo.png`} alt='SlideChat' />
 			</Link>
 			<div className='appbar-items'>
-				{/* <span className='appbar-item'>Notification</span> */}
 				<ClickAwayListener onClickAway={(e) => setUserDropDown('')}>
 					<span className='dropdown' onClick={(e) => setUserDropDown('open')}>
 						<span className='appbar-item'>

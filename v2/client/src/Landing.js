@@ -5,7 +5,7 @@ import AppBar from './AppBar';
 import { baseURL } from './config';
 
 /**
- * Slides on the left of the screen
+ * Landing page of slidechat
  */
 export default function Landing(props) {
 	return (

@@ -26,6 +26,9 @@ function Main(props) {
 	const [qid, setQid] = useState(undefined);
 	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
 
+	/**
+	 * fetch slideInfo from server and require login if required
+	 */
 	useEffect(() => {
 		axios
 			.get(`${serverURL}/api/slideInfo?slideID=${sid}`)
@@ -69,7 +72,7 @@ function Main(props) {
 
 	/**
 	 * apply the new page number
-	 * @param {*} newPageNum
+	 * @param {number} newPageNum
 	 */
 	const applyPage = (newPageNum) => {
 		document.getElementById('pageNum').value = newPageNum;
@@ -97,6 +100,9 @@ function Main(props) {
 		setSlideDrawing(false);
 	};
 
+	/**
+	 * go to the page the page the user entered iff it is a valid page
+	 */
 	const gotoPage = () => {
 		let newPageNum = +document.getElementById('pageNum').value;
 		if (!Number.isInteger(newPageNum)) {
