@@ -451,7 +451,7 @@ function commonAPI(db) {
 				{ projection: { pageTotal: true, pages: true, anonymity: true } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
-			if (slide.anonymity === 'A') throw { status: 401, error: 'Unauthorized' };
+			if (slide.anonymity !== 'C') throw { status: 401, error: 'Unauthorized' };
 			if (
 				isNotValidPage(req.body.pageNum, slide.pageTotal) ||
 				notExistInList(req.body.qid, slide.pages[+req.body.pageNum - 1].questions) ||
@@ -504,7 +504,7 @@ function commonAPI(db) {
 				{ projection: { pageTotal: true, pages: true, anonymity: true } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
-			if (slide.anonymity === 'A') throw { status: 401, error: 'Unauthorized' };
+			if (slide.anonymity !== 'C') throw { status: 401, error: 'Unauthorized' };
 			if (
 				isNotValidPage(req.body.pageNum, slide.pageTotal) ||
 				notExistInList(req.body.qid, slide.pages[+req.body.pageNum - 1].questions) ||
