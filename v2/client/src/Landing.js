@@ -1,11 +1,11 @@
 import React from 'react';
 import Button from '@material-ui/core/Button';
 
-import AppBar from './AppBar';
+import AppBar from './components/AppBar';
 import { baseURL } from './config';
 
 /**
- * Slides on the left of the screen
+ * Landing page
  */
 export default function Landing(props) {
 	return (

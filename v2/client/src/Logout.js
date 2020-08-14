@@ -2,6 +2,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { serverURL } from './config';
 
+/**
+ * Log out page of the app. If logout is successful, the user successfully logs out from
+ * our server. Yet, if their UTORID login session is not expired yet, when they click on 
+ * the login button, they gets logged in immediately. The UTORID login uses a session cookie,
+ * exiting the browser clears the cookie and ends the session.
+ * Note if the user uses chrome setting "on start up: continue where you left off", session
+ * cookies will not be cleared!
+ */
 export default function Logout(props) {
 	let [success, setSuccess] = useState('unknown');
 	useEffect(() => {

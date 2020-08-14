@@ -886,6 +886,7 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 				const chats = slide.pages[+req.body.pageNum - 1].questions[req.body.qid].chats;
 				let needSetUnsolved = true;
 				setUnsolvedLoop: for (let i of chats) {
+					if (!i) continue;
 					for (let j of i.endorsement) {
 						if (j !== endorseName) {
 							needSetUnsolved = false;

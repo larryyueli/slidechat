@@ -4,8 +4,8 @@ import axios from 'axios';
 
 import SlideDrawingOverlay from './SlideDrawingOverlay';
 import SlideFlipOverlay from './SlideFlipOverlay';
-import { serverURL } from './config';
-import { randInt } from './util';
+import { serverURL } from '../../config';
+import { randInt } from '../../util';
 
 const loadingImg = process.env.PUBLIC_URL + '/imgs/loading.png';
 const disconnectedImg = process.env.PUBLIC_URL + '/imgs/disconnected.png';

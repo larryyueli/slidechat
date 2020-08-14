@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { ClickAwayListener, Button } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 
-import { baseURL } from './config';
-import { getDisplayName, setDisplayName, getRandomName } from './util';
+import { baseURL } from '../config';
+import { getDisplayName, setDisplayName, getRandomName } from '../util';
 
 const NAME_FORMAT = /^[\w- ]+$/;
 

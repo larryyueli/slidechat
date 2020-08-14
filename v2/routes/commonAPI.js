@@ -19,7 +19,9 @@ function commonAPI(db) {
 	 */
 	router.get('/api/course', async (req, res) => {
 		try {
-			let course = await courses.findOne({ _id: ObjectID.createFromHexString(req.query.id) });
+			let course = await courses.findOne({
+				_id: ObjectID.createFromHexString(req.query.id),
+			});
 			if (!course) throw { status: 404, error: 'not found' };
 
 			let courseSlides = [];
@@ -32,7 +34,11 @@ function commonAPI(db) {
 					console.log(`slide ${slideId} not found`);
 					continue;
 				}
-				courseSlides.push({ id: slideId, filename: slideEntry.filename, description: slideEntry.description });
+				courseSlides.push({
+					id: slideId,
+					filename: slideEntry.filename,
+					description: slideEntry.description,
+				});
 			}
 			res.json({
 				name: course.name,
@@ -188,6 +194,7 @@ function commonAPI(db) {
 			let result = slide.pages[+req.query.pageNum - 1].questions;
 			for (let question of result) {
 				if (question) {
+					question.user = question.chats[0].user;
 					question.create = question.chats[0].time;
 					delete question.chats;
 				}
@@ -219,10 +226,11 @@ function commonAPI(db) {
 			) {
 				throw { status: 400, error: 'bad request' };
 			}
+			let question = slide.pages[+req.query.pageNum - 1].questions[req.query.qid];
 			res.json({
-				title: slide.pages[+req.query.pageNum - 1].questions[req.query.qid].title,
-				chats: slide.pages[+req.query.pageNum - 1].questions[req.query.qid].chats,
-				drawing: slide.pages[+req.query.pageNum - 1].questions[req.query.qid].drawing,
+				title: question.title,
+				chats: question.chats,
+				drawing: question.drawing,
 			});
 		} catch (err) {
 			errorHandler(res, err);
@@ -235,7 +243,7 @@ function commonAPI(db) {
 	 *   sid: slide id
 	 *   pageNum: page number
 	 *   title: question title
-	 *   body: question body
+	 *   body(optional): question body
 	 *   user: userID
 	 *   drawing(optional): the drawing for the question
 	 */
@@ -272,20 +280,21 @@ function commonAPI(db) {
 			let newQuestion = {
 				status: 'unsolved',
 				time: time,
-				chats: [],
+				chats: [
+					{
+						time: time,
+						body: req.body.body, // does not escape here, client renderer(markdown-it) will escape it
+						// saving redundant user name here to save some queries
+						user: slide.anonymity === 'nonymous' ? shortName(req.session.realName) : req.body.user,
+						uid: slide.anonymity === 'nonymous' ? req.session.uid : undefined,
+						likes: [],
+						endorsement: [],
+					},
+				],
 				title: req.body.title,
 				drawing: req.body.drawing,
-				user: slide.anonymity === 'nonymous' ? shortName(req.session.realName) : req.body.user,
 				id: id,
 			};
-			let newChat = {
-				time: time,
-				body: req.body.body, // does not escape here, md renderer(markdown-it) will escape it
-				user: slide.anonymity === 'nonymous' ? shortName(req.session.realName) : req.body.user,
-				likes: [],
-				endorsement: [],
-			};
-			newQuestion.chats.push(newChat);
 
 			let insertQuestion = {}; // cannot use template string on the left hand side
 			insertQuestion[`pages.${req.body.pageNum - 1}.questions`] = newQuestion;
@@ -335,6 +344,7 @@ function commonAPI(db) {
 				time: time,
 				body: req.body.body, // does not escape here, md renderer(markdown-it) will escape it
 				user: slide.anonymity === 'nonymous' ? shortName(req.session.realName) : req.body.user,
+				uid: slide.anonymity === 'nonymous' ? req.session.uid : undefined,
 				likes: [],
 				endorsement: [],
 			};
@@ -383,9 +393,9 @@ function commonAPI(db) {
 				throw { status: 400, error: 'bad request' };
 			}
 
-			let name = slide.anonymity === 'nonymous' ? shortName(req.session.realName) : req.body.user;
+			let uid = slide.anonymity === 'nonymous' ? req.session.uid : req.body.user;
 			let insertLike = {}; // cannot use template string on the left hand side
-			insertLike[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.likes`] = name;
+			insertLike[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.likes`] = uid;
 
 			// if anonymous, randomly generated username may repeat, so it does not make
 			// sense to only allow one like per name. So everyone can like as many times
@@ -394,8 +404,7 @@ function commonAPI(db) {
 			if (slide.anonymity !== 'anyone') {
 				// like if not yet liked, otherwise unlike
 				if (
-					slide.pages[req.body.pageNum - 1].questions[req.body.qid].chats[req.body.cid].likes.indexOf(name) <
-					0
+					slide.pages[req.body.pageNum - 1].questions[req.body.qid].chats[req.body.cid].likes.indexOf(uid) < 0
 				) {
 					updateRes = await slides.updateOne(
 						{ _id: ObjectID.createFromHexString(req.body.sid) },
@@ -416,6 +425,108 @@ function commonAPI(db) {
 
 			if (updateRes.modifiedCount !== 1) {
 				throw 'like update error';
+			}
+
+			res.send();
+		} catch (err) {
+			errorHandler(res, err);
+		}
+	});
+
+	/**
+	 * Modify the content of a chat message
+	 * Only the owner of the message is allowed. Anonymous chat does not allow anyone
+	 * to modify.
+	 * req body:
+	 *   sid: slide id
+	 *   qid: question index, integer range from from 0 to questions.length (exclusive)
+	 *   pageNum: page number
+	 *   cid: chat index
+	 *   body: message body
+	 */
+	router.post('/api/modifyChat', async (req, res) => {
+		try {
+			const slide = await slides.findOne(
+				{ _id: ObjectID.createFromHexString(req.body.sid) },
+				{ projection: { pageTotal: true, pages: true, anonymity: true } }
+			);
+			if (!slide) throw { status: 404, error: 'slide not found' };
+			if (slide.anonymity === 'anyone') throw { status: 401, error: 'Unauthorized' };
+			if (
+				isNotValidPage(req.body.pageNum, slide.pageTotal) ||
+				notExistInList(req.body.qid, slide.pages[+req.body.pageNum - 1].questions) ||
+				notExistInList(req.body.cid, slide.pages[+req.body.pageNum - 1].questions[req.body.qid].chats) ||
+				typeof req.body.body !== 'string' ||
+				!req.body.body
+			) {
+				throw { status: 400, error: 'bad request' };
+			}
+			if (slide.pages[+req.body.pageNum - 1].questions[req.body.qid].chats[req.body.cid].uid !== req.session.uid)
+				throw { status: 401, error: 'Unauthorized' };
+			
+			const time = Date.now();
+			const change = {
+				[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.body`]: req.body.body,
+				[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.time`]: time,
+				[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.modified`]: true,
+				[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.time`]: time,
+			};
+			let updateRes = await slides.updateOne(
+				{ _id: ObjectID.createFromHexString(req.body.sid) },
+				{ $set: change }
+			);
+
+			if (updateRes.modifiedCount !== 1) {
+				throw 'chat modify error';
+			}
+
+			res.send();
+		} catch (err) {
+			errorHandler(res, err);
+		}
+	});
+
+	/**
+	 * Delete one's own chat message
+	 * Anonymous chat does not allow anyone to delete except instructors.
+	 * Index 0 (question body) is not allowed to delete because it contains question
+	 * owner information
+	 * req body:
+	 *   sid: slide id
+	 *   qid: question index
+	 *   pageNum: page number
+	 *   cid: chat index
+	 */
+	router.post('/api/deleteOwnChat', async (req, res) => {
+		try {
+			const slide = await slides.findOne(
+				{ _id: ObjectID.createFromHexString(req.body.sid) },
+				{ projection: { pageTotal: true, pages: true, anonymity: true } }
+			);
+			if (!slide) throw { status: 404, error: 'slide not found' };
+			if (slide.anonymity === 'anyone' ) throw { status: 401, error: 'Unauthorized' };
+			if (
+				isNotValidPage(req.body.pageNum, slide.pageTotal) ||
+				notExistInList(req.body.qid, slide.pages[+req.body.pageNum - 1].questions) ||
+				req.body.cid === 0 ||
+				notExistInList(req.body.cid, slide.pages[+req.body.pageNum - 1].questions[req.body.qid].chats)
+			) {
+				throw { status: 400, error: 'bad request' };
+			}
+			if (slide.pages[+req.body.pageNum - 1].questions[req.body.qid].chats[req.body.cid].uid !== req.session.uid)
+				throw { status: 401, error: 'Unauthorized' };
+
+			const time = Date.now();
+			const change = {
+				[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}`]: null,
+			};
+			let updateRes = await slides.updateOne(
+				{ _id: ObjectID.createFromHexString(req.body.sid) },
+				{ $set: change }
+			);
+
+			if (updateRes.modifiedCount !== 1) {
+				throw 'delete own chat error';
 			}
 
 			res.send();

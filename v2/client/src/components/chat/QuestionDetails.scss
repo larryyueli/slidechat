@@ -1,0 +1,111 @@
+.chat-details {
+	@import './github-gist.scss';
+
+	.title {
+		font-size: 1.4rem;
+		padding: 2rem 1rem 0 1rem;
+		overflow-wrap: anywhere;
+	}
+
+	.chat {
+		padding: 1rem;
+		border-bottom: 1px solid #cccccc;
+		overflow-wrap: anywhere;
+
+		.info {
+			@include flexSides();
+			font-size: 0.9rem;
+
+			.author {
+				overflow-wrap: anywhere;
+			}
+
+			.time {
+				margin-left: 0.5rem;
+				color: #cccccc;
+			}
+
+			.icons {
+				display: flex;
+				align-items: center;
+
+				.icon {
+					@include clickable();
+					margin: 0 0.3rem;
+				}
+
+				.endorsed {
+					color: $endorsementColour;
+				}
+
+				.not-endorsed {
+					color: #cccccc;
+				}
+
+				.liked {
+					display: flex;
+					align-items: center;
+					color: $likeColour;
+				}
+
+				.nobody-liked {
+					display: flex;
+					align-items: center;
+					color: #cccccc;
+				}
+
+				.delete {
+					color: $secondary;
+					&:hover {
+						color: lighten($secondary, 10%);
+					}
+				}
+			}
+		}
+
+		.info-bottom {
+			font-size: 0.9rem;
+
+			.modify-btn {
+				margin-top: 1rem;
+				@include clickable();
+				color: #cccccc;
+				text-decoration: underline;
+			}
+
+			.endorsement {
+				margin-top: 1rem;
+				color: $endorsementColour;
+			}
+		}
+
+		p > code {
+			background-color: $codeBackground;
+			padding: 0.15rem;
+		}
+	}
+
+	.MuiExpansionPanelDetails-root {
+		padding-top: 16px !important;
+		padding-bottom: 16px !important;
+	}
+
+	.send-message-bar {
+		display: flex;
+		padding: 0.5rem;
+		align-items: center;
+
+		.MuiTextField-root {
+			flex: 1;
+			margin-right: 0.5rem;
+
+			.MuiOutlinedInput-multiline {
+				padding: 6px;
+			}
+		}
+
+		button {
+			background-color: $primary;
+		}
+	}
+}

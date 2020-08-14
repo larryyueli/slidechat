@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
-import ChatArea from './ChatArea';
-import Slides from './Slides';
-import AppBar from './AppBar';
+import ChatArea from './components/chat/ChatArea';
+import Slides from './components/slide/Slides';
+import AppBar from './components/AppBar';
 import { serverURL } from './config';
 
 /**
- * The main body of the application
- * It consists two main components: slides on the left, and chat area on the right. Changing the page
- * number will need to change both sides.
+ * Main page of the application: the slides and chats of a given set of slides, given
+ * from the URL.
  */
 function Main(props) {
 	const sid = props.match.params.slideId;
@@ -135,6 +134,7 @@ function Main(props) {
 				/>
 				<ChatArea
 					sid={sid}
+					uid={uid}
 					pageNum={page}
 					canvasComponentRef={canvasComponentRef}
 					setSlideDrawing={setSlideDrawing}

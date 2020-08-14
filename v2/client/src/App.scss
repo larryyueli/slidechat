@@ -1,10 +1,9 @@
 @import './palette.scss';
 @import './util.scss';
 
-@import './AppBar.scss';
-@import './ChatArea.scss';
-@import './github-gist.scss';
-@import './Slides.scss';
+@import './components/AppBar.scss';
+@import './components/chat/ChatArea.scss';
+@import './components/slide/Slides.scss';
 @import './Landing.scss';
 
 body {
