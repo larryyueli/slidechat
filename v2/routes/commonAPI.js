@@ -91,7 +91,7 @@ function commonAPI(db) {
 				{ projection: { _id: true, anonymity: true, pageTotal: true } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
-			if (slide.anonymity !== 'anyone' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
+			if (slide.anonymity !== 'A' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
 			if (isNotValidPage(req.query.pageNum, slide.pageTotal)) {
 				throw { status: 400, error: 'bad request' };
 			}
@@ -114,7 +114,7 @@ function commonAPI(db) {
 				{ projection: { _id: true, anonymity: true, pageTotal: true, pages: true } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
-			if (slide.anonymity !== 'anyone' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
+			if (slide.anonymity !== 'A' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
 			if (isNotValidPage(req.query.pageNum, slide.pageTotal)) {
 				throw { status: 400, error: 'bad request' };
 			}
@@ -167,7 +167,7 @@ function commonAPI(db) {
 				{ projection: { filename: true, anonymity: true } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
-			if (slide.anonymity != 'anyone' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
+			if (slide.anonymity != 'A' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
 			res.download(path.join(fileStorage, req.query.slideID, slide.filename));
 		} catch (err) {
 			errorHandler(res, err);
@@ -187,7 +187,7 @@ function commonAPI(db) {
 				{ projection: { pages: true, pageTotal: true, anonymity: true } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
-			if (slide.anonymity != 'anyone' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
+			if (slide.anonymity != 'A' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
 			if (isNotValidPage(req.query.pageNum, slide.pageTotal)) {
 				throw { status: 400, error: 'bad request' };
 			}
@@ -219,7 +219,7 @@ function commonAPI(db) {
 				{ projection: { pages: true, anonymity: true } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
-			if (slide.anonymity != 'anyone' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
+			if (slide.anonymity != 'A' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
 			if (
 				isNotValidPage(req.query.pageNum, slide.pageTotal) ||
 				notExistInList(req.query.qid, slide.pages[+req.query.pageNum - 1].questions)
@@ -254,7 +254,7 @@ function commonAPI(db) {
 				{ projection: { pageTotal: true, anonymity: true, pages: true } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
-			if (slide.anonymity != 'anyone' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
+			if (slide.anonymity != 'A' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
 			if (
 				isNotValidPage(req.body.pageNum, slide.pageTotal) ||
 				typeof req.body.title !== 'string' ||
@@ -285,8 +285,8 @@ function commonAPI(db) {
 						time: time,
 						body: req.body.body, // does not escape here, client renderer(markdown-it) will escape it
 						// saving redundant user name here to save some queries
-						user: slide.anonymity === 'nonymous' ? shortName(req.session.realName) : req.body.user,
-						uid: slide.anonymity === 'nonymous' ? req.session.uid : undefined,
+						user: slide.anonymity === 'C' ? shortName(req.session.realName) : req.body.user,
+						uid: slide.anonymity === 'C' ? req.session.uid : undefined,
 						likes: [],
 						endorsement: [],
 					},
@@ -328,7 +328,7 @@ function commonAPI(db) {
 				{ projection: { pageTotal: true, pages: true, anonymity: true } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
-			if (slide.anonymity != 'anyone' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
+			if (slide.anonymity != 'A' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
 			if (
 				isNotValidPage(req.body.pageNum, slide.pageTotal) ||
 				notExistInList(req.body.qid, slide.pages[+req.body.pageNum - 1].questions) ||
@@ -343,8 +343,8 @@ function commonAPI(db) {
 			let newChat = {
 				time: time,
 				body: req.body.body, // does not escape here, md renderer(markdown-it) will escape it
-				user: slide.anonymity === 'nonymous' ? shortName(req.session.realName) : req.body.user,
-				uid: slide.anonymity === 'nonymous' ? req.session.uid : undefined,
+				user: slide.anonymity === 'C' ? shortName(req.session.realName) : req.body.user,
+				uid: slide.anonymity === 'C' ? req.session.uid : undefined,
 				likes: [],
 				endorsement: [],
 			};
@@ -384,7 +384,7 @@ function commonAPI(db) {
 				{ projection: { pageTotal: true, pages: true, anonymity: true } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
-			if (slide.anonymity !== 'anyone' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
+			if (slide.anonymity !== 'A' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
 			if (
 				isNotValidPage(req.body.pageNum, slide.pageTotal) ||
 				notExistInList(req.body.qid, slide.pages[+req.body.pageNum - 1].questions) ||
@@ -393,7 +393,7 @@ function commonAPI(db) {
 				throw { status: 400, error: 'bad request' };
 			}
 
-			let uid = slide.anonymity === 'nonymous' ? req.session.uid : req.body.user;
+			let uid = slide.anonymity === 'C' ? req.session.uid : req.body.user;
 			let insertLike = {}; // cannot use template string on the left hand side
 			insertLike[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.likes`] = uid;
 
@@ -401,7 +401,7 @@ function commonAPI(db) {
 			// sense to only allow one like per name. So everyone can like as many times
 			// as they want
 			let updateRes;
-			if (slide.anonymity !== 'anyone') {
+			if (slide.anonymity !== 'A') {
 				// like if not yet liked, otherwise unlike
 				if (
 					slide.pages[req.body.pageNum - 1].questions[req.body.qid].chats[req.body.cid].likes.indexOf(uid) < 0
@@ -451,7 +451,7 @@ function commonAPI(db) {
 				{ projection: { pageTotal: true, pages: true, anonymity: true } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
-			if (slide.anonymity === 'anyone') throw { status: 401, error: 'Unauthorized' };
+			if (slide.anonymity === 'A') throw { status: 401, error: 'Unauthorized' };
 			if (
 				isNotValidPage(req.body.pageNum, slide.pageTotal) ||
 				notExistInList(req.body.qid, slide.pages[+req.body.pageNum - 1].questions) ||
@@ -463,7 +463,7 @@ function commonAPI(db) {
 			}
 			if (slide.pages[+req.body.pageNum - 1].questions[req.body.qid].chats[req.body.cid].uid !== req.session.uid)
 				throw { status: 401, error: 'Unauthorized' };
-			
+
 			const time = Date.now();
 			const change = {
 				[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats.${req.body.cid}.body`]: req.body.body,
@@ -504,7 +504,7 @@ function commonAPI(db) {
 				{ projection: { pageTotal: true, pages: true, anonymity: true } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
-			if (slide.anonymity === 'anyone' ) throw { status: 401, error: 'Unauthorized' };
+			if (slide.anonymity === 'A') throw { status: 401, error: 'Unauthorized' };
 			if (
 				isNotValidPage(req.body.pageNum, slide.pageTotal) ||
 				notExistInList(req.body.qid, slide.pages[+req.body.pageNum - 1].questions) ||

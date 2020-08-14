@@ -50,10 +50,10 @@ function AppBar(props) {
 				<ClickAwayListener onClickAway={(e) => setUserDropDown('')}>
 					<span className='dropdown' onClick={(e) => setUserDropDown('open')}>
 						<span className='appbar-item'>
-							Hi, {props.anonymity === 'nonymous' ? props.username : name} !
+							Hi, {props.anonymity === 'C' ? props.username : name} !
 						</span>
 						<div className={`dropdown-content ${userDropDown}`}>
-							{props.anonymity !== 'nonymous' ? (
+							{props.anonymity !== 'C' ? (
 								<>
 									<div className='dropdown-item input-label'>Set display name: </div>
 									<div className='dropdown-item anonymous-name-bar'>

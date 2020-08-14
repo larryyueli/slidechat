@@ -108,11 +108,7 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 	 */
 	router.post('/api/updateCourseName', instructorAuth, async (req, res) => {
 		try {
-			if (
-				req.body.cid.length != 24 || 
-				typeof req.body.name !== 'string' || 
-				!req.body.name
-			) {
+			if (req.body.cid.length != 24 || typeof req.body.name !== 'string' || !req.body.name) {
 				throw { status: 400, error: 'bad request' };
 			}
 
@@ -160,10 +156,10 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 			if (!course) throw { status: 404, error: 'course not found' };
 			if (course.instructors.indexOf(req.session.uid) < 0) throw { status: 401, error: 'Unauthorized' };
 
-			for (let instructor of course.instructors){
+			for (let instructor of course.instructors) {
 				let updateRes = await users.updateOne(
 					{ _id: instructor },
-					{ $pull: { courses: {id: req.query.cid } } }
+					{ $pull: { courses: { id: req.query.cid } } }
 				);
 
 				if (updateRes.modifiedCount === 0) {
@@ -236,6 +232,9 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 	 * req body:
 	 *   cid: course id
 	 *   anonymity: anonymity level of the slide
+	 *     A: anonymous
+	 *     B: login required anonymous
+	 *     C: non-anonymous
 	 * req.files:
 	 *   file: *.pdf
 	 */
@@ -243,7 +242,7 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 		try {
 			if (
 				req.body.cid.length != 24 ||
-				['anyone', 'student', 'nonymous'].indexOf(req.body.anonymity) < 0 ||
+				['A', 'B', 'C'].indexOf(req.body.anonymity) < 0 ||
 				!req.files.file ||
 				!req.files.file.name.toLocaleLowerCase().endsWith('.pdf')
 			) {
@@ -640,11 +639,14 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 	 * set anonymity level of a slide
 	 * req body:
 	 *   anonymity: new anonymity level of the slide
+	 *     A: anonymous
+	 *     B: login required anonymous
+	 *     C: non-anonymous
 	 *   sid: the slide id
 	 */
 	router.post('/api/setAnonymity', instructorAuth, async (req, res) => {
 		try {
-			if (req.body.sid.length != 24 || ['anyone', 'student', 'nonymous'].indexOf(req.body.anonymity) < 0) {
+			if (req.body.sid.length != 24 || ['A', 'B', 'C'].indexOf(req.body.anonymity) < 0) {
 				return res.status(400).send();
 			}
 			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });

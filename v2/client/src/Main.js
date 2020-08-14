@@ -21,7 +21,7 @@ function Main(props) {
 	const [isInstructor, setIsInstructor] = useState(false);
 	const [uid, setUid] = useState('');
 	const [username, setUsername] = useState('');
-	const [anonymity, setAnonymity] = useState('anyone');
+	const [anonymity, setAnonymity] = useState('A');
 	const [qid, setQid] = useState(undefined);
 	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
 
@@ -32,7 +32,7 @@ function Main(props) {
 		axios
 			.get(`${serverURL}/api/slideInfo?slideID=${sid}`)
 			.then((res) => {
-				if (res.data.anonymity !== 'anyone' && !res.data.loginUser) {
+				if (res.data.anonymity !== 'A' && !res.data.loginUser) {
 					window.location.href = `${serverURL}/p/login/${sid}/${window.location.hash.substring(1)}`;
 				} else {
 					return res;

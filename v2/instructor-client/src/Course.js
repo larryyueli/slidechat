@@ -43,7 +43,7 @@ export default function Course({ cid, role, fetchCourses }) {
 
 		let formData = new FormData();
 		formData.append('cid', cid);
-		formData.append('anonymity', 'anyone');
+		formData.append('anonymity', 'B'); // login required anonymous chat
 		formData.append('file', fileUpload.current.files[0]);
 		try {
 			setUploading(true);
@@ -134,7 +134,7 @@ export default function Course({ cid, role, fetchCourses }) {
 			})
 			.then((res) => {
 				fetchCourse();
-				setRenaming(false)
+				setRenaming(false);
 			})
 			.catch((err) => {
 				console.log(err);
@@ -166,30 +166,44 @@ export default function Course({ cid, role, fetchCourses }) {
 	return (
 		<div className='course'>
 			<div className='title'>
-				{managing ? (renaming ? <div className='title-name'>
-					<TextField
-						placeholder='Course Name'
-						defaultValue={course.name}
-						inputRef={nameRef}
-					/>
-					<span className='material-icons icon confirm' onClick={changeCourseName}>check</span>
-				</div> : <div className='title-name'>
-						{course.name}
-						<span className='material-icons icon rename' onClick={() => { setRenaming(true) }}>create</span>
-					</div>) : <span>{course.name}</span>}
+				{managing ? (
+					renaming ? (
+						<div className='title-name'>
+							<TextField placeholder='Course Name' defaultValue={course.name} inputRef={nameRef} />
+							<span className='material-icons icon confirm' onClick={changeCourseName}>
+								check
+							</span>
+						</div>
+					) : (
+						<div className='title-name'>
+							{course.name}
+							<span
+								className='material-icons icon rename'
+								onClick={() => {
+									setRenaming(true);
+								}}>
+								create
+							</span>
+						</div>
+					)
+				) : (
+					<span>{course.name}</span>
+				)}
 
 				{role === 'instructor' ? (
 					<div className='manage-icons'>
-						{managing ? <span className='material-icons delete icon' onClick={deleteCourse}>
-							delete_forever
-						</span> : null}
+						{managing ? (
+							<span className='material-icons delete icon' onClick={deleteCourse}>
+								delete_forever
+							</span>
+						) : null}
 						<span className={`manage ${managing ? 'managing' : ''}`} onClick={changeManageStatus}>
 							<span className='material-icons icon'>settings</span>
 						</span>
 					</div>
 				) : (
-						<span>&nbsp;</span>
-					)}
+					<span>&nbsp;</span>
+				)}
 			</div>
 			<div className='slides'>
 				{course.slides.map((slide) => {
@@ -217,10 +231,10 @@ export default function Course({ cid, role, fetchCourses }) {
 									</Button>
 								</div>
 							) : (
-									<Button variant='outlined' color='primary' onClick={(e) => copyToClipboard(link)}>
-										Copy link
-									</Button>
-								)}
+								<Button variant='outlined' color='primary' onClick={(e) => copyToClipboard(link)}>
+									Copy link
+								</Button>
+							)}
 						</div>
 					);
 				})}

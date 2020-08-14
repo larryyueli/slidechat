@@ -27,6 +27,12 @@ export default function SlideSettings({ sid, open, onClose }) {
 			});
 	}, [sid]);
 
+	/**
+	 * Change anonymity level:
+	 *   A: anonymous
+	 *   B: login required anonymous
+	 *   C: non-anonymous
+	 */
 	const changeAnonymity = (e) => {
 		axios
 			.post(`${serverURL}/api/setAnonymity`, {
@@ -95,7 +101,7 @@ export default function SlideSettings({ sid, open, onClose }) {
 	/**
 	 * set the display result
 	 * @param {Boolean} success
-	 * @param {String} message 
+	 * @param {String} message
 	 */
 	const setResult = (success, message) => {
 		let node = resultRef.current;
@@ -126,9 +132,9 @@ export default function SlideSettings({ sid, open, onClose }) {
 						<div className='row'>
 							<span className='label'>Anonymity:</span>
 							<Select value={settings.anonymity} onChange={changeAnonymity}>
-								<MenuItem value='anyone'>No login required</MenuItem>
-								<MenuItem value='student'>Login required, anonymous chat</MenuItem>
-								<MenuItem value='nonymous'>Login required, non-anonymous chat</MenuItem>
+								<MenuItem value='A'>No login required</MenuItem>
+								<MenuItem value='B'>Login required, anonymous chat</MenuItem>
+								<MenuItem value='C'>Login required, non-anonymous chat</MenuItem>
 							</Select>
 						</div>
 						<div className='row'>
@@ -153,7 +159,7 @@ export default function SlideSettings({ sid, open, onClose }) {
 						</div>
 						<div className='row'>
 							<span className='label'>Re-upload PDF file:</span>
-							<input type='file' name='file' ref={fileReupload} accept='.pdf'/>
+							<input type='file' name='file' ref={fileReupload} accept='.pdf' />
 							<Button onClick={reuploadFile} disabled={uploading} variant='contained' color='primary'>
 								Upload
 							</Button>
