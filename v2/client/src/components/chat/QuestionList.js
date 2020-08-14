@@ -6,6 +6,12 @@ import ChatAreaTitle from './ChatAreaTitle';
 import { serverURL } from '../../config';
 import { formatTime } from '../../util';
 
+/**
+ * Sort the given question list
+ * @param {*} unsorted question list
+ * @param {String} sorting sorting method (update/create)
+ * @returns the sorted question list
+ */
 function sortQuestions(unsorted, sorting) {
 	let questions = unsorted.filter((a) => a != null);
 	if (sorting === 'update') {
@@ -35,6 +41,10 @@ export default function QuestionList(props) {
 		}
 	};
 
+	/**
+	 * apply new sorting method
+	 * @param {String} newSort new sorting method (update/create)
+	 */
 	const applySort = (newSort) => {
 		if (newSort !== sorting) {
 			setQuestions(sortQuestions(questions, newSort));
@@ -64,8 +74,8 @@ export default function QuestionList(props) {
 				title='Discussion'
 				showManage={props.isInstructor}
 				managing={managing}
-                toggleManaging={toggleManaging}
-                showBackBtn={false}
+				toggleManaging={toggleManaging}
+				showBackBtn={false}
 			/>
 			<div className='chat-list'>
 				<div className='new-chat-btn-row' key={-1}>

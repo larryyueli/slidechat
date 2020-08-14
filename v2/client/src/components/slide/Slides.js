@@ -9,8 +9,9 @@ import { randInt } from '../../util';
 
 const loadingImg = process.env.PUBLIC_URL + '/imgs/loading.png';
 const disconnectedImg = process.env.PUBLIC_URL + '/imgs/disconnected.png';
+
 /**
- * Slides on the left of the screen
+ * Slides on the left side of the screen
  */
 export default function Slides(props) {
 	const [audioSrc, setAudioSrc] = useState('');
@@ -58,6 +59,9 @@ export default function Slides(props) {
 		// eslint-disable-next-line
 	}, [props.pageTotal, props.pageNum]);
 
+	/**
+	 * upload audio to server
+	 */
 	const uploadAudio = async () => {
 		if (fileUpload.current.files.length !== 1) return;
 
@@ -79,6 +83,9 @@ export default function Slides(props) {
 		}
 	};
 
+	/**
+	 * delete the audio on this page
+	 */
 	const deleteAudio = async () => {
 		if (!window.confirm(`Are you sure to delete this audio?`)) return;
 		setUploading(true);
@@ -94,11 +101,19 @@ export default function Slides(props) {
 			});
 	};
 
+	/**
+	 * go to next page
+	 * @param {Event} onClick event
+	 */
 	const nextPage = (e) => {
 		setNextDisable(true);
 		props.nextPage();
 	}
 
+	/**
+	 * go to prev page
+	 * @param {Event} onClick event
+	 */
 	const prevPage = (e) => {
 		setPrevDisable(true);
 		props.prevPage();

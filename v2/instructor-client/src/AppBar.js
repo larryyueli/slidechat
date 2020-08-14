@@ -16,7 +16,6 @@ function AppBar(props) {
 				<img className='appbar-logo' src={`${baseURL}/imgs/logo.png`} alt='SlideChat' />
 			</a>
 			<div>
-				{/* <span className='appbar-item'>Notification</span> */}
 				<Link to={`${baseURL}${instructorURL}`} className='appbar-item'>
 					My Courses
 				</Link>

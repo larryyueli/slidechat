@@ -15,13 +15,14 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 	const slides = db.collection('slides');
 
 	/**
-	 * get the courses the user joined, either as an instructor or a student
+	 * get the courses the instructor joined
 	 */
 	router.get('/api/myCourses', instructorAuth, async (req, res) => {
 		try {
 			let user = await users.findOne({ _id: req.session.uid }, { projection: { courses: 1 } });
 			if (!user) {
 				return res.json({
+					uid: req.session.uid,
 					user: shortName(req.session.realName),
 					courses: [],
 				});

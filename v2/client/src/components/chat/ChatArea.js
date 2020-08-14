@@ -6,7 +6,7 @@ import QuestionList from './QuestionList';
 import QuestionDetails from './QuestionDetails';
 
 /**
- * This is the chat area on the right of the page.
+ * This is the chat area on the right side of the page.
  */
 export default function ChatArea(props) {
 	const [state, setState] = useState('list');
@@ -38,7 +38,9 @@ export default function ChatArea(props) {
 		setState('modify');
 	};
 
-	// onClick handler for back button to go back to the chat list
+	/**
+	 * onClick handler for back button to go back to the chat list
+	 */
 	const back = () => {
 		if (state !== 'modify') {
 			setState('list');

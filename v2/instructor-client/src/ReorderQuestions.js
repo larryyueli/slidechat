@@ -5,6 +5,9 @@ import { Button, CircularProgress } from '@material-ui/core';
 import AppBar from './AppBar';
 import { serverURL, fullURL } from './config';
 
+/**
+ * Page for reordering questions
+ */
 export default function ReorderQuestions(props) {
 	const sid = props.match.params.slideId;
 	const [loading, setLoading] = useState(true);
@@ -18,7 +21,7 @@ export default function ReorderQuestions(props) {
 				setUser(res.data.loginUser);
 				let slide = { pageTotal: res.data.pageTotal, pages: [], unused: [] };
 				let i = 1;
-				for (; i <= slide.pageTotal; i++) {
+				for (; i <= slide.pageTotal; i++) { // fetch all questions
 					let res = await axios.get(`${serverURL}/api/questions?slideID=${sid}&pageNum=${i}`);
 					let questions = { pageNum: i, questions: res.data };
 					questions.count = res.data.reduce((total, curr) => {
@@ -52,15 +55,24 @@ export default function ReorderQuestions(props) {
 		fetchSlide();
 	}, [sid]);
 
-	const removeQuestions = (index) => {
+	/**
+	 * move questions at page i to unused questions
+	 * @param {Number} i page index
+	 */
+	const removeQuestions = (i) => {
 		const slideCopy = { ...slide };
-		for (let i of slide.pages[index]) {
-			slideCopy.unused.push(i);
+		for (let page of slide.pages[i]) {
+			slideCopy.unused.push(page);
 		}
-		slideCopy.pages[index] = [];
+		slideCopy.pages[i] = [];
 		setSlide(slideCopy);
 	};
 
+	/**
+	 * move all questions below the selected page to their previous page, move the question
+	 * of the selected page to unused. For cases where the instructor removed a page.
+	 * @param {*} index start page index
+	 */
 	const shiftUp = (index) => {
 		const slideCopy = { ...slide };
 		for (let i of slide.pages[index]) {
@@ -74,6 +86,10 @@ export default function ReorderQuestions(props) {
 		setSlide(slideCopy);
 	};
 
+	/**
+	 * Move all questions below the selected page to the their next page
+	 * @param {*} index start page index
+	 */
 	const shiftDown = (index) => {
 		const slideCopy = { ...slide };
 		for (let i of slide.pages[slide.pageTotal - 1]) {
@@ -87,6 +103,10 @@ export default function ReorderQuestions(props) {
 		setSlide(slideCopy);
 	};
 
+	/**
+	 * Add selected unused questions to the page given by the input with id `add-${index}`
+	 * @param {*} index unused questions index
+	 */
 	const addToPage = (index) => {
 		let to = +document.getElementById(`add-${index}`).value;
 		if (!Number.isInteger(to) || to < 1 || to > slide.pageTotal) return;
@@ -99,6 +119,11 @@ export default function ReorderQuestions(props) {
 		setSlide(slideCopy);
 	};
 
+	/**
+	 * Return the preview of questions on a given page
+	 * @param {*} page 
+	 * @returns preview
+	 */
 	const previewPage = (page) => {
 		let list = [];
 		for (let i = 0; i < 5 && i < page.questions.length; i++) {

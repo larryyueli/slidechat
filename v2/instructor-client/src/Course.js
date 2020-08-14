@@ -5,6 +5,9 @@ import { Button, TextField, CircularProgress } from '@material-ui/core';
 import SlideSettings from './SlideSettings';
 import { serverURL, fullURL } from './config';
 
+/**
+ * A block containing information about one course
+ */
 export default function Course({ cid, role, fetchCourses }) {
 	const [course, setCourse] = useState(null);
 	const [loading, setLoading] = useState(true);
@@ -17,6 +20,9 @@ export default function Course({ cid, role, fetchCourses }) {
 	const newUserRef = useRef(null);
 	const nameRef = useRef(null);
 
+	/**
+	 * fetch course information from server
+	 */
 	const fetchCourse = async () => {
 		try {
 			let res = await axios.get(`${serverURL}/api/course?id=${cid}`);
@@ -61,6 +67,9 @@ export default function Course({ cid, role, fetchCourses }) {
 		}
 	};
 
+	/**
+	 * invite an instructor to this course
+	 */
 	const addInstructor = async () => {
 		try {
 			await axios.post(`${serverURL}/api/addInstructor`, {
@@ -84,12 +93,19 @@ export default function Course({ cid, role, fetchCourses }) {
 		}
 	};
 
+	/**
+	 * toggle managing status
+	 */
 	const changeManageStatus = () => {
 		setAddInstructorRes(null);
 		setManaging(!managing);
 		setRenaming(false);
 	};
 
+	/**
+	 * copy string to clipboard
+	 * @param {*} str string want to copy
+	 */
 	const copyToClipboard = (str) => {
 		const el = document.createElement('textarea');
 		el.value = str;
@@ -101,11 +117,16 @@ export default function Course({ cid, role, fetchCourses }) {
 		document.body.removeChild(el);
 	};
 
+	/**
+	 * open slide settings for a given slide
+	 * @param {*} filename slide filename
+	 * @param {*} sid slide ID
+	 */
 	const modifySlide = (filename, sid) => {
 		setOpenModify({ open: true, filename: filename, sid: sid });
 	};
 
-	const ChangeCoursename = () => {
+	const changeCourseName = () => {
 		axios
 			.post(`${serverURL}/api/updateCourseName`, {
 				cid: cid,
@@ -151,7 +172,7 @@ export default function Course({ cid, role, fetchCourses }) {
 						defaultValue={course.name}
 						inputRef={nameRef}
 					/>
-					<span className='material-icons icon confirm' onClick={ChangeCoursename}>check</span>
+					<span className='material-icons icon confirm' onClick={changeCourseName}>check</span>
 				</div> : <div className='title-name'>
 						{course.name}
 						<span className='material-icons icon rename' onClick={() => { setRenaming(true) }}>create</span>

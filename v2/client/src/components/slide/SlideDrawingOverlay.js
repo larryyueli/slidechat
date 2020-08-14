@@ -5,6 +5,9 @@ import React, { createRef } from 'react';
 // Integers takes less space than floats when transmitted as a string of json
 const resolution = 9999;
 
+/**
+ * The drawing layer of slide
+ */
 export default class SlideOverlay extends React.Component {
 	constructor(props) {
 		super(props);
@@ -16,6 +19,10 @@ export default class SlideOverlay extends React.Component {
 		this.ctx = null;
 	}
 
+	/**
+	 * resize the canvas to the same size as the slide
+	 * @param {*} slide 
+	 */
 	resize(slide) {
 		this.canvas.width = slide.clientWidth;
 		this.canvas.height = slide.clientHeight;
@@ -23,6 +30,9 @@ export default class SlideOverlay extends React.Component {
 		this.redraw();
 	}
 
+	/**
+	 * initialize context of canvas
+	 */
 	setupCtx() {
 		this.ctx = this.canvas.getContext('2d');
 		this.ctx.lineWidth = (this.canvas.width / 100) >> 0;
@@ -70,6 +80,10 @@ export default class SlideOverlay extends React.Component {
 		}
 	}
 
+	/**
+	 * update the last line and draw it
+	 * @param {*} lastLine the updated line
+	 */
 	applyLineChange(lastLine){
 		let len = lastLine.length;
 		this.ctx.beginPath();
@@ -85,6 +99,10 @@ export default class SlideOverlay extends React.Component {
 		this.ctx.closePath();
 	}
 
+	/**
+	 * apply mouseDown event
+	 * @param {*} e mouseDown event
+	 */
 	drawingOnMouseDown(e) {
 		if (this.state.readOnly) return;
 		this.lines.push([
@@ -94,6 +112,10 @@ export default class SlideOverlay extends React.Component {
 		this.isDrawing = true;
 	}
 
+	/**
+	 * apply MouseMove event
+	 * @param {*} e MouseMove event
+	 */
 	drawingOnMouseMove(e) {
 		if (this.state.readOnly) return;
 		if (!this.isDrawing) return;
@@ -103,16 +125,28 @@ export default class SlideOverlay extends React.Component {
 		this.applyLineChange(lastLine);
 	}
 
+	/**
+	 * apply MouseUp event
+	 * @param {*} e MouseUp event
+	 */
 	drawingOnMouseUp(e) {
 		this.isDrawing = false;
 	}
 
+	/**
+	 * apply touchend event
+	 * @param {*} e touchend event
+	 */
 	touchend(e){
 		if (this.isDrawing && e.touches.length === 0){
 			this.isDrawing = false;
 		}
 	}
 
+	/**
+	 * apply touchmove event
+	 * @param {*} e touchmove event
+	 */
 	touchmove(e){
 		if (this.state.readOnly) return;
 		if (!this.isDrawing) return;
@@ -127,6 +161,10 @@ export default class SlideOverlay extends React.Component {
 		this.applyLineChange(lastLine);
 	}
 
+	/**
+	 * apply touchstart event
+	 * @param {*} e touchstart event
+	 */
 	touchstart(e){
 		e.preventDefault();
 		if (this.state.readOnly || this.isDrawing) return;
@@ -141,16 +179,27 @@ export default class SlideOverlay extends React.Component {
 		]);
 	}
 
+	/**
+	 * undo the lest line
+	 * @param {*} e onClick event
+	 */
 	undo(e) {
 		this.lines.pop();
 		this.redraw();
 	}
 
+	/**
+	 * clear the canvas
+	 * @param {*} e onClick event
+	 */
 	clear(e) {
 		this.lines = [];
 		this.clearCanvas();
 	}
 
+	/**
+	 * draw the cleared canvas
+	 */
 	clearCanvas() {
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	}

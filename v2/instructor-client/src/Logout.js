@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { serverURL } from './config';
 
+/**
+ * The page showing user is logout
+ */
 export default function Logout(props) {
 	let [success, setSuccess] = useState('unknown');
 	useEffect(() => {

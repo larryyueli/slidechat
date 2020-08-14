@@ -4,6 +4,9 @@ import { Button, TextField, CircularProgress, Dialog, Select, MenuItem } from '@
 
 import { baseURL, serverURL, instructorURL } from './config';
 
+/**
+ * A modal window for slide settings
+ */
 export default function SlideSettings({ sid, open, onClose }) {
 	const [loading, setLoading] = useState(true);
 	const [uploading, setUploading] = useState(false);
@@ -89,6 +92,11 @@ export default function SlideSettings({ sid, open, onClose }) {
 		}
 	};
 
+	/**
+	 * set the display result
+	 * @param {Boolean} success
+	 * @param {String} message 
+	 */
 	const setResult = (success, message) => {
 		let node = resultRef.current;
 		node.innerText = message;
@@ -145,7 +153,7 @@ export default function SlideSettings({ sid, open, onClose }) {
 						</div>
 						<div className='row'>
 							<span className='label'>Re-upload PDF file:</span>
-							<input type='file' name='file' ref={fileReupload} />
+							<input type='file' name='file' ref={fileReupload} accept='.pdf'/>
 							<Button onClick={reuploadFile} disabled={uploading} variant='contained' color='primary'>
 								Upload
 							</Button>

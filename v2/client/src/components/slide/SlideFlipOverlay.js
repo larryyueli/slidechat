@@ -1,5 +1,8 @@
 import React, { Component, createRef } from 'react';
 
+/**
+ * A layer on top of the slide to detect flip page clicks
+ */
 export default class SlideFlipOverlay extends Component {
 	constructor(props) {
 		super(props);
@@ -9,6 +12,10 @@ export default class SlideFlipOverlay extends Component {
 		this.resize = this.resize.bind(this);
 	}
 
+	/**
+	 * resize the layer to the same size of the slide
+	 * @param {Event} e resize event
+	 */
 	resize(e) {
 		this.overlay.style.height = `${this.slide.clientHeight}px`;
 	}

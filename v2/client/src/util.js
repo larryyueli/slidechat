@@ -1,3 +1,8 @@
+/**
+ * return the formatted time
+ * @param {Number} time
+ * @return {String}
+ */
 export function formatTime(time) {
 	let now = Date.now();
 
@@ -21,6 +26,11 @@ export function formatTime(time) {
 	}
 }
 
+/**
+ * return the formatted names
+ * @param {Array} names
+ * @return {String}
+ */
 export function formatNames(names) {
 	let len = names.length;
 	if (len === 1) {
@@ -36,13 +46,25 @@ export function formatNames(names) {
 	}
 }
 
+/**
+ * return an array contain numbers from start to end
+ * @param {Number} start
+ * @param {Number} end
+ * @return {Array[Number]} number array
+ */
 export function range(start, end) {
 	return Array.from({ length: end - start }, (_, i) => start + i);
 }
 
+/**
+ * return an random integer from 0 to max-1
+ * @param {Number} max
+ * @returns {Number}
+ */
 export function randInt(max) {
 	return Math.floor(Math.random() * max);
 }
+
 const nameList = [
 	'Alchemist',
 	'Archer',
@@ -111,10 +133,20 @@ const nameList = [
 	'Witch',
 	'Wizard',
 ];
+
+/**
+ * return a random anonymous name
+ * @returns {String}
+ */
 export function getRandomName() {
 	return `Anonymous ${nameList[randInt(nameList.length)]}`;
 }
 
+/**
+ * return the value of given cookieName, null if cookie not exist
+ * @param {String} cookieName
+ * @returns cookie value
+ */
 export function getCookie(cookieName) {
 	let cookies = document.cookie.split('; ');
 	for (let cookie of cookies) {
@@ -126,6 +158,10 @@ export function getCookie(cookieName) {
 	return null;
 }
 
+/**
+ * delete the cookie
+ * @param {String} cookieName
+ */
 export function deleteCookie(cookieName) {
 	let cookies = document.cookie.split('; ');
 	for (let cookie of cookies) {
@@ -137,10 +173,18 @@ export function deleteCookie(cookieName) {
 }
 
 const nameKey = 'SlideChat_DispName';
+/**
+ * save new display name
+ * @param {String} name
+ */
 export function setDisplayName(name) {
 	window.localStorage.setItem(nameKey, name);
 }
 
+/**
+ * get the display name
+ * @returns {String}
+ */
 export function getDisplayName() {
 	let name = window.localStorage.getItem(nameKey);
 	if (name) {

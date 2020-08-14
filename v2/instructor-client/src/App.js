@@ -8,7 +8,7 @@ import { baseURL, instructorURL } from './config';
 
 /**
  * The main entrance of the application
- * It consists three main components: App bar, slides on the left, and chat area on the right
+ * Switch to Logout, reorder, courses page based on URL
  */
 function App() {
 	let date = new Date();
