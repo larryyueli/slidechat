@@ -7,18 +7,33 @@ import { serverURL } from '../../config';
 import { formatTime } from '../../util';
 
 /**
- * Sort the given question list
+ * Sort the given question list.
+ * The array should already have qid remembered and null elements removed.
  * @param {*} unsorted question list
  * @param {String} sorting sorting method (update/create)
  * @returns the sorted question list
  */
-function sortQuestions(unsorted, sorting) {
-	let questions = unsorted.filter((a) => a != null);
+function sortQuestions(questions, sorting) {
 	if (sorting === 'update') {
 		return questions.sort((a, b) => b.time - a.time);
 	} else if (sorting === 'create') {
 		return questions.sort((a, b) => b.create - a.create);
 	}
+}
+
+/**
+ * Questions don't store a unique id in the database, instead, they are stored in an array,
+ * and the array index is the unique id. However, when we sort the array, the index
+ * information is lost. We need to store it when API response arrives.
+ * Null elements are deleted questions, they should be removed once the index is remembered.
+ * @param {Array} questions
+ */
+function rememberQid(questions) {
+	questions.forEach((question, i) => {
+		if (!question) return;
+		question.id = i;
+	});
+	return questions.filter((a) => a != null);
 }
 
 export default function QuestionList(props) {
@@ -35,7 +50,7 @@ export default function QuestionList(props) {
 	const fetchQuestionList = async () => {
 		try {
 			const res = await axios.get(`${serverURL}/api/questions?slideID=${props.sid}&pageNum=${props.pageNum}`);
-			setQuestions(sortQuestions(res.data, sorting));
+			setQuestions(sortQuestions(rememberQid(res.data), sorting));
 		} catch (err) {
 			console.error(err);
 		}

@@ -275,7 +275,6 @@ function commonAPI(db) {
 				}
 			}
 
-			let id = slide.pages[req.body.pageNum - 1].questions.length;
 			let time = Date.now();
 			let newQuestion = {
 				status: 'unsolved',
@@ -293,7 +292,6 @@ function commonAPI(db) {
 				],
 				title: req.body.title,
 				drawing: req.body.drawing,
-				id: id,
 			};
 
 			let insertQuestion = {}; // cannot use template string on the left hand side
