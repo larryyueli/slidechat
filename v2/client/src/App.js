@@ -1,29 +1,25 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
-import AppBar from './Appbar.js'
 import Main from './Main.js';
-import Profile from './Profile.js';
-import ReorderQuestions from './ReorderQuestions.js';
+import Landing from './Landing';
+import Logout from './Logout';
 import { baseURL } from './config';
-
 
 /**
  * The main entrance of the application
- * It consists three main components: App bar, slides on the left, and chat area on the right
+ * Switch to Logout, Main, Landing page based on URL
  */
 function App() {
-    return (
-        <Router>
-            <AppBar />
-            <Switch>
-                <Route path={`${baseURL}/profile`} exact component={Profile} />
-                <Route path={`${baseURL}/profile/reorderQuestions/:slideId`} component={ReorderQuestions} />
-                <Route path={`${baseURL}/:slideId`} component={Main} />
-            </Switch>
-        </Router>
-    );
+	return (
+		<Router>
+			<Switch>
+				<Route path={`${baseURL}/logout`} component={Logout} />
+				<Route path={`${baseURL}/:slideId`} component={Main} />
+				<Route path={`${baseURL}/`} component={Landing} />
+			</Switch>
+		</Router>
+	);
 }
-
 
 export default App;

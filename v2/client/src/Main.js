@@ -1,97 +1,156 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
-import ChatArea from './ChatArea';
-import Slides from './Slides';
+import ChatArea from './components/chat/ChatArea';
+import Slides from './components/slide/Slides';
+import AppBar from './components/AppBar';
 import { serverURL } from './config';
 
 /**
- * The main body of the application
- * It consists two main components: slides on the left, and chat area on the right. Changing the page
- * number will need to change both sides.
+ * Main page of the application: the slides and chats of a given set of slides, given
+ * from the URL.
  */
 function Main(props) {
-    const sid = props.match.params.slideId;
-    const [pageTotal, setPageTotal] = useState(0);
-    const [page, setPage] = useState(1);
-    const [title, setTitle] = useState("");
-    const [filename, setFilename] = useState("");
+	const sid = props.match.params.slideId;
+	const [pageTotal, setPageTotal] = useState(0);
+	const [page, setPage] = useState(1);
+	const [title, setTitle] = useState('');
+	const [filename, setFilename] = useState('');
+	const [drawable, setDrawable] = useState(false);
+	const [slideDrawing, setSlideDrawing] = useState(false);
+	const [isInstructor, setIsInstructor] = useState(false);
+	const [uid, setUid] = useState('');
+	const [username, setUsername] = useState('');
+	const [anonymity, setAnonymity] = useState('A');
+	const [qid, setQid] = useState(undefined);
+	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
 
-    useEffect(() => {
-        axios.get(`${serverURL}/api/slideInfo?slideID=${sid}`).then(res => {
-            let currentPage = 1;
-            if (window.location.hash) {
-                let n = +window.location.hash.substring(1);
-                if (n > 0 && n <= res.data.pageTotal && Number.isInteger(n)) {
-                    currentPage = n;
-                }
-            }
+	/**
+	 * fetch slide info from server and redirect to login if needed
+	 */
+	useEffect(() => {
+		axios
+			.get(`${serverURL}/api/slideInfo?slideID=${sid}`)
+			.then((res) => {
+				if (res.data.anonymity !== 'A' && !res.data.loginUser) {
+					window.location.href = `${serverURL}/p/login/${sid}/${window.location.hash.substring(1)}`;
+				} else {
+					return res;
+				}
+			})
+			.then((res) => {
+				let currentPage = 1;
+				let questionId;
+				let m = window.location.hash.match(/^#(\d+)(-(\d+))?$/);
+				if (m) {
+					let n = +m[1];
+					if (n <= res.data.pageTotal) {
+						currentPage = n;
+						questionId = m[3];
+					}
+				}
 
-            setPage(currentPage);
-            setPageTotal(res.data.pageTotal);
-            setTitle(res.data.title);
-            setFilename(res.data.filename);
-            document.getElementById("pageNum").value = currentPage;
-        }).catch(err => {
-            console.error(err);
-        });
-    }, [sid]);
+				setAnonymity(res.data.anonymity);
+				if (res.data.loginUser) {
+					setUid(res.data.loginUser);
+					setUsername(res.data.username);
+				}
+				if (res.data.isInstructor) setIsInstructor(true);
+				setPageTotal(res.data.pageTotal);
+				setTitle(res.data.title);
+				setFilename(res.data.filename);
+				setDrawable(Boolean(res.data.drawable));
+				document.getElementById('pageNum').value = currentPage;
+				setPage(currentPage);
+				if (questionId) setQid(questionId);
+			})
+			.catch((err) => {
+				console.error(err);
+			});
+	}, [sid]);
 
-    /**
-     * Go to the next page of slide, should fetch the url and the chat threads list of the new page 
-     */
-    const nextPage = () => {
-        if (page >= pageTotal) return;
-        let newPageNum = page + 1;
-        document.getElementById("pageNum").value = newPageNum;
-        window.location.hash = newPageNum;
-        setPage(newPageNum);
-    }
+	/**
+	 * apply the new page number
+	 * @param {number} newPageNum
+	 */
+	const applyPage = (newPageNum) => {
+		document.getElementById('pageNum').value = newPageNum;
+		window.history.replaceState(null, null, `#${newPageNum}`);
+		setPage(newPageNum);
+	};
 
-    /**
-     * Go to the previous page of slide, should fetch the url and the chat threads list of the new page 
-     */
-    const prevPage = () => {
-        if (page < 2) return;
-        let newPageNum = page - 1;
-        document.getElementById("pageNum").value = newPageNum;
-        window.location.hash = newPageNum;
-        setPage(newPageNum);
-    }
+	/**
+	 * Go to the next page of slide, should fetch the url and the chat threads list of the new page
+	 */
+	const nextPage = () => {
+		if (page >= pageTotal) return;
+		let newPageNum = page + 1;
+		applyPage(newPageNum);
+		setSlideDrawing(false);
+	};
 
-    const gotoPage = () => {
-        let newPageNum = +document.getElementById("pageNum").value;
-        if (!Number.isInteger(newPageNum)) {
-            document.getElementById("pageNum").value = page;
-            return;
-        }
-        if (newPageNum > pageTotal) {
-            newPageNum = pageTotal;
-        } else if (newPageNum < 1) {
-            newPageNum = 1;
-        }
-        document.getElementById("pageNum").value = newPageNum;
-        window.location.hash = newPageNum;
-        setPage(newPageNum);
-    }
+	/**
+	 * Go to the previous page of slide, should fetch the url and the chat threads list of the new page
+	 */
+	const prevPage = () => {
+		if (page < 2) return;
+		let newPageNum = page - 1;
+		applyPage(newPageNum);
+		setSlideDrawing(false);
+	};
 
-    return (
-        <div className="main">
-            <Slides
-                title={title}
-                filename={filename}
-                sid={sid}
-                pageNum={page}
-                pageTotal={pageTotal}
-                nextPage={nextPage}
-                prevPage={prevPage}
-                gotoPage={gotoPage} />
-            <ChatArea
-                sid={sid}
-                pageNum={page} />
-        </div>
-    );
+	/**
+	 * go to the page the page the user entered iff it is a valid page
+	 */
+	const gotoPage = () => {
+		let newPageNum = +document.getElementById('pageNum').value;
+		if (!Number.isInteger(newPageNum)) {
+			document.getElementById('pageNum').value = page;
+			return;
+		}
+		if (newPageNum > pageTotal) {
+			newPageNum = pageTotal;
+		} else if (newPageNum < 1) {
+			newPageNum = 1;
+		}
+		applyPage(newPageNum);
+	};
+
+	return (
+		<>
+			<AppBar
+				anonymity={anonymity}
+				uid={uid}
+				username={username}
+				loginURL={`${serverURL}/p/login/${sid}/${page}`}
+			/>
+			<div className='main'>
+				<Slides
+					title={title}
+					filename={filename}
+					sid={sid}
+					pageNum={page}
+					pageTotal={pageTotal}
+					nextPage={nextPage}
+					prevPage={prevPage}
+					gotoPage={gotoPage}
+					drawing={slideDrawing}
+					canvasComponentRef={canvasComponentRef}
+					isInstructor={isInstructor}
+				/>
+				<ChatArea
+					sid={sid}
+					uid={uid}
+					pageNum={page}
+					canvasComponentRef={canvasComponentRef}
+					setSlideDrawing={setSlideDrawing}
+					isInstructor={isInstructor}
+					drawable={drawable}
+					qid={qid}
+				/>
+			</div>
+		</>
+	);
 }
-
 
 export default Main;

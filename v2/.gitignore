@@ -1,0 +1,8 @@
+/node_modules
+
+# misc
+.DS_Store
+
+# server configs
+secrets.js
+instructorList.json

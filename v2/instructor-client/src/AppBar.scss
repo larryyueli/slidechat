@@ -1,0 +1,63 @@
+.appbar {
+	position: static;
+	@include flexSides();
+	padding: 0.5rem 0.5rem;
+	@media (min-width: 768px) {
+		padding: 0.5rem 3rem;
+	}
+	color: #ffffff;
+	background-color: $primary;
+	box-shadow: 0 3px 10px #aaaaaa;
+	user-select: none;
+
+	.logo-link {
+		display: flex;
+		align-items: center;
+		.appbar-logo {
+			font-size: 1.5rem;
+			font-weight: 500;
+			height: 2.5rem;
+			width: auto;
+		}
+	}
+
+	.appbar-item {
+		color: #ffffff;
+		text-decoration: none;
+		margin: 0 0.5rem;
+		padding: 0.4rem;
+		border-radius: 0.4rem;
+
+		&:hover {
+			background-color: #ffffff20;
+		}
+	}
+
+	.dropdown {
+		position: relative;
+
+		.dropdown-content {
+			display: none;
+			position: absolute;
+			left: 0;
+			top: 2rem;
+			background-color: $backgroundColour;
+			width: 100%;
+			box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+			z-index: 1;
+			.dropdown-item {
+				color: black;
+				padding: 1rem 1.3rem;
+				text-decoration: none;
+				display: block;
+				text-align: left;
+				&:hover {
+					background-color: #f1f1f1;
+				}
+			}
+		}
+	}
+	.dropdown-content.open {
+		display: block;
+	}
+}

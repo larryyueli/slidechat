@@ -1,12 +1,10 @@
 @import './palette.scss';
 @import './util.scss';
 
-@import './Appbar.scss';
-@import './ChatArea.scss';
-@import './github-gist.scss';
-@import './Profile.scss';
-@import './ReorderQuestions.scss';
-@import './Slides.scss';
+@import './components/AppBar.scss';
+@import './components/chat/ChatArea.scss';
+@import './components/slide/Slides.scss';
+@import './Landing.scss';
 
 body {
 	margin: 0;
@@ -19,8 +17,7 @@ body {
 }
 
 code {
-	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-		monospace;
+	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
 @media (min-width: 768px) {
@@ -30,6 +27,9 @@ code {
 		grid-template-rows: auto;
 		height: calc(100vh - 4rem);
 		/* 2rem line height + 0.5rem padding * 2 + 1rem margin */
+		.slide-wrapper {
+			width: 90%;
+		}
 	}
 
 	.chat-area {

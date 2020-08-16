@@ -1,0 +1,118 @@
+.slide-container {
+	margin: 1rem 0;
+	text-align: center;
+
+	.title {
+		font-size: 1.6rem;
+	}
+
+	.slide-wrapper {
+		width: 100%;
+		margin: 1rem auto 0 auto;
+		position: relative;
+
+		.slide {
+			width: 100%;
+		}
+
+		.slide-overlay {
+			position: absolute;
+			top: 0;
+			left: 0;
+			background-color: #00ff0008;
+			width: 100%;
+		}
+
+		.drawing-controls {
+			display: flex;
+			justify-content: center;
+
+			& > span {
+				@include clickable();
+				background-color: #cccccc;
+				padding: 0.3rem;
+				margin: 0.5rem;
+				border-radius: 0.2rem;
+				box-shadow: 1px 2px 3px #aaaaaa;
+			}
+		}
+
+		.flip-page-overlay {
+			position: absolute;
+			top: 0;
+			left: 0;
+			// background-color: #ff000008;
+			display: grid;
+			grid-template-columns: 1fr 1fr 1fr;
+			width: 100%;
+		}
+
+		.slide-audio {
+			width: 100%;
+			outline: none;
+		}
+	}
+
+	.audio-instructor {
+		@include flexCenter();
+		margin: 0 auto;
+
+		.file {
+			width: 13rem;
+		}
+
+		.progress {
+			padding: 0.2rem;
+			border-radius: 0.5rem;
+		}
+
+		.upload {
+			background-color: $primary;
+			color: white;
+			margin: 0 0.5rem;
+			&:disabled {
+				background-color: $disabled;
+			}
+		}
+
+		.delete {
+			background-color: $secondary;
+			color: white;
+			margin: 0 0.5rem;
+			&:disabled {
+				background-color: $disabled;
+			}
+		}
+	}
+
+	.flip-page-btns {
+		button {
+			margin: 0.5rem 1rem;
+			background-color: $gray;
+		}
+	}
+
+	input {
+		width: 1.8rem;
+		background-color: $backgroundColour;
+		padding: 0.1rem;
+		font-size: 1em;
+		text-align: center;
+		border: 1px solid $backgroundColour;
+		border-radius: 0.25rem;
+
+		&:hover {
+			background-color: #e9e9e9;
+		}
+
+		&:focus {
+			outline: none;
+			border-color: black;
+			background-color: #e9e9e9;
+		}
+	}
+
+	.download-link {
+		color: #aaaaaa;
+	}
+}

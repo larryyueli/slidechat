@@ -1,0 +1,223 @@
+.profile {
+	width: 35rem;
+	max-width: 90%;
+	margin: 3rem auto;
+
+	> .title {
+		text-align: center;
+		font-size: 3rem;
+	}
+
+	.course {
+		margin: 2rem 0;
+		border: 2px solid $primary;
+		border-radius: 2rem;
+		padding: 2rem;
+
+		> .loading {
+			text-align: center;
+		}
+
+		.title {
+			font-size: 1.5rem;
+			font-weight: 450;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+
+			.manage-icons {
+				@include flexCenter();
+				.manage {
+					@include clickable();
+					@include flexCenter();
+					height: 2.4rem;
+					width: 2.4rem;
+					background-color: $primary;
+					color: white;
+					border-radius: 0.4rem;
+					box-shadow: 1px 1px 4px #aaaaaa;
+
+					.icon {
+						font-size: 1.5rem;
+						transition: transform 0.3s;
+					}
+				}
+
+				.managing {
+					background-color: $secondary;
+					.icon {
+						transform: rotate(120deg);
+					}
+				}
+
+				.delete {
+					margin-right: 2rem;
+					@include clickable();
+					@include flexCenter();
+					background-color: $secondary;
+					color: white;
+					border-radius: 0.4rem;
+					height: 2.4rem;
+					width: 2.4rem;
+				}
+			}
+
+			.title-name {
+				@include flexCenter();
+
+				.confirm{
+					@include clickable();
+					color: $primary;
+				}
+
+				.rename{
+					@include clickable();
+					margin-left: 1rem;
+				}
+			}
+		}
+
+		.slides {
+			margin: 1rem 0;
+
+			.slide-item {
+				display: flex;
+				padding: 0.5rem 0;
+				border-top: 1px solid $dividerColour;
+				border-bottom: 1px solid $dividerColour;
+				margin-top: -1px;
+
+				.slide-link {
+					@include ellipsis();
+					flex: 1;
+					padding: 0.6rem 0;
+					color: $primary;
+				}
+
+				.btns {
+					display: flex;
+					align-items: center;
+					.MuiButton-root {
+						margin-left: 0.3rem;
+					}
+				}
+			}
+		}
+
+		.upload-bar {
+			@include flexCenter;
+			margin-bottom: 1em;
+			.MuiCircularProgress-root {
+				margin-left: 1rem;
+			}
+			button {
+				background-color: $primary;
+				color: white;
+				&:disabled {
+					background-color: $disabled;
+				}
+			}
+		}
+
+		.addInstructor-bar {
+			@include flexCenter();
+			margin-top: 1em;
+
+			.MuiTextField-root {
+				width: 50%;
+				margin-right: 1em;
+
+				.MuiOutlinedInput-input,
+				.MuiOutlinedInput-multiline {
+					padding: 6px;
+				}
+			}
+			button {
+				background-color: $primary;
+				color: white;
+			}
+		}
+
+		.result-ok {
+			text-align: center;
+			color: green;
+		}
+
+		.result-fail {
+			text-align: center;
+			color: $secondary;
+		}
+	}
+
+	.createCourse-bar {
+		@include flexCenter();
+		margin-top: 1em;
+
+		.MuiTextField-root {
+			width: 50%;
+			margin-right: 1em;
+
+			.MuiOutlinedInput-input,
+			.MuiOutlinedInput-multiline {
+				padding: 6px;
+			}
+		}
+
+		button {
+			background-color: $primary;
+			color: white;
+		}
+	}
+}
+
+.setting {
+	width: 35rem;
+	padding: 1rem;
+	.title {
+		font-size: 1.5rem;
+		font-weight: 500;
+
+		.result {
+			margin-left: 1rem;
+			font-size: 1rem;
+			font-weight: 400;
+			transition: opacity 0.5s;
+		}
+
+		.ok {
+			color: green;
+		}
+		.fail {
+			color: $secondary;
+		}
+	}
+
+	.row {
+		margin: 1rem 0;
+		display: flex;
+		align-items: center;
+
+		.label {
+			font-weight: 450;
+			margin-right: 1rem;
+		}
+
+		.title-input {
+			width: 18rem;
+			margin-right: 1rem;
+		}
+
+		.MuiButton-root {
+			margin-right: 1rem;
+		}
+
+		button,
+		.reorder-btn {
+			background-color: $primary;
+			color: white;
+			&:disabled {
+				background-color: $disabled;
+			}
+		}
+	}
+}

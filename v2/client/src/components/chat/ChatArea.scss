@@ -1,0 +1,91 @@
+.chat-area {
+	min-width: 0;
+
+	.chat-area-title {
+		font-size: 1.5rem;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 1rem 1.5rem;
+		border: 1px solid #cccccc;
+		box-shadow: 0 3px 6px #cccccc;
+		user-select: none;
+
+		.title {
+			margin: 0 0.7rem;
+			@include ellipsis();
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.back-button {
+			display: flex;
+			align-items: center;
+			transition: color 0.2s;
+
+			&:hover {
+				color: #aaaaaa;
+			}
+		}
+
+		.placeholder {
+			width: 2.4rem;
+		}
+
+		.manage {
+			@include clickable();
+			@include flexCenter();
+			height: 2.4rem;
+			width: 2.4rem;
+			color: black;
+			border-radius: 0.4rem;
+
+			.icon {
+				font-size: 1.5rem;
+				transition: transform 0.3s;
+			}
+
+			&:hover {
+				background-color: #e9e9e9;
+			}
+		}
+
+		.managing {
+			background-color: #e9e9e9;
+			box-shadow: inset 1px 1px 4px #aaaaaa;
+
+			.icon {
+				transform: rotate(120deg);
+			}
+		}
+	}
+
+	.new-chat-btn-row {
+		text-align: center;
+		padding: 1rem 0;
+		border-bottom: 1px solid #cccccc;
+		button {
+			background-color: $primary;
+			color: white;
+		}
+	}
+
+	.sort-select-row {
+		margin: 1rem;
+		text-align: right;
+		text-transform: uppercase;
+		color: #aaaaaa;
+		span {
+			@include clickable();
+			margin-left: 1rem;
+			&.selected {
+				color: #000000;
+			}
+		}
+	}
+
+	@import './QuestionList.scss';
+	@import './QuestionDetails.scss';
+	@import './NewQuestion.scss';
+}

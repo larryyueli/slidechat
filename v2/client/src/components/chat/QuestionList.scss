@@ -1,0 +1,60 @@
+.chat-list {
+	.chat {
+		padding: 1rem;
+		border-bottom: 1px solid #cccccc;
+		&:hover {
+			background: #fdfdfd;
+			cursor: pointer;
+		}
+
+		.title-row {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+
+			.title {
+				font-size: 1.2rem;
+				font-weight: 420;
+				@include ellipsis();
+			}
+
+			.icons {
+				display: flex;
+				align-items: center;
+			}
+
+			.icon {
+				user-select: none;
+				margin: 0 0.3rem;
+			}
+
+			.endorsed {
+				color: $endorsementColour;
+			}
+
+			.delete {
+				color: $secondary;
+				&:hover {
+					color: lighten($secondary, 10%);
+				}
+			}
+		}
+
+		.info {
+			@include flexSides();
+
+			.author {
+				flex: 1;
+				font-size: 0.9rem;
+				color: #cccccc;
+				@include ellipsis();
+			}
+
+			.time {
+				font-size: 0.9rem;
+				margin-left: 0.5rem;
+				color: #cccccc;
+			}
+		}
+	}
+}

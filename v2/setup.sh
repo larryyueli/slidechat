@@ -1,14 +1,11 @@
-cd client
 npm i
-npm run build
-
-cd ../server
-npm i
+cd client && npm i && cd ..
+cd instructor-client && npm i && cd ..
 
 # default location to store pdf files
 mkdir -p ~/.slidechat/files
 
-mkdir react-build
-cp ../client/build/* react-build/
+npm run build
 
-npm start
+echo
+echo 'You are all almost done! Check out our GitHub Wiki for how to deploy this app or start developing.'

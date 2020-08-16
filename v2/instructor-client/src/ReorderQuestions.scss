@@ -1,0 +1,156 @@
+.reorder-page {
+	width: 60rem;
+	max-width: 100%;
+	margin: 3rem auto;
+
+	> .title {
+		text-align: center;
+		font-size: 2.5rem;
+	}
+
+	.subtitle {
+		text-align: center;
+		font-size: 1.5rem;
+		margin: 1em;
+	}
+
+	.upload-bar {
+		@include flexCenter;
+		margin-bottom: 1em;
+		.MuiCircularProgress-root {
+			margin-left: 1rem;
+		}
+	}
+
+	@mixin questions-preview-icon {
+		@include tooltip(15rem);
+		.tooltip-text {
+			text-align: left;
+			list-style: none;
+			li::before {
+				content: '-';
+				padding-right: 0.8rem;
+			}
+		}
+		.question-icon {
+			display: inline-block;
+			margin: 0 0.25rem;
+			padding: 0.25rem 0.5rem;
+			border: 1px solid #cccccc;
+			border-radius: 0.25rem;
+		}
+	}
+
+	.container {
+		display: flex;
+		.left-side {
+			flex: 3;
+			min-width: 0;
+
+			.pages-list {
+				border: 1px solid #cccccc;
+
+				.page-item {
+					border: 1px solid #cccccc;
+					padding: 0.5rem;
+					display: flex;
+					align-items: center;
+					justify-content: space-between;
+
+					.page-item-left {
+						display: flex;
+						align-items: center;
+
+						.thumbnail {
+							max-height: 5rem;
+							margin-right: 1rem;
+						}
+
+						.tooltip {
+							@include questions-preview-icon();
+						}
+					}
+
+					.page-item-right {
+						display: flex;
+						align-items: center;
+
+						.tooltip {
+							@include tooltip(15rem);
+							.reorder-btn {
+								@include clickable();
+								@include flexCenter();
+								width: 2rem;
+								height: 2rem;
+								margin: 0 0.25rem;
+								border-radius: 0.25rem;
+								border: 1px solid #cccccc;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		.right-side {
+			flex: 1;
+			min-width: 0;
+			padding: 2rem;
+
+			.toolbox {
+				position: sticky;
+				top: 2rem;
+				border: 1px solid #cccccc;
+				text-align: center;
+				box-shadow: 1px 1px 6px #cccccc;
+				border-radius: 0.5rem;
+
+				.title {
+					font-size: 1.3rem;
+					margin: 0.5rem 0;
+				}
+
+				.unused-item {
+					padding: 0.5rem;
+					border-top: 1px solid #cccccc;
+					border-bottom: 1px solid #cccccc;
+
+					.tooltip {
+						@include questions-preview-icon();
+						display: block;
+					}
+
+					.input-row {
+						margin: 0.5rem 0 0 0;
+						input[type='text'] {
+							margin-left: 0.5rem;
+							width: 3rem;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	.button-row {
+		text-align: center;
+		margin: 1rem 0;
+		.MuiButtonBase-root {
+			margin: 0 1rem;
+		}
+		.primary {
+			background-color: $primary;
+			color: white;
+		}
+	}
+
+	.result-ok {
+		text-align: center;
+		color: green;
+	}
+
+	.result-fail {
+		text-align: center;
+		color: $secondary;
+	}
+}
