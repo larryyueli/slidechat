@@ -4,12 +4,12 @@ An online content publishing platform that enables better communication around t
 
 ## Features
 
-- upload a set of slides and have students discuss around each page
-- add a sound track to each page and give an asynchronous lecture
-- provides anonymous, login required anonymous or non-anonymous chat
-- use Latex math and Markdown in the chat
-- draw on the slides to highlight where you are talking about
-- provide tools to rearrange chat threads when a new version of slides is uploaded
+-   upload a set of slides and have students discuss around each page
+-   add a sound track to each page and give an asynchronous lecture
+-   provides anonymous, login required anonymous or non-anonymous chat
+-   use Latex math and Markdown in the chat
+-   draw on the slides to highlight where you are talking about
+-   provide tools to rearrange chat threads when a new version of slides is uploaded
 
 ## Screenshots
 
@@ -21,7 +21,7 @@ An online content publishing platform that enables better communication around t
 
 ## Setup
 
-This application requires NodeJS, MongoDB amd linux command line tool ImageMagick. Also the current version does not provide authentication, a external organization authentication(e.g. Shibboleth) is required. Please take a look at our [GitHub Wiki](https://github.com/lvlingxiao1/slidechat/wiki).
+This application requires NodeJS, MongoDB amd linux command line tool ImageMagick. Also the current version does not provide authentication, a external organization authentication(e.g. Shibboleth) is required. Please take a look at our [documentations](v2/docs/Home.md) for how to setup.
 
 ## Contact
 
