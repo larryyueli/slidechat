@@ -180,7 +180,7 @@ export default function QuestionDetails(props) {
 									</div>
 								) : null}
 								{message.endorsement && message.endorsement.length > 0 ? (
-									<div className='endorsement'>{`Endorsed by ${formatNames(
+									<div className='endorsement'>{`Verified by ${formatNames(
 										message.endorsement
 									)}`}</div>
 								) : null}
