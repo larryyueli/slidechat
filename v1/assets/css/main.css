@@ -1,7 +1,0 @@
-#comments{
-    height: 900px;
-    overflow: scroll;
-}
-input.ng-invalid.ng-dirty {
-    border: 1px solid red;
-}
