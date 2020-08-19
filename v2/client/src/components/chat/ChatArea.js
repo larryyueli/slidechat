@@ -14,6 +14,10 @@ export default function ChatArea(props) {
 	const [qid, setQid] = useState(-1);
 	const [drawing, setDrawing] = useState(false);
 
+	useEffect(() => {
+		setState('list');
+	}, [props.pageNum, props.sid]);
+
 	// when first mounting, if the URL contains questions number, go to the question
 	useEffect(() => {
 		if (props.qid !== undefined) {
