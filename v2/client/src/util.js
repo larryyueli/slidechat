@@ -22,7 +22,7 @@ export function formatTime(time) {
 		return `${(elapsed / oneDay) >> 0} days ago`;
 	} else {
 		let date = new Date(time);
-		return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+		return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
 	}
 }
 
