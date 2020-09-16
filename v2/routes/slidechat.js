@@ -7,7 +7,7 @@ const dbConfig = {
 	useNewUrlParser: true,
 };
 
-const { baseURL, dbURL, cookieName } = require('../config');
+const { baseURL, dbURL, cookieName, authenticationFailMessage } = require('../config');
 const instructorAPI = require('./instructorAPI');
 const commonAPI = require('./commonAPI');
 
@@ -36,7 +36,7 @@ function instructorAuth(req, res, next) {
 	} else if (!req.session.uid) {
 		res.redirect(`${baseURL}/p/login/prof`);
 	} else if (!isInstructor(req.session.uid)) {
-		res.status(401).send(`User ${req.session.uid} is not an instructor. This incident will be reported.`);
+		res.status(401).send(`User ${req.session.uid} is not an instructor. This incident will be reported. ${authenticationFailMessage}`);
 		console.error(`Instructor auth failed: ${req.session.uid}`);
 	} else {
 		next();

@@ -18,4 +18,7 @@ module.exports = {
 	fileStorage: path.join(os.homedir(), '.slidechat', 'files'),
 
 	convertOptions: { '-density': 150 },
+
+	authenticationFailMessage:
+		'To get instructor access, please send your UTORID to Larry Zhang (ylzhang AT cs.toronto.edu).',
 };
