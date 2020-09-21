@@ -6,7 +6,7 @@ import markdownItMathJax from 'markdown-it-mathjax';
 import highlight from 'highlight.js';
 
 import ChatAreaTitle from './ChatAreaTitle';
-import { serverURL } from '../../config';
+import { baseURL, serverURL } from '../../config';
 import { formatTime, formatNames, getDisplayName } from '../../util';
 
 const md = markdownIt({
@@ -45,9 +45,9 @@ export default function QuestionDetails(props) {
 				`${serverURL}/api/chats?slideID=${props.sid}&pageNum=${props.pageNum}&qid=${props.qid}`
 			);
 			setMessages(res.data);
-			window.history.replaceState(null, null, `#${props.pageNum}-${props.qid}`);
+			window.history.replaceState(null, null, `${baseURL}/${props.sid}/${props.pageNum}/${props.qid}`);
 			if (res.data.drawing && props.drawable) {
-				props.setSlideDrawing(true);
+				props.setDrawingOverlay(true);
 				props.canvasComponentRef.current.setState({ readOnly: true });
 				props.canvasComponentRef.current.lines = res.data.drawing;
 				props.canvasComponentRef.current.redraw();

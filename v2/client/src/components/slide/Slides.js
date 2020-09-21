@@ -129,7 +129,7 @@ export default function Slides(props) {
 			</div>
 			<div className='slide-wrapper'>
 				<img id='slide-img' src={img} alt='slide' className='slide' />
-				{props.drawing ? (
+				{props.drawingOverlay ? (
 					<SlideDrawingOverlay ref={props.canvasComponentRef} />
 				) : (
 					<SlideFlipOverlay

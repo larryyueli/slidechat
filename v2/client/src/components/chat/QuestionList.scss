@@ -1,4 +1,29 @@
 .chat-list {
+	.new-chat-btn-row {
+		text-align: center;
+		padding: 1rem 0;
+		border-bottom: 1px solid #cccccc;
+		button {
+			background-color: $primary;
+			color: white;
+		}
+	}
+
+	.sort-select-row {
+		margin: 0.3rem 1rem;
+		text-align: right;
+		font-size: 0.8rem;
+		text-transform: uppercase;
+		color: #aaaaaa;
+		span {
+			@include clickable();
+			margin-left: 1rem;
+			&.selected {
+				color: #000000;
+			}
+		}
+	}
+
 	.chat {
 		padding: 1rem;
 		border-bottom: 1px solid #cccccc;
@@ -55,6 +80,10 @@
 				margin-left: 0.5rem;
 				color: #cccccc;
 			}
+		}
+		.extra-info {
+			color: #cccccc;
+			font-size: 0.9rem;
 		}
 	}
 }

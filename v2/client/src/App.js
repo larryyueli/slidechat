@@ -15,6 +15,8 @@ function App() {
 		<Router>
 			<Switch>
 				<Route path={`${baseURL}/logout`} component={Logout} />
+				<Route path={`${baseURL}/:slideId/:pageNum/:qid`} component={Main} />
+				<Route path={`${baseURL}/:slideId/:pageNum`} component={Main} />
 				<Route path={`${baseURL}/:slideId`} component={Main} />
 				<Route path={`${baseURL}/`} component={Landing} />
 			</Switch>

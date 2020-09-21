@@ -194,3 +194,8 @@ export function getDisplayName() {
 	setDisplayName(name);
 	return name;
 }
+
+// qid for special pages
+export const QUESTION_LIST = -1;
+export const NEW_QUESTION = -2;
+export const MODIFY_CHAT = -3;

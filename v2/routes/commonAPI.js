@@ -206,6 +206,34 @@ function commonAPI(db) {
 	});
 
 	/**
+	 * get all questions of a file
+	 * req query:
+	 *   slideID: object ID of a slide
+	 */
+	router.get('/api/questionsAll', async (req, res) => {
+		try {
+			let slide = await slides.findOne(
+				{ _id: ObjectID.createFromHexString(req.query.slideID) },
+				{ projection: { pages: true, anonymity: true } }
+			);
+			if (!slide) throw { status: 404, error: 'slide not found' };
+			if (slide.anonymity != 'A' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
+			for (let i of slide.pages) {
+				for (let question of i.questions) {
+					if (question) {
+						question.user = question.chats[0].user;
+						question.create = question.chats[0].time;
+						delete question.chats;
+					}
+				}
+			}
+			res.json(slide.pages);
+		} catch (err) {
+			errorHandler(res, err);
+		}
+	});
+
+	/**
 	 * get chats under a question
 	 * req query:
 	 *   slideID: object ID of a slide

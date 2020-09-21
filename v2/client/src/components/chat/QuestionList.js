@@ -28,10 +28,29 @@ function sortQuestions(questions, sorting) {
  * Null elements are deleted questions, they should be removed once the index is remembered.
  * @param {Array} questions
  */
-function rememberQid(questions) {
+function rememberQid(questions, pageNum) {
 	questions.forEach((question, i) => {
 		if (!question) return;
 		question.id = i;
+		question.pageNum = pageNum;
+	});
+	return questions.filter((a) => a != null);
+}
+/**
+ * Similar to rememberQid, but also remember page number, and return a flattened array with all
+ * questions of all pages in the same level
+ * @param {Array} pages
+ */
+function rememberPageAndQid(pages) {
+	let questions = [];
+	pages.forEach((page, i) => {
+		const pageNum = i + 1;
+		page.questions.forEach((question, qid) => {
+			if (!question) return;
+			question.id = qid;
+			question.pageNum = pageNum;
+		});
+		questions.push(...page.questions);
 	});
 	return questions.filter((a) => a != null);
 }
@@ -39,10 +58,12 @@ function rememberQid(questions) {
 export default function QuestionList(props) {
 	const [managing, setManaging] = useState(false);
 	const [questions, setQuestions] = useState([]);
+	const [showAll, setShowAll] = useState(false);
 	const [sorting, setSorting] = useState('update');
 
 	// fetch questions when page is changed
 	useEffect(() => {
+		setShowAll(false);
 		fetchQuestionList();
 		// eslint-disable-next-line
 	}, [props.sid, props.pageNum]);
@@ -50,7 +71,7 @@ export default function QuestionList(props) {
 	const fetchQuestionList = async () => {
 		try {
 			const res = await axios.get(`${serverURL}/api/questions?slideID=${props.sid}&pageNum=${props.pageNum}`);
-			setQuestions(sortQuestions(rememberQid(res.data), sorting));
+			setQuestions(sortQuestions(rememberQid(res.data, props.pageNum), sorting));
 		} catch (err) {
 			console.error(err);
 		}
@@ -67,12 +88,30 @@ export default function QuestionList(props) {
 		}
 	};
 
+	/**
+	 * apply new sorting method
+	 * @param {String} newSort new sorting method (update/create)
+	 */
+	const toggleShowAll = (newValue) => {
+		if (newValue !== showAll) {
+			setShowAll(newValue);
+			if (newValue) {
+				axios.get(`${serverURL}/api/questionsAll?slideID=${props.sid}`).then((res) => {
+					setQuestions(sortQuestions(rememberPageAndQid(res.data, props.pageNum), sorting));
+				});
+			} else {
+				fetchQuestionList();
+			}
+		}
+	};
+
 	const deleteQuestion = (e, question) => {
 		e.stopPropagation();
 		if (!window.confirm(`Are you sure to delete "${question.title}"?`)) return;
 
 		axios
-			.delete(`${serverURL}/api/question?sid=${props.sid}&qid=${question.id}&pageNum=${props.pageNum}`)
+			.delete(`${serverURL}/api/question?sid=${props.sid}&qid=${question.id}&pageNum=${question.pageNum}`)
+			.then((res) => setShowAll(false))
 			.then(fetchQuestionList)
 			.catch((err) => {
 				console.error(err);
@@ -98,6 +137,15 @@ export default function QuestionList(props) {
 						Ask a new question
 					</Button>
 				</div>
+				<div className='sort-select-row' key={-3}>
+					questions from:
+					<span className={showAll ? '' : 'selected'} onClick={(e) => toggleShowAll(false)}>
+						This page
+					</span>
+					<span className={showAll ? 'selected' : ''} onClick={(e) => toggleShowAll(true)}>
+						All pages
+					</span>
+				</div>
 				<div className='sort-select-row' key={-2}>
 					sort by:
 					<span className={sorting === 'update' ? 'selected' : ''} onClick={(e) => applySort('update')}>
@@ -110,7 +158,10 @@ export default function QuestionList(props) {
 				{questions.map((question, i) => {
 					if (!question) return null;
 					return (
-						<div className='chat' key={i} onClick={(e) => props.goToQuestionDetails(question.id)}>
+						<div
+							className='chat'
+							key={i}
+							onClick={(e) => props.goToQuestion(question.pageNum, question.id)}>
 							<div className='title-row'>
 								<div className='title'>{question.title}</div>
 								<div className='icons'>
@@ -130,6 +181,9 @@ export default function QuestionList(props) {
 								<div className='author'>{question.user}</div>
 								<div className='time'>{formatTime(question.time)}</div>
 							</div>
+							{question.pageNum !== props.pageNum ? (
+								<div className='extra-info'>From page {question.pageNum}</div>
+							) : null}
 						</div>
 					);
 				})}

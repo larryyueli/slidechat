@@ -16,8 +16,8 @@ export default function ModifyChat(props) {
 			.post(`${serverURL}/api/modifyChat/`, {
 				sid: props.sid,
 				pageNum: props.pageNum,
-				qid: props.qid,
-				cid: props.old.id,
+				qid: props.old.qid,
+				cid: props.old.cid,
 				body: textRef.current.value,
 			})
 			.then((res) => {
@@ -34,8 +34,8 @@ export default function ModifyChat(props) {
 			.post(`${serverURL}/api/deleteOwnChat`, {
 				sid: props.sid,
 				pageNum: props.pageNum,
-				qid: props.qid,
-				cid: props.old.id,
+				qid: props.old.qid,
+				cid: props.old.cid,
 			})
 			.then((res) => {
 				props.back();
@@ -58,7 +58,7 @@ export default function ModifyChat(props) {
 					</Button>
 				</div>
 				<div>
-					{props.old.id !== 0 ? (
+					{props.old.cid !== 0 ? (
 						<Button onClick={deleteOwnChat} variant='contained' className='delete-btn'>
 							Delete message
 						</Button>

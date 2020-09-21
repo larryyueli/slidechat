@@ -61,30 +61,6 @@
 		}
 	}
 
-	.new-chat-btn-row {
-		text-align: center;
-		padding: 1rem 0;
-		border-bottom: 1px solid #cccccc;
-		button {
-			background-color: $primary;
-			color: white;
-		}
-	}
-
-	.sort-select-row {
-		margin: 1rem;
-		text-align: right;
-		text-transform: uppercase;
-		color: #aaaaaa;
-		span {
-			@include clickable();
-			margin-left: 1rem;
-			&.selected {
-				color: #000000;
-			}
-		}
-	}
-
 	@import './QuestionList.scss';
 	@import './QuestionDetails.scss';
 	@import './NewQuestion.scss';
