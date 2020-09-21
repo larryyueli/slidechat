@@ -137,23 +137,27 @@ export default function QuestionList(props) {
 						Ask a new question
 					</Button>
 				</div>
-				<div className='sort-select-row' key={-3}>
-					questions from:
-					<span className={showAll ? '' : 'selected'} onClick={(e) => toggleShowAll(false)}>
-						This page
-					</span>
-					<span className={showAll ? 'selected' : ''} onClick={(e) => toggleShowAll(true)}>
-						All pages
-					</span>
-				</div>
-				<div className='sort-select-row' key={-2}>
-					sort by:
-					<span className={sorting === 'update' ? 'selected' : ''} onClick={(e) => applySort('update')}>
-						Last update
-					</span>
-					<span className={sorting === 'create' ? 'selected' : ''} onClick={(e) => applySort('create')}>
-						Creation
-					</span>
+				<div className='align-right'>
+					<div className='list-options' key={-3}>
+						<div className='option-label'>questions from:</div>
+						<div className={'option ' + (showAll ? '' : 'selected')} onClick={(e) => toggleShowAll(false)}>
+							This page
+						</div>
+						<div className={'option ' + (showAll ? 'selected' : '')} onClick={(e) => toggleShowAll(true)}>
+							All pages
+						</div>
+						<div className='option-label'>sort by:</div>
+						<div
+							className={'option ' + (sorting === 'update' ? 'selected' : '')}
+							onClick={(e) => applySort('update')}>
+							Last update
+						</div>
+						<div
+							className={'option ' + (sorting === 'create' ? 'selected' : '')}
+							onClick={(e) => applySort('create')}>
+							Creation
+						</div>
+					</div>
 				</div>
 				{questions.map((question, i) => {
 					if (!question) return null;
@@ -181,9 +185,7 @@ export default function QuestionList(props) {
 								<div className='author'>{question.user}</div>
 								<div className='time'>{formatTime(question.time)}</div>
 							</div>
-							{question.pageNum !== props.pageNum ? (
-								<div className='extra-info'>From page {question.pageNum}</div>
-							) : null}
+							{showAll ? <div className='extra-info'>From page {question.pageNum}</div> : null}
 						</div>
 					);
 				})}

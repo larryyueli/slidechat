@@ -9,15 +9,24 @@
 		}
 	}
 
-	.sort-select-row {
-		margin: 0.3rem 1rem;
+	.align-right {
 		text-align: right;
+	}
+	.list-options {
+		margin: 0.3rem 1rem;
+		display: inline-grid;
+		grid-template-columns: auto auto auto;
+		row-gap: 0.3rem;
+		column-gap: 0.8rem;
 		font-size: 0.8rem;
 		text-transform: uppercase;
 		color: #aaaaaa;
-		span {
+		.option-label {
+			text-align: right;
+		}
+		.option {
 			@include clickable();
-			margin-left: 1rem;
+			text-align: center;
 			&.selected {
 				color: #000000;
 			}

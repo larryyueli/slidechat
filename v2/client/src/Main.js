@@ -121,6 +121,7 @@ function Main(props) {
 		} else if (newPageNum < 1) {
 			newPageNum = 1;
 		}
+		setDrawingOverlay(false);
 		setQid(QUESTION_LIST);
 		applyPage(newPageNum);
 	};
