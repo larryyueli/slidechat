@@ -4,6 +4,7 @@ import { Button, TextField, CircularProgress } from '@material-ui/core';
 
 import SlideSettings from './SlideSettings';
 import { serverURL, fullURL } from './config';
+import { formatTime } from './util';
 
 /**
  * A block containing information about one course
@@ -14,6 +15,7 @@ export default function Course({ cid, role, fetchCourses }) {
 	const [managing, setManaging] = useState(false);
 	const [renaming, setRenaming] = useState(false);
 	const [uploading, setUploading] = useState(false);
+	const [uploadErr, setUploadErr] = useState(null);
 	const [addInstructorRes, setAddInstructorRes] = useState(null);
 	const [openModify, setOpenModify] = useState({ open: false });
 	const fileUpload = useRef(null);
@@ -39,20 +41,24 @@ export default function Course({ cid, role, fetchCourses }) {
 	}, []);
 
 	const uploadPDF = async () => {
-		if (fileUpload.current.files.length !== 1) return;
-
-		let formData = new FormData();
-		formData.append('cid', cid);
-		formData.append('anonymity', 'B'); // login required anonymous chat
-		formData.append('file', fileUpload.current.files[0]);
-		try {
-			setUploading(true);
-			await axios.post(`${serverURL}/api/addSlide/`, formData);
-		} catch (err) {
-			console.log(err);
-		} finally {
-			setUploading(false);
-			fetchCourse();
+		for (let i = 0; i < fileUpload.current.files.length; i++) {
+			if (!fileUpload.current.files[i].name.toLocaleLowerCase().endsWith('.pdf')) {
+				alert('Please upload a PDF file');
+				return;
+			}
+			let formData = new FormData();
+			formData.append('cid', cid);
+			formData.append('anonymity', 'B'); // login required anonymous chat
+			formData.append('file', fileUpload.current.files[i]);
+			try {
+				setUploading(true);
+				await axios.post(`${serverURL}/api/addSlide/`, formData);
+			} catch (err) {
+				setUploadErr(err.message);
+			} finally {
+				setUploading(false);
+				fetchCourse();
+			}
 		}
 	};
 
@@ -210,9 +216,12 @@ export default function Course({ cid, role, fetchCourses }) {
 					let link = `${fullURL()}/${slide.id}`;
 					return (
 						<div key={slide.id} className='slide-item'>
-							<a className='slide-link' href={link}>
-								{slide.filename}
-							</a>
+							<div className='left'>
+								<a className='slide-link' href={link}>
+									{slide.filename}
+								</a>
+								<div className='time-row'>Last activity: {formatTime(slide.lastActive)}</div>
+							</div>
 							{managing ? (
 								<div className='btns'>
 									<Button
@@ -231,9 +240,11 @@ export default function Course({ cid, role, fetchCourses }) {
 									</Button>
 								</div>
 							) : (
-								<Button variant='outlined' color='primary' onClick={(e) => copyToClipboard(link)}>
-									Copy link
-								</Button>
+								<div className='btns'>
+									<Button variant='outlined' color='primary' onClick={(e) => copyToClipboard(link)}>
+										Copy link
+									</Button>
+								</div>
 							)}
 						</div>
 					);
@@ -241,13 +252,16 @@ export default function Course({ cid, role, fetchCourses }) {
 			</div>
 
 			{managing ? (
-				<div className='upload-bar'>
-					<input type='file' name='file' ref={fileUpload} accept='.pdf' />
-					<Button onClick={uploadPDF} disabled={uploading} variant='contained' color='primary'>
-						Upload
-					</Button>
-					{uploading ? <CircularProgress /> : null}
-				</div>
+				<>
+					<div className='upload-bar'>
+						<input type='file' name='file' ref={fileUpload} accept='.pdf' multiple />
+						<Button onClick={uploadPDF} disabled={uploading} variant='contained' color='primary'>
+							Upload
+						</Button>
+						{uploading ? <CircularProgress /> : null}
+					</div>
+					<div className='result-fail'>{uploadErr}</div>
+				</>
 			) : null}
 
 			<div className='instructors'>
