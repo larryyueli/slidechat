@@ -28,7 +28,7 @@ function commonAPI(db) {
 			for (let slideId of course.slides) {
 				let slideEntry = await slides.findOne(
 					{ _id: ObjectID.createFromHexString(slideId) },
-					{ projection: { filename: 1, description: 1 } }
+					{ projection: { filename: 1, description: 1, lastActive: 1 } }
 				);
 				if (!slideEntry) {
 					console.log(`slide ${slideId} not found`);
@@ -38,6 +38,7 @@ function commonAPI(db) {
 					id: slideId,
 					filename: slideEntry.filename,
 					description: slideEntry.description,
+					lastActive: slideEntry.lastActive,
 				});
 			}
 			res.json({
@@ -326,7 +327,12 @@ function commonAPI(db) {
 			insertQuestion[`pages.${req.body.pageNum - 1}.questions`] = newQuestion;
 			let updateRes = await slides.updateOne(
 				{ _id: ObjectID.createFromHexString(req.body.sid) },
-				{ $push: insertQuestion }
+				{
+					$push: insertQuestion,
+					$set: {
+						lastActive: time,
+					},
+				}
 			);
 			if (updateRes.modifiedCount !== 1) {
 				throw 'question update error';
@@ -377,11 +383,15 @@ function commonAPI(db) {
 
 			let insertChat = {}; // cannot use template string on the left hand side
 			insertChat[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats`] = newChat;
-			let updateLastActiveTime = {};
-			updateLastActiveTime[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.time`] = time;
 			let updateRes = await slides.updateOne(
 				{ _id: ObjectID.createFromHexString(req.body.sid) },
-				{ $push: insertChat, $set: updateLastActiveTime }
+				{
+					$push: insertChat,
+					$set: {
+						lastActive: time,
+						[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.time`]: time,
+					},
+				}
 			);
 
 			if (updateRes.modifiedCount !== 1) {
