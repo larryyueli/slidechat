@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
-import ChatArea from './components/chat/ChatArea';
 import Slides from './components/slide/Slides';
 import AppBar from './components/AppBar';
-import { serverURL } from './config';
+import ModifyChat from './components/chat/ModifyChat';
+import NewQuestion from './components/chat/NewQuestion';
+import QuestionList from './components/chat/QuestionList';
+import QuestionDetails from './components/chat/QuestionDetails';
+import { baseURL, serverURL } from './config';
+import { QUESTION_LIST, NEW_QUESTION, MODIFY_CHAT } from './util';
 
 /**
  * Main page of the application: the slides and chats of a given set of slides, given
@@ -17,12 +21,14 @@ function Main(props) {
 	const [title, setTitle] = useState('');
 	const [filename, setFilename] = useState('');
 	const [drawable, setDrawable] = useState(false);
-	const [slideDrawing, setSlideDrawing] = useState(false);
+	const [drawingOverlay, setDrawingOverlay] = useState(false);
 	const [isInstructor, setIsInstructor] = useState(false);
 	const [uid, setUid] = useState('');
 	const [username, setUsername] = useState('');
 	const [anonymity, setAnonymity] = useState('A');
-	const [qid, setQid] = useState(undefined);
+	const [qid, setQid] = useState(QUESTION_LIST);
+	const [drawing, setDrawing] = useState(false);
+	const [chatToModify, setChatToModify] = useState({});
 	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
 
 	/**
@@ -41,12 +47,12 @@ function Main(props) {
 			.then((res) => {
 				let currentPage = 1;
 				let questionId;
-				let m = window.location.hash.match(/^#(\d+)(-(\d+))?$/);
-				if (m) {
-					let n = +m[1];
+				if (props.match.params.pageNum) {
+					let n = +props.match.params.pageNum;
+					console.log(n);
 					if (n <= res.data.pageTotal) {
 						currentPage = n;
-						questionId = m[3];
+						questionId = +props.match.params.qid;
 					}
 				}
 
@@ -67,7 +73,7 @@ function Main(props) {
 			.catch((err) => {
 				console.error(err);
 			});
-	}, [sid]);
+	}, [sid, props.match.params]);
 
 	/**
 	 * apply the new page number
@@ -75,7 +81,7 @@ function Main(props) {
 	 */
 	const applyPage = (newPageNum) => {
 		document.getElementById('pageNum').value = newPageNum;
-		window.history.replaceState(null, null, `#${newPageNum}`);
+		window.history.replaceState(null, null, `${baseURL}/${sid}/${newPageNum}`);
 		setPage(newPageNum);
 	};
 
@@ -85,8 +91,9 @@ function Main(props) {
 	const nextPage = () => {
 		if (page >= pageTotal) return;
 		let newPageNum = page + 1;
+		setQid(QUESTION_LIST);
 		applyPage(newPageNum);
-		setSlideDrawing(false);
+		setDrawingOverlay(false);
 	};
 
 	/**
@@ -95,8 +102,9 @@ function Main(props) {
 	const prevPage = () => {
 		if (page < 2) return;
 		let newPageNum = page - 1;
+		setQid(QUESTION_LIST);
 		applyPage(newPageNum);
-		setSlideDrawing(false);
+		setDrawingOverlay(false);
 	};
 
 	/**
@@ -113,7 +121,49 @@ function Main(props) {
 		} else if (newPageNum < 1) {
 			newPageNum = 1;
 		}
+		setDrawingOverlay(false);
+		setQid(QUESTION_LIST);
 		applyPage(newPageNum);
+	};
+
+	const gotoQuestion = (pageNum, qid) => {
+		applyPage(pageNum);
+		setQid(qid);
+	};
+
+	const gotoNewQuestion = () => {
+		setQid(NEW_QUESTION);
+		setDrawingOverlay(false);
+		setDrawing(false);
+	};
+
+	const goToModify = (chat, cid) => {
+		setChatToModify({ ...chat, cid, qid });
+		setQid(MODIFY_CHAT);
+	};
+
+	/**
+	 * onClick handler for back button to go back to the chat list
+	 */
+	const back = () => {
+		if (qid === MODIFY_CHAT) {
+			gotoQuestion(page, chatToModify.qid);
+		} else {
+			setQid(QUESTION_LIST);
+			setDrawingOverlay(false);
+			window.history.replaceState(null, null, `${baseURL}/${sid}/${page}`);
+		}
+	};
+
+	const startDrawing = (e) => {
+		setDrawing(true);
+		setDrawingOverlay(true);
+	};
+
+	const cancelDrawing = (e) => {
+		setDrawing(false);
+		canvasComponentRef.current.clear();
+		setDrawingOverlay(false);
 	};
 
 	return (
@@ -134,20 +184,47 @@ function Main(props) {
 					nextPage={nextPage}
 					prevPage={prevPage}
 					gotoPage={gotoPage}
-					drawing={slideDrawing}
+					drawingOverlay={drawingOverlay}
 					canvasComponentRef={canvasComponentRef}
 					isInstructor={isInstructor}
 				/>
-				<ChatArea
-					sid={sid}
-					uid={uid}
-					pageNum={page}
-					canvasComponentRef={canvasComponentRef}
-					setSlideDrawing={setSlideDrawing}
-					isInstructor={isInstructor}
-					drawable={drawable}
-					qid={qid}
-				/>
+				<div className='chat-area'>
+					{qid === QUESTION_LIST ? (
+						<QuestionList
+							sid={sid}
+							pageNum={page}
+							isInstructor={isInstructor}
+							askNewQuestion={gotoNewQuestion}
+							goToQuestion={gotoQuestion}
+						/>
+					) : qid === NEW_QUESTION ? (
+						<NewQuestion
+							sid={sid}
+							pageNum={page}
+							back={back}
+							drawable={drawable}
+							drawing={drawing}
+							startDrawing={startDrawing}
+							cancelDrawing={cancelDrawing}
+							canvasComponentRef={canvasComponentRef}
+						/>
+					) : qid === MODIFY_CHAT ? (
+						<ModifyChat sid={sid} pageNum={page} old={chatToModify} back={back} />
+					) : (
+						<QuestionDetails
+							sid={sid}
+							pageNum={page}
+							qid={qid}
+							uid={uid}
+							isInstructor={isInstructor}
+							drawable={drawable}
+							setDrawingOverlay={setDrawingOverlay}
+							canvasComponentRef={canvasComponentRef}
+							goToModify={goToModify}
+							back={back}
+						/>
+					)}
+				</div>
 			</div>
 		</>
 	);

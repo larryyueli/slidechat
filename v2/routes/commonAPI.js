@@ -28,7 +28,7 @@ function commonAPI(db) {
 			for (let slideId of course.slides) {
 				let slideEntry = await slides.findOne(
 					{ _id: ObjectID.createFromHexString(slideId) },
-					{ projection: { filename: 1, description: 1 } }
+					{ projection: { filename: 1, description: 1, lastActive: 1 } }
 				);
 				if (!slideEntry) {
 					console.log(`slide ${slideId} not found`);
@@ -38,6 +38,7 @@ function commonAPI(db) {
 					id: slideId,
 					filename: slideEntry.filename,
 					description: slideEntry.description,
+					lastActive: slideEntry.lastActive,
 				});
 			}
 			res.json({
@@ -206,6 +207,34 @@ function commonAPI(db) {
 	});
 
 	/**
+	 * get all questions of a file
+	 * req query:
+	 *   slideID: object ID of a slide
+	 */
+	router.get('/api/questionsAll', async (req, res) => {
+		try {
+			let slide = await slides.findOne(
+				{ _id: ObjectID.createFromHexString(req.query.slideID) },
+				{ projection: { pages: true, anonymity: true } }
+			);
+			if (!slide) throw { status: 404, error: 'slide not found' };
+			if (slide.anonymity != 'A' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
+			for (let i of slide.pages) {
+				for (let question of i.questions) {
+					if (question) {
+						question.user = question.chats[0].user;
+						question.create = question.chats[0].time;
+						delete question.chats;
+					}
+				}
+			}
+			res.json(slide.pages);
+		} catch (err) {
+			errorHandler(res, err);
+		}
+	});
+
+	/**
 	 * get chats under a question
 	 * req query:
 	 *   slideID: object ID of a slide
@@ -298,7 +327,12 @@ function commonAPI(db) {
 			insertQuestion[`pages.${req.body.pageNum - 1}.questions`] = newQuestion;
 			let updateRes = await slides.updateOne(
 				{ _id: ObjectID.createFromHexString(req.body.sid) },
-				{ $push: insertQuestion }
+				{
+					$push: insertQuestion,
+					$set: {
+						lastActive: time,
+					},
+				}
 			);
 			if (updateRes.modifiedCount !== 1) {
 				throw 'question update error';
@@ -349,11 +383,15 @@ function commonAPI(db) {
 
 			let insertChat = {}; // cannot use template string on the left hand side
 			insertChat[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats`] = newChat;
-			let updateLastActiveTime = {};
-			updateLastActiveTime[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.time`] = time;
 			let updateRes = await slides.updateOne(
 				{ _id: ObjectID.createFromHexString(req.body.sid) },
-				{ $push: insertChat, $set: updateLastActiveTime }
+				{
+					$push: insertChat,
+					$set: {
+						lastActive: time,
+						[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.time`]: time,
+					},
+				}
 			);
 
 			if (updateRes.modifiedCount !== 1) {

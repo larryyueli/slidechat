@@ -108,7 +108,7 @@ export default function Slides(props) {
 	const nextPage = (e) => {
 		setNextDisable(true);
 		props.nextPage();
-	}
+	};
 
 	/**
 	 * go to prev page
@@ -117,7 +117,7 @@ export default function Slides(props) {
 	const prevPage = (e) => {
 		setPrevDisable(true);
 		props.prevPage();
-	}
+	};
 
 	return (
 		<div className='slide-container'>
@@ -129,7 +129,7 @@ export default function Slides(props) {
 			</div>
 			<div className='slide-wrapper'>
 				<img id='slide-img' src={img} alt='slide' className='slide' />
-				{props.drawing ? (
+				{props.drawingOverlay ? (
 					<SlideDrawingOverlay ref={props.canvasComponentRef} />
 				) : (
 					<SlideFlipOverlay
@@ -149,8 +149,17 @@ export default function Slides(props) {
 					</Button>
 				</div>
 				<div>
-					Page <input id='pageNum' type='text' defaultValue={props.pageNum} onBlur={props.gotoPage} /> of{' '}
-					{props.pageTotal}
+					Page{' '}
+					<input
+						id='pageNum'
+						type='tel'
+						defaultValue={props.pageNum}
+						onBlur={props.gotoPage}
+						onKeyDown={(e) => {
+							if (e.keyCode === 13) document.getElementById('pageNum').blur();
+						}}
+					/>{' '}
+					of {props.pageTotal}
 				</div>
 
 				<audio className='slide-audio' controls={audioSrc ? true : false} src={audioSrc}>

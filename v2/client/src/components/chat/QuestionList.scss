@@ -1,4 +1,38 @@
 .chat-list {
+	.new-chat-btn-row {
+		text-align: center;
+		padding: 1rem 0;
+		border-bottom: 1px solid #cccccc;
+		button {
+			background-color: $primary;
+			color: white;
+		}
+	}
+
+	.align-right {
+		text-align: right;
+	}
+	.list-options {
+		margin: 0.3rem 1rem;
+		display: inline-grid;
+		grid-template-columns: auto auto auto;
+		row-gap: 0.3rem;
+		column-gap: 0.8rem;
+		font-size: 0.8rem;
+		text-transform: uppercase;
+		color: #aaaaaa;
+		.option-label {
+			text-align: right;
+		}
+		.option {
+			@include clickable();
+			text-align: center;
+			&.selected {
+				color: #000000;
+			}
+		}
+	}
+
 	.chat {
 		padding: 1rem;
 		border-bottom: 1px solid #cccccc;
@@ -55,6 +89,10 @@
 				margin-left: 0.5rem;
 				color: #cccccc;
 			}
+		}
+		.extra-info {
+			color: #cccccc;
+			font-size: 0.9rem;
 		}
 	}
 }

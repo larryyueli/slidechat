@@ -4,6 +4,7 @@
  * @return {String}
  */
 export function formatTime(time) {
+	if (!time) return 'Never';
 	let now = Date.now();
 
 	const oneMinute = 60 * 1000;

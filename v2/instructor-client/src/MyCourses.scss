@@ -65,12 +65,12 @@
 			.title-name {
 				@include flexCenter();
 
-				.confirm{
+				.confirm {
 					@include clickable();
 					color: $primary;
 				}
 
-				.rename{
+				.rename {
 					@include clickable();
 					margin-left: 1rem;
 				}
@@ -79,19 +79,23 @@
 
 		.slides {
 			margin: 1rem 0;
+			border-top: 1px solid $dividerColour;
 
 			.slide-item {
-				display: flex;
 				padding: 0.5rem 0;
-				border-top: 1px solid $dividerColour;
 				border-bottom: 1px solid $dividerColour;
-				margin-top: -1px;
+				display: flex;
 
-				.slide-link {
-					@include ellipsis();
+				.left {
 					flex: 1;
-					padding: 0.6rem 0;
-					color: $primary;
+					line-height: 200%;
+					@include ellipsis();
+					.slide-link {
+						color: $primary;
+					}
+					.time-row {
+						color: $gray;
+					}
 				}
 
 				.btns {
