@@ -314,6 +314,39 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 				throw 'slide add to course failed';
 			}
 
+			// step 6: add a default question
+			let time = Date.now();
+			let newQuestion = {
+				status: 'unsolved',
+				time: time,
+				chats: [
+					{
+						time: time,
+						body:
+							'Wanna know more about how to use the tool? Check out this [demo](https://mcsapps.utm.utoronto.ca/slidechat/5f1b35eb3997b943b856e362)!',
+						user: 'SlideChat',
+						uid: 'SlideChat',
+						likes: [],
+						endorsement: [],
+					},
+				],
+				title: 'Welcome to SlideChat!',
+			};
+			updateRes = await slides.updateOne(
+				{ _id: objID },
+				{
+					$push: {
+						['pages.0.questions']: newQuestion,
+					},
+					$set: {
+						lastActive: time,
+					},
+				}
+			);
+			if (updateRes.modifiedCount !== 1) {
+				throw 'error when adding default question after uploading';
+			}
+
 			res.json({ id: id });
 		} catch (err) {
 			errorHandler(res, err);
