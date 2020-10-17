@@ -54,7 +54,7 @@ export default function Course({ cid, role, fetchCourses }) {
 				setUploading(true);
 				await axios.post(`${serverURL}/api/addSlide/`, formData);
 			} catch (err) {
-				setUploadErr(err);
+				setUploadErr(err.message);
 			} finally {
 				setUploading(false);
 				fetchCourse();
