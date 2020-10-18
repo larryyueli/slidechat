@@ -36,7 +36,9 @@ function instructorAuth(req, res, next) {
 	} else if (!req.session.uid) {
 		res.redirect(`${baseURL}/p/login/prof`);
 	} else if (!isInstructor(req.session.uid)) {
-		res.status(401).send(`User ${req.session.uid} is not an instructor. This incident will be reported. ${authenticationFailMessage}`);
+		res.status(401).send(
+			`User ${req.session.uid} is not an instructor. This incident will be reported. ${authenticationFailMessage}`
+		);
 		console.error(`Instructor auth failed: ${req.session.uid}`);
 	} else {
 		next();
@@ -99,12 +101,7 @@ async function startSlideChat() {
 			req.session.realName = req.headers.http_cn;
 			req.session.email = req.headers.http_mail;
 		}
-		let path = req.path.split('/');
-		if (path[3] === 'prof') {
-			res.redirect(`${baseURL}/prof`);
-		} else {
-			res.redirect(`${baseURL}/${path[3]}#${path[4]}`);
-		}
+		res.redirect(baseURL + req.path.substring(8));
 	});
 
 	router.get('/api/logout', (req, res) => {
@@ -130,10 +127,10 @@ async function startSlideChat() {
 	});
 	router.use(instructorURL, instructorAuth, express.static('instructor-client/build'));
 
-	router.get(/^\/([A-Fa-f0-9]+\/?)?$/, (req, res) => {
+	router.use(express.static('client/build'));
+	router.get(/^\/([A-Fa-f0-9\/]+)?$/, (req, res) => {
 		res.sendFile('index.html', { root: 'client/build' });
 	});
-	router.use(express.static('client/build'));
 
 	router.use((req, res) => res.status(404).send());
 
