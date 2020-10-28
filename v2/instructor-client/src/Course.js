@@ -9,13 +9,14 @@ import { formatTime } from './util';
 /**
  * A block containing information about one course
  */
-export default function Course({ cid, role, creationTime, fetchCourses }) {
+export default function Course({ cid, role, minimizeStatus, creationTime, fetchCourses }) {
 	const [course, setCourse] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [managing, setManaging] = useState(false);
 	const [renaming, setRenaming] = useState(false);
 	const [uploading, setUploading] = useState(false);
 	const [uploadErr, setUploadErr] = useState(null);
+	const [minimized, setMinimized] = useState(minimizeStatus);
 	const [addInstructorRes, setAddInstructorRes] = useState(null);
 	const [openModify, setOpenModify] = useState({ open: false });
 	const fileUpload = useRef(null);
@@ -108,6 +109,17 @@ export default function Course({ cid, role, creationTime, fetchCourses }) {
 		setRenaming(false);
 	};
 
+	const toggleMinimize = () => {
+		axios.post(`${serverURL}/api/minimizeCourse`, {
+			cid,
+			status: !minimized,
+		});
+		setMinimized(!minimized);
+		setAddInstructorRes(null);
+		setManaging(false);
+		setRenaming(false);
+	};
+
 	/**
 	 * copy string to clipboard
 	 * @param {*} str string want to copy
@@ -196,61 +208,73 @@ export default function Course({ cid, role, creationTime, fetchCourses }) {
 					<span>{course.name}</span>
 				)}
 
-				{role === 'instructor' ? (
-					<div className='manage-icons'>
-						{managing ? (
-							<span className='material-icons delete icon' onClick={deleteCourse}>
-								delete_forever
+				<div className='manage-icons'>
+					{role === 'instructor' && !minimized ? (
+						<>
+							{managing ? (
+								<span className='material-icons icon delete' onClick={deleteCourse}>
+									delete_forever
+								</span>
+							) : null}
+							<span className={`icon manage ${managing ? 'managing' : ''}`} onClick={changeManageStatus}>
+								<span className='material-icons'>settings</span>
 							</span>
-						) : null}
-						<span className={`manage ${managing ? 'managing' : ''}`} onClick={changeManageStatus}>
-							<span className='material-icons icon'>settings</span>
-						</span>
-					</div>
-				) : (
-					<span>&nbsp;</span>
-				)}
+						</>
+					) : null}
+					<span className='material-icons icon minimize' onClick={toggleMinimize}>
+						{minimized ? 'unfold_more' : 'unfold_less'}
+					</span>
+				</div>
 			</div>
 			<div className='creation-time'>{'Created: ' + formatTime(creationTime)}</div>
-			<div className='slides'>
-				{course.slides.map((slide) => {
-					let link = `${fullURL()}/${slide.id}`;
-					return (
-						<div key={slide.id} className='slide-item'>
-							<div className='left'>
-								<a className='slide-link' href={link}>
-									{slide.filename}
-								</a>
-								<div className='time-row'>Last activity: {formatTime(slide.lastActive)}</div>
+			{minimized ? null : (
+				<div className='slides'>
+					{course.slides.map((slide) => {
+						let link = `${fullURL()}/${slide.id}`;
+						return (
+							<div key={slide.id} className='slide-item'>
+								<div className='left'>
+									<a className='slide-link' href={link}>
+										{slide.filename}
+									</a>
+									<div className='time-row'>Last activity: {formatTime(slide.lastActive)}</div>
+									<div className='time-row'>
+										Anonymity: {slide.anonymity}&nbsp;&nbsp;&nbsp;Drawing:{' '}
+										{slide.drawable ? 'Y' : 'N'}
+									</div>
+								</div>
+								{managing ? (
+									<div className='btns'>
+										<Button
+											className='slide-delete-btn'
+											variant='outlined'
+											color='primary'
+											onClick={(e) => modifySlide(slide.filename, slide.id)}>
+											Modify
+										</Button>
+										<Button
+											className='slide-delete-btn'
+											variant='outlined'
+											color='secondary'
+											onClick={(e) => deleteSlide(slide.filename, slide.id)}>
+											Delete
+										</Button>
+									</div>
+								) : (
+									<div className='btns'>
+										<Button
+											variant='outlined'
+											color='primary'
+											onClick={(e) => copyToClipboard(link)}>
+											Copy link
+										</Button>
+									</div>
+								)}
 							</div>
-							{managing ? (
-								<div className='btns'>
-									<Button
-										className='slide-delete-btn'
-										variant='outlined'
-										color='primary'
-										onClick={(e) => modifySlide(slide.filename, slide.id)}>
-										Modify
-									</Button>
-									<Button
-										className='slide-delete-btn'
-										variant='outlined'
-										color='secondary'
-										onClick={(e) => deleteSlide(slide.filename, slide.id)}>
-										Delete
-									</Button>
-								</div>
-							) : (
-								<div className='btns'>
-									<Button variant='outlined' color='primary' onClick={(e) => copyToClipboard(link)}>
-										Copy link
-									</Button>
-								</div>
-							)}
-						</div>
-					);
-				})}
-			</div>
+						);
+					})}
+				</div>
+			)}
 
 			{managing ? (
 				<>
@@ -278,11 +302,7 @@ export default function Course({ cid, role, creationTime, fetchCourses }) {
 							placeholder='utorid'
 							inputRef={newUserRef}
 						/>
-						<Button
-							id='fileSubmit'
-							variant='contained'
-							color='primary'
-							onClick={(e) => addInstructor(course.cid)}>
+						<Button id='fileSubmit' variant='contained' color='primary' onClick={addInstructor}>
 							Add Instructor
 						</Button>
 					</div>
@@ -293,7 +313,10 @@ export default function Course({ cid, role, creationTime, fetchCourses }) {
 			{openModify.open ? (
 				<SlideSettings
 					open={openModify.open}
-					onClose={(_) => setOpenModify({ open: false })}
+					onClose={(_) => {
+						setOpenModify({ open: false });
+						fetchCourse();
+					}}
 					sid={openModify.sid}
 				/>
 			) : null}

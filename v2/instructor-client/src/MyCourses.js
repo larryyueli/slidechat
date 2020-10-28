@@ -42,27 +42,28 @@ export default function MyCourses(props) {
 		}
 		fetchCourses();
 	};
-
+	console.log(courses);
 	return (
 		<>
 			<AppBar user={user} />
 			<div className='profile'>
 				<div className='title'>My Courses</div>
-				{courses.map((course) => (
-					<Course
-						cid={course.id}
-						role={course.role}
-						key={course.id}
-						creationTime={course.time}
-						fetchCourses={fetchCourses}
-					/>
-				))}
 				<div className='createCourse-bar'>
 					<TextField variant='outlined' id={`new-course`} placeholder='Course Name' inputRef={newCourseRef} />
 					<Button id='fileSubmit' onClick={createCourse} variant='contained' color='primary'>
 						Create Course
 					</Button>
 				</div>
+				{courses.map((course) => (
+					<Course
+						cid={course.id}
+						role={course.role}
+						minimizeStatus={Boolean(course.minimized)}
+						key={course.id}
+						creationTime={course.time}
+						fetchCourses={fetchCourses}
+					/>
+				))}
 			</div>
 		</>
 	);

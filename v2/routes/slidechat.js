@@ -115,7 +115,7 @@ async function startSlideChat() {
 
 	// APIs
 	router.use(instructorAPI(db, instructorAuth, isInstructor));
-	router.use(commonAPI(db));
+	router.use(commonAPI(db, isInstructor));
 
 	// Routes
 	router.get(instructorURL, instructorAuth, (req, res) => {

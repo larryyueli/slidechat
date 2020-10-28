@@ -200,6 +200,8 @@ function Main(props) {
 						<NewQuestion
 							sid={sid}
 							pageNum={page}
+							anonymity={anonymity}
+							username={username}
 							back={back}
 							drawable={drawable}
 							drawing={drawing}
@@ -215,6 +217,8 @@ function Main(props) {
 							pageNum={page}
 							qid={qid}
 							uid={uid}
+							anonymity={anonymity}
+							username={username}
 							isInstructor={isInstructor}
 							drawable={drawable}
 							setDrawingOverlay={setDrawingOverlay}

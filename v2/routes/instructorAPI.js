@@ -6,6 +6,7 @@ const { ObjectID } = require('mongodb');
 
 const { fileStorage, convertOptions } = require('../config');
 const { isNotValidPage, notExistInList, errorHandler, questionCount, shortName } = require('./util');
+const validAnonymities = ['A', 'B', 'C', 'D'];
 
 function instructorAPI(db, instructorAuth, isInstructor) {
 	let router = express.Router();
@@ -35,6 +36,33 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 				user: shortName(req.session.realName),
 				courses: user.courses,
 			});
+		} catch (err) {
+			errorHandler(res, err);
+		}
+	});
+
+	/**
+	 * store the status of minimization of courses on an instructor's page
+	 * req body:
+	 * 	 cid: course id
+	 *   status: minimize status of the course
+	 */
+	router.post('/api/minimizeCourse', instructorAuth, async (req, res) => {
+		try {
+			let user = await users.findOne({ _id: req.session.uid }, { projection: { courses: 1 } });
+			if (!user) throw 400;
+			for (let i in user.courses) {
+				if (user.courses[i].id === req.body.cid) {
+					await users.updateOne(
+						{ _id: req.session.uid },
+						{
+							$set: { [`courses.${i}.minimized`]: Boolean(req.body.status) },
+						}
+					);
+					break;
+				}
+			}
+			res.end();
 		} catch (err) {
 			errorHandler(res, err);
 		}
@@ -245,7 +273,7 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 		try {
 			if (
 				req.body.cid.length != 24 ||
-				['A', 'B', 'C'].indexOf(req.body.anonymity) < 0 ||
+				validAnonymities.indexOf(req.body.anonymity) < 0 ||
 				!req.files.file ||
 				!req.files.file.name.toLocaleLowerCase().endsWith('.pdf')
 			) {
@@ -682,7 +710,7 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 	 */
 	router.post('/api/setAnonymity', instructorAuth, async (req, res) => {
 		try {
-			if (req.body.sid.length != 24 || ['A', 'B', 'C'].indexOf(req.body.anonymity) < 0) {
+			if (req.body.sid.length != 24 || validAnonymities.indexOf(req.body.anonymity) < 0) {
 				return res.status(400).send();
 			}
 			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
