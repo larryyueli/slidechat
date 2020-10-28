@@ -27,6 +27,9 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 					courses: [],
 				});
 			} // does not need to initialize here
+			for (let course of user.courses) {
+				course.time = ObjectID(course.id).getTimestamp().getTime();
+			}
 			res.json({
 				uid: req.session.uid,
 				user: shortName(req.session.realName),
@@ -323,7 +326,7 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 					{
 						time: time,
 						body:
-							'You can ask a question to have a discussion on any page of the slides; others will be able to answer you and join the discussion. \n\nTo learn more features about how SlideChat works, check out [this demo](https://mcsapps.utm.utoronto.ca/slidechat/5f1b35eb3997b943b856e362)',
+							'Wanna know more about how to use the tool? Check out this [demo](https://mcsapps.utm.utoronto.ca/slidechat/5f1b35eb3997b943b856e362)!',
 						user: 'SlideChat',
 						uid: 'SlideChat',
 						likes: [],

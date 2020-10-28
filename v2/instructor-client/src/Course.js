@@ -9,7 +9,7 @@ import { formatTime } from './util';
 /**
  * A block containing information about one course
  */
-export default function Course({ cid, role, fetchCourses }) {
+export default function Course({ cid, role, creationTime, fetchCourses }) {
 	const [course, setCourse] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [managing, setManaging] = useState(false);
@@ -211,6 +211,7 @@ export default function Course({ cid, role, fetchCourses }) {
 					<span>&nbsp;</span>
 				)}
 			</div>
+			<div className='creation-time'>{'Created: ' + formatTime(creationTime)}</div>
 			<div className='slides'>
 				{course.slides.map((slide) => {
 					let link = `${fullURL()}/${slide.id}`;
