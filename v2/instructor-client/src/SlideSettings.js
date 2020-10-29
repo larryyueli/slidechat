@@ -117,7 +117,7 @@ export default function SlideSettings({ sid, open, onClose }) {
 	};
 
 	return (
-		<Dialog onClose={onClose} open={open}>
+		<Dialog onClose={onClose} open={open} maxWidth='40rem'>
 			<div className='setting'>
 				{loading ? (
 					<div style={{ textAlign: 'center' }}>
@@ -132,9 +132,10 @@ export default function SlideSettings({ sid, open, onClose }) {
 						<div className='row'>
 							<span className='label'>Anonymity:</span>
 							<Select value={settings.anonymity} onChange={changeAnonymity}>
-								<MenuItem value='A'>No login required</MenuItem>
-								<MenuItem value='B'>Login required, anonymous chat</MenuItem>
-								<MenuItem value='C'>Login required, non-anonymous chat</MenuItem>
+								<MenuItem value='A'>A: No login required</MenuItem>
+								<MenuItem value='B'>B: Login required, anonymous chat to everyone</MenuItem>
+								<MenuItem value='C'>C: Login required, non-anonymous chat to everyone</MenuItem>
+								<MenuItem value='D'>D: Login required, anonymous chat to classmates but not instructors</MenuItem>
 							</Select>
 						</div>
 						<div className='row'>

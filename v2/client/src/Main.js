@@ -39,7 +39,7 @@ function Main(props) {
 			.get(`${serverURL}/api/slideInfo?slideID=${sid}`)
 			.then((res) => {
 				if (res.data.anonymity !== 'A' && !res.data.loginUser) {
-					window.location.href = `${serverURL}/p/login/${sid}/${window.location.hash.substring(1)}`;
+					window.location.href = `${serverURL}/p/login/${window.location.pathname.substring(baseURL.length)}`;
 				} else {
 					return res;
 				}
@@ -49,7 +49,6 @@ function Main(props) {
 				let questionId;
 				if (props.match.params.pageNum) {
 					let n = +props.match.params.pageNum;
-					console.log(n);
 					if (n <= res.data.pageTotal) {
 						currentPage = n;
 						questionId = +props.match.params.qid;
@@ -68,7 +67,7 @@ function Main(props) {
 				setDrawable(Boolean(res.data.drawable));
 				document.getElementById('pageNum').value = currentPage;
 				setPage(currentPage);
-				if (questionId) setQid(questionId);
+				if (questionId || questionId === 0) setQid(questionId);
 			})
 			.catch((err) => {
 				console.error(err);
@@ -201,6 +200,8 @@ function Main(props) {
 						<NewQuestion
 							sid={sid}
 							pageNum={page}
+							anonymity={anonymity}
+							username={username}
 							back={back}
 							drawable={drawable}
 							drawing={drawing}
@@ -216,6 +217,8 @@ function Main(props) {
 							pageNum={page}
 							qid={qid}
 							uid={uid}
+							anonymity={anonymity}
+							username={username}
 							isInstructor={isInstructor}
 							drawable={drawable}
 							setDrawingOverlay={setDrawingOverlay}

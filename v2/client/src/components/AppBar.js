@@ -31,7 +31,7 @@ function AppBar(props) {
 
 	/**
 	 * update displayName iff newName is valid
-	 * @param {String} newName 
+	 * @param {String} newName
 	 */
 	const confirmName = (newName) => {
 		if (newName > 30 || !newName.match(NAME_FORMAT)) {
@@ -43,15 +43,13 @@ function AppBar(props) {
 
 	return (
 		<div className='appbar'>
-			<Link to={`${baseURL}/`} className="logo-link">
+			<Link to={`${baseURL}/`} className='logo-link'>
 				<img className='appbar-logo' src={`${baseURL}/imgs/logo.png`} alt='SlideChat' />
 			</Link>
 			<div className='appbar-items'>
 				<ClickAwayListener onClickAway={(e) => setUserDropDown('')}>
 					<span className='dropdown' onClick={(e) => setUserDropDown('open')}>
-						<span className='appbar-item'>
-							Hi, {props.anonymity === 'C' ? props.username : name} !
-						</span>
+						<span className='appbar-item'>Hi, {props.anonymity === 'C' ? props.username : name} !</span>
 						<div className={`dropdown-content ${userDropDown}`}>
 							{props.anonymity !== 'C' ? (
 								<>

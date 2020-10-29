@@ -1,3 +1,5 @@
+@import './SlideSettings.scss';
+
 .profile {
 	width: 35rem;
 	max-width: 90%;
@@ -6,6 +8,9 @@
 	> .title {
 		text-align: center;
 		font-size: 3rem;
+	}
+	.creation-time {
+		color: $gray;
 	}
 
 	.course {
@@ -27,38 +32,39 @@
 
 			.manage-icons {
 				@include flexCenter();
-				.manage {
+				.icon {
 					@include clickable();
 					@include flexCenter();
 					height: 2.4rem;
 					width: 2.4rem;
-					background-color: $primary;
 					color: white;
 					border-radius: 0.4rem;
 					box-shadow: 1px 1px 4px #aaaaaa;
+					margin-right: 1rem;
+				}
 
-					.icon {
+				.manage {
+					background-color: $primary;
+					margin-right: 1rem;
+					.material-icons {
 						font-size: 1.5rem;
 						transition: transform 0.3s;
 					}
-				}
-
-				.managing {
-					background-color: $secondary;
-					.icon {
-						transform: rotate(120deg);
+					&.managing {
+						background-color: $secondary;
+						.material-icons {
+							transform: rotate(120deg);
+						}
 					}
 				}
 
 				.delete {
-					margin-right: 2rem;
-					@include clickable();
-					@include flexCenter();
 					background-color: $secondary;
-					color: white;
-					border-radius: 0.4rem;
-					height: 2.4rem;
-					width: 2.4rem;
+					margin-right: 1rem;
+				}
+
+				.minimize {
+					background-color: $primary;
 				}
 			}
 
@@ -88,13 +94,14 @@
 
 				.left {
 					flex: 1;
-					line-height: 200%;
 					@include ellipsis();
 					.slide-link {
 						color: $primary;
+						line-height: 200%;
 					}
 					.time-row {
 						color: $gray;
+						font-size: smaller;
 					}
 				}
 
@@ -170,58 +177,6 @@
 		button {
 			background-color: $primary;
 			color: white;
-		}
-	}
-}
-
-.setting {
-	width: 35rem;
-	padding: 1rem;
-	.title {
-		font-size: 1.5rem;
-		font-weight: 500;
-
-		.result {
-			margin-left: 1rem;
-			font-size: 1rem;
-			font-weight: 400;
-			transition: opacity 0.5s;
-		}
-
-		.ok {
-			color: green;
-		}
-		.fail {
-			color: $secondary;
-		}
-	}
-
-	.row {
-		margin: 1rem 0;
-		display: flex;
-		align-items: center;
-
-		.label {
-			font-weight: 450;
-			margin-right: 1rem;
-		}
-
-		.title-input {
-			width: 18rem;
-			margin-right: 1rem;
-		}
-
-		.MuiButton-root {
-			margin-right: 1rem;
-		}
-
-		button,
-		.reorder-btn {
-			background-color: $primary;
-			color: white;
-			&:disabled {
-				background-color: $disabled;
-			}
 		}
 	}
 }

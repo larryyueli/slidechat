@@ -66,6 +66,7 @@ export function randInt(max) {
 }
 
 const nameList = [
+	'AI',
 	'Alchemist',
 	'Archer',
 	'Archimage',
@@ -76,8 +77,6 @@ const nameList = [
 	'Blacksmith',
 	'Blue Mage',
 	'Bounty Hunter',
-	'Caster',
-	'Cook',
 	'Dancer',
 	'Dark Knight',
 	'Demon Hunter',
@@ -89,12 +88,11 @@ const nameList = [
 	'Enchanter',
 	'Engineer',
 	'Fighter',
-	'Fisherman',
 	'Gladiator',
 	'Guardian',
 	'Gunblader',
 	'Gunner',
-	'Herbalist',
+	'Homunculus',
 	'Hunter',
 	'Inquisitor',
 	'Joker',
@@ -103,14 +101,11 @@ const nameList = [
 	'Machinist',
 	'Mage',
 	'Merchant',
-	'Miner',
-	'Mobile Suit',
 	'Monk',
 	'Necromancer',
 	'Ninja',
 	'NPC',
 	'Paladin',
-	'Pegasus Rider',
 	'Pirate',
 	'Priest',
 	'Prophet',
@@ -118,8 +113,6 @@ const nameList = [
 	'Red Mage',
 	'Rider',
 	'Rogue',
-	'Rune Saber',
-	'Saber',
 	'Sage',
 	'Samurai',
 	'Scholar',
@@ -129,8 +122,6 @@ const nameList = [
 	'Warlock',
 	'Warrior',
 	'White Mage',
-	'Witch Doctor',
-	'Witch',
 	'Wizard',
 ];
 
@@ -199,3 +190,17 @@ export function getDisplayName() {
 export const QUESTION_LIST = -1;
 export const NEW_QUESTION = -2;
 export const MODIFY_CHAT = -3;
+
+export function anonymityMessage(anonymity, realName) {
+	switch (anonymity) {
+		case 'A':
+		case 'B':
+			return `Post as ${getDisplayName()}. Anonymous to everyone.`;
+		case 'C':
+			return `Post as ${realName}`;
+		case 'D':
+			return `Post as ${getDisplayName()}. Anonymous to classmates but not instructors.`;
+		default:
+			return '';
+	}
+}

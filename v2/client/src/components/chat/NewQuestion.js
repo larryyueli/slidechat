@@ -4,7 +4,7 @@ import { Button, TextField } from '@material-ui/core';
 
 import ChatAreaTitle from './ChatAreaTitle';
 import { serverURL } from '../../config';
-import { getDisplayName } from '../../util';
+import { anonymityMessage, getDisplayName } from '../../util';
 
 export default function NewQuestion(props) {
 	const titleRef = useRef(null);
@@ -34,12 +34,7 @@ export default function NewQuestion(props) {
 
 	return (
 		<>
-			<ChatAreaTitle
-				title='Ask a Question'
-				showManage={false}
-				showBackBtn={true}
-				back={props.back}
-			/>
+			<ChatAreaTitle title='Ask a Question' showManage={false} showBackBtn={true} back={props.back} />
 			<div className='new-chat-form' key={-1}>
 				<div>
 					<TextField
@@ -80,6 +75,7 @@ export default function NewQuestion(props) {
 						Send
 					</Button>
 				</div>
+				<div className='anonymity'>{anonymityMessage(props.anonymity, props.username)}</div>
 			</div>
 		</>
 	);

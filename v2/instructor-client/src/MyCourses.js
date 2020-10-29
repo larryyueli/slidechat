@@ -23,7 +23,7 @@ export default function MyCourses(props) {
 		try {
 			let res = await axios.get(`${serverURL}/api/myCourses`);
 			setUser(res.data.user);
-			setCourses(res.data.courses);
+			setCourses(res.data.courses.sort((a, b) => b.time - a.time));
 		} catch (err) {
 			console.error(err);
 		}
@@ -31,7 +31,7 @@ export default function MyCourses(props) {
 
 	const createCourse = async () => {
 		try {
-			if (!newCourseRef.current.value){
+			if (!newCourseRef.current.value) {
 				return;
 			}
 			await axios.post(`${serverURL}/api/createCourse`, {
@@ -42,21 +42,28 @@ export default function MyCourses(props) {
 		}
 		fetchCourses();
 	};
-
+	console.log(courses);
 	return (
 		<>
 			<AppBar user={user} />
 			<div className='profile'>
 				<div className='title'>My Courses</div>
-				{courses.map((course) => (
-					<Course cid={course.id} role={course.role} key={course.id} fetchCourses={fetchCourses}/>
-				))}
 				<div className='createCourse-bar'>
 					<TextField variant='outlined' id={`new-course`} placeholder='Course Name' inputRef={newCourseRef} />
 					<Button id='fileSubmit' onClick={createCourse} variant='contained' color='primary'>
 						Create Course
 					</Button>
 				</div>
+				{courses.map((course) => (
+					<Course
+						cid={course.id}
+						role={course.role}
+						minimizeStatus={Boolean(course.minimized)}
+						key={course.id}
+						creationTime={course.time}
+						fetchCourses={fetchCourses}
+					/>
+				))}
 			</div>
 		</>
 	);

@@ -7,7 +7,7 @@ import highlight from 'highlight.js';
 
 import ChatAreaTitle from './ChatAreaTitle';
 import { baseURL, serverURL } from '../../config';
-import { formatTime, formatNames, getDisplayName } from '../../util';
+import { formatTime, formatNames, getDisplayName, anonymityMessage } from '../../util';
 
 const md = markdownIt({
 	breaks: true,
@@ -142,7 +142,9 @@ export default function QuestionDetails(props) {
 						<div className='chat' key={i}>
 							<div className='info'>
 								<div>
-									<span className='author'>{message.user}</span>
+									<span className='author'>{`${message.user}${
+										props.isInstructor && message.uid ? ` (${message.uid})` : ''
+									}`}</span>
 									<span className='time'>
 										{(message.modified ? 'Modified ' : '') + formatTime(message.time)}
 									</span>
@@ -194,6 +196,7 @@ export default function QuestionDetails(props) {
 						Send
 					</Button>
 				</div>
+				<div className='anonymity'>{anonymityMessage(props.anonymity, props.username)}</div>
 			</div>
 		</>
 	);
