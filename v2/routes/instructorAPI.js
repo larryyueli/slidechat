@@ -50,7 +50,7 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 	router.post('/api/minimizeCourse', instructorAuth, async (req, res) => {
 		try {
 			let user = await users.findOne({ _id: req.session.uid }, { projection: { courses: 1 } });
-			if (!user) throw 400;
+			if (!user) throw { status: 400, error: 'invalid user/course combination' };
 			for (let i in user.courses) {
 				if (user.courses[i].id === req.body.cid) {
 					await users.updateOne(
@@ -264,8 +264,9 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 	 *   cid: course id
 	 *   anonymity: anonymity level of the slide
 	 *     A: anonymous
-	 *     B: login required anonymous
+	 *     B: login required, anonymous to everyone
 	 *     C: non-anonymous
+	 *     D: anonymous to classmates but not instructors
 	 * req.files:
 	 *   file: *.pdf
 	 */
@@ -286,7 +287,7 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 
 			if (!course) {
 				throw { status: 400, error: 'course not exist' };
-			} else if (course.instructors.indexOf(req.session.uid)) {
+			} else if (course.instructors.indexOf(req.session.uid) < 0) {
 				throw { status: 403, error: 'Unauthorized' };
 			}
 
