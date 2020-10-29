@@ -19,6 +19,7 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 	const [minimized, setMinimized] = useState(minimizeStatus);
 	const [addInstructorRes, setAddInstructorRes] = useState(null);
 	const [openModify, setOpenModify] = useState({ open: false });
+	const [lastActive, setLastActive] = useState(0);
 	const fileUpload = useRef(null);
 	const newUserRef = useRef(null);
 	const nameRef = useRef(null);
@@ -31,6 +32,11 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 			let res = await axios.get(`${serverURL}/api/course?id=${cid}`);
 			setCourse(res.data);
 			setLoading(false);
+			let last = 0;
+			for (let i of res.data.slides) {
+				if (i.lastActive > last) last = i.lastActive;
+			}
+			setLastActive(last);
 		} catch (err) {
 			console.error(err);
 		}
@@ -226,7 +232,9 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 					</span>
 				</div>
 			</div>
-			<div className='creation-time'>{'Created: ' + formatTime(creationTime)}</div>
+			<div className='creation-time'>
+				{'Created: ' + formatTime(creationTime)}&nbsp;&nbsp;&nbsp;{'Last active: ' + formatTime(lastActive)}
+			</div>
 			{minimized ? null : (
 				<div className='slides'>
 					{course.slides.map((slide) => {
