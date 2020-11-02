@@ -233,7 +233,7 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 				</div>
 			</div>
 			<div className='creation-time'>
-				{'Created: ' + formatTime(creationTime)}&nbsp;&nbsp;&nbsp;{'Last active: ' + formatTime(lastActive)}
+				{'Created: ' + formatTime(creationTime)}&nbsp;&nbsp;&nbsp;{'Last activity: ' + formatTime(lastActive)}
 			</div>
 			{minimized ? null : (
 				<div className='slides'>
