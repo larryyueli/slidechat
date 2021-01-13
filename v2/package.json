@@ -11,7 +11,7 @@
 		"build-i": "cd instructor-client && GENERATE_SOURCEMAP=false npm run build && cd .."
 	},
 	"dependencies": {
-		"axios": "^0.19.2",
+		"axios": "^0.21.1",
 		"body-parser": "^1.19.0",
 		"compression": "^1.7.4",
 		"connect-mongodb-session": "^2.3.3",
@@ -26,7 +26,7 @@
 	},
 	"devDependencies": {
 		"@material-ui/core": "^4.2.0",
-		"highlight.js": "^10.0.3",
+		"highlight.js": "^10.4.1",
 		"markdown-it": "^11.0.0",
 		"markdown-it-mathjax": "^2.0.0",
 		"node-sass": "^4.14.1",
