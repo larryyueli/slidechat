@@ -1,4 +1,4 @@
-# If you want to run this application on your server
+# How to run this application on your server
 
 1. Install NodeJS v12.18.3 or above.
 2. Install command line utilities: `imagemagick`, `ghostscript` and `poppler-utils`. These can be installed with `apt` or other package managers. Enable converting PDF files:

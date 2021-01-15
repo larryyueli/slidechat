@@ -4,9 +4,6 @@ name: Build
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 on:
-  push:
-    branches:
-      - develop
   pull_request:
     branches:
       - develop
