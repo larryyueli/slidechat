@@ -8,7 +8,7 @@ updates:
   - package-ecosystem: npm # See documentation for possible values
     directory: /v2 # Location of package manifests
     schedule:
-      interval: weekly
+      interval: monthly
     open-pull-requests-limit: 5
   - package-ecosystem: github-actions
     directory: /
