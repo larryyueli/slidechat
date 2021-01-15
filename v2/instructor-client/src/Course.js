@@ -61,7 +61,11 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 				setUploading(true);
 				await axios.post(`${serverURL}/api/addSlide/`, formData);
 			} catch (err) {
-				setUploadErr(err.message);
+				if (err.response.status === 502) {
+					setUploadErr("This is a large file and we are still processing it. Please Come back later to check the result");
+				} else {
+					setUploadErr(err.message);
+				}
 			} finally {
 				setUploading(false);
 				fetchCourse();
