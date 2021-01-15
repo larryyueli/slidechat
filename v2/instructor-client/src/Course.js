@@ -199,20 +199,20 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 							</span>
 						</div>
 					) : (
-						<div className='title-name'>
-							{course.name}
-							<span
-								className='material-icons icon rename'
-								onClick={() => {
-									setRenaming(true);
-								}}>
-								create
+							<div className='title-name'>
+								{course.name}
+								<span
+									className='material-icons icon rename'
+									onClick={() => {
+										setRenaming(true);
+									}}>
+									create
 							</span>
-						</div>
-					)
+							</div>
+						)
 				) : (
-					<span>{course.name}</span>
-				)}
+						<span>{course.name}</span>
+					)}
 
 				<div className='manage-icons'>
 					{role === 'instructor' && !minimized ? (
@@ -235,6 +235,20 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 			<div className='creation-time'>
 				{'Created: ' + formatTime(creationTime)}&nbsp;&nbsp;&nbsp;{'Last activity: ' + formatTime(lastActive)}
 			</div>
+
+			{managing ? (
+				<>
+					<div className='upload-bar'>
+						<input type='file' name='file' ref={fileUpload} accept='.pdf' multiple />
+						<Button onClick={uploadPDF} disabled={uploading} variant='contained' color='primary'>
+							Upload
+						</Button>
+						{uploading ? <CircularProgress /> : null}
+					</div>
+					<div className='result-fail'>{uploadErr}</div>
+				</>
+			) : null}
+
 			{minimized ? null : (
 				<div className='slides'>
 					{course.slides.map((slide) => {
@@ -269,33 +283,20 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 										</Button>
 									</div>
 								) : (
-									<div className='btns'>
-										<Button
-											variant='outlined'
-											color='primary'
-											onClick={(e) => copyToClipboard(link)}>
-											Copy link
+										<div className='btns'>
+											<Button
+												variant='outlined'
+												color='primary'
+												onClick={(e) => copyToClipboard(link)}>
+												Copy link
 										</Button>
-									</div>
-								)}
+										</div>
+									)}
 							</div>
 						);
 					})}
 				</div>
 			)}
-
-			{managing ? (
-				<>
-					<div className='upload-bar'>
-						<input type='file' name='file' ref={fileUpload} accept='.pdf' multiple />
-						<Button onClick={uploadPDF} disabled={uploading} variant='contained' color='primary'>
-							Upload
-						</Button>
-						{uploading ? <CircularProgress /> : null}
-					</div>
-					<div className='result-fail'>{uploadErr}</div>
-				</>
-			) : null}
 
 			<div className='instructors'>
 				<strong>Instructors: </strong>
