@@ -199,20 +199,20 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 							</span>
 						</div>
 					) : (
-							<div className='title-name'>
-								{course.name}
-								<span
-									className='material-icons icon rename'
-									onClick={() => {
-										setRenaming(true);
-									}}>
-									create
+						<div className='title-name'>
+							{course.name}
+							<span
+								className='material-icons icon rename'
+								onClick={() => {
+									setRenaming(true);
+								}}>
+								create
 							</span>
-							</div>
-						)
+						</div>
+					)
 				) : (
-						<span>{course.name}</span>
-					)}
+					<span>{course.name}</span>
+				)}
 
 				<div className='manage-icons'>
 					{role === 'instructor' && !minimized ? (
@@ -283,15 +283,15 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 										</Button>
 									</div>
 								) : (
-										<div className='btns'>
-											<Button
-												variant='outlined'
-												color='primary'
-												onClick={(e) => copyToClipboard(link)}>
-												Copy link
+									<div className='btns'>
+										<Button
+											variant='outlined'
+											color='primary'
+											onClick={(e) => copyToClipboard(link)}>
+											Copy link
 										</Button>
-										</div>
-									)}
+									</div>
+								)}
 							</div>
 						);
 					})}
