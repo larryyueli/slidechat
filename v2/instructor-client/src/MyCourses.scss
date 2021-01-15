@@ -117,7 +117,7 @@
 
 		.upload-bar {
 			@include flexCenter;
-			margin-bottom: 1em;
+			margin: 1rem 0rem; 
 			.MuiCircularProgress-root {
 				margin-left: 1rem;
 			}

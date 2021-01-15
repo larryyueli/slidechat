@@ -239,6 +239,20 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 			<div className='creation-time'>
 				{'Created: ' + formatTime(creationTime)}&nbsp;&nbsp;&nbsp;{'Last activity: ' + formatTime(lastActive)}
 			</div>
+
+			{managing ? (
+				<>
+					<div className='upload-bar'>
+						<input type='file' name='file' ref={fileUpload} accept='.pdf' multiple />
+						<Button onClick={uploadPDF} disabled={uploading} variant='contained' color='primary'>
+							Upload
+						</Button>
+						{uploading ? <CircularProgress /> : null}
+					</div>
+					<div className='result-fail'>{uploadErr}</div>
+				</>
+			) : null}
+
 			{minimized ? null : (
 				<div className='slides'>
 					{course.slides.map((slide) => {
@@ -287,19 +301,6 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 					})}
 				</div>
 			)}
-
-			{managing ? (
-				<>
-					<div className='upload-bar'>
-						<input type='file' name='file' ref={fileUpload} accept='.pdf' multiple />
-						<Button onClick={uploadPDF} disabled={uploading} variant='contained' color='primary'>
-							Upload
-						</Button>
-						{uploading ? <CircularProgress /> : null}
-					</div>
-					<div className='result-fail'>{uploadErr}</div>
-				</>
-			) : null}
 
 			<div className='instructors'>
 				<strong>Instructors: </strong>
