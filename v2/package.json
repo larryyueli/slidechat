@@ -27,7 +27,7 @@
 	"devDependencies": {
 		"@material-ui/core": "^4.11.2",
 		"cross-env": "^7.0.3",
-		"highlight.js": "^10.4.1",
+		"highlight.js": "^10.5.0",
 		"markdown-it": "^12.0.4",
 		"markdown-it-mathjax": "^2.0.0",
 		"node-sass": "^4.14.1",
