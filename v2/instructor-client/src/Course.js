@@ -61,7 +61,11 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 				setUploading(true);
 				await axios.post(`${serverURL}/api/addSlide/`, formData);
 			} catch (err) {
-				setUploadErr(err.message);
+				if (err.response.status === 502) {
+					setUploadErr("This is a large file and we are still processing it. Please Come back later to check the result");
+				} else {
+					setUploadErr(err.message);
+				}
 			} finally {
 				setUploading(false);
 				fetchCourse();
@@ -233,8 +237,22 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 				</div>
 			</div>
 			<div className='creation-time'>
-				{'Created: ' + formatTime(creationTime)}&nbsp;&nbsp;&nbsp;{'Last active: ' + formatTime(lastActive)}
+				{'Created: ' + formatTime(creationTime)}&nbsp;&nbsp;&nbsp;{'Last activity: ' + formatTime(lastActive)}
 			</div>
+
+			{managing ? (
+				<>
+					<div className='upload-bar'>
+						<input type='file' name='file' ref={fileUpload} accept='.pdf' multiple />
+						<Button onClick={uploadPDF} disabled={uploading} variant='contained' color='primary'>
+							Upload
+						</Button>
+						{uploading ? <CircularProgress /> : null}
+					</div>
+					<div className='result-fail'>{uploadErr}</div>
+				</>
+			) : null}
+
 			{minimized ? null : (
 				<div className='slides'>
 					{course.slides.map((slide) => {
@@ -283,19 +301,6 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 					})}
 				</div>
 			)}
-
-			{managing ? (
-				<>
-					<div className='upload-bar'>
-						<input type='file' name='file' ref={fileUpload} accept='.pdf' multiple />
-						<Button onClick={uploadPDF} disabled={uploading} variant='contained' color='primary'>
-							Upload
-						</Button>
-						{uploading ? <CircularProgress /> : null}
-					</div>
-					<div className='result-fail'>{uploadErr}</div>
-				</>
-			) : null}
 
 			<div className='instructors'>
 				<strong>Instructors: </strong>

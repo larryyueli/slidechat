@@ -50,7 +50,7 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 	router.post('/api/minimizeCourse', instructorAuth, async (req, res) => {
 		try {
 			let user = await users.findOne({ _id: req.session.uid }, { projection: { courses: 1 } });
-			if (!user) throw 400;
+			if (!user) throw { status: 400, error: 'invalid user/course combination' };
 			for (let i in user.courses) {
 				if (user.courses[i].id === req.body.cid) {
 					await users.updateOne(
@@ -264,8 +264,9 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 	 *   cid: course id
 	 *   anonymity: anonymity level of the slide
 	 *     A: anonymous
-	 *     B: login required anonymous
+	 *     B: login required, anonymous to everyone
 	 *     C: non-anonymous
+	 *     D: anonymous to classmates but not instructors
 	 * req.files:
 	 *   file: *.pdf
 	 */
@@ -286,7 +287,7 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 
 			if (!course) {
 				throw { status: 400, error: 'course not exist' };
-			} else if (course.instructors.indexOf(req.session.uid)) {
+			} else if (course.instructors.indexOf(req.session.uid) < 0) {
 				throw { status: 403, error: 'Unauthorized' };
 			}
 
@@ -354,7 +355,7 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 					{
 						time: time,
 						body:
-							'Wanna know more about how to use the tool? Check out this [demo](https://mcsapps.utm.utoronto.ca/slidechat/5f1b35eb3997b943b856e362)!',
+							'You can ask a question to have a discussion on any page of the slides; others will be able to answer you and join the discussion. \n\nTo learn more features about how SlideChat works, check out [this demo](https://mcsapps.utm.utoronto.ca/slidechat/5f1b35eb3997b943b856e362)',
 						user: 'SlideChat',
 						uid: 'SlideChat',
 						likes: [],
