@@ -37,6 +37,8 @@ SlideChat's development started at and has been supported by the University of T
 
 [Kevin Hua](https://github.com/konokevinda), since Summer 2020
 
+Aashdeep Brar, since Winter 2021
+
 Junwen Shen, since Winter 2021
 
 Christine Taing, since Winter 2021
