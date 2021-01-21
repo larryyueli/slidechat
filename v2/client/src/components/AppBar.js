@@ -84,7 +84,7 @@ function AppBar(props) {
 									</div>
 									{props.isInstructor ? (
 										<Button
-											className='appbar-button'
+											className='dropdown-item clickable'
 											onClick={(e) => props.setIsInstructorView(!props.isInstructorView)}>
 											{props.isInstructorView
 												? 'Change to Student View'
