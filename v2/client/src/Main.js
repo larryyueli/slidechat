@@ -30,7 +30,7 @@ function Main(props) {
 	const [drawing, setDrawing] = useState(false);
 	const [chatToModify, setChatToModify] = useState({});
 	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
-	const [isInstructorView, setIsInstructorView] = useState(false);
+	const [isInstructorView, setIsInstructorView] = useState(true);
 
 	/**
 	 * fetch slide info from server and redirect to login if needed
