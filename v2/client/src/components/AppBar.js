@@ -82,6 +82,15 @@ function AppBar(props) {
 									<div className='dropdown-item'>
 										Signed in as <b>{props.uid}</b>
 									</div>
+									{props.isInstructor ? (
+										<Button
+											className='appbar-button'
+											onClick={(e) => props.setIsInstructorView(!props.isInstructorView)}>
+											{props.isInstructorView
+												? 'Change to Student View'
+												: 'Change to Instructor View'}
+										</Button>
+									) : null}
 									<Link className='dropdown-item clickable' to={`${baseURL}/logout`}>
 										Logout
 									</Link>

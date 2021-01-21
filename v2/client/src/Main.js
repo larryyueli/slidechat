@@ -30,6 +30,7 @@ function Main(props) {
 	const [drawing, setDrawing] = useState(false);
 	const [chatToModify, setChatToModify] = useState({});
 	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
+	const [isInstructorView, setIsInstructorView] = useState(false);
 
 	/**
 	 * fetch slide info from server and redirect to login if needed
@@ -172,6 +173,9 @@ function Main(props) {
 				uid={uid}
 				username={username}
 				loginURL={`${serverURL}/p/login/${sid}/${page}`}
+				isInstructor={isInstructor}
+				isInstructorView={isInstructorView}
+				setIsInstructorView={setIsInstructorView}
 			/>
 			<div className='main'>
 				<Slides
@@ -195,6 +199,7 @@ function Main(props) {
 							isInstructor={isInstructor}
 							askNewQuestion={gotoNewQuestion}
 							goToQuestion={gotoQuestion}
+							isInstructorView={isInstructorView}
 						/>
 					) : qid === NEW_QUESTION ? (
 						<NewQuestion
@@ -225,6 +230,7 @@ function Main(props) {
 							canvasComponentRef={canvasComponentRef}
 							goToModify={goToModify}
 							back={back}
+							isInstructorView={isInstructorView}
 						/>
 					)}
 				</div>
