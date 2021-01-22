@@ -99,7 +99,7 @@ export default function EditCourse({ show, showOrHide, cid, course, fetchCourse 
 						</TableRow>
 						<TableRow>
 							<TableCell>
-								<span className='label'>Anonymity:</span>
+								<span className='label'>Default Anonymity:</span>
 							</TableCell>
 							<TableCell>
 								<Select className='input' value={anonymity} onChange={changeAnonymity}>
@@ -114,7 +114,7 @@ export default function EditCourse({ show, showOrHide, cid, course, fetchCourse 
 						</TableRow>
 						<TableRow>
 							<TableCell>
-								<span className='label'>Drawing:</span>
+								<span className='label'>Default Drawable:</span>
 							</TableCell>
 							<TableCell>
 								<Select className='input' value={Boolean(drawable)} onChange={changeDrawable}>
