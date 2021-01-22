@@ -99,7 +99,7 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 	 * create a new course
 	 * req body:
 	 *   course: course name
-	 * 	 anonymity: anonymity level of the slide
+	 *   anonymity: anonymity level of the slide
 	 *     A: anonymous
 	 *     B: login required, anonymous to everyone
 	 *     C: non-anonymous
@@ -302,7 +302,7 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 			}
 			let course = await courses.findOne(
 				{ _id: ObjectID.createFromHexString(req.body.cid) },
-				{ projection: { _id: 1, instructors: 1 } }
+				{ projection: { _id: 1, instructors: 1, anonymity: 1, drawable: 1 } }
 			);
 
 			if (!course) {
