@@ -12,7 +12,7 @@ import { serverURL } from './config';
  * This page lists all the courses of the instructor and all the slides
  */
 export default function MyCourses(props) {
-	const [show, setShow] = useState(false);
+	const [showNewCourseEditor, setShowNewCourseEditor] = useState(false);
 	let [courses, setCourses] = useState([]);
 	let [user, setUser] = useState('');
 
@@ -30,8 +30,8 @@ export default function MyCourses(props) {
 		}
 	};
 
-	const showOrHide = () => {
-		setShow(!show);
+	const showOrHideNewCourseEditor = () => {
+		setShowNewCourseEditor(!showNewCourseEditor);
 	};
 
 	return (
@@ -40,10 +40,14 @@ export default function MyCourses(props) {
 			<div className='profile'>
 				<div className='title'>My Courses</div>
 				<div className='createCourse-bar'>
-					<Button onClick={showOrHide} variant='contained' color='primary'>
+					<Button onClick={showOrHideNewCourseEditor} variant='contained' color='primary'>
 						Create Course
 					</Button>
-					<NewCourse show={show} showOrHide={showOrHide} fetchCourses={fetchCourses} />
+					<NewCourse
+						show={showNewCourseEditor}
+						showOrHide={showOrHideNewCourseEditor}
+						fetchCourses={fetchCourses}
+					/>
 					{/* <TextField variant='outlined' id={`new-course`} placeholder='Course Name' inputRef={newCourseRef} /> */}
 				</div>
 				{courses.map((course) => (

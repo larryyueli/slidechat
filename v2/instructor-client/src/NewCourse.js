@@ -16,7 +16,8 @@ import axios from 'axios';
 import { serverURL } from './config';
 
 export default function NewCourse({ show, showOrHide, fetchCourses }) {
-	const [settings, setSettings] = useState({ drawable: true, anonymity: 'B' });
+	const [anonymity, setAnonymity] = useState('B');
+	const [drawable, setDrawable] = useState(true);
 	const resultRef = useRef(null);
 	const nameRef = useRef(null);
 
@@ -28,11 +29,11 @@ export default function NewCourse({ show, showOrHide, fetchCourses }) {
 	 *   D: anonymous chat to classmates but not instructors
 	 */
 	const changeAnonymity = (e) => {
-		setSettings({ ...settings, anonymity: e.target.value });
+		setAnonymity(e.target.value);
 	};
 
 	const changeDrawable = (e) => {
-		setSettings({ ...settings, drawable: e.target.value });
+		setDrawable(e.target.value);
 	};
 
 	const createCourse = async () => {
@@ -43,12 +44,13 @@ export default function NewCourse({ show, showOrHide, fetchCourses }) {
 		axios
 			.post(`${serverURL}/api/createCourse`, {
 				name: nameRef.current.value,
-				anonymity: settings.anonymity,
-				drawable: settings.drawable,
+				anonymity: anonymity,
+				drawable: drawable,
 			})
 			.then((_) => {
 				setResult(true, 'course created!');
-				setSettings({ drawable: true, anonymity: 'B' });
+				setAnonymity('B');
+				setDrawable(true);
 				fetchCourses();
 				showOrHide();
 			})
@@ -77,7 +79,7 @@ export default function NewCourse({ show, showOrHide, fetchCourses }) {
 	};
 
 	return (
-		<Dialog className='dialog' open={show} onClose={showOrHide} maxWidth={false}>
+		<Dialog className='editor' open={show} onClose={showOrHide} maxWidth={false}>
 			<TableContainer>
 				<Table>
 					<TableHead>
@@ -102,7 +104,7 @@ export default function NewCourse({ show, showOrHide, fetchCourses }) {
 								<span className='label'>Anonymity:</span>
 							</TableCell>
 							<TableCell>
-								<Select className='input' value={settings.anonymity} onChange={changeAnonymity}>
+								<Select className='input' value={anonymity} onChange={changeAnonymity}>
 									<MenuItem value='A'>A: No login required</MenuItem>
 									<MenuItem value='B'>B: Login required, anonymous chat to everyone</MenuItem>
 									<MenuItem value='C'>C: Login required, non-anonymous chat to everyone</MenuItem>
@@ -117,7 +119,7 @@ export default function NewCourse({ show, showOrHide, fetchCourses }) {
 								<span className='label'>Drawing:</span>
 							</TableCell>
 							<TableCell>
-								<Select className='input' value={Boolean(settings.drawable)} onChange={changeDrawable}>
+								<Select className='input' value={Boolean(drawable)} onChange={changeDrawable}>
 									<MenuItem value={true}>On</MenuItem>
 									<MenuItem value={false}>Off</MenuItem>
 								</Select>

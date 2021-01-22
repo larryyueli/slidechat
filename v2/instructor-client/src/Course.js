@@ -14,7 +14,7 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 	const [course, setCourse] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [managing, setManaging] = useState(false);
-	const [show, setShow] = useState(false);
+	const [showCourseEditor, setShowCourseEditor] = useState(false);
 	const [uploading, setUploading] = useState(false);
 	const [uploadErr, setUploadErr] = useState(null);
 	const [minimized, setMinimized] = useState(minimizeStatus);
@@ -24,8 +24,8 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 	const fileUpload = useRef(null);
 	const newUserRef = useRef(null);
 
-	const showOrHide = () => {
-		setShow(!show);
+	const showOrHideCourseEditor = () => {
+		setShowCourseEditor(!showCourseEditor);
 	};
 
 	/**
@@ -59,7 +59,6 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 			}
 			let formData = new FormData();
 			formData.append('cid', cid);
-			// formData.append('anonymity', 'B'); // login required anonymous chat
 			formData.append('file', fileUpload.current.files[i]);
 			try {
 				setUploading(true);
@@ -122,7 +121,7 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 	const changeManageStatus = () => {
 		setAddInstructorRes(null);
 		setManaging(!managing);
-		setShow(false);
+		setShowCourseEditor(false);
 	};
 
 	const toggleMinimize = () => {
@@ -133,7 +132,7 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 		setMinimized(!minimized);
 		setAddInstructorRes(null);
 		setManaging(false);
-		setShow(false);
+		setShowCourseEditor(false);
 	};
 
 	/**
@@ -188,12 +187,12 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 				{managing ? (
 					<div className='title-name'>
 						{course.name}
-						<span className='material-icons icon rename' onClick={showOrHide}>
+						<span className='material-icons icon rename' onClick={showOrHideCourseEditor}>
 							edit
 						</span>
 						<EditCourse
-							show={show}
-							showOrHide={showOrHide}
+							show={showCourseEditor}
+							showOrHide={showOrHideCourseEditor}
 							cid={cid}
 							course={course}
 							fetchCourse={fetchCourse}
