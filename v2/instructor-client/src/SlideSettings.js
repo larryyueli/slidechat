@@ -32,6 +32,7 @@ export default function SlideSettings({ sid, open, onClose }) {
 	 *   A: anonymous
 	 *   B: login required anonymous
 	 *   C: non-anonymous
+	 *   D: anonymous chat to classmates but not instructors
 	 */
 	const changeAnonymity = (e) => {
 		axios
@@ -135,7 +136,9 @@ export default function SlideSettings({ sid, open, onClose }) {
 								<MenuItem value='A'>A: No login required</MenuItem>
 								<MenuItem value='B'>B: Login required, anonymous chat to everyone</MenuItem>
 								<MenuItem value='C'>C: Login required, non-anonymous chat to everyone</MenuItem>
-								<MenuItem value='D'>D: Login required, anonymous chat to classmates but not instructors</MenuItem>
+								<MenuItem value='D'>
+									D: Login required, anonymous chat to classmates but not instructors
+								</MenuItem>
 							</Select>
 						</div>
 						<div className='row'>

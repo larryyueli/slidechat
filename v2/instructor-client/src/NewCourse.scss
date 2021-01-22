@@ -1,0 +1,35 @@
+.dialog {
+	.title {
+		margin-bottom: 0.5rem;
+		font-size: 1.25rem;
+		font-weight: 500;
+
+		.result {
+			margin-left: 1rem;
+			font-size: 1rem;
+			font-weight: 400;
+			transition: opacity 0.5s;
+		}
+
+		.ok {
+			color: green;
+		}
+		.fail {
+			color: $secondary;
+		}
+	}
+	.label {
+		font-weight: 450;
+		margin-right: 1rem;
+	}
+	.MuiButton-root {
+		margin-right: 1rem;
+		color: white;
+	}
+	.create {
+		background-color: $primary;
+	}
+	.cancel {
+		background-color: $secondary;
+	}
+}

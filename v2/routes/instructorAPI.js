@@ -99,17 +99,30 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 	 * create a new course
 	 * req body:
 	 *   course: course name
+	 * 	 anonymity: anonymity level of the slide
+	 *     A: anonymous
+	 *     B: login required, anonymous to everyone
+	 *     C: non-anonymous
+	 *     D: anonymous to classmates but not instructors
+	 *   drawable: allow drawing
 	 */
 	router.post('/api/createCourse', instructorAuth, async (req, res) => {
 		try {
-			if (typeof req.body.course !== 'string' || !req.body.course) {
+			if (
+				typeof req.body.name !== 'string' ||
+				!req.body.name ||
+				!req.body.anonymity ||
+				req.body.drawable === null
+			) {
 				throw { status: 400, error: 'bad request' };
 			}
 
 			let insertRes = await courses.insertOne({
-				name: req.body.course,
+				name: req.body.name,
 				instructors: [req.session.uid],
 				slides: [],
+				anonymity: req.body.anonymity,
+				drawable: req.body.drawable,
 			});
 
 			let courseID = insertRes.ops[0]._id.toHexString();
@@ -132,29 +145,42 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 	});
 
 	/**
-	 * change a course name
+	 * modify default settings of a course
+	 * req query:
+	 *   id: object ID of the course
 	 * req body:
 	 *   name: course name
-	 * 	 cid: object ID of a course
+	 * 	 anonymity: anonymity level of the slide
+	 *     A: anonymous
+	 *     B: login required, anonymous to everyone
+	 *     C: non-anonymous
+	 *     D: anonymous to classmates but not instructors
+	 *   drawable: allow drawing
 	 */
-	router.post('/api/updateCourseName', instructorAuth, async (req, res) => {
+	router.post('/api/modifyCourseDefault', instructorAuth, async (req, res) => {
 		try {
-			if (req.body.cid.length != 24 || typeof req.body.name !== 'string' || !req.body.name) {
+			if (
+				req.query.id.length !== 24 ||
+				typeof req.body.name !== 'string' ||
+				!req.body.name ||
+				!req.body.anonymity ||
+				req.body.drawable === null
+			) {
 				throw { status: 400, error: 'bad request' };
 			}
-
 			let course = await courses.findOne(
-				{ _id: ObjectID.createFromHexString(req.body.cid) },
+				{ _id: ObjectID.createFromHexString(req.query.id) },
 				{ projection: { instructors: 1 } }
 			);
-			if (!course) throw { status: 404, error: 'course not found' };
+			if (!course) throw { status: 404, error: 'not found' };
 			if (course.instructors.indexOf(req.session.uid) < 0) throw { status: 401, error: 'Unauthorized' };
-
 			let updateRes = await courses.updateOne(
-				{ _id: ObjectID.createFromHexString(req.body.cid) },
+				{ _id: ObjectID.createFromHexString(req.query.id) },
 				{
 					$set: {
 						name: req.body.name,
+						anonymity: req.body.anonymity,
+						drawable: req.body.drawable,
 					},
 				}
 			);
@@ -262,11 +288,6 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 	 * add a new slide to course
 	 * req body:
 	 *   cid: course id
-	 *   anonymity: anonymity level of the slide
-	 *     A: anonymous
-	 *     B: login required, anonymous to everyone
-	 *     C: non-anonymous
-	 *     D: anonymous to classmates but not instructors
 	 * req.files:
 	 *   file: *.pdf
 	 */
@@ -274,7 +295,6 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 		try {
 			if (
 				req.body.cid.length != 24 ||
-				validAnonymities.indexOf(req.body.anonymity) < 0 ||
 				!req.files.file ||
 				!req.files.file.name.toLocaleLowerCase().endsWith('.pdf')
 			) {
@@ -295,8 +315,8 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 			let insertRes = await slides.insertOne({
 				course: course._id,
 				filename: req.files.file.name,
-				anonymity: req.body.anonymity,
-				drawable: true,
+				anonymity: course.anonymity,
+				drawable: course.drawable,
 			});
 
 			// Step 2: use the id as the directory name, create a directory, move pdf to directory
