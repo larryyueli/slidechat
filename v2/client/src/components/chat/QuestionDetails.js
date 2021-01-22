@@ -138,12 +138,15 @@ export default function QuestionDetails(props) {
 				</div>
 				{messages.chats.map((message, i) => {
 					if (!message) return null;
+
 					return (
 						<div className='chat' key={i}>
 							<div className='info'>
 								<div>
 									<span className='author'>{`${message.user}${
-										props.isInstructor && message.uid ? ` (${message.uid})` : ''
+										props.isInstructor && message.uid && props.isInstructorView
+											? ` (${message.uid})`
+											: ''
 									}`}</span>
 									<span className='time'>
 										{(message.modified ? 'Modified ' : '') + formatTime(message.time)}

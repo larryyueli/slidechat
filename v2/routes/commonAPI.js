@@ -199,6 +199,9 @@ function commonAPI(db, isInstructor) {
 				if (question) {
 					question.user = question.chats[0].user;
 					question.create = question.chats[0].time;
+					if (isInstructor(req.session.uid)) {
+						question.uid = question.chats[0].uid;
+					}
 					delete question.chats;
 				}
 			}
@@ -226,6 +229,9 @@ function commonAPI(db, isInstructor) {
 					if (question) {
 						question.user = question.chats[0].user;
 						question.create = question.chats[0].time;
+						if (isInstructor(req.session.uid)) {
+							question.uid = question.chats[0].uid;
+						}
 						delete question.chats;
 					}
 				}

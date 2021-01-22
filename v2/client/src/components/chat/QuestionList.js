@@ -182,7 +182,9 @@ export default function QuestionList(props) {
 								</div>
 							</div>
 							<div className='info'>
-								<div className='author'>{question.user}</div>
+								<div className='author'>{`${question.user} ${
+									question.uid && props.isInstructorView ? `(${question.uid})` : ''
+								}`}</div>
 								<div className='time'>{formatTime(question.time)}</div>
 							</div>
 							{showAll ? <div className='extra-info'>From page {question.pageNum}</div> : null}
