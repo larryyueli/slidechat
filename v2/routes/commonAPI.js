@@ -270,7 +270,7 @@ function commonAPI(db, isInstructor) {
 			// hide students' id, except if it is their own, keep it for showing the modify button
 			if (!isInstructor(req.session.uid)) {
 				for (let i of question.chats) {
-					if (i.uid !== req.session.uid) i.uid = undefined;
+					if (i && i.uid !== req.session.uid) i.uid = undefined;
 				}
 			}
 
