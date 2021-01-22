@@ -49,7 +49,15 @@ function AppBar(props) {
 			<div className='appbar-items'>
 				<ClickAwayListener onClickAway={(e) => setUserDropDown('')}>
 					<span className='dropdown' onClick={(e) => setUserDropDown('open')}>
-						<span className='appbar-item'>Hi, {props.anonymity === 'C' ? props.username : name} !</span>
+						<span className='appbar-item'>
+							Hi, {props.anonymity === 'C' ? props.username : name}
+							{props.anonymity === 'D' && props.isInstructor
+								? props.isInstructorView
+									? "(Instructor's View)"
+									: "(Student's View)"
+								: ' '}
+							!
+						</span>
 						<div className={`dropdown-content ${userDropDown}`}>
 							{props.anonymity !== 'C' ? (
 								<>
@@ -83,13 +91,13 @@ function AppBar(props) {
 										Signed in as <b>{props.uid}</b>
 									</div>
 									{props.isInstructor ? (
-										<Button
+										<div
 											className='dropdown-item clickable'
 											onClick={(e) => props.setIsInstructorView(!props.isInstructorView)}>
 											{props.isInstructorView
-												? 'Change to Student View'
-												: 'Change to Instructor View'}
-										</Button>
+												? "Change to Student's View"
+												: "Change to Instructor's View"}
+										</div>
 									) : null}
 									<Link className='dropdown-item clickable' to={`${baseURL}/logout`}>
 										Logout
