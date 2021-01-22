@@ -4,12 +4,12 @@ An online content publishing platform that enables better communication around t
 
 ## Features
 
--   upload a set of slides and have students discuss around each page
--   add a sound track to each page and give an asynchronous lecture
--   provides anonymous, login required anonymous or non-anonymous chat
--   use Latex math and Markdown in the chat
--   draw on the slides to highlight where you are talking about
--   provide tools to rearrange chat threads when a new version of slides is uploaded
+- upload a set of slides and have students discuss around each page
+- add a sound track to each page and give an asynchronous lecture
+- provides anonymous, login required anonymous or non-anonymous chat
+- use Latex math and Markdown in the chat
+- draw on the slides to highlight where you are talking about
+- provide tools to rearrange chat threads when a new version of slides is uploaded
 
 ## Screenshots
 
@@ -39,7 +39,7 @@ SlideChat's development started at and has been supported by the University of T
 
 Aashdeep Brar, since Winter 2021
 
-Junwen Shen, since Winter 2021
+[Junwen Shen](https://github.com/Samarium150), since Winter 2021
 
 Christine Taing, since Winter 2021
 

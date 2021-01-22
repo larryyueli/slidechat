@@ -5,6 +5,7 @@ import { Button, TextField, CircularProgress } from '@material-ui/core';
 import SlideSettings from './SlideSettings';
 import { serverURL, fullURL } from './config';
 import { formatTime } from './util';
+import EditCourse from './EditCourse';
 
 /**
  * A block containing information about one course
@@ -13,7 +14,7 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 	const [course, setCourse] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [managing, setManaging] = useState(false);
-	const [renaming, setRenaming] = useState(false);
+	const [showCourseEditor, setShowCourseEditor] = useState(false);
 	const [uploading, setUploading] = useState(false);
 	const [uploadErr, setUploadErr] = useState(null);
 	const [minimized, setMinimized] = useState(minimizeStatus);
@@ -22,7 +23,10 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 	const [lastActive, setLastActive] = useState(0);
 	const fileUpload = useRef(null);
 	const newUserRef = useRef(null);
-	const nameRef = useRef(null);
+
+	const showOrHideCourseEditor = () => {
+		setShowCourseEditor(!showCourseEditor);
+	};
 
 	/**
 	 * fetch course information from server
@@ -55,14 +59,15 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 			}
 			let formData = new FormData();
 			formData.append('cid', cid);
-			formData.append('anonymity', 'B'); // login required anonymous chat
 			formData.append('file', fileUpload.current.files[i]);
 			try {
 				setUploading(true);
 				await axios.post(`${serverURL}/api/addSlide/`, formData);
 			} catch (err) {
 				if (err.response.status === 502) {
-					setUploadErr("This is a large file and we are still processing it. Please Come back later to check the result");
+					setUploadErr(
+						'This is a large file and we are still processing it. Please Come back later to check the result'
+					);
 				} else {
 					setUploadErr(err.message);
 				}
@@ -116,7 +121,7 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 	const changeManageStatus = () => {
 		setAddInstructorRes(null);
 		setManaging(!managing);
-		setRenaming(false);
+		setShowCourseEditor(false);
 	};
 
 	const toggleMinimize = () => {
@@ -127,7 +132,7 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 		setMinimized(!minimized);
 		setAddInstructorRes(null);
 		setManaging(false);
-		setRenaming(false);
+		setShowCourseEditor(false);
 	};
 
 	/**
@@ -152,21 +157,6 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 	 */
 	const modifySlide = (filename, sid) => {
 		setOpenModify({ open: true, filename: filename, sid: sid });
-	};
-
-	const changeCourseName = () => {
-		axios
-			.post(`${serverURL}/api/updateCourseName`, {
-				cid: cid,
-				name: nameRef.current.value,
-			})
-			.then((res) => {
-				fetchCourse();
-				setRenaming(false);
-			})
-			.catch((err) => {
-				console.log(err);
-			});
 	};
 
 	const deleteCourse = () => {
@@ -195,25 +185,19 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 		<div className='course'>
 			<div className='title'>
 				{managing ? (
-					renaming ? (
-						<div className='title-name'>
-							<TextField placeholder='Course Name' defaultValue={course.name} inputRef={nameRef} />
-							<span className='material-icons icon confirm' onClick={changeCourseName}>
-								check
-							</span>
-						</div>
-					) : (
-						<div className='title-name'>
-							{course.name}
-							<span
-								className='material-icons icon rename'
-								onClick={() => {
-									setRenaming(true);
-								}}>
-								create
-							</span>
-						</div>
-					)
+					<div className='title-name'>
+						{course.name}
+						<span className='material-icons icon rename' onClick={showOrHideCourseEditor}>
+							edit
+						</span>
+						<EditCourse
+							show={showCourseEditor}
+							showOrHide={showOrHideCourseEditor}
+							cid={cid}
+							course={course}
+							fetchCourse={fetchCourse}
+						/>
+					</div>
 				) : (
 					<span>{course.name}</span>
 				)}

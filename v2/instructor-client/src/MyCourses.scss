@@ -1,4 +1,5 @@
 @import './SlideSettings.scss';
+@import './NewCourse.scss';
 
 .profile {
 	width: 35rem;
@@ -117,7 +118,7 @@
 
 		.upload-bar {
 			@include flexCenter;
-			margin: 1rem 0rem; 
+			margin: 1rem 0rem;
 			.MuiCircularProgress-root {
 				margin-left: 1rem;
 			}

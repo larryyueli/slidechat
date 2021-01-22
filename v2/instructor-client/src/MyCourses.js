@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Button, TextField } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 
 import AppBar from './AppBar';
 import Course from './Course';
+import NewCourse from './NewCourse';
 import { serverURL } from './config';
 
 /**
@@ -11,9 +12,9 @@ import { serverURL } from './config';
  * This page lists all the courses of the instructor and all the slides
  */
 export default function MyCourses(props) {
+	const [showNewCourseEditor, setShowNewCourseEditor] = useState(false);
 	let [courses, setCourses] = useState([]);
 	let [user, setUser] = useState('');
-	let newCourseRef = useRef(null);
 
 	useEffect(() => {
 		fetchCourses();
@@ -29,30 +30,25 @@ export default function MyCourses(props) {
 		}
 	};
 
-	const createCourse = async () => {
-		try {
-			if (!newCourseRef.current.value) {
-				return;
-			}
-			await axios.post(`${serverURL}/api/createCourse`, {
-				course: newCourseRef.current.value,
-			});
-		} catch (err) {
-			console.error(err);
-		}
-		fetchCourses();
+	const showOrHideNewCourseEditor = () => {
+		setShowNewCourseEditor(!showNewCourseEditor);
 	};
-	console.log(courses);
+
 	return (
 		<>
 			<AppBar user={user} />
 			<div className='profile'>
 				<div className='title'>My Courses</div>
 				<div className='createCourse-bar'>
-					<TextField variant='outlined' id={`new-course`} placeholder='Course Name' inputRef={newCourseRef} />
-					<Button id='fileSubmit' onClick={createCourse} variant='contained' color='primary'>
+					<Button onClick={showOrHideNewCourseEditor} variant='contained' color='primary'>
 						Create Course
 					</Button>
+					<NewCourse
+						show={showNewCourseEditor}
+						showOrHide={showOrHideNewCourseEditor}
+						fetchCourses={fetchCourses}
+					/>
+					{/* <TextField variant='outlined' id={`new-course`} placeholder='Course Name' inputRef={newCourseRef} /> */}
 				</div>
 				{courses.map((course) => (
 					<Course

@@ -47,6 +47,8 @@ function commonAPI(db, isInstructor) {
 				name: course.name,
 				instructors: course.instructors,
 				slides: courseSlides,
+				anonymity: course.anonymity,
+				drawable: course.drawable,
 			});
 		} catch (err) {
 			errorHandler(res, err);
