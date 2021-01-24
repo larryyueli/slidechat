@@ -85,10 +85,26 @@
 		}
 	}
 
-	.flip-page-btns {
-		button {
-			margin: 0.5rem 1rem;
-			background-color: $gray;
+	.page-panel {
+		margin: 0.5rem 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		.material-icons {
+			@include clickable;
+			margin: 0rem 0.5rem;
+			font-size: 35px;
+			transition: color 0.1s;
+			&:hover {
+				color: $gray;
+			}
+		}
+		.page-input {
+			margin: 0 0.5rem;
+		}
+		.disable {
+			color: $gray;
+			cursor: default;
 		}
 	}
 
