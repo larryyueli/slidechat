@@ -7,6 +7,11 @@
 		overflow-wrap: anywhere;
 	}
 
+	.toast .MuiSnackbarContent-root {
+		background-color: #4caf50;
+		justify-content: center;
+	}
+
 	.chat {
 		padding: 1rem;
 		border-bottom: 1px solid #cccccc;
@@ -28,6 +33,10 @@
 			.icons {
 				display: flex;
 				align-items: center;
+
+				.quote {
+					color: #cccccc;
+				}
 
 				.icon {
 					@include clickable();

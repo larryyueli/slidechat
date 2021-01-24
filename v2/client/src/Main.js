@@ -219,6 +219,7 @@ function Main(props) {
 					) : (
 						<QuestionDetails
 							sid={sid}
+							filename={filename}
 							pageNum={page}
 							qid={qid}
 							uid={uid}

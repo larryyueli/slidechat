@@ -25,11 +25,11 @@
 	.MuiButton-root {
 		margin-right: 1rem;
 		color: white;
-	}
-	.create {
-		background-color: $primary;
-	}
-	.cancel {
-		background-color: $secondary;
+		.create {
+			background-color: $primary;
+		}
+		.cancel {
+			background-color: $secondary;
+		}
 	}
 }
