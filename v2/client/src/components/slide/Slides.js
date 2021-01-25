@@ -140,26 +140,38 @@ export default function Slides(props) {
 					/>
 				)}
 
-				<div className='flip-page-btns'>
-					<Button variant='contained' disabled={prevDisable} onClick={prevPage}>
-						PREV
-					</Button>
-					<Button variant='contained' disabled={nextDisable} onClick={nextPage}>
-						NEXT
-					</Button>
-				</div>
-				<div>
-					Page{' '}
-					<input
-						id='pageNum'
-						type='tel'
-						defaultValue={props.pageNum}
-						onBlur={props.gotoPage}
-						onKeyDown={(e) => {
-							if (e.keyCode === 13) document.getElementById('pageNum').blur();
-						}}
-					/>{' '}
-					of {props.pageTotal}
+				<div className='page-panel'>
+					<span
+						className={`material-icons ${props.pageNum <= 1 ? 'disable' : ''}`}
+						onClick={() => props.gotoPage(1)}>
+						first_page
+					</span>
+					<span className={`material-icons ${props.pageNum <= 1 ? 'disable' : ''}`} onClick={prevPage}>
+						navigate_before
+					</span>
+					<div className='page-input'>
+						Page{' '}
+						<input
+							id='pageNum'
+							type='tel'
+							defaultValue={props.pageNum}
+							onBlur={props.gotoInputPage}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter') document.getElementById('pageNum').blur();
+							}}
+						/>{' '}
+						of {props.pageTotal}
+					</div>
+					<span
+						className={`material-icons ${props.pageNum >= props.pageTotal ? 'disable' : ''}`}
+						onClick={nextPage}>
+						navigate_next
+					</span>
+					<span
+						className={`material-icons ${props.pageNum >= props.pageTotal ? 'disable' : ''}`}
+						onClick={() => props.gotoPage(props.pageTotal)}>
+						last_page
+					</span>
 				</div>
 
 				<audio className='slide-audio' controls={audioSrc ? true : false} src={audioSrc}>
