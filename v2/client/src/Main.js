@@ -188,6 +188,8 @@ function Main(props) {
 					prevPage={prevPage}
 					gotoPage={gotoPage}
 					drawingOverlay={drawingOverlay}
+					startDrawing={startDrawing}
+					cancelDrawing={cancelDrawing}
 					canvasComponentRef={canvasComponentRef}
 					isInstructor={isInstructor}
 				/>
