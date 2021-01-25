@@ -155,7 +155,7 @@ export default function Slides(props) {
 							id='pageNum'
 							type='tel'
 							defaultValue={props.pageNum}
-							onBlur={props.gotoPage}
+							onBlur={props.gotoInputPage}
 							onKeyDown={(e) => {
 								if (e.key === 'Enter') document.getElementById('pageNum').blur();
 							}}

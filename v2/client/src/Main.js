@@ -108,22 +108,29 @@ function Main(props) {
 	};
 
 	/**
-	 * go to the page the page the user entered iff it is a valid page
+	 * Go to the page user entered in the input
 	 */
-	const gotoPage = () => {
+	const gotoInputPage = () => {
 		let newPageNum = +document.getElementById('pageNum').value;
 		if (!Number.isInteger(newPageNum)) {
 			document.getElementById('pageNum').value = page;
 			return;
 		}
-		if (newPageNum > pageTotal) {
-			newPageNum = pageTotal;
-		} else if (newPageNum < 1) {
-			newPageNum = 1;
+		gotoPage(newPageNum);
+	};
+
+	/**
+	 * Go to the page pageNum iff it is a valid page
+	 */
+	const gotoPage = (pageNum) => {
+		if (pageNum > pageTotal) {
+			pageNum = pageTotal;
+		} else if (pageNum < 1) {
+			pageNum = 1;
 		}
 		setDrawingOverlay(false);
 		setQid(QUESTION_LIST);
-		applyPage(newPageNum);
+		applyPage(pageNum);
 	};
 
 	const gotoQuestion = (pageNum, qid) => {
@@ -187,6 +194,7 @@ function Main(props) {
 					nextPage={nextPage}
 					prevPage={prevPage}
 					gotoPage={gotoPage}
+					gotoInputPage={gotoInputPage}
 					drawingOverlay={drawingOverlay}
 					canvasComponentRef={canvasComponentRef}
 					isInstructor={isInstructor}
