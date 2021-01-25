@@ -127,17 +127,19 @@ export default function Slides(props) {
 					(Download {props.filename})
 				</a>
 			</div>
-			
-			{props.drawingOverlay ? (
-				<Button variant='contained' onClick={props.cancelDrawing}>
-					cancel
-				</Button>
-			) : (
-				<Button variant='contained' onClick={props.startDrawing}>
-					edit
-				</Button>
-			)}
-			
+
+			<div className='drawing-toggle'>
+				{props.drawingOverlay ? (
+					<span className='material-icons icon' onClick={props.cancelDrawing}>
+						close
+					</span>
+				) : (
+					<span className='material-icons icon' onClick={props.startDrawing}>
+						create
+					</span>
+				)}
+			</div>
+
 			<div className='slide-wrapper'>
 				<img id='slide-img' src={img} alt='slide' className='slide' />
 				{props.drawingOverlay ? (
