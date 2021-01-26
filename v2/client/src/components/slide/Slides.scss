@@ -9,6 +9,10 @@
 	.slide-bar {
 		position: relative;
 
+		.drawing-toggle {
+			@include clickable();
+		}
+
 		.icon {
 			position: absolute;
 			display: flex;

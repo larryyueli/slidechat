@@ -95,6 +95,7 @@ function Main(props) {
 		setQid(QUESTION_LIST);
 		applyPage(newPageNum);
 		setDrawingOverlay(false);
+		setDrawing(false);
 		setDrawingToggle(true);
 	};
 
@@ -107,6 +108,7 @@ function Main(props) {
 		setQid(QUESTION_LIST);
 		applyPage(newPageNum);
 		setDrawingOverlay(false);
+		setDrawing(false);
 		setDrawingToggle(true);
 	};
 
@@ -132,7 +134,6 @@ function Main(props) {
 	const gotoQuestion = (pageNum, qid) => {
 		applyPage(pageNum);
 		setQid(qid);
-		setDrawing(false);
 		setDrawingToggle(false);
 	};
 
@@ -159,6 +160,7 @@ function Main(props) {
 			setDrawingOverlay(false);
 			window.history.replaceState(null, null, `${baseURL}/${sid}/${page}`);
 		}
+		setDrawing(false);
 		setDrawingToggle(true);
 	};
 
@@ -237,7 +239,9 @@ function Main(props) {
 							username={username}
 							isInstructor={isInstructor}
 							drawable={drawable}
+							setDrawing={setDrawing}
 							setDrawingOverlay={setDrawingOverlay}
+							setDrawingToggle={setDrawingToggle}
 							canvasComponentRef={canvasComponentRef}
 							goToModify={goToModify}
 							back={back}

@@ -128,7 +128,7 @@ export default function Slides(props) {
 				</a>
 
 				{props.drawingToggle ? (
-					<div className='drawing-toggle'>
+					<div className='drawing-toggle' title='Temporary Drawing'>
 						{props.drawing ? (
 							<span className={`material-icons icon drawing`} onClick={props.cancelDrawing}>
 								close
@@ -145,7 +145,10 @@ export default function Slides(props) {
 			<div className='slide-wrapper'>
 				<img id='slide-img' src={img} alt='slide' className='slide' />
 				{props.drawingOverlay ? (
-					<SlideDrawingOverlay ref={props.canvasComponentRef} />
+					<SlideDrawingOverlay 
+						ref={props.canvasComponentRef} 
+						drawing={props.drawing}
+					/>
 				) : (
 					<SlideFlipOverlay
 						prevBtnDisable={prevDisable}

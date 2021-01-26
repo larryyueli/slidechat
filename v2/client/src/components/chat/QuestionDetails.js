@@ -31,6 +31,9 @@ export default function QuestionDetails(props) {
 
 	useEffect(() => {
 		fetchQuestionDetails();
+		props.setDrawingOverlay(false);
+		props.setDrawing(false);
+		props.setDrawingToggle(false);
 		// eslint-disable-next-line
 	}, [props.sid, props.pageNum, props.qid]);
 

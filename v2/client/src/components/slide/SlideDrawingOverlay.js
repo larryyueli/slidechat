@@ -209,7 +209,7 @@ export default class SlideOverlay extends React.Component {
 			<>
 				<canvas 
 					className='slide-overlay' 
-					style={{cursor: `url(${process.env.PUBLIC_URL}/imgs/pen_cursor.png),crosshair`}} 
+					style={this.props.drawing ? {cursor: `url(${process.env.PUBLIC_URL}/imgs/pen_cursor.png),crosshair`} : {}} 
 					ref={this.canvasRef}
 				></canvas>
 				{this.state.readOnly ? null : (
