@@ -122,15 +122,30 @@ export default function Slides(props) {
 	return (
 		<div className='slide-container'>
 			<div className='title'>{props.title}</div>
-			<div>
+			<div className='slide-bar'>
 				<a className='download-link' href={`${serverURL}/api/downloadPdf?slideID=${props.sid}`}>
 					(Download {props.filename})
 				</a>
+
+				{props.showTempDrawingBtn ? (
+					<div className='drawing-toggle' title='Temporary Drawing'>
+						{props.drawing ? (
+							<span className={`material-icons icon drawing`} onClick={props.cancelDrawing}>
+								close
+							</span>
+						) : (
+							<span className={`material-icons icon`} onClick={props.startDrawing}>
+								create
+							</span>
+						)}
+					</div>
+				) : null}
 			</div>
+
 			<div className='slide-wrapper'>
 				<img id='slide-img' src={img} alt='slide' className='slide' />
 				{props.drawingOverlay ? (
-					<SlideDrawingOverlay ref={props.canvasComponentRef} />
+					<SlideDrawingOverlay ref={props.canvasComponentRef} drawing={props.drawing} />
 				) : (
 					<SlideFlipOverlay
 						prevBtnDisable={prevDisable}

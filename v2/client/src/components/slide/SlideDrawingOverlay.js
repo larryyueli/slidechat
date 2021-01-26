@@ -21,7 +21,7 @@ export default class SlideOverlay extends React.Component {
 
 	/**
 	 * resize the canvas to the same size as the slide
-	 * @param {*} slide 
+	 * @param {*} slide
 	 */
 	resize(slide) {
 		this.canvas.width = slide.clientWidth;
@@ -35,7 +35,7 @@ export default class SlideOverlay extends React.Component {
 	 */
 	setupCtx() {
 		this.ctx = this.canvas.getContext('2d');
-		this.ctx.lineWidth = (this.canvas.width / 100) >> 0;
+		this.ctx.lineWidth = this.canvas.width / 200;
 		this.ctx.strokeStyle = 'red';
 		this.ctx.lineCap = 'round';
 		this.ctx.lineJoin = 'round';
@@ -49,9 +49,9 @@ export default class SlideOverlay extends React.Component {
 		this.canvas.addEventListener('mousemove', (e) => this.drawingOnMouseMove(e));
 		this.canvas.addEventListener('mouseup', (e) => this.drawingOnMouseUp(e));
 
-		this.canvas.addEventListener('touchend', (e) => { this.touchend(e); });
-		this.canvas.addEventListener('touchmove', (e) => { this.touchmove(e); });
-		this.canvas.addEventListener('touchstart', (e) => { this.touchstart(e); });
+		this.canvas.addEventListener('touchend', (e) => this.touchend(e));
+		this.canvas.addEventListener('touchmove', (e) => this.touchmove(e));
+		this.canvas.addEventListener('touchstart', (e) => this.touchstart(e));
 
 		const slide = document.getElementById('slide-img');
 		if (slide.complete) {
@@ -84,7 +84,7 @@ export default class SlideOverlay extends React.Component {
 	 * update the last line and draw it
 	 * @param {*} lastLine the updated line
 	 */
-	applyLineChange(lastLine){
+	applyLineChange(lastLine) {
 		let len = lastLine.length;
 		this.ctx.beginPath();
 		this.ctx.moveTo(
@@ -137,8 +137,8 @@ export default class SlideOverlay extends React.Component {
 	 * apply touchend event
 	 * @param {*} e touchend event
 	 */
-	touchend(e){
-		if (this.isDrawing && e.touches.length === 0){
+	touchend(e) {
+		if (this.isDrawing && e.touches.length === 0) {
 			this.isDrawing = false;
 		}
 	}
@@ -147,7 +147,7 @@ export default class SlideOverlay extends React.Component {
 	 * apply touchmove event
 	 * @param {*} e touchmove event
 	 */
-	touchmove(e){
+	touchmove(e) {
 		if (this.state.readOnly) return;
 		if (!this.isDrawing) return;
 		let touch = e.touches[0];
@@ -165,7 +165,7 @@ export default class SlideOverlay extends React.Component {
 	 * apply touchstart event
 	 * @param {*} e touchstart event
 	 */
-	touchstart(e){
+	touchstart(e) {
 		e.preventDefault();
 		if (this.state.readOnly || this.isDrawing) return;
 		this.isDrawing = true;
@@ -207,7 +207,14 @@ export default class SlideOverlay extends React.Component {
 	render() {
 		return (
 			<>
-				<canvas className='slide-overlay' ref={this.canvasRef}></canvas>
+				<canvas
+					className='slide-overlay'
+					style={
+						this.props.drawing
+							? { cursor: `url(${process.env.PUBLIC_URL}/imgs/pen_cursor.png),crosshair` }
+							: {}
+					}
+					ref={this.canvasRef}></canvas>
 				{this.state.readOnly ? null : (
 					<div className='drawing-controls'>
 						<span onClick={(e) => this.undo(e)}>Undo</span>
