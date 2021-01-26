@@ -95,6 +95,7 @@ function Main(props) {
 		setQid(QUESTION_LIST);
 		applyPage(newPageNum);
 		setDrawingOverlay(false);
+		setDrawingToggle(true);
 	};
 
 	/**
@@ -106,6 +107,7 @@ function Main(props) {
 		setQid(QUESTION_LIST);
 		applyPage(newPageNum);
 		setDrawingOverlay(false);
+		setDrawingToggle(true);
 	};
 
 	/**

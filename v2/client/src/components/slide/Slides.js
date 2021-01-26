@@ -129,16 +129,16 @@ export default function Slides(props) {
 
 				{props.drawingToggle ? (
 					<div className='drawing-toggle'>
-					{props.drawing ? (
-						<span className={`material-icons icon drawing`} onClick={props.cancelDrawing}>
-							close
-						</span>
-					) : (
-						<span className={`material-icons icon`} onClick={props.startDrawing}>
-							create
-						</span>
-					)}
-				</div>
+						{props.drawing ? (
+							<span className={`material-icons icon drawing`} onClick={props.cancelDrawing}>
+								close
+							</span>
+						) : (
+							<span className={`material-icons icon`} onClick={props.startDrawing}>
+								create
+							</span>
+						)}
+					</div>
 				) : null}
 			</div>
 
