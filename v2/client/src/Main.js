@@ -146,6 +146,7 @@ function Main(props) {
 	 * onClick handler for back button to go back to the chat list
 	 */
 	const back = () => {
+		setDrawing(false);
 		if (qid === MODIFY_CHAT) {
 			gotoQuestion(page, chatToModify.qid);
 		} else {

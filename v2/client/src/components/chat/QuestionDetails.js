@@ -48,7 +48,7 @@ export default function QuestionDetails(props) {
 			window.history.replaceState(null, null, `${baseURL}/${props.sid}/${props.pageNum}/${props.qid}`);
 			if (res.data.drawing && props.drawable) {
 				props.setDrawingOverlay(true);
-				props.canvasComponentRef.current.setState({ readOnly: true });
+				// props.canvasComponentRef.current.setState({ readOnly: true });
 				props.canvasComponentRef.current.lines = res.data.drawing;
 				props.canvasComponentRef.current.redraw();
 			}
