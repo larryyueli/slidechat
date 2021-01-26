@@ -207,7 +207,11 @@ export default class SlideOverlay extends React.Component {
 	render() {
 		return (
 			<>
-				<canvas className='slide-overlay' ref={this.canvasRef}></canvas>
+				<canvas 
+					className='slide-overlay' 
+					style={{cursor: `url(${process.env.PUBLIC_URL}/imgs/pen_cursor.png),crosshair`}} 
+					ref={this.canvasRef}
+				></canvas>
 				{this.state.readOnly ? null : (
 					<div className='drawing-controls'>
 						<span onClick={(e) => this.undo(e)}>Undo</span>
