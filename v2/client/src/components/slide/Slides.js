@@ -122,22 +122,21 @@ export default function Slides(props) {
 	return (
 		<div className='slide-container'>
 			<div className='title'>{props.title}</div>
-			<div>
+			<div className='slide-bar'>
 				<a className='download-link' href={`${serverURL}/api/downloadPdf?slideID=${props.sid}`}>
 					(Download {props.filename})
 				</a>
-			</div>
-
-			<div className='drawing-toggle'>
-				{props.drawingOverlay ? (
-					<span className='material-icons icon' onClick={props.cancelDrawing}>
-						close
-					</span>
-				) : (
-					<span className='material-icons icon' onClick={props.startDrawing}>
-						create
-					</span>
-				)}
+				<div className='drawing-toggle'>
+					{props.drawing ? (
+						<span className={`material-icons icon drawing`} onClick={props.cancelDrawing}>
+							close
+						</span>
+					) : (
+						<span className={`material-icons icon`} onClick={props.startDrawing}>
+							create
+						</span>
+					)}
+				</div>
 			</div>
 
 			<div className='slide-wrapper'>
