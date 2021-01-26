@@ -28,6 +28,7 @@ function Main(props) {
 	const [anonymity, setAnonymity] = useState('A');
 	const [qid, setQid] = useState(QUESTION_LIST);
 	const [drawing, setDrawing] = useState(false);
+	const [previousCanvas, setPreviousCanvas] = useState([]);
 	const [chatToModify, setChatToModify] = useState({});
 	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
 	const [isInstructorView, setIsInstructorView] = useState(true);
@@ -129,6 +130,7 @@ function Main(props) {
 	const gotoQuestion = (pageNum, qid) => {
 		applyPage(pageNum);
 		setQid(qid);
+		setDrawing(false);
 	};
 
 	const gotoNewQuestion = () => {
@@ -146,7 +148,6 @@ function Main(props) {
 	 * onClick handler for back button to go back to the chat list
 	 */
 	const back = () => {
-		setDrawing(false);
 		if (qid === MODIFY_CHAT) {
 			gotoQuestion(page, chatToModify.qid);
 		} else {
@@ -154,6 +155,9 @@ function Main(props) {
 			setDrawingOverlay(false);
 			window.history.replaceState(null, null, `${baseURL}/${sid}/${page}`);
 		}
+
+		setDrawing(false);
+		// clear array
 	};
 
 	const startDrawing = (e) => {
@@ -165,6 +169,24 @@ function Main(props) {
 		setDrawing(false);
 		canvasComponentRef.current.clear();
 		setDrawingOverlay(false);
+	};
+
+	const startTempDrawing = (e) => {
+		console.log('start', canvasComponentRef.current.lines)
+		const a = canvasComponentRef.current.lines;
+		setPreviousCanvas(a);
+		startDrawing();
+	};
+	
+	const cancelTempDrawing = (e) => {
+		// If we cancel a temp drawing while on a question that 
+		// has a drawing, we need to restore the original image
+		console.log('cancel', previousCanvas)
+		canvasComponentRef.current.lines = previousCanvas;
+		canvasComponentRef.current.redraw();
+
+		setDrawing(false);
+		setDrawingOverlay(true);
 	};
 
 	return (
