@@ -126,7 +126,9 @@ export default function Slides(props) {
 				<a className='download-link' href={`${serverURL}/api/downloadPdf?slideID=${props.sid}`}>
 					(Download {props.filename})
 				</a>
-				<div className='drawing-toggle'>
+
+				{props.drawingToggle ? (
+					<div className='drawing-toggle'>
 					{props.drawing ? (
 						<span className={`material-icons icon drawing`} onClick={props.cancelDrawing}>
 							close
@@ -137,6 +139,7 @@ export default function Slides(props) {
 						</span>
 					)}
 				</div>
+				) : null}
 			</div>
 
 			<div className='slide-wrapper'>

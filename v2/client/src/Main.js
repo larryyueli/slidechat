@@ -28,7 +28,7 @@ function Main(props) {
 	const [anonymity, setAnonymity] = useState('A');
 	const [qid, setQid] = useState(QUESTION_LIST);
 	const [drawing, setDrawing] = useState(false);
-	const [previousCanvas, setPreviousCanvas] = useState([]);
+	const [drawingToggle, setDrawingToggle] = useState(true);
 	const [chatToModify, setChatToModify] = useState({});
 	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
 	const [isInstructorView, setIsInstructorView] = useState(true);
@@ -131,12 +131,14 @@ function Main(props) {
 		applyPage(pageNum);
 		setQid(qid);
 		setDrawing(false);
+		setDrawingToggle(false);
 	};
 
 	const gotoNewQuestion = () => {
 		setQid(NEW_QUESTION);
 		setDrawingOverlay(false);
 		setDrawing(false);
+		setDrawingToggle(false);
 	};
 
 	const goToModify = (chat, cid) => {
@@ -155,9 +157,7 @@ function Main(props) {
 			setDrawingOverlay(false);
 			window.history.replaceState(null, null, `${baseURL}/${sid}/${page}`);
 		}
-
-		setDrawing(false);
-		// clear array
+		setDrawingToggle(true);
 	};
 
 	const startDrawing = (e) => {
@@ -169,24 +169,6 @@ function Main(props) {
 		setDrawing(false);
 		canvasComponentRef.current.clear();
 		setDrawingOverlay(false);
-	};
-
-	const startTempDrawing = (e) => {
-		console.log('start', canvasComponentRef.current.lines)
-		const a = canvasComponentRef.current.lines;
-		setPreviousCanvas(a);
-		startDrawing();
-	};
-	
-	const cancelTempDrawing = (e) => {
-		// If we cancel a temp drawing while on a question that 
-		// has a drawing, we need to restore the original image
-		console.log('cancel', previousCanvas)
-		canvasComponentRef.current.lines = previousCanvas;
-		canvasComponentRef.current.redraw();
-
-		setDrawing(false);
-		setDrawingOverlay(true);
 	};
 
 	return (
@@ -212,6 +194,7 @@ function Main(props) {
 					gotoPage={gotoPage}
 					drawingOverlay={drawingOverlay}
 					drawing={drawing}
+					drawingToggle={drawingToggle}
 					startDrawing={startDrawing}
 					cancelDrawing={cancelDrawing}
 					canvasComponentRef={canvasComponentRef}
