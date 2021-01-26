@@ -28,7 +28,7 @@ function Main(props) {
 	const [anonymity, setAnonymity] = useState('A');
 	const [qid, setQid] = useState(QUESTION_LIST);
 	const [drawing, setDrawing] = useState(false);
-	const [drawingToggle, setDrawingToggle] = useState(true);
+	const [showTempDrawingBtn, setShowTempDrawingBtn] = useState(true);
 	const [chatToModify, setChatToModify] = useState({});
 	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
 	const [isInstructorView, setIsInstructorView] = useState(true);
@@ -96,7 +96,7 @@ function Main(props) {
 		applyPage(newPageNum);
 		setDrawingOverlay(false);
 		setDrawing(false);
-		setDrawingToggle(true);
+		setShowTempDrawingBtn(true);
 	};
 
 	/**
@@ -109,7 +109,7 @@ function Main(props) {
 		applyPage(newPageNum);
 		setDrawingOverlay(false);
 		setDrawing(false);
-		setDrawingToggle(true);
+		setShowTempDrawingBtn(true);
 	};
 
 	/**
@@ -134,14 +134,14 @@ function Main(props) {
 	const gotoQuestion = (pageNum, qid) => {
 		applyPage(pageNum);
 		setQid(qid);
-		setDrawingToggle(false);
+		setShowTempDrawingBtn(false);
 	};
 
 	const gotoNewQuestion = () => {
 		setQid(NEW_QUESTION);
 		setDrawingOverlay(false);
 		setDrawing(false);
-		setDrawingToggle(false);
+		setShowTempDrawingBtn(false);
 	};
 
 	const goToModify = (chat, cid) => {
@@ -159,9 +159,9 @@ function Main(props) {
 			setQid(QUESTION_LIST);
 			setDrawingOverlay(false);
 			window.history.replaceState(null, null, `${baseURL}/${sid}/${page}`);
+			setShowTempDrawingBtn(true);
 		}
 		setDrawing(false);
-		setDrawingToggle(true);
 	};
 
 	const startDrawing = (e) => {
@@ -198,7 +198,7 @@ function Main(props) {
 					gotoPage={gotoPage}
 					drawingOverlay={drawingOverlay}
 					drawing={drawing}
-					drawingToggle={drawingToggle}
+					showTempDrawingBtn={showTempDrawingBtn}
 					startDrawing={startDrawing}
 					cancelDrawing={cancelDrawing}
 					canvasComponentRef={canvasComponentRef}
@@ -241,7 +241,7 @@ function Main(props) {
 							drawable={drawable}
 							setDrawing={setDrawing}
 							setDrawingOverlay={setDrawingOverlay}
-							setDrawingToggle={setDrawingToggle}
+							setShowTempDrawingBtn={setShowTempDrawingBtn}
 							canvasComponentRef={canvasComponentRef}
 							goToModify={goToModify}
 							back={back}

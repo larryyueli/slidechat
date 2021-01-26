@@ -33,7 +33,7 @@ export default function QuestionDetails(props) {
 		fetchQuestionDetails();
 		props.setDrawingOverlay(false);
 		props.setDrawing(false);
-		props.setDrawingToggle(false);
+		props.setShowTempDrawingBtn(false);
 		// eslint-disable-next-line
 	}, [props.sid, props.pageNum, props.qid]);
 
