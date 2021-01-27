@@ -1,8 +1,6 @@
 @mixin clickable {
 	user-select: none;
-	&:hover {
-		cursor: pointer;
-	}
+	cursor: pointer;
 }
 
 @mixin ellipsis {

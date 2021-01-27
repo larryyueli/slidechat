@@ -126,7 +126,7 @@ export default function QuestionList(props) {
 		<>
 			<ChatAreaTitle
 				title='Discussion'
-				showManage={props.isInstructor}
+				showManage={props.isInstructor && props.isInstructorView}
 				managing={managing}
 				toggleManaging={toggleManaging}
 				showBackBtn={false}

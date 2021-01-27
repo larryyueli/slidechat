@@ -90,26 +90,14 @@ function Main(props) {
 	 * Go to the next page of slide, should fetch the url and the chat threads list of the new page
 	 */
 	const nextPage = () => {
-		if (page >= pageTotal) return;
-		let newPageNum = page + 1;
-		setQid(QUESTION_LIST);
-		applyPage(newPageNum);
-		setDrawingOverlay(false);
-		setDrawing(false);
-		setShowTempDrawingBtn(true);
+		gotoPage(page + 1);
 	};
 
 	/**
 	 * Go to the previous page of slide, should fetch the url and the chat threads list of the new page
 	 */
 	const prevPage = () => {
-		if (page < 2) return;
-		let newPageNum = page - 1;
-		setQid(QUESTION_LIST);
-		applyPage(newPageNum);
-		setDrawingOverlay(false);
-		setDrawing(false);
-		setShowTempDrawingBtn(true);
+		gotoPage(page - 1);
 	};
 
 	/**
@@ -133,8 +121,15 @@ function Main(props) {
 		} else if (pageNum < 1) {
 			pageNum = 1;
 		}
-		setDrawingOverlay(false);
-		setQid(QUESTION_LIST);
+		if (pageNum === page) return;
+		if (qid !== QUESTION_LIST) {
+			setQid(QUESTION_LIST);
+			setDrawing(false);
+			setDrawingOverlay(false);
+			setShowTempDrawingBtn(true);
+		} else if (drawing) {
+			canvasComponentRef.current.clear();
+		}
 		applyPage(pageNum);
 	};
 
@@ -211,6 +206,7 @@ function Main(props) {
 					cancelDrawing={cancelDrawing}
 					canvasComponentRef={canvasComponentRef}
 					isInstructor={isInstructor}
+					isInstructorView={isInstructorView}
 				/>
 				<div className='chat-area'>
 					{qid === QUESTION_LIST ? (
