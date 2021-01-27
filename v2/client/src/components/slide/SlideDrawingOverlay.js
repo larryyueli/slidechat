@@ -211,7 +211,7 @@ export default class SlideOverlay extends React.Component {
 					className='slide-overlay'
 					style={
 						this.props.drawing
-							? { cursor: `url(${process.env.PUBLIC_URL}/imgs/pen_cursor.png),crosshair` }
+							? { cursor: `url(${process.env.PUBLIC_URL}/imgs/laser_pointer.png) 9 9, crosshair` }
 							: {}
 					}
 					ref={this.canvasRef}></canvas>

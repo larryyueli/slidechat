@@ -132,7 +132,8 @@ export default function QuestionDetails(props) {
 	};
 
 	const copyLink = async () => {
-		navigator.clipboard.writeText(
+		if (!navigator.clipboard) return alert('Your browser does not support accessing clipboard!');
+		await navigator.clipboard.writeText(
 			`[@${props.filename}/Page ${props.pageNum}/Q${props.qid}](${window.location.href})`
 		);
 		showOrHideToast();
@@ -142,7 +143,7 @@ export default function QuestionDetails(props) {
 		<>
 			<ChatAreaTitle
 				title={messages.title}
-				showManage={props.isInstructor}
+				showManage={props.isInstructor && props.isInstructorView}
 				managing={managing}
 				toggleManaging={toggleManaging}
 				showBackBtn={true}

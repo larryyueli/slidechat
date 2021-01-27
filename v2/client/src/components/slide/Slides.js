@@ -135,7 +135,7 @@ export default function Slides(props) {
 							</span>
 						) : (
 							<span className={`material-icons icon`} onClick={props.startDrawing}>
-								create
+								brush
 							</span>
 						)}
 					</div>
@@ -193,7 +193,7 @@ export default function Slides(props) {
 					Your browser does not support the audio element.
 				</audio>
 
-				{props.isInstructor ? (
+				{props.isInstructor && props.isInstructorView ? (
 					<div className='audio-instructor'>
 						<input type='file' id='file' className='file' ref={fileUpload} accept='.mp3' />
 						<Button variant='contained' onClick={uploadAudio} disabled={uploading} className='upload'>
