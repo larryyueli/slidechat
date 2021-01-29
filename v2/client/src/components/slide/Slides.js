@@ -141,6 +141,10 @@ export default function Slides(props) {
 	};
 
 	const startRecording = async () => {
+		if (!navigator.mediaDevices) {
+			window.alert("Your browser doesn't support using microphone. Are you using HTTPS?");
+			return;
+		}
 		navigator.mediaDevices
 			.getUserMedia({ audio: true })
 			.then(async () => {
