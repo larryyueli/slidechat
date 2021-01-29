@@ -32,6 +32,7 @@ function Main(props) {
 	const [chatToModify, setChatToModify] = useState({});
 	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
 	const [isInstructorView, setIsInstructorView] = useState(true);
+	const [record, setRecord] = useState({ uploaded: false, recording: false, recordingFile: null, recordingSrc: '' });
 
 	/**
 	 * fetch slide info from server and redirect to login if needed
@@ -116,6 +117,19 @@ function Main(props) {
 	 * Go to the page pageNum iff it is a valid page
 	 */
 	const gotoPage = (pageNum) => {
+		if (record.recording) {
+			if (window.confirm('Go to previous page will lose your current recording progress')) {
+				if (window.audioRecorder !== null) {
+					window.audioRecorder.stop();
+					window.audioRecorder = null;
+				}
+				setRecord({ ...record, recording: false });
+			} else return;
+		} else if (record.recordingSrc !== '' && !record.uploaded) {
+			if (window.confirm("You haven't uploaded your recording. Do you want to discard it?")) {
+				setRecord({ ...record, recordingFile: null, recordingSrc: '' });
+			} else return;
+		}
 		if (pageNum > pageTotal) {
 			pageNum = pageTotal;
 		} else if (pageNum < 1) {
@@ -207,6 +221,8 @@ function Main(props) {
 					canvasComponentRef={canvasComponentRef}
 					isInstructor={isInstructor}
 					isInstructorView={isInstructorView}
+					record={record}
+					setRecord={setRecord}
 				/>
 				<div className='chat-area'>
 					{qid === QUESTION_LIST ? (

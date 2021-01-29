@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "mic-recorder-to-mp3": "^2.2.2",
     "react-scripts": "^4.0.1"
   },
   "homepage": "/slidechat/",

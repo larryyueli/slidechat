@@ -95,12 +95,22 @@
 			border-radius: 0.5rem;
 		}
 
-		.upload {
+		.upload,
+		.start,
+		.stop {
 			background-color: $primary;
 			color: white;
 			margin: 0 0.5rem;
 			&:disabled {
 				background-color: $disabled;
+			}
+			.start-icon {
+				color: #f5345b;
+				margin-right: 2px;
+			}
+			.stop-icon {
+				color: #591616;
+				margin-left: 2px;
 			}
 		}
 
@@ -113,7 +123,22 @@
 			}
 		}
 	}
-
+	.recording {
+		@include flexCenter();
+		margin: 1rem auto;
+		border: 2px dashed gray;
+		width: fit-content;
+		padding: 1rem;
+		border-radius: 10px;
+		.recording-audio {
+			margin: 0.5rem;
+		}
+		.upload {
+			background-color: $primary;
+			color: white;
+			margin: 0 0.5rem;
+		}
+	}
 	.page-panel {
 		margin: 0.5rem 0;
 		display: flex;
