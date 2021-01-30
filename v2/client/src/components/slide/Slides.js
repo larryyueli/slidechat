@@ -20,6 +20,8 @@ export default function Slides(props) {
 	const [uploading, setUploading] = useState(false);
 	const [img, setImg] = useState(loadingImg);
 	const fileUpload = useRef(null);
+	const [scrollPosition, setScrollPosition] = useState(0);
+	const [carousel, setCarousel] = useState(null);
 
 	useEffect(() => {
 		if (!props.pageTotal) return;
@@ -56,6 +58,7 @@ export default function Slides(props) {
 			.catch((err) => {
 				console.error(err);
 			});
+		setCarousel(document.getElementById('carousel'));
 		// eslint-disable-next-line
 	}, [props.pageTotal, props.pageNum]);
 
@@ -182,6 +185,21 @@ export default function Slides(props) {
 		delete window.audioRecorder;
 	};
 
+	const scroll = (e) => {
+		if (carousel) {
+			if (e.deltaY > 0) {
+				const pos = scrollPosition - 40 < 0 ? 0 : scrollPosition - 40;
+				carousel.scrollLeft = pos;
+				setScrollPosition(pos);
+			} else {
+				const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+				const pos = scrollPosition + 40 >= maxScroll ? maxScroll : scrollPosition + 40;
+				carousel.scrollLeft = pos;
+				setScrollPosition(pos);
+			}
+		}
+	};
+
 	return (
 		<div className='slide-container'>
 			<div className='title'>{props.title}</div>
@@ -250,6 +268,15 @@ export default function Slides(props) {
 						onClick={() => props.gotoPage(props.pageTotal)}>
 						last_page
 					</span>
+				</div>
+
+				<div className='carousel'>
+					<div id='carousel' className='carousel-box' onWheel={scroll}>
+						<img
+							className='carousel-img'
+							src='https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/dog-puppy-on-garden-royalty-free-image-1586966191.jpg?crop=1.00xw:0.669xh;0,0.190xh&resize=1200:*'
+						/>
+					</div>
 				</div>
 
 				<audio className='slide-audio' controls={audioSrc ? true : false} src={audioSrc}>

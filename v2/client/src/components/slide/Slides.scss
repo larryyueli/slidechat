@@ -163,6 +163,48 @@
 		}
 	}
 
+	.carousel {
+		height: 4rem;
+		max-width: 50rem;
+		display: flex;
+		align-items: center;
+		margin: 1rem auto;
+		justify-content: space-around;
+		position: relative;
+		// overflow: hidden;
+		// overflow-y: hidden;
+
+		& .carousel-box::-webkit-scrollbar {
+			width: 0px;
+		}
+
+		& .carousel-box {
+			height: 6.2rem;
+			width: auto;
+			max-width: 50rem;
+			overflow-x: scroll;
+			scroll-behavior: smooth;
+			white-space: nowrap;
+			display: inline-block;
+			text-align: center;
+			display: flex;
+			align-items: center;
+			padding: 0rem 0.4rem;
+
+			& .carousel-img {
+				height: 50px;
+				margin: 0 5px;
+				transition: 0.5s ease;
+				cursor: pointer;
+			}
+
+			& .carousel-img:hover {
+				transform: scale(1.2);
+				margin: 0 1.5rem;
+			}
+		}
+	}
+
 	input {
 		width: 1.8rem;
 		background-color: $backgroundColour;
