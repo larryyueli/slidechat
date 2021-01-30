@@ -118,10 +118,14 @@ function Main(props) {
 	 */
 	const gotoPage = (pageNum) => {
 		if (record.recording) {
-			if (window.confirm('Go to previous page will lose your current recording progress')) {
-				if (window.audioRecorder !== null) {
+			if (
+				window.confirm(
+					'Go to another page will lose your current recording progress. Do you want to discard it?'
+				)
+			) {
+				if (window.audioRecorder) {
 					window.audioRecorder.stop();
-					window.audioRecorder = null;
+					delete window.audioRecorder;
 				}
 				setRecord({ ...record, recording: false });
 			} else return;
