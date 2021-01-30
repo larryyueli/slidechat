@@ -547,10 +547,9 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 				{ _id: ObjectID.createFromHexString(req.body.sid) },
 				{ $set: updateQuery }
 			);
-			if (updateRes.modifiedCount !== 1) {
+			if (updateRes.result.ok !== 1) {
 				throw 'audio upload failed';
 			}
-
 			res.send();
 		} catch (err) {
 			errorHandler(res, err);

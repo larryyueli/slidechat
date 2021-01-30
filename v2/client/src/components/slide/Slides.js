@@ -83,6 +83,27 @@ export default function Slides(props) {
 		}
 	};
 
+	const uploadRecording = async () => {
+		setUploading(true);
+		let formData = new FormData();
+		formData.append('sid', props.sid);
+		formData.append('pageNum', props.pageNum);
+		formData.append('file', props.record.recordingFile);
+		try {
+			setUploading(true);
+			await axios.post(`${serverURL}/api/audio/`, formData);
+			setAudioSrc(
+				`${serverURL}/api/slideAudio?slideID=${props.sid}&pageNum=${props.pageNum}&random=${randInt(10000)}`
+			);
+			props.setRecord({ ...props.record, uploaded: true });
+		} catch (err) {
+			console.log(err);
+		} finally {
+			setUploading(false);
+			props.setRecord({ ...props.record, recordingFile: null, recordingSrc: '' });
+		}
+	};
+
 	/**
 	 * delete the audio on this page
 	 */
@@ -117,6 +138,48 @@ export default function Slides(props) {
 	const prevPage = (e) => {
 		setPrevDisable(true);
 		props.prevPage();
+	};
+
+	const startRecording = async () => {
+		if (!navigator.mediaDevices) {
+			window.alert("Your browser doesn't support using microphone. Are you using HTTPS?");
+			return;
+		}
+		if (props.record.recordingSrc !== '' && !props.record.uploaded) {
+			if (!window.confirm("You haven't uploaded your recording. Do you want to discard it?")) return;
+		}
+		navigator.mediaDevices
+			.getUserMedia({ audio: true })
+			.then(async () => {
+				const MicRecorder = (await import('mic-recorder-to-mp3')).default;
+				window.audioRecorder = new MicRecorder({ bitRate: 128 });
+				window.audioRecorder
+					.start()
+					.then(() => {
+						props.setRecord({ ...props.record, recording: true });
+					})
+					.catch((err) => console.error(err));
+			})
+			.catch(() => {
+				window.alert('Audio permission denied.');
+			});
+	};
+
+	const stopRecording = () => {
+		window.audioRecorder
+			.stop()
+			.getMp3()
+			.then(([buffer, blob]) => {
+				props.setRecord({
+					...props.record,
+					recording: false,
+					uploaded: false,
+					recordingFile: new File(buffer, 'recording.mp3', { type: blob.type, lastModified: Date.now() }),
+					recordingSrc: URL.createObjectURL(blob),
+				});
+			})
+			.catch((err) => console.error(err));
+		delete window.audioRecorder;
 	};
 
 	return (
@@ -194,18 +257,49 @@ export default function Slides(props) {
 				</audio>
 
 				{props.isInstructor && props.isInstructorView ? (
-					<div className='audio-instructor'>
-						<input type='file' id='file' className='file' ref={fileUpload} accept='.mp3' />
-						<Button variant='contained' onClick={uploadAudio} disabled={uploading} className='upload'>
-							{audioSrc ? 'Replace' : 'Upload'} Audio
-						</Button>
-						{uploading ? <CircularProgress /> : null}
-						{audioSrc ? (
-							<Button variant='contained' onClick={deleteAudio} disabled={uploading} className='delete'>
-								Delete Audio
+					<>
+						<div className='audio-instructor'>
+							<input type='file' id='file' className='file' ref={fileUpload} accept='.mp3' />
+							<Button variant='contained' onClick={uploadAudio} disabled={uploading} className='upload'>
+								{audioSrc ? 'Replace' : 'Upload'} audio
 							</Button>
+							{uploading ? <CircularProgress /> : null}
+							{audioSrc ? (
+								<Button
+									variant='contained'
+									onClick={deleteAudio}
+									disabled={uploading}
+									className='delete'>
+									Delete Audio
+								</Button>
+							) : null}
+							{props.record.recording ? (
+								<Button variant='contained' className='stop' onClick={stopRecording}>
+									<span className='material-icons stop-icon'>stop</span>
+									Stop recording
+								</Button>
+							) : (
+								<Button variant='contained' className='start' onClick={startRecording}>
+									<span className='material-icons start-icon'>radio_button_checked</span>
+									Start recording
+								</Button>
+							)}
+						</div>
+						{props.record.recordingSrc ? (
+							<div className='recording'>
+								<audio className='recording-audio' controls={true} src={props.record.recordingSrc}>
+									Your browser does not support the audio element.
+								</audio>
+								<Button
+									variant='contained'
+									onClick={uploadRecording}
+									disabled={uploading}
+									className='upload'>
+									{audioSrc ? 'Replace' : 'Upload'} audio
+								</Button>
+							</div>
 						) : null}
-					</div>
+					</>
 				) : null}
 			</div>
 		</div>
