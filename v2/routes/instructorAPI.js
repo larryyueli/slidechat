@@ -323,18 +323,21 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 			let objID = insertRes.ops[0]._id;
 			let id = objID.toHexString();
 			let dir = path.join(fileStorage, id);
+			let thumbnailDir = path.join(dir, 'thumbnails');
 			// overwrite if exists. should not happen: id is unique
 			if (fs.existsSync(dir)) {
 				console.log(`Directory ${id} already exists, overwriting...`);
 				await fs.promises.rmdir(dir, { recursive: true });
 			}
-			await fs.promises.mkdir(dir, { recursive: true });
+			await fs.promises.mkdir(thumbnailDir, { recursive: true });
 			await req.files.file.mv(path.join(dir, req.files.file.name));
 
 			// Step 3: convert to images
 			let pdfImage = new PDFImage(path.join(dir, req.files.file.name), {
 				pdfFileBaseName: 'page',
+				thumbnailFileBaseName: 'thumbnail',
 				outputDirectory: dir,
+				outputThumbnailDirectory: thumbnailDir,
 				convertOptions: convertOptions,
 			});
 			let imagePaths = await pdfImage.convertFile();
@@ -432,17 +435,20 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 			}
 
 			let dir = path.join(fileStorage, req.body.sid);
+			let thumbnailDir = path.join(dir, 'thumbnails');
 			// remove old slide
 			if (fs.existsSync(dir)) {
 				await fs.promises.rmdir(dir, { recursive: true });
 			}
-			await fs.promises.mkdir(dir, { recursive: true });
+			await fs.promises.mkdir(thumbnailDir, { recursive: true });
 			await req.files.file.mv(path.join(dir, req.files.file.name));
 
 			// Step 3: convert to images
 			let pdfImage = new PDFImage(path.join(dir, req.files.file.name), {
 				pdfFileBaseName: 'page',
+				thumbnailFileBaseName: 'thumbnail',
 				outputDirectory: dir,
+				outputThumbnailDirectory: thumbnailDir,
 				convertOptions: convertOptions,
 			});
 			let imagePaths = await pdfImage.convertFile();

@@ -14,12 +14,15 @@ function PDFImage(pdfFilePath, options) {
     this.pdfFilePath = pdfFilePath;
 
     this.setPdfFileBaseName(options.pdfFileBaseName);
+    this.setThumbnailFileBaseName(options.thumbnailFileBaseName);
     this.setConvertOptions(options.convertOptions);
     this.setConvertExtension(options.convertExtension);
     this.useGM = options.graphicsMagick || false;
     this.combinedImage = options.combinedImage || false;
 
     this.outputDirectory = options.outputDirectory || path.dirname(pdfFilePath);
+    this.outputThumbnailDirectory = 
+        options.outputThumbnailDirectory || path.join(path.dirname(pdfFilePath), 'thumbnails')
 }
 
 PDFImage.prototype = {
@@ -67,6 +70,12 @@ PDFImage.prototype = {
             this.pdfFileBaseName + "-" + pageNumber + "." + this.convertExtension
         );
     },
+    getOutputThumbnailPathForImage: function (pageNumber) {
+        return path.join(
+            this.outputThumbnailDirectory,
+            this.thumbnailFileBaseName + "-" + pageNumber + "." + this.convertExtension
+        );
+    },
     getOutputImagePathForFile: function () {
         return path.join(
             this.outputDirectory,
@@ -78,6 +87,9 @@ PDFImage.prototype = {
     },
     setPdfFileBaseName: function (pdfFileBaseName) {
         this.pdfFileBaseName = pdfFileBaseName || path.basename(this.pdfFilePath, ".pdf");
+    },
+    setThumbnailFileBaseName: function (thumbnailFileBaseName) {
+        this.thumbnailFileBaseName = thumbnailFileBaseName || path.basename(this.pdfFilePath, ".pdf");
     },
     setConvertExtension: function (convertExtension) {
         this.convertExtension = convertExtension || "png";
@@ -91,6 +103,15 @@ PDFImage.prototype = {
             this.useGM ? "gm convert" : "convert",
             convertOptionsString ? convertOptionsString + " " : "",
             pdfFilePath, pageNumber, outputImagePath
+        );
+    },
+    constructConvertImageToThumbnailCommand: function (pageNumber) {
+        var imagePath = this.getOutputImagePathForPage(pageNumber);
+        var outputThumbnailPath = this.getOutputThumbnailPathForImage(pageNumber);
+        return util.format(
+            "%s \"%s\" -thumbnail \"128x72>\" \"%s\"",
+            this.useGM ? "gm convert" : "convert",
+            imagePath, outputThumbnailPath
         );
     },
     constructCombineCommandForFile: function (imagePaths) {
@@ -172,9 +193,24 @@ PDFImage.prototype = {
         var pdfFilePath = this.pdfFilePath;
         var outputImagePath = this.getOutputImagePathForPage(pageNumber);
         var convertCommand = this.constructConvertCommandForPage(pageNumber);
+        var convertToThumbnailCommand = this.constructConvertImageToThumbnailCommand(pageNumber);
 
         var promise = new Promise(function (resolve, reject) {
-            function convertPageToImage() {
+            function convertImageToThumbnail() {
+                exec(convertToThumbnailCommand, function (err, stdout, stderr) {
+                    if (err) {
+                        return reject({
+                            message: "Failed to convert image to thumbnail",
+                            error: err,
+                            stdout: stdout,
+                            stderr: stderr
+                        });
+                    }
+                    return resolve(outputImagePath);
+                });
+            }
+
+            function convertPageToImageAndThumbnail() {
                 exec(convertCommand, function (err, stdout, stderr) {
                     if (err) {
                         return reject({
@@ -184,7 +220,7 @@ PDFImage.prototype = {
                             stderr: stderr
                         });
                     }
-                    return resolve(outputImagePath);
+                    return convertImageToThumbnail();
                 });
             }
 
@@ -202,7 +238,7 @@ PDFImage.prototype = {
 
                 if (imageNotExists) {
                     // (1)
-                    convertPageToImage();
+                    convertPageToImageAndThumbnail();
                     return;
                 }
 
@@ -217,7 +253,7 @@ PDFImage.prototype = {
 
                     if (imageFileStat.mtime < pdfFileStat.mtime) {
                         // (2)
-                        convertPageToImage();
+                        convertPageToImageAndThumbnail();
                         return;
                     }
 
