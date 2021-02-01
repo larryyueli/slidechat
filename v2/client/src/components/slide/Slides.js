@@ -5,7 +5,7 @@ import axios from 'axios';
 import SlideDrawingOverlay from './SlideDrawingOverlay';
 import SlideFlipOverlay from './SlideFlipOverlay';
 import { serverURL } from '../../config';
-import { randInt } from '../../util';
+import { randInt, range } from '../../util';
 
 const loadingImg = process.env.PUBLIC_URL + '/imgs/loading.png';
 const disconnectedImg = process.env.PUBLIC_URL + '/imgs/disconnected.png';
@@ -20,8 +20,7 @@ export default function Slides(props) {
 	const [uploading, setUploading] = useState(false);
 	const [img, setImg] = useState(loadingImg);
 	const fileUpload = useRef(null);
-	const [scrollPosition, setScrollPosition] = useState(0);
-	const [carousel, setCarousel] = useState(null);
+	const carousel = useRef(null);
 
 	useEffect(() => {
 		if (!props.pageTotal) return;
@@ -58,7 +57,6 @@ export default function Slides(props) {
 			.catch((err) => {
 				console.error(err);
 			});
-		setCarousel(document.getElementById('carousel'));
 		// eslint-disable-next-line
 	}, [props.pageTotal, props.pageNum]);
 
@@ -131,7 +129,8 @@ export default function Slides(props) {
 	 */
 	const nextPage = (e) => {
 		setNextDisable(true);
-		props.nextPage();
+		props.gotoPage(props.pageNum + 1);
+		centerCarousel(props.pageNum + 1);
 	};
 
 	/**
@@ -140,7 +139,34 @@ export default function Slides(props) {
 	 */
 	const prevPage = (e) => {
 		setPrevDisable(true);
-		props.prevPage();
+		props.gotoPage(props.pageNum - 1);
+		centerCarousel(props.pageNum - 1);
+	};
+
+	/**
+	 * go to prev page
+	 * @param {Event} onClick event
+	 */
+	const firstPage = (e) => {
+		props.gotoPage(1);
+		centerCarousel(1);
+	};
+	/**
+	 * go to prev page
+	 * @param {Event} onClick event
+	 */
+	const lastPage = (e) => {
+		props.gotoPage(props.pageTotal);
+		centerCarousel(props.pageNum);
+	};
+
+	const centerCarousel = (pageNum) => {
+		const thumbnail = carousel.current.querySelector(`#thumbnail-${pageNum}`);
+		carousel.current.scroll({
+			top: 0,
+			left: thumbnail.offsetLeft - carousel.current.clientWidth / 2 - 40,
+			behavior: 'smooth',
+		});
 	};
 
 	const startRecording = async () => {
@@ -185,21 +211,6 @@ export default function Slides(props) {
 		delete window.audioRecorder;
 	};
 
-	const scroll = (e) => {
-		if (carousel) {
-			if (e.deltaY > 0) {
-				const pos = scrollPosition - 40 < 0 ? 0 : scrollPosition - 40;
-				carousel.scrollLeft = pos;
-				setScrollPosition(pos);
-			} else {
-				const maxScroll = carousel.scrollWidth - carousel.clientWidth;
-				const pos = scrollPosition + 40 >= maxScroll ? maxScroll : scrollPosition + 40;
-				carousel.scrollLeft = pos;
-				setScrollPosition(pos);
-			}
-		}
-	};
-
 	return (
 		<div className='slide-container'>
 			<div className='title'>{props.title}</div>
@@ -237,9 +248,7 @@ export default function Slides(props) {
 				)}
 
 				<div className='page-panel'>
-					<span
-						className={`material-icons ${props.pageNum <= 1 ? 'disable' : ''}`}
-						onClick={() => props.gotoPage(1)}>
+					<span className={`material-icons ${props.pageNum <= 1 ? 'disable' : ''}`} onClick={firstPage}>
 						first_page
 					</span>
 					<span className={`material-icons ${props.pageNum <= 1 ? 'disable' : ''}`} onClick={prevPage}>
@@ -265,18 +274,23 @@ export default function Slides(props) {
 					</span>
 					<span
 						className={`material-icons ${props.pageNum >= props.pageTotal ? 'disable' : ''}`}
-						onClick={() => props.gotoPage(props.pageTotal)}>
+						onClick={lastPage}>
 						last_page
 					</span>
 				</div>
 
-				<div className='carousel'>
-					<div id='carousel' className='carousel-box' onWheel={scroll}>
-						<img
-							className='carousel-img'
-							src='https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/dog-puppy-on-garden-royalty-free-image-1586966191.jpg?crop=1.00xw:0.669xh;0,0.190xh&resize=1200:*'
-						/>
-					</div>
+				<div className='carousel' ref={carousel}>
+					{range(1, props.pageTotal + 1).map((i) => (
+						<div
+							className={`thumbnail-container ${props.pageNum === i ? 'current-slide' : ''}`}
+							id={`thumbnail-${i}`}
+							onClick={(e) => props.gotoPage(i)}>
+							<img
+								src={`${serverURL}/api/slideThumbnail?slideID=${props.sid}&pageNum=${i}`}
+								alt='thumbnail'
+							/>
+						</div>
+					))}
 				</div>
 
 				<audio className='slide-audio' controls={audioSrc ? true : false} src={audioSrc}>

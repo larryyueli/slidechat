@@ -88,20 +88,6 @@ function Main(props) {
 	};
 
 	/**
-	 * Go to the next page of slide, should fetch the url and the chat threads list of the new page
-	 */
-	const nextPage = () => {
-		gotoPage(page + 1);
-	};
-
-	/**
-	 * Go to the previous page of slide, should fetch the url and the chat threads list of the new page
-	 */
-	const prevPage = () => {
-		gotoPage(page - 1);
-	};
-
-	/**
 	 * Go to the page user entered in the input
 	 */
 	const gotoInputPage = () => {
@@ -213,8 +199,6 @@ function Main(props) {
 					sid={sid}
 					pageNum={page}
 					pageTotal={pageTotal}
-					nextPage={nextPage}
-					prevPage={prevPage}
 					gotoPage={gotoPage}
 					gotoInputPage={gotoInputPage}
 					drawingOverlay={drawingOverlay}
