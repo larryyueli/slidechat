@@ -157,7 +157,7 @@ export default function Slides(props) {
 	 */
 	const lastPage = (e) => {
 		props.gotoPage(props.pageTotal);
-		centerCarousel(props.pageNum);
+		centerCarousel(props.pageTotal);
 	};
 
 	const centerCarousel = (pageNum) => {
