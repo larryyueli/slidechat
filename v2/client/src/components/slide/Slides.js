@@ -162,9 +162,10 @@ export default function Slides(props) {
 
 	const centerCarousel = (pageNum) => {
 		const thumbnail = carousel.current.querySelector(`#thumbnail-${pageNum}`);
+		if (!thumbnail) return;
 		carousel.current.scroll({
 			top: 0,
-			left: thumbnail.offsetLeft - carousel.current.clientWidth / 2 - 40,
+			left: thumbnail.offsetLeft - carousel.current.clientWidth / 2 + 40,
 			behavior: 'smooth',
 		});
 	};
