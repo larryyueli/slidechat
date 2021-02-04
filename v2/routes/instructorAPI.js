@@ -8,7 +8,7 @@ const { fileStorage, convertOptions } = require('../config');
 const { isNotValidPage, notExistInList, errorHandler, questionCount, shortName } = require('./util');
 const validAnonymities = ['A', 'B', 'C', 'D'];
 
-function instructorAPI(db, instructorAuth, isInstructor) {
+function instructorAPI(db, io, instructorAuth, isInstructor) {
 	let router = express.Router();
 
 	const users = db.collection('users');

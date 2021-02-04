@@ -59,7 +59,7 @@ function isInstructor(uid) {
 	}
 }
 
-async function startSlideChat() {
+async function startSlideChat(io) {
 	const router = express.Router();
 
 	let dbClient;
@@ -113,9 +113,17 @@ async function startSlideChat() {
 		});
 	});
 
+	io.on('connection', async (socket) => {
+		console.log('connected');
+		socket.join('some channel');
+		socket.on('something', (data) => {
+			console.log(data);
+		});
+	});
+
 	// APIs
-	router.use(instructorAPI(db, instructorAuth, isInstructor));
-	router.use(commonAPI(db, isInstructor));
+	router.use(instructorAPI(db, io, instructorAuth, isInstructor));
+	router.use(commonAPI(db, io, isInstructor));
 
 	// Routes
 	router.get(instructorURL, instructorAuth, (req, res) => {

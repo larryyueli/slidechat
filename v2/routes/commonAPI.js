@@ -5,7 +5,7 @@ const { ObjectID } = require('mongodb');
 const { fileStorage } = require('../config');
 const { isNotValidPage, notExistInList, errorHandler, shortName } = require('./util');
 
-function commonAPI(db, isInstructor) {
+function commonAPI(db, io, isInstructor) {
 	let router = express.Router();
 
 	const users = db.collection('users');

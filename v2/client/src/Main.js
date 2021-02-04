@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import { io } from 'socket.io/client-dist/socket.io';
 
 import Slides from './components/slide/Slides';
 import AppBar from './components/AppBar';
@@ -34,6 +35,8 @@ function Main(props) {
 	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
 	const [isInstructorView, setIsInstructorView] = useState(true);
 	const [record, setRecord] = useState({ uploaded: false, recording: false, recordingFile: null, recordingSrc: '' });
+	const questionListRef = useRef(null);
+	const questionDetailsRef = useRef(null);
 
 	/**
 	 * fetch slide info from server and redirect to login if needed
@@ -77,6 +80,12 @@ function Main(props) {
 				console.error(err);
 			});
 	}, [sid, props.match.params]);
+
+	useEffect(() => {
+		const socket = io(serverURL);
+		console.log(socket);
+		// questionListRef.current.onNewQuestionEvent(123);  // this doesn't work yet
+	}, []);
 
 	/**
 	 * apply the new page number
@@ -225,6 +234,7 @@ function Main(props) {
 							askNewQuestion={gotoNewQuestion}
 							goToQuestion={gotoQuestion}
 							isInstructorView={isInstructorView}
+							ref={questionListRef}
 						/>
 					) : qid === NEW_QUESTION ? (
 						<NewQuestion
@@ -259,6 +269,7 @@ function Main(props) {
 							goToModify={goToModify}
 							back={back}
 							isInstructorView={isInstructorView}
+							ref={questionDetailsRef}
 						/>
 					)}
 				</div>

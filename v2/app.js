@@ -9,6 +9,8 @@ const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
 const session = require('express-session');
 const MongoSessStore = require('connect-mongodb-session')(session);
+const http = require('http');
+const io = require('socket.io')();
 
 const config = require('./config');
 const secrets = require('./secrets');
@@ -33,9 +35,9 @@ morgan.token('id', (req) => {
 });
 morgan.token('body', (req) => {
 	return JSON.stringify(req.body);
-})
+});
 
-let main = (async () => {
+(async () => {
 	const app = express();
 	app.disable('x-powered-by'); // remove the HTTP header "X-powered-by: express"
 
@@ -66,12 +68,18 @@ let main = (async () => {
 		})
 	);
 
-	const slidechat = await startSlideChat();
+	const server = http.createServer(app);
+	io.attach(server, {
+		serveClient: false,
+		cors: NODE_ENV !== 'production' ? { origin: '*' } : undefined,
+	});
+
+	const slidechat = await startSlideChat(io);
 	app.use('/', slidechat);
 
 	app.use((req, res) => res.status(404).send());
 
-	app.listen(PORT, function () {
+	server.listen(PORT, function () {
 		console.log(`App listening on port ${PORT} in ${NODE_ENV} mode`);
 	});
 })();

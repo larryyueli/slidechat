@@ -122,6 +122,12 @@ export default function QuestionList(props) {
 		setManaging(!managing);
 	};
 
+	const onNewQuestionEvent = (data) => {
+		console.log(data);
+		// questions.push(data);
+		// setQuestions(questions);
+	};
+
 	return (
 		<>
 			<ChatAreaTitle
