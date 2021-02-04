@@ -51,7 +51,7 @@ function AppBar(props) {
 
 	const toggleLargerSlide = (e) => {
 		props.setLargerSlide(e.target.checked);
-		localStorage.setItem('slidechat_larger_slide', e.target.checked ? '1' : '0');
+		localStorage.setItem('SlideChat_LargerSlide', e.target.checked ? '1' : '0');
 	};
 
 	return (

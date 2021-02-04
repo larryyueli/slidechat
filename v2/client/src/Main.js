@@ -34,7 +34,7 @@ function Main(props) {
 	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
 	const [isInstructorView, setIsInstructorView] = useState(true);
 	const [record, setRecord] = useState({ uploaded: false, recording: false, recordingFile: null, recordingSrc: '' });
-	const [largerSlide, setLargerSlide] = useState(localStorage.getItem('slidechat_larger_slide') === '1');
+	const [largerSlide, setLargerSlide] = useState(localStorage.getItem('SlideChat_LargerSlide') === '1');
 
 	/**
 	 * fetch slide info from server and redirect to login if needed
