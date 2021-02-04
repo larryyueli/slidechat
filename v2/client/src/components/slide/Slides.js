@@ -227,10 +227,10 @@ export default function Slides(props) {
 								close
 							</span>
 						) : (
-							<span className={`material-icons icon`} onClick={props.startDrawing}>
-								brush
-							</span>
-						)}
+								<span className={`material-icons icon`} onClick={props.startDrawing}>
+									brush
+								</span>
+							)}
 					</div>
 				) : null}
 			</div>
@@ -240,13 +240,13 @@ export default function Slides(props) {
 				{props.drawingOverlay ? (
 					<SlideDrawingOverlay ref={props.canvasComponentRef} drawing={props.drawing} />
 				) : (
-					<SlideFlipOverlay
-						prevBtnDisable={prevDisable}
-						nextBtnDisable={nextDisable}
-						prevPage={prevPage}
-						nextPage={nextPage}
-					/>
-				)}
+						<SlideFlipOverlay
+							prevBtnDisable={prevDisable}
+							nextBtnDisable={nextDisable}
+							prevPage={prevPage}
+							nextPage={nextPage}
+						/>
+					)}
 
 				<div className='page-panel'>
 					<span className={`material-icons ${props.pageNum <= 1 ? 'disable' : ''}`} onClick={firstPage}>
@@ -280,19 +280,21 @@ export default function Slides(props) {
 					</span>
 				</div>
 
-				<div className='carousel' ref={carousel}>
-					{range(1, props.pageTotal + 1).map((i) => (
-						<div
-							className={`thumbnail-container ${props.pageNum === i ? 'current-slide' : ''}`}
-							id={`thumbnail-${i}`}
-							onClick={(e) => props.gotoPage(i)}>
-							<img
-								src={`${serverURL}/api/slideThumbnail?slideID=${props.sid}&pageNum=${i}`}
-								alt='thumbnail'
-							/>
-						</div>
-					))}
-				</div>
+				{props.showCarouselPanel ? (
+					<div className='carousel' ref={carousel}>
+						{range(1, props.pageTotal + 1).map((i) => (
+							<div
+								className={`thumbnail-container ${props.pageNum === i ? 'current-slide' : ''}`}
+								id={`thumbnail-${i}`}
+								onClick={(e) => props.gotoPage(i)}>
+								<img
+									src={`${serverURL}/api/slideThumbnail?slideID=${props.sid}&pageNum=${i}`}
+									alt='thumbnail'
+								/>
+							</div>
+						))}
+					</div>
+				) : null}
 
 				<audio className='slide-audio' controls={audioSrc ? true : false} src={audioSrc}>
 					Your browser does not support the audio element.

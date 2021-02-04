@@ -58,6 +58,13 @@
 				text-decoration: none;
 				display: block;
 				text-align: left;
+	
+				.MuiSwitch-colorSecondary.Mui-checked {
+					color: #6ca17c;
+				}
+				.MuiSwitch-colorSecondary.Mui-checked + .MuiSwitch-track {
+					background-color: #1ca17c;
+				}
 			}
 
 			.clickable {

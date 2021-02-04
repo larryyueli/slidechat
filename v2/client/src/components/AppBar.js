@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ClickAwayListener, Button } from '@material-ui/core';
+import { ClickAwayListener, Button, Switch } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 
 import { baseURL } from '../config';
@@ -39,6 +39,14 @@ function AppBar(props) {
 		} else {
 			setDisplayName(newName);
 		}
+	};
+
+	/**
+	 * update showCarouselPanel
+	 * @param {Event} e input onChange event
+	 */
+	const setShowCarouselPanel = (e) => {
+		props.setShowCarouselPanel(e.target.checked)
 	};
 
 	return (
@@ -85,6 +93,10 @@ function AppBar(props) {
 									</div>
 								</>
 							) : null}
+							<div className='dropdown-item'>
+								Display thumbnails
+								<Switch checked={props.showCarouselPanel} onChange={setShowCarouselPanel}></Switch>
+							</div>
 							{props.uid ? (
 								<>
 									<div className='dropdown-item'>
@@ -104,10 +116,10 @@ function AppBar(props) {
 									</Link>
 								</>
 							) : (
-								<a href={props.loginURL} className='dropdown-item'>
-									Sign In
-								</a>
-							)}
+									<a href={props.loginURL} className='dropdown-item'>
+										Sign In
+									</a>
+								)}
 						</div>
 					</span>
 				</ClickAwayListener>
