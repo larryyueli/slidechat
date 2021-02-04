@@ -46,7 +46,7 @@ function AppBar(props) {
 	 * @param {Event} e input onChange event
 	 */
 	const setShowCarouselPanel = (e) => {
-		props.setShowCarouselPanel(e.target.checked)
+		props.setShowCarouselPanel(e.target.checked);
 	};
 
 	return (
@@ -116,10 +116,10 @@ function AppBar(props) {
 									</Link>
 								</>
 							) : (
-									<a href={props.loginURL} className='dropdown-item'>
-										Sign In
-									</a>
-								)}
+								<a href={props.loginURL} className='dropdown-item'>
+									Sign In
+								</a>
+							)}
 						</div>
 					</span>
 				</ClickAwayListener>

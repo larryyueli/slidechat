@@ -161,6 +161,7 @@ export default function Slides(props) {
 	};
 
 	const centerCarousel = (pageNum) => {
+		if (!props.showCarouselPanel) return;
 		const thumbnail = carousel.current.querySelector(`#thumbnail-${pageNum}`);
 		if (!thumbnail) return;
 		carousel.current.scroll({
@@ -227,10 +228,10 @@ export default function Slides(props) {
 								close
 							</span>
 						) : (
-								<span className={`material-icons icon`} onClick={props.startDrawing}>
-									brush
-								</span>
-							)}
+							<span className={`material-icons icon`} onClick={props.startDrawing}>
+								brush
+							</span>
+						)}
 					</div>
 				) : null}
 			</div>
@@ -240,13 +241,13 @@ export default function Slides(props) {
 				{props.drawingOverlay ? (
 					<SlideDrawingOverlay ref={props.canvasComponentRef} drawing={props.drawing} />
 				) : (
-						<SlideFlipOverlay
-							prevBtnDisable={prevDisable}
-							nextBtnDisable={nextDisable}
-							prevPage={prevPage}
-							nextPage={nextPage}
-						/>
-					)}
+					<SlideFlipOverlay
+						prevBtnDisable={prevDisable}
+						nextBtnDisable={nextDisable}
+						prevPage={prevPage}
+						nextPage={nextPage}
+					/>
+				)}
 
 				<div className='page-panel'>
 					<span className={`material-icons ${props.pageNum <= 1 ? 'disable' : ''}`} onClick={firstPage}>
