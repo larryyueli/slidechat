@@ -58,6 +58,18 @@
 				text-decoration: none;
 				display: block;
 				text-align: left;
+
+				.MuiSwitch-root {
+					.Mui-checked {
+						color: $primary;
+					}
+					.Mui-checked + .MuiSwitch-track {
+						background-color: $primaryLight;
+					}
+					.Mui-checked:hover {
+						background-color: $primaryShadow;
+					}
+				}
 			}
 
 			.clickable {

@@ -107,6 +107,29 @@ function commonAPI(db, isInstructor) {
 	});
 
 	/**
+	 * get slide thumbnail
+	 * req query:
+	 *   slideID: object ID of the slide
+	 *   pageNum: integer range from from 1 to pageTotal (inclusive)
+	 */
+	router.get('/api/slideThumbnail', async (req, res) => {
+		try {
+			let slide = await slides.findOne(
+				{ _id: ObjectID.createFromHexString(req.query.slideID) },
+				{ projection: { _id: true, anonymity: true, pageTotal: true } }
+			);
+			if (!slide) throw { status: 404, error: 'slide not found' };
+			if (slide.anonymity !== 'A' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
+			if (isNotValidPage(req.query.pageNum, slide.pageTotal)) {
+				throw { status: 400, error: 'bad request' };
+			}
+			res.sendFile(path.join(fileStorage, req.query.slideID, 'thumbnails', `thumbnail-${+req.query.pageNum - 1}.png`));
+		} catch (err) {
+			errorHandler(res, err);
+		}
+	});
+
+	/**
 	 * get slide audio
 	 * req query:
 	 *   slideID: object ID of the slide

@@ -1,6 +1,7 @@
 .slide-container {
 	margin: 1rem 0;
 	text-align: center;
+	min-width: 0;
 
 	.title {
 		font-size: 1.6rem;
@@ -160,6 +161,43 @@
 		.disable {
 			color: $gray;
 			cursor: default;
+		}
+	}
+
+	.carousel {
+		display: flex;
+		align-items: center;
+		@media (min-width: 768px) {
+			width: 80%;
+		}
+		margin: 1rem auto;
+		white-space: nowrap;
+		overflow-x: auto;
+		padding: 0.5rem;
+		box-sizing: border-box;
+		border: 1px solid #d4d4d4;
+		position: relative;
+
+		.thumbnail-container {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			cursor: pointer;
+			min-width: 80px;
+			height: 45px;
+			margin: 0 5px;
+			transition: margin 0.5s ease-out, transform 0.5s ease-out;
+			img {
+				max-width: 100%;
+				max-height: 100%;
+			}
+			&.current-slide {
+				outline: 2px solid $likeColour;
+			}
+			&:hover {
+				transform: scale(1.1);
+				margin: 0 1.5rem;
+			}
 		}
 	}
 

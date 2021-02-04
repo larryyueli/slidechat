@@ -29,6 +29,7 @@ function Main(props) {
 	const [qid, setQid] = useState(QUESTION_LIST);
 	const [drawing, setDrawing] = useState(false);
 	const [showTempDrawingBtn, setShowTempDrawingBtn] = useState(true);
+	const [showCarouselPanel, setShowCarouselPanel] = useState(true);
 	const [chatToModify, setChatToModify] = useState({});
 	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
 	const [isInstructorView, setIsInstructorView] = useState(true);
@@ -85,20 +86,6 @@ function Main(props) {
 		document.getElementById('pageNum').value = newPageNum;
 		window.history.replaceState(null, null, `${baseURL}/${sid}/${newPageNum}`);
 		setPage(newPageNum);
-	};
-
-	/**
-	 * Go to the next page of slide, should fetch the url and the chat threads list of the new page
-	 */
-	const nextPage = () => {
-		gotoPage(page + 1);
-	};
-
-	/**
-	 * Go to the previous page of slide, should fetch the url and the chat threads list of the new page
-	 */
-	const prevPage = () => {
-		gotoPage(page - 1);
 	};
 
 	/**
@@ -205,6 +192,8 @@ function Main(props) {
 				isInstructor={isInstructor}
 				isInstructorView={isInstructorView}
 				setIsInstructorView={setIsInstructorView}
+				showCarouselPanel={showCarouselPanel}
+				setShowCarouselPanel={setShowCarouselPanel}
 			/>
 			<div className='main'>
 				<Slides
@@ -213,8 +202,6 @@ function Main(props) {
 					sid={sid}
 					pageNum={page}
 					pageTotal={pageTotal}
-					nextPage={nextPage}
-					prevPage={prevPage}
 					gotoPage={gotoPage}
 					gotoInputPage={gotoInputPage}
 					drawingOverlay={drawingOverlay}
@@ -225,6 +212,7 @@ function Main(props) {
 					canvasComponentRef={canvasComponentRef}
 					isInstructor={isInstructor}
 					isInstructorView={isInstructorView}
+					showCarouselPanel={showCarouselPanel}
 					record={record}
 					setRecord={setRecord}
 				/>
