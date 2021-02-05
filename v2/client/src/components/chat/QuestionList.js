@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import axios from 'axios';
 import { Button } from '@material-ui/core';
 
@@ -55,149 +55,169 @@ function rememberPageAndQid(pages) {
 	return questions.filter((a) => a != null);
 }
 
-export default function QuestionList(props) {
-	const [managing, setManaging] = useState(false);
-	const [questions, setQuestions] = useState([]);
-	const [showAll, setShowAll] = useState(false);
-	const [sorting, setSorting] = useState('update');
+export default class QuestionList extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			managing: false,
+			questions: [],
+			showAll: false,
+			sorting: 'update'
+		};
+	}
+
+	componentDidMount() {
+		this.fetchQuestionList();
+	}
 
 	// fetch questions when page is changed
-	useEffect(() => {
-		setShowAll(false);
-		fetchQuestionList();
-		// eslint-disable-next-line
-	}, [props.sid, props.pageNum]);
+	componentDidUpdate(prevProps) {
+		if (this.props.sid !== prevProps.sid || this.props.pageNum !== prevProps.pageNum) {
+			this.setState({ showAll: false });
+			this.fetchQuestionList();
+		}
+	}
 
-	const fetchQuestionList = async () => {
+	async fetchQuestionList() {
 		try {
-			const res = await axios.get(`${serverURL}/api/questions?slideID=${props.sid}&pageNum=${props.pageNum}`);
-			setQuestions(sortQuestions(rememberQid(res.data, props.pageNum), sorting));
+			const res = await axios.get(`${serverURL}/api/questions?slideID=${this.props.sid}&pageNum=${this.props.pageNum}`);
+			this.setState((prevState, props) => ({
+				questions: sortQuestions(rememberQid(res.data, this.props.pageNum), prevState.sorting)
+			}));
 		} catch (err) {
 			console.error(err);
 		}
-	};
+	}
 
 	/**
 	 * apply new sorting method
 	 * @param {String} newSort new sorting method (update/create)
 	 */
-	const applySort = (newSort) => {
-		if (newSort !== sorting) {
-			setQuestions(sortQuestions(questions, newSort));
-			setSorting(newSort);
+	applySort(newSort) {
+		if (newSort !== this.state.sorting) {
+			this.setState((prevState, props) => ({
+				questions: sortQuestions(prevState.questions, newSort),
+				sorting: newSort
+			}));
 		}
-	};
+	}
 
 	/**
 	 * apply new sorting method
 	 * @param {String} newSort new sorting method (update/create)
 	 */
-	const toggleShowAll = (newValue) => {
-		if (newValue !== showAll) {
-			setShowAll(newValue);
+	toggleShowAll(newValue) {
+		if (newValue !== this.state.showAll) {
+			this.setState({ showAll: newValue });
 			if (newValue) {
-				axios.get(`${serverURL}/api/questionsAll?slideID=${props.sid}`).then((res) => {
-					setQuestions(sortQuestions(rememberPageAndQid(res.data, props.pageNum), sorting));
+				axios.get(`${serverURL}/api/questionsAll?slideID=${this.props.sid}`).then((res) => {
+					this.setState((prevState, props) => ({
+						questions: sortQuestions(rememberPageAndQid(res.data, this.props.pageNum), prevState.sorting)
+					}));
 				});
 			} else {
-				fetchQuestionList();
+				this.fetchQuestionList();
 			}
 		}
-	};
+	}
 
-	const deleteQuestion = (e, question) => {
+	deleteQuestion(e, question) {
 		e.stopPropagation();
 		if (!window.confirm(`Are you sure to delete "${question.title}"?`)) return;
 
 		axios
-			.delete(`${serverURL}/api/question?sid=${props.sid}&qid=${question.id}&pageNum=${question.pageNum}`)
-			.then((res) => setShowAll(false))
-			.then(fetchQuestionList)
+			.delete(`${serverURL}/api/question?sid=${this.props.sid}&qid=${question.id}&pageNum=${question.pageNum}`)
+			.then((res) => this.setState({ showAll: false }))
+			.then(this.fetchQuestionList())
 			.catch((err) => {
 				console.error(err);
 			});
-	};
+	}
 
-	const toggleManaging = () => {
-		setManaging(!managing);
-	};
+	toggleManaging() {
+		this.setState((prevState, props) => ({
+			managing: !prevState.managing
+		}));
+	}
 
-	const onNewQuestionEvent = (data) => {
+	onNewQuestionEvent(data) {
 		console.log(data);
 		// questions.push(data);
 		// setQuestions(questions);
-	};
+	}
 
-	return (
-		<>
-			<ChatAreaTitle
-				title='Discussion'
-				showManage={props.isInstructor && props.isInstructorView}
-				managing={managing}
-				toggleManaging={toggleManaging}
-				showBackBtn={false}
-			/>
-			<div className='chat-list'>
-				<div className='new-chat-btn-row' key={-1}>
-					<Button variant='contained' onClick={props.askNewQuestion}>
-						Ask a new question
-					</Button>
-				</div>
-				<div className='align-right'>
-					<div className='list-options' key={-3}>
-						<div className='option-label'>questions from:</div>
-						<div className={'option ' + (showAll ? '' : 'selected')} onClick={(e) => toggleShowAll(false)}>
-							This page
-						</div>
-						<div className={'option ' + (showAll ? 'selected' : '')} onClick={(e) => toggleShowAll(true)}>
-							All pages
-						</div>
-						<div className='option-label'>sort by:</div>
-						<div
-							className={'option ' + (sorting === 'update' ? 'selected' : '')}
-							onClick={(e) => applySort('update')}>
-							Last update
-						</div>
-						<div
-							className={'option ' + (sorting === 'create' ? 'selected' : '')}
-							onClick={(e) => applySort('create')}>
-							Creation
+	render() {
+		const { managing, questions, showAll, sorting } = this.state;
+		return (
+			<>
+				<ChatAreaTitle
+					title='Discussion'
+					showManage={this.props.isInstructor && this.props.isInstructorView}
+					managing={managing}
+					toggleManaging={this.toggleManaging}
+					showBackBtn={false}
+				/>
+				<div className='chat-list'>
+					<div className='new-chat-btn-row' key={-1}>
+						<Button variant='contained' onClick={this.props.askNewQuestion}>
+							Ask a new question
+						</Button>
+					</div>
+					<div className='align-right'>
+						<div className='list-options' key={-3}>
+							<div className='option-label'>questions from:</div>
+							<div className={'option ' + (showAll ? '' : 'selected')} onClick={(e) => this.toggleShowAll(false)}>
+								This page
+							</div>
+							<div className={'option ' + (showAll ? 'selected' : '')} onClick={(e) => this.toggleShowAll(true)}>
+								All pages
+							</div>
+							<div className='option-label'>sort by:</div>
+							<div
+								className={'option ' + (sorting === 'update' ? 'selected' : '')}
+								onClick={(e) => this.applySort('update')}>
+								Last update
+							</div>
+							<div
+								className={'option ' + (sorting === 'create' ? 'selected' : '')}
+								onClick={(e) => this.applySort('create')}>
+								Creation
+							</div>
 						</div>
 					</div>
-				</div>
-				{questions.map((question, i) => {
-					if (!question) return null;
-					return (
-						<div
-							className='chat'
-							key={i}
-							onClick={(e) => props.goToQuestion(question.pageNum, question.id)}>
-							<div className='title-row'>
-								<div className='title'>{question.title}</div>
-								<div className='icons'>
-									{question.status === 'solved' ? (
-										<span className='material-icons endorsed icon'>verified</span>
-									) : null}
-									{managing ? (
-										<span
-											className='material-icons delete icon'
-											onClick={(e) => deleteQuestion(e, question)}>
-											delete_forever
-										</span>
-									) : null}
+					{questions.map((question, i) => {
+						if (!question) return null;
+						return (
+							<div
+								className='chat'
+								key={i}
+								onClick={(e) => this.props.goToQuestion(question.pageNum, question.id)}>
+								<div className='title-row'>
+									<div className='title'>{question.title}</div>
+									<div className='icons'>
+										{question.status === 'solved' ? (
+											<span className='material-icons endorsed icon'>verified</span>
+										) : null}
+										{managing ? (
+											<span
+												className='material-icons delete icon'
+												onClick={(e) => this.deleteQuestion(e, question)}>
+												delete_forever
+											</span>
+										) : null}
+									</div>
 								</div>
+								<div className='info'>
+									<div className='author'>{`${question.user} ${question.uid && this.props.isInstructorView ? `(${question.uid})` : ''
+										}`}</div>
+									<div className='time'>{formatTime(question.time)}</div>
+								</div>
+								{showAll ? <div className='extra-info'>From page {question.pageNum}</div> : null}
 							</div>
-							<div className='info'>
-								<div className='author'>{`${question.user} ${
-									question.uid && props.isInstructorView ? `(${question.uid})` : ''
-								}`}</div>
-								<div className='time'>{formatTime(question.time)}</div>
-							</div>
-							{showAll ? <div className='extra-info'>From page {question.pageNum}</div> : null}
-						</div>
-					);
-				})}
-			</div>
-		</>
-	);
+						);
+					})}
+				</div>
+			</>
+		);
+	}
 }
