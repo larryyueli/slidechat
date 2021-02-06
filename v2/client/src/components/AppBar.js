@@ -42,16 +42,22 @@ function AppBar(props) {
 	};
 
 	/**
-	 * update showCarouselPanel
+	 * update showCarouselPanel, store setting in localStorage
 	 * @param {Event} e input onChange event
 	 */
 	const setShowCarouselPanel = (e) => {
 		props.setShowCarouselPanel(e.target.checked);
+		localStorage.setItem('SlideChat_HideCarousel', e.target.checked ? '0' : '1');
 	};
 
 	const toggleLargerSlide = (e) => {
 		props.setLargerSlide(e.target.checked);
 		localStorage.setItem('SlideChat_LargerSlide', e.target.checked ? '1' : '0');
+	};
+
+	const toggleStudentView = (e) => {
+		props.setIsInstructorView(!e.target.checked);
+		localStorage.setItem('SlideChat_StudentView', e.target.checked ? '1' : '0');
 	};
 
 	return (
@@ -119,7 +125,7 @@ function AppBar(props) {
 											Student View (for instructors)
 											<Switch
 												checked={!props.isInstructorView}
-												onChange={(e) => props.setIsInstructorView(!e.target.checked)}></Switch>
+												onChange={toggleStudentView}></Switch>
 										</div>
 									) : null}
 									<Link className='dropdown-item clickable' to={`${baseURL}/logout`}>

@@ -30,12 +30,12 @@ function Main(props) {
 	const [qid, setQid] = useState(QUESTION_LIST);
 	const [drawing, setDrawing] = useState(false);
 	const [showTempDrawingBtn, setShowTempDrawingBtn] = useState(true);
-	const [showCarouselPanel, setShowCarouselPanel] = useState(true);
 	const [chatToModify, setChatToModify] = useState({});
 	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
-	const [isInstructorView, setIsInstructorView] = useState(true);
 	const [record, setRecord] = useState({ uploaded: false, recording: false, recordingFile: null, recordingSrc: '' });
 	const [largerSlide, setLargerSlide] = useState(localStorage.getItem('SlideChat_LargerSlide') === '1');
+	const [showCarouselPanel, setShowCarouselPanel] = useState(localStorage.getItem('SlideChat_HideCarousel') !== '1'); // default true for null
+	const [isInstructorView, setIsInstructorView] = useState(localStorage.getItem('SlideChat_StudentView') !== '1'); // default true for null
 	const questionListRef = useRef(null);
 	const questionDetailsRef = useRef(null);
 
