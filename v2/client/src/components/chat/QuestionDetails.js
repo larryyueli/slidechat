@@ -230,7 +230,7 @@ export default class QuestionDetails extends React.Component {
 									dangerouslySetInnerHTML={{ __html: md.render(message.body) }}></div>
 								<div className='info-bottom'>
 									{message.uid === this.props.uid ? (
-										<div className='modify-btn' onClick={(e) => this.props.gotoModify(message, i)}>
+										<div className='modify-btn' onClick={() => this.props.gotoModify(message, i)}>
 											Modify
 										</div>
 									) : null}

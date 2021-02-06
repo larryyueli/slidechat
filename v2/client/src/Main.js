@@ -196,7 +196,7 @@ function Main(props) {
 		setShowTempDrawingBtn(false);
 	};
 
-	const goToModify = (chat, cid) => {
+	const gotoModify = (chat, cid) => {
 		setChatToModify({ ...chat, cid, qid });
 		setQid(MODIFY_CHAT);
 	};
@@ -304,7 +304,7 @@ function Main(props) {
 							setDrawingOverlay={setDrawingOverlay}
 							setShowTempDrawingBtn={setShowTempDrawingBtn}
 							canvasComponentRef={canvasComponentRef}
-							goToModify={goToModify}
+							gotoModify={gotoModify}
 							back={back}
 							isInstructorView={isInstructorView}
 							ref={questionDetailsRef}
