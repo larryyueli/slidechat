@@ -89,8 +89,8 @@ export default class QuestionDetails extends React.Component {
 			})
 			.then((res) => {
 				this.chatRef.current.value = '';
+				this.fetchQuestionDetails();
 			})
-			.then(this.fetchQuestionDetails())
 			.catch((err) => {
 				console.error(err);
 			});
@@ -104,7 +104,7 @@ export default class QuestionDetails extends React.Component {
 				qid: this.props.qid,
 				cid: cid,
 			})
-			.then(this.fetchQuestionDetails())
+			.then(() => this.fetchQuestionDetails())
 			.catch((err) => {
 				console.error(err);
 			});
@@ -119,7 +119,7 @@ export default class QuestionDetails extends React.Component {
 				cid: cid,
 				user: getDisplayName(),
 			})
-			.then(this.fetchQuestionDetails())
+			.then(() => this.fetchQuestionDetails())
 			.catch((err) => {
 				console.error(err);
 			});
@@ -131,7 +131,7 @@ export default class QuestionDetails extends React.Component {
 
 		axios
 			.delete(`${serverURL}/api/chat?sid=${this.props.sid}&qid=${this.props.qid}&pageNum=${this.props.pageNum}&cid=${cid}`)
-			.then(this.fetchQuestionDetails())
+			.then(() => this.fetchQuestionDetails())
 			.catch((err) => {
 				console.error(err);
 			});
