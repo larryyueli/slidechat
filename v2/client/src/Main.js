@@ -35,6 +35,7 @@ function Main(props) {
 	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
 	const [isInstructorView, setIsInstructorView] = useState(true);
 	const [record, setRecord] = useState({ uploaded: false, recording: false, recordingFile: null, recordingSrc: '' });
+	const [largerSlide, setLargerSlide] = useState(localStorage.getItem('SlideChat_LargerSlide') === '1');
 	const questionListRef = useRef(null);
 	const questionDetailsRef = useRef(null);
 
@@ -239,8 +240,10 @@ function Main(props) {
 				setIsInstructorView={setIsInstructorView}
 				showCarouselPanel={showCarouselPanel}
 				setShowCarouselPanel={setShowCarouselPanel}
+				largerSlide={largerSlide}
+				setLargerSlide={setLargerSlide}
 			/>
-			<div className='main'>
+			<div className={`main ${largerSlide ? 'larger-slide' : ''}`}>
 				<Slides
 					filename={filename}
 					sid={sid}

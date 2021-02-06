@@ -49,6 +49,11 @@ function AppBar(props) {
 		props.setShowCarouselPanel(e.target.checked);
 	};
 
+	const toggleLargerSlide = (e) => {
+		props.setLargerSlide(e.target.checked);
+		localStorage.setItem('SlideChat_LargerSlide', e.target.checked ? '1' : '0');
+	};
+
 	return (
 		<div className='appbar'>
 			<div className='appbar-left'>
@@ -99,6 +104,10 @@ function AppBar(props) {
 							<div className='dropdown-item'>
 								Display thumbnails
 								<Switch checked={props.showCarouselPanel} onChange={setShowCarouselPanel}></Switch>
+							</div>
+							<div className='dropdown-item'>
+								Larger slide
+								<Switch checked={props.largerSlide} onChange={toggleLargerSlide}></Switch>
 							</div>
 							{props.uid ? (
 								<>

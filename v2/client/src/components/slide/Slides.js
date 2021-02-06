@@ -312,7 +312,8 @@ export default function Slides(props) {
 							<div
 								className={`thumbnail-container ${props.pageNum === i ? 'current-slide' : ''}`}
 								id={`thumbnail-${i}`}
-								onClick={(e) => props.gotoPage(i)}>
+								onClick={(e) => props.gotoPage(i)}
+								key={i}>
 								<img
 									src={`${serverURL}/api/slideThumbnail?slideID=${props.sid}&pageNum=${i}`}
 									alt='thumbnail'

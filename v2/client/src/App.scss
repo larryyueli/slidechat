@@ -31,8 +31,15 @@ code {
 			width: 90%;
 		}
 	}
+	.main.larger-slide {
+		grid-template-columns: 3fr 1fr;
+		.slide-wrapper {
+			width: 95%;
+		}
+	}
 
 	.chat-area {
+		min-width: 300px;
 		overflow-y: auto;
 		border-left: 1px solid $dividerColour;
 	}
