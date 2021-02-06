@@ -42,7 +42,6 @@ function Main(props) {
 	 * fetch slide info from server and redirect to login if needed
 	 */
 	useEffect(() => {
-		const socket = io(serverURL);
 		axios
 			.get(`${serverURL}/api/slideInfo?slideID=${sid}`)
 			.then((res) => {
@@ -67,20 +66,60 @@ function Main(props) {
 				if (res.data.loginUser) {
 					setUid(res.data.loginUser);
 					setUsername(res.data.username);
-					socket.emit("join room", sid);
 				}
 				if (res.data.isInstructor) setIsInstructor(true);
-				setPageTotal(res.data.pageTotal);
 				setTitle(res.data.title);
 				setFilename(res.data.filename);
 				setDrawable(Boolean(res.data.drawable));
 				document.getElementById('pageNum').value = currentPage;
 				setPage(currentPage);
 				if (questionId || questionId === 0) setQid(questionId);
+				setPageTotal(res.data.pageTotal);
 			})
 			.catch((err) => {
 				console.error(err);
 			});
+
+		const socket = io(serverURL);
+		socket.emit('join slide room', sid);
+		socket.on('connect', () => {
+			console.log('socket connected');
+		});
+		socket.on('disconnect', (reason) => {
+			console.log('socket disconnected, reason: ', reason);
+		});
+		socket.on('reconnect', (attemptNumber) => {
+			console.log('socket reconnected: ', attemptNumber);
+		});
+		socket.on('new question', (data) => {
+			console.log(data);
+			if (questionListRef.current) questionListRef.current.onNewQuestionEvent(data);
+		});
+		socket.on('new reply', (data) => {
+			console.log(data);
+			// TODO
+		});
+		socket.on('new reply', (data) => {
+			console.log(data);
+			// TODO
+		});
+		socket.on('like', (data) => {
+			console.log(data);
+			// TODO
+		});
+		socket.on('modify', (data) => {
+			console.log(data);
+			// TODO
+		});
+		socket.on('delete chat', (data) => {
+			console.log(data);
+			// TODO
+		});
+		socket.on('endorse', (data) => {
+			console.log(data);
+			// TODO
+		});
+		socket.on('error', (msg) => alert(msg));
 	}, [sid, props.match.params]);
 
 	/**
@@ -190,6 +229,7 @@ function Main(props) {
 	return (
 		<>
 			<AppBar
+				title={title}
 				anonymity={anonymity}
 				uid={uid}
 				username={username}
@@ -202,7 +242,6 @@ function Main(props) {
 			/>
 			<div className='main'>
 				<Slides
-					title={title}
 					filename={filename}
 					sid={sid}
 					pageNum={page}

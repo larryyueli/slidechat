@@ -1,7 +1,7 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectID } = require('mongodb');
 const dbConfig = {
 	useUnifiedTopology: true,
 	useNewUrlParser: true,
@@ -72,6 +72,7 @@ async function startSlideChat(io) {
 
 	console.log('connected to database');
 	const db = dbClient.db('slidechat');
+	const slides = db.collection('slides');
 
 	if (process.env.NODE_ENV !== 'production') {
 		router.use('/', (req, res, next) => {
@@ -115,11 +116,21 @@ async function startSlideChat(io) {
 
 	io.on('connection', async (socket) => {
 		console.log('connected');
-		socket.on('join room', (room) => {
-			socket.join(room);
-		});
-		socket.on('something', (data) => {
-			console.log(data);
+		socket.on('join slide room', async (slideID) => {
+			let slide;
+			try {
+				slide = await slides.findOne(
+					{ _id: ObjectID.createFromHexString(slideID) },
+					{ projection: { _id: true } }
+				);
+			} catch (err) {
+				return;
+			}
+			if (slide) {
+				socket.join(slideID);
+			} else {
+				socket.emit('error', 'Join slide room: invalid slide ID!');
+			}
 		});
 	});
 

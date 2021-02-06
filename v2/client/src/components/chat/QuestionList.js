@@ -5,56 +5,6 @@ import { Button } from '@material-ui/core';
 import ChatAreaTitle from './ChatAreaTitle';
 import { serverURL } from '../../config';
 import { formatTime } from '../../util';
-import { io } from 'socket.io/client-dist/socket.io';
-
-/**
- * Sort the given question list.
- * The array should already have qid remembered and null elements removed.
- * @param {*} unsorted question list
- * @param {String} sorting sorting method (update/create)
- * @returns the sorted question list
- */
-function sortQuestions(questions, sorting) {
-	if (sorting === 'update') {
-		return questions.sort((a, b) => b.time - a.time);
-	} else if (sorting === 'create') {
-		return questions.sort((a, b) => b.create - a.create);
-	}
-}
-
-/**
- * Questions don't store a unique id in the database, instead, they are stored in an array,
- * and the array index is the unique id. However, when we sort the array, the index
- * information is lost. We need to store it when API response arrives.
- * Null elements are deleted questions, they should be removed once the index is remembered.
- * @param {Array} questions
- */
-function rememberQid(questions, pageNum) {
-	questions.forEach((question, i) => {
-		if (!question) return;
-		question.id = i;
-		question.pageNum = pageNum;
-	});
-	return questions.filter((a) => a != null);
-}
-/**
- * Similar to rememberQid, but also remember page number, and return a flattened array with all
- * questions of all pages in the same level
- * @param {Array} pages
- */
-function rememberPageAndQid(pages) {
-	let questions = [];
-	pages.forEach((page, i) => {
-		const pageNum = i + 1;
-		page.questions.forEach((question, qid) => {
-			if (!question) return;
-			question.id = qid;
-			question.pageNum = pageNum;
-		});
-		questions.push(...page.questions);
-	});
-	return questions.filter((a) => a != null);
-}
 
 export default class QuestionList extends React.Component {
 	constructor(props) {
@@ -63,32 +13,79 @@ export default class QuestionList extends React.Component {
 			managing: false,
 			questions: [],
 			showAll: false,
-			sorting: 'update'
+			sorting: 'update',
 		};
 	}
 
 	componentDidMount() {
-		const socket = io(serverURL);
 		this.fetchQuestionList();
-		socket.on('new question', () => {
-			this.fetchQuestionList();
-		})
 	}
 
 	// fetch questions when page is changed
 	componentDidUpdate(prevProps) {
 		if (this.props.sid !== prevProps.sid || this.props.pageNum !== prevProps.pageNum) {
-			this.setState({ showAll: false });
-			this.fetchQuestionList();
+			if (!this.state.showAll) this.fetchQuestionList();
 		}
+	}
+
+	/**
+	 * Sort the given question list.
+	 * The array should already have qid remembered and null elements removed.
+	 * @param {*} unsorted question list
+	 * @param {String} sorting sorting method (update/create)
+	 * @returns the sorted question list
+	 */
+	sortQuestions(questions, sorting) {
+		if (sorting === 'update') {
+			return questions.sort((a, b) => b.time - a.time);
+		} else if (sorting === 'create') {
+			return questions.sort((a, b) => b.create - a.create);
+		}
+	}
+
+	/**
+	 * Questions don't store a unique id in the database, instead, they are stored in an array,
+	 * and the array index is the unique id. However, when we sort the array, the index
+	 * information is lost. We need to store it when API response arrives.
+	 * Null elements are deleted questions, they should be removed once the index is remembered.
+	 * @param {Array} questions
+	 */
+	rememberQid(questions, pageNum) {
+		questions.forEach((question, i) => {
+			if (!question) return;
+			question.id = i;
+			question.pageNum = pageNum;
+		});
+		return questions.filter((a) => a != null);
+	}
+
+	/**
+	 * Similar to rememberQid, but also remember page number, and return a flattened array with all
+	 * questions of all pages in the same level
+	 * @param {Array} pages
+	 */
+	rememberPageAndQid(pages) {
+		let questions = [];
+		pages.forEach((page, i) => {
+			const pageNum = i + 1;
+			page.questions.forEach((question, qid) => {
+				if (!question) return;
+				question.id = qid;
+				question.pageNum = pageNum;
+			});
+			questions.push(...page.questions);
+		});
+		return questions.filter((a) => a != null);
 	}
 
 	async fetchQuestionList() {
 		try {
-			const res = await axios.get(`${serverURL}/api/questions?slideID=${this.props.sid}&pageNum=${this.props.pageNum}`);
-			this.setState((prevState, props) => ({
-				questions: sortQuestions(rememberQid(res.data, this.props.pageNum), prevState.sorting)
-			}));
+			const res = await axios.get(
+				`${serverURL}/api/questions?slideID=${this.props.sid}&pageNum=${this.props.pageNum}`
+			);
+			this.setState({
+				questions: this.sortQuestions(this.rememberQid(res.data, this.props.pageNum), this.state.sorting),
+			});
 		} catch (err) {
 			console.error(err);
 		}
@@ -100,10 +97,10 @@ export default class QuestionList extends React.Component {
 	 */
 	applySort(newSort) {
 		if (newSort !== this.state.sorting) {
-			this.setState((prevState, props) => ({
-				questions: sortQuestions(prevState.questions, newSort),
-				sorting: newSort
-			}));
+			this.setState({
+				questions: this.sortQuestions(this.state.questions, newSort),
+				sorting: newSort,
+			});
 		}
 	}
 
@@ -116,9 +113,12 @@ export default class QuestionList extends React.Component {
 			this.setState({ showAll: newValue });
 			if (newValue) {
 				axios.get(`${serverURL}/api/questionsAll?slideID=${this.props.sid}`).then((res) => {
-					this.setState((prevState, props) => ({
-						questions: sortQuestions(rememberPageAndQid(res.data, this.props.pageNum), prevState.sorting)
-					}));
+					this.setState({
+						questions: this.sortQuestions(
+							this.rememberPageAndQid(res.data, this.props.pageNum),
+							this.state.sorting
+						),
+					});
 				});
 			} else {
 				this.fetchQuestionList();
@@ -139,16 +139,8 @@ export default class QuestionList extends React.Component {
 			});
 	}
 
-	toggleManaging() {
-		this.setState((prevState, props) => ({
-			managing: !prevState.managing
-		}));
-	}
-
 	onNewQuestionEvent(data) {
-		console.log(data);
-		// questions.push(data);
-		// setQuestions(questions);
+		this.setState({ questions: this.sortQuestions([...this.state.questions, data], this.state.sorting) });
 	}
 
 	render() {
@@ -159,7 +151,7 @@ export default class QuestionList extends React.Component {
 					title='Discussion'
 					showManage={this.props.isInstructor && this.props.isInstructorView}
 					managing={managing}
-					toggleManaging={this.toggleManaging}
+					toggleManaging={() => this.setState({ managing: !this.state.managing })}
 					showBackBtn={false}
 				/>
 				<div className='chat-list'>
@@ -171,10 +163,14 @@ export default class QuestionList extends React.Component {
 					<div className='align-right'>
 						<div className='list-options' key={-3}>
 							<div className='option-label'>questions from:</div>
-							<div className={'option ' + (showAll ? '' : 'selected')} onClick={(e) => this.toggleShowAll(false)}>
+							<div
+								className={'option ' + (showAll ? '' : 'selected')}
+								onClick={() => this.toggleShowAll(false)}>
 								This page
 							</div>
-							<div className={'option ' + (showAll ? 'selected' : '')} onClick={(e) => this.toggleShowAll(true)}>
+							<div
+								className={'option ' + (showAll ? 'selected' : '')}
+								onClick={() => this.toggleShowAll(true)}>
 								All pages
 							</div>
 							<div className='option-label'>sort by:</div>
@@ -213,8 +209,9 @@ export default class QuestionList extends React.Component {
 									</div>
 								</div>
 								<div className='info'>
-									<div className='author'>{`${question.user} ${question.uid && this.props.isInstructorView ? `(${question.uid})` : ''
-										}`}</div>
+									<div className='author'>{`${question.user} ${
+										question.uid && this.props.isInstructorView ? `(${question.uid})` : ''
+									}`}</div>
 									<div className='time'>{formatTime(question.time)}</div>
 								</div>
 								{showAll ? <div className='extra-info'>From page {question.pageNum}</div> : null}

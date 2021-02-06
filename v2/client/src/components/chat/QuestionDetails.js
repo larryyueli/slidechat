@@ -35,6 +35,7 @@ export default class QuestionDetails extends React.Component {
 		};
 		this.chatRef = React.createRef();
 		this.sendNewChat = this.sendNewChat.bind(this);
+		this.copyLink = this.copyLink.bind(this);
 	}
 
 	componentDidMount() {
@@ -43,8 +44,11 @@ export default class QuestionDetails extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		if (this.props.sid !== prevProps.sid || this.props.pageNum !== prevProps.pageNum ||
-			this.props.qid !== prevProps.qid) {
+		if (
+			this.props.sid !== prevProps.sid ||
+			this.props.pageNum !== prevProps.pageNum ||
+			this.props.qid !== prevProps.qid
+		) {
 			this.fetchQuestionDetails();
 			this.props.setDrawingOverlay(false);
 			this.props.setDrawing(false);
@@ -59,7 +63,11 @@ export default class QuestionDetails extends React.Component {
 				`${serverURL}/api/chats?slideID=${this.props.sid}&pageNum=${this.props.pageNum}&qid=${this.props.qid}`
 			);
 			this.setState({ messages: res.data });
-			window.history.replaceState(null, null, `${baseURL}/${this.props.sid}/${this.props.pageNum}/${this.props.qid}`);
+			window.history.replaceState(
+				null,
+				null,
+				`${baseURL}/${this.props.sid}/${this.props.pageNum}/${this.props.qid}`
+			);
 			if (res.data.drawing && this.props.drawable) {
 				this.props.setDrawingOverlay(true);
 				this.props.canvasComponentRef.current.setState({ readOnly: true });
@@ -69,12 +77,6 @@ export default class QuestionDetails extends React.Component {
 		} catch (err) {
 			console.error(err);
 		}
-	}
-
-	toggleManaging() {
-		this.setState((prevState, props) => ({
-			managing: !prevState.managing
-		}));
 	}
 
 	sendNewChat() {
@@ -130,17 +132,13 @@ export default class QuestionDetails extends React.Component {
 		if (!window.confirm(`Are you sure to delete this chat?`)) return;
 
 		axios
-			.delete(`${serverURL}/api/chat?sid=${this.props.sid}&qid=${this.props.qid}&pageNum=${this.props.pageNum}&cid=${cid}`)
+			.delete(
+				`${serverURL}/api/chat?sid=${this.props.sid}&qid=${this.props.qid}&pageNum=${this.props.pageNum}&cid=${cid}`
+			)
 			.then(() => this.fetchQuestionDetails())
 			.catch((err) => {
 				console.error(err);
 			});
-	}
-
-	showOrHideToast() {
-		this.setState((prevState, props) => ({
-			showToast: !prevState.showToast
-		}));
 	}
 
 	async copyLink() {
@@ -148,7 +146,7 @@ export default class QuestionDetails extends React.Component {
 		await navigator.clipboard.writeText(
 			`[@${this.props.filename}/Page ${this.props.pageNum}/Q${this.props.qid}](${window.location.href})`
 		);
-		this.showOrHideToast();
+		this.setState({ showToast: true });
 	}
 
 	render() {
@@ -159,7 +157,7 @@ export default class QuestionDetails extends React.Component {
 					title={messages.title}
 					showManage={this.props.isInstructor && this.props.isInstructorView}
 					managing={managing}
-					toggleManaging={this.toggleManaging}
+					toggleManaging={() => this.setState({ managing: !this.state.managing })}
 					showBackBtn={true}
 					back={this.props.back}
 				/>
@@ -169,9 +167,9 @@ export default class QuestionDetails extends React.Component {
 					</div>
 					<Snackbar
 						className='toast'
-						anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+						anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
 						open={showToast}
-						onClose={this.showOrHideToast}
+						onClose={() => this.setState({ showToast: false })}
 						autoHideDuration={2500}
 						message='Link copied to clipboard!'
 					/>
@@ -181,10 +179,11 @@ export default class QuestionDetails extends React.Component {
 							<div className='chat' key={i}>
 								<div className='info'>
 									<div>
-										<span className='author'>{`${message.user}${this.props.isInstructor && message.uid && this.props.isInstructorView
-											? ` (${message.uid})`
-											: ''
-											}`}</span>
+										<span className='author'>{`${message.user}${
+											this.props.isInstructor && message.uid && this.props.isInstructorView
+												? ` (${message.uid})`
+												: ''
+										}`}</span>
 										<span className='time'>
 											{(message.modified ? 'Modified ' : '') + formatTime(message.time)}
 										</span>
@@ -193,13 +192,15 @@ export default class QuestionDetails extends React.Component {
 										{i === 0 ? (
 											<span
 												className='material-icons icon quote'
-												title='quote this question'
+												title='Quote this question'
 												onClick={this.copyLink}>
 												link
 											</span>
 										) : null}
 										{message.endorsement.length ? (
-											<span className='material-icons endorsed icon' onClick={(e) => this.endorseChat(i)}>
+											<span
+												className='material-icons endorsed icon'
+												onClick={(e) => this.endorseChat(i)}>
 												verified
 											</span>
 										) : this.props.isInstructor ? (
@@ -216,16 +217,20 @@ export default class QuestionDetails extends React.Component {
 											</span>
 										</span>
 										{managing && i > 0 ? (
-											<span className='material-icons delete icon' onClick={(e) => this.deleteChat(e, i)}>
+											<span
+												className='material-icons delete icon'
+												onClick={(e) => this.deleteChat(e, i)}>
 												delete_forever
 											</span>
 										) : null}
 									</div>
 								</div>
-								<div className='body' dangerouslySetInnerHTML={{ __html: md.render(message.body) }}></div>
+								<div
+									className='body'
+									dangerouslySetInnerHTML={{ __html: md.render(message.body) }}></div>
 								<div className='info-bottom'>
 									{message.uid === this.props.uid ? (
-										<div className='modify-btn' onClick={(e) => this.props.goToModify(message, i)}>
+										<div className='modify-btn' onClick={(e) => this.props.gotoModify(message, i)}>
 											Modify
 										</div>
 									) : null}
@@ -239,7 +244,13 @@ export default class QuestionDetails extends React.Component {
 						);
 					})}
 					<div className='send-message-bar' key={-1}>
-						<TextField variant='outlined' id={`chat-response`} multiline rowsMax='4' inputRef={this.chatRef} />
+						<TextField
+							variant='outlined'
+							id={`chat-response`}
+							multiline
+							rowsMax='4'
+							inputRef={this.chatRef}
+						/>
 						<Button variant='contained' color='primary' onClick={this.sendNewChat}>
 							Send
 						</Button>

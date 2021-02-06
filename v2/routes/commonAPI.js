@@ -123,7 +123,9 @@ function commonAPI(db, io, isInstructor) {
 			if (isNotValidPage(req.query.pageNum, slide.pageTotal)) {
 				throw { status: 400, error: 'bad request' };
 			}
-			res.sendFile(path.join(fileStorage, req.query.slideID, 'thumbnails', `thumbnail-${+req.query.pageNum - 1}.png`));
+			res.sendFile(
+				path.join(fileStorage, req.query.slideID, 'thumbnails', `thumbnail-${+req.query.pageNum - 1}.png`)
+			);
 		} catch (err) {
 			errorHandler(res, err);
 		}
@@ -364,21 +366,25 @@ function commonAPI(db, io, isInstructor) {
 				drawing: req.body.drawing,
 			};
 
-			let insertQuestion = {}; // cannot use template string on the left hand side
-			insertQuestion[`pages.${req.body.pageNum - 1}.questions`] = newQuestion;
-			let updateRes = await slides.updateOne(
+			let insertQuestion = {
+				[`pages.${req.body.pageNum - 1}.questions`]: newQuestion,
+			};
+			let updateRes = await slides.findOneAndUpdate(
 				{ _id: ObjectID.createFromHexString(req.body.sid) },
 				{
 					$push: insertQuestion,
 					$set: {
 						lastActive: time,
 					},
-				}
+				},
+				{ projection: { pages: 1 } }
 			);
-			if (updateRes.modifiedCount !== 1) {
+			if (updateRes.ok !== 1) {
 				throw 'question update error';
 			}
-			io.emit("new question");
+			newQuestion.pageNum = req.body.pageNum;
+			newQuestion.qid = updateRes.value.pages[newQuestion.pageNum - 1].questions.length;
+			io.emit('new question', newQuestion);
 			res.send();
 		} catch (err) {
 			errorHandler(res, err);

@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Button, CircularProgress } from '@material-ui/core';
+import { Button, CircularProgress, Snackbar } from '@material-ui/core';
 import axios from 'axios';
 
 import SlideDrawingOverlay from './SlideDrawingOverlay';
 import SlideFlipOverlay from './SlideFlipOverlay';
-import { serverURL } from '../../config';
+import { fullURL, serverURL } from '../../config';
 import { randInt, range } from '../../util';
 
 const loadingImg = process.env.PUBLIC_URL + '/imgs/loading.png';
@@ -19,10 +19,12 @@ export default function Slides(props) {
 	const [prevDisable, setPrevDisable] = useState(true);
 	const [uploading, setUploading] = useState(false);
 	const [img, setImg] = useState(loadingImg);
+	const [showToast, setShowToast] = useState(false);
 	const fileUpload = useRef(null);
 	const carousel = useRef(null);
 
 	useEffect(() => {
+		console.log(props);
 		if (!props.pageTotal) return;
 		fetch(`${serverURL}/api/slideImg?slideID=${props.sid}&pageNum=${props.pageNum}`)
 			.then((res) => {
@@ -147,7 +149,7 @@ export default function Slides(props) {
 	 * go to prev page
 	 * @param {Event} onClick event
 	 */
-	const firstPage = (e) => {
+	const firstPage = () => {
 		props.gotoPage(1);
 		centerCarousel(1);
 	};
@@ -155,7 +157,7 @@ export default function Slides(props) {
 	 * go to prev page
 	 * @param {Event} onClick event
 	 */
-	const lastPage = (e) => {
+	const lastPage = () => {
 		props.gotoPage(props.pageTotal);
 		centerCarousel(props.pageTotal);
 	};
@@ -213,27 +215,50 @@ export default function Slides(props) {
 		delete window.audioRecorder;
 	};
 
+	const copyLink = async () => {
+		if (!navigator.clipboard) return alert('Your browser does not support accessing clipboard!');
+		await navigator.clipboard.writeText(
+			`[@${props.filename}/Page ${props.pageNum}](${fullURL()}/${props.sid}/${props.pageNum})`
+		);
+		setShowToast(true);
+	};
+
 	return (
 		<div className='slide-container'>
-			<div className='title'>{props.title}</div>
-			<div className='slide-bar'>
-				<a className='download-link' href={`${serverURL}/api/downloadPdf?slideID=${props.sid}`}>
-					(Download {props.filename})
-				</a>
-
+			<div className='slide-toolbar'>
 				{props.showTempDrawingBtn ? (
-					<div className='drawing-toggle' title='Temporary Drawing'>
-						{props.drawing ? (
-							<span className={`material-icons icon drawing`} onClick={props.cancelDrawing}>
+					props.drawing ? (
+						<div className='icon-btn drawing' title='Temporary drawing'>
+							<span className={`material-icons icon`} onClick={props.cancelDrawing}>
 								close
 							</span>
-						) : (
+						</div>
+					) : (
+						<div className='icon-btn' title='Clear drawing'>
 							<span className={`material-icons icon`} onClick={props.startDrawing}>
 								brush
 							</span>
-						)}
-					</div>
+						</div>
+					)
 				) : null}
+				<div className='icon-btn' title='Quote this page'>
+					<span className='material-icons' onClick={copyLink}>
+						link
+					</span>
+				</div>
+				<div className='icon-btn' title='Download PDF'>
+					<a className='material-icons' href={`${serverURL}/api/downloadPdf?slideID=${props.sid}`}>
+						file_download
+					</a>
+				</div>
+				<Snackbar
+					className='toast'
+					anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+					open={showToast}
+					onClose={() => setShowToast(false)}
+					autoHideDuration={2500}
+					message='Link copied to clipboard!'
+				/>
 			</div>
 
 			<div className='slide-wrapper'>
