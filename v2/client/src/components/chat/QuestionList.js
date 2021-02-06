@@ -128,7 +128,7 @@ export default class QuestionList extends React.Component {
 		axios
 			.delete(`${serverURL}/api/question?sid=${this.props.sid}&qid=${question.id}&pageNum=${question.pageNum}`)
 			.then((res) => this.setState({ showAll: false }))
-			.then(this.fetchQuestionList())
+			.then(() => this.fetchQuestionList())
 			.catch((err) => {
 				console.error(err);
 			});
