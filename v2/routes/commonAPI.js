@@ -378,7 +378,7 @@ function commonAPI(db, io, isInstructor) {
 			if (updateRes.modifiedCount !== 1) {
 				throw 'question update error';
 			}
-
+			io.emit("new question");
 			res.send();
 		} catch (err) {
 			errorHandler(res, err);
@@ -438,7 +438,6 @@ function commonAPI(db, io, isInstructor) {
 			if (updateRes.modifiedCount !== 1) {
 				throw 'chat update error';
 			}
-
 			res.send();
 		} catch (err) {
 			errorHandler(res, err);

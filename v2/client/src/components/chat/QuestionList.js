@@ -5,6 +5,7 @@ import { Button } from '@material-ui/core';
 import ChatAreaTitle from './ChatAreaTitle';
 import { serverURL } from '../../config';
 import { formatTime } from '../../util';
+import { io } from 'socket.io/client-dist/socket.io';
 
 /**
  * Sort the given question list.
@@ -67,7 +68,11 @@ export default class QuestionList extends React.Component {
 	}
 
 	componentDidMount() {
+		const socket = io(serverURL);
 		this.fetchQuestionList();
+		socket.on('new question', () => {
+			this.fetchQuestionList();
+		})
 	}
 
 	// fetch questions when page is changed

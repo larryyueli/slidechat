@@ -115,7 +115,9 @@ async function startSlideChat(io) {
 
 	io.on('connection', async (socket) => {
 		console.log('connected');
-		socket.join('some channel');
+		socket.on('join room', (room) => {
+			socket.join(room);
+		});
 		socket.on('something', (data) => {
 			console.log(data);
 		});

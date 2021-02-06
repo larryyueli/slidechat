@@ -42,6 +42,7 @@ function Main(props) {
 	 * fetch slide info from server and redirect to login if needed
 	 */
 	useEffect(() => {
+		const socket = io(serverURL);
 		axios
 			.get(`${serverURL}/api/slideInfo?slideID=${sid}`)
 			.then((res) => {
@@ -66,6 +67,7 @@ function Main(props) {
 				if (res.data.loginUser) {
 					setUid(res.data.loginUser);
 					setUsername(res.data.username);
+					socket.emit("join room", sid);
 				}
 				if (res.data.isInstructor) setIsInstructor(true);
 				setPageTotal(res.data.pageTotal);
@@ -80,12 +82,6 @@ function Main(props) {
 				console.error(err);
 			});
 	}, [sid, props.match.params]);
-
-	useEffect(() => {
-		const socket = io(serverURL);
-		console.log(socket);
-		// questionListRef.current.onNewQuestionEvent(123);  // this doesn't work yet
-	}, []);
 
 	/**
 	 * apply the new page number
