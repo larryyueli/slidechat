@@ -149,6 +149,48 @@ export default class QuestionDetails extends React.Component {
 		this.setState({ showToast: true });
 	}
 
+	onNewReplyEvent(data) {
+		if (this.props.pageNum === data.pageNum && this.props.qid === data.qid) {
+			delete data.pageNum;
+			delete data.qid;
+			this.setState({ messages: { ...this.state.messages, chats: [...this.state.messages.chats, data] } });
+		}
+	}
+
+	onNewLikeEvent(data) {
+		if (this.props.pageNum === data.pageNum && this.props.qid === data.qid) {
+			const likes = this.state.messages.chats[data.cid].likes;
+			if (data.like > 0) {
+				likes.push(data.user);
+			} else {
+				likes.splice(likes.findIndex((e) => e === data.user));
+			}
+			this.setState({ messages: this.state.messages });
+		}
+	}
+
+	onNewModifyEvent(data) {
+		console.log(this.state.messages);
+		// TODO
+	}
+
+	onNewDeleteEvent(data) {
+		console.log(this.state.messages);
+		// TODO
+	}
+
+	onNewEndorseEvent(data) {
+		if (this.props.pageNum === data.pageNum && this.props.qid === data.qid) {
+			const endorsement = this.state.messages.chats[data.cid].endorsement;
+			if (data.endorse > 0) {
+				endorsement.push(data.user);
+			} else {
+				endorsement.splice(endorsement.findIndex((e) => e === data.user));
+			}
+			this.setState({ messages: this.state.messages });
+		}
+	}
+
 	render() {
 		const { managing, messages, showToast } = this.state;
 		return (

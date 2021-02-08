@@ -143,6 +143,16 @@ export default class QuestionList extends React.Component {
 		this.setState({ questions: this.sortQuestions([...this.state.questions, data], this.state.sorting) });
 	}
 
+	onNewReplyEvent(data) {
+		this.state.questions.forEach((question) => {
+			if (question.pageNum === data.pageNum && question.id === data.qid) {
+				question.time = data.time;
+				return;
+			}
+		});
+		this.setState({ questions: this.sortQuestions(this.state.questions, this.state.sorting) });
+	}
+
 	render() {
 		const { managing, questions, showAll, sorting } = this.state;
 		return (
