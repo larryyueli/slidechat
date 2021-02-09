@@ -971,7 +971,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			let updateRes;
 
 			// endorse if not already endorsed, otherwise revoke the endorsement
-			let endorseCountChange;
+			let endorseCountChange, solved;
 			if (
 				slide.pages[+req.body.pageNum - 1].questions[req.body.qid].chats[req.body.cid].endorsement.includes(
 					endorseName
@@ -979,37 +979,40 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			) {
 				const chats = slide.pages[+req.body.pageNum - 1].questions[req.body.qid].chats;
 				let needSetUnsolved = true;
-				setUnsolvedLoop: for (let i of chats) {
-					if (!i) continue;
-					for (let j of i.endorsement) {
-						if (j !== endorseName) {
+				setUnsolvedLoop: for (let i in chats) {
+					if (!chats[i]) continue;
+					for (let j of chats[i].endorsement) {
+						if (j !== endorseName || (j === endorseName && +i !== req.body.cid)) {
 							needSetUnsolved = false;
 							break setUnsolvedLoop;
 						}
 					}
 				}
 				if (needSetUnsolved) {
-					const setUnsolved = {};
-					setUnsolved[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.status`] = 'unsolved';
+					const setUnsolved = {
+						[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.status`]: 'unsolved',
+					};
 					updateRes = await slides.updateOne(
 						{ _id: ObjectID.createFromHexString(req.body.sid) },
 						{ $pull: updateEndorse, $set: setUnsolved }
 					);
+					solved = 0;
 				} else {
 					updateRes = await slides.updateOne(
 						{ _id: ObjectID.createFromHexString(req.body.sid) },
 						{ $pull: updateEndorse }
 					);
+					solved = 1;
 				}
 				endorseCountChange = -1;
 			} else {
-				const setSolved = {};
-				setSolved[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.status`] = 'solved';
+				const setSolved = { [`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.status`]: 'solved' };
 				updateRes = await slides.updateOne(
 					{ _id: ObjectID.createFromHexString(req.body.sid) },
 					{ $addToSet: updateEndorse, $set: setSolved }
 				);
 				endorseCountChange = 1;
+				solved = 1;
 			}
 
 			if (updateRes.modifiedCount !== 1) {
@@ -1020,6 +1023,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 				qid: req.body.qid,
 				cid: req.body.cid,
 				user: endorseName,
+				solved: solved,
 				endorseCountChange: endorseCountChange,
 			});
 			res.send();

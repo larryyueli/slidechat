@@ -190,7 +190,7 @@ export default class QuestionDetails extends React.Component {
 		this.setState((state, props) => {
 			if (props.pageNum === data.pageNum && props.qid === data.qid) {
 				const endorsement = state.messages.chats[data.cid].endorsement;
-				if (data.endorse > 0) {
+				if (data.endorseCountChange > 0) {
 					endorsement.push(data.user);
 				} else {
 					endorsement.splice(
@@ -257,7 +257,7 @@ export default class QuestionDetails extends React.Component {
 												onClick={(e) => this.endorseChat(i)}>
 												verified
 											</span>
-										) : this.props.isInstructor ? (
+										) : this.props.isInstructor && this.props.isInstructorView ? (
 											<span
 												className='material-icons not-endorsed icon'
 												onClick={(e) => this.endorseChat(i)}>

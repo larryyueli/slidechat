@@ -450,6 +450,7 @@ function commonAPI(db, io, isInstructor) {
 			if (updateRes.ok !== 1) {
 				throw 'chat update error';
 			}
+			delete newChat.uid;
 			newChat.pageNum = req.body.pageNum;
 			newChat.qid = req.body.qid;
 			io.to(req.body.sid).emit('new reply', newChat);

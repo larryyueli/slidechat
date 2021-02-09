@@ -115,6 +115,7 @@ function Main(props) {
 		});
 		socket.on('endorse', (data) => {
 			console.log(data);
+			if (questionListRef.current) questionListRef.current.onNewEndorseEvent(data);
 			if (questionDetailsRef.current) questionDetailsRef.current.onNewEndorseEvent(data);
 		});
 		socket.on('error', (msg) => alert(msg));
