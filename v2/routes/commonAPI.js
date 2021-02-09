@@ -584,15 +584,6 @@ function commonAPI(db, io, isInstructor) {
 				throw 'chat modify error';
 			}
 
-			if (req.body != slide.pages[+req.body.pageNum - 1].questions[req.body.qid].chats[req.body.cid].body) {
-				io.to(req.body.sid).emit('modify', {
-					pageNum: req.body.pageNum,
-					qid: req.body.qid,
-					cid: req.body.cid,
-					body: req.body.body,
-				});
-			}
-
 			res.send();
 		} catch (err) {
 			errorHandler(res, err);
