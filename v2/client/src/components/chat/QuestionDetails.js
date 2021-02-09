@@ -162,6 +162,7 @@ export default class QuestionDetails extends React.Component {
 	onNewLikeEvent(data) {
 		this.setState((state, props) => {
 			if (props.pageNum === data.pageNum && props.qid === data.qid) {
+				console.log(state.messages.chats[data.cid]);
 				const likes = state.messages.chats[data.cid].likes;
 				if (data.likeCountChange > 0) {
 					likes.push(data.user);
@@ -180,6 +181,8 @@ export default class QuestionDetails extends React.Component {
 		if (this.props.pageNum === data.pageNum && this.props.qid === data.qid) {
 			const chats = this.state.messages.chats;
 			chats[data.cid].body = data.body;
+			chats[data.cid].modified = true;
+			chats[data.cid].time = data.time
 			this.setState((state) => ({
 				messages: { ...state.messages, chats: [...chats] },
 			}));

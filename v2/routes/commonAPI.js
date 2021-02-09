@@ -584,6 +584,14 @@ function commonAPI(db, io, isInstructor) {
 				throw 'chat modify error';
 			}
 
+			io.to(req.body.sid).emit('modify', {
+				pageNum: req.body.pageNum,
+				qid: req.body.qid,
+				cid: req.body.cid,
+				time: time,
+				body: req.body.body,
+			});
+
 			res.send();
 		} catch (err) {
 			errorHandler(res, err);

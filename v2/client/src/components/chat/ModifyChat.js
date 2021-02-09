@@ -4,7 +4,6 @@ import { Button, TextField } from '@material-ui/core';
 
 import ChatAreaTitle from './ChatAreaTitle';
 import { serverURL } from '../../config';
-import { text } from 'body-parser';
 
 export default function ModifyChat(props) {
 	const textRef = useRef(null);
