@@ -93,32 +93,26 @@ function Main(props) {
 			console.log('socket reconnected: ', attemptNumber);
 		});
 		socket.on('new question', (data) => {
-			console.log(data);
 			if (questionListRef.current) questionListRef.current.onNewQuestionEvent(data);
 		});
 		socket.on('new reply', (data) => {
-			console.log(data);
-			// TODO
-		});
-		socket.on('new reply', (data) => {
-			console.log(data);
-			// TODO
+			if (questionListRef.current) questionListRef.current.onNewReplyEvent(data);
+			if (questionDetailsRef.current) questionDetailsRef.current.onNewReplyEvent(data);
 		});
 		socket.on('like', (data) => {
-			console.log(data);
-			// TODO
+			if (questionDetailsRef.current) questionDetailsRef.current.onNewLikeEvent(data);
 		});
 		socket.on('modify', (data) => {
 			console.log(data);
-			// TODO
+			if (questionDetailsRef.current) questionDetailsRef.current.onNewModifyEvent(data);
 		});
 		socket.on('delete chat', (data) => {
 			console.log(data);
-			// TODO
+			if (questionDetailsRef.current) questionDetailsRef.current.onNewDeleteEvent(data);
 		});
 		socket.on('endorse', (data) => {
-			console.log(data);
-			// TODO
+			if (questionListRef.current) questionListRef.current.onNewEndorseEvent(data);
+			if (questionDetailsRef.current) questionDetailsRef.current.onNewEndorseEvent(data);
 		});
 		socket.on('error', (msg) => alert(msg));
 	}, [sid, props.match.params]);

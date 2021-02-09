@@ -149,6 +149,60 @@ export default class QuestionDetails extends React.Component {
 		this.setState({ showToast: true });
 	}
 
+	onNewReplyEvent(data) {
+		if (this.props.pageNum === data.pageNum && this.props.qid === data.qid) {
+			delete data.pageNum;
+			delete data.qid;
+			this.setState((state) => ({
+				messages: { ...state.messages, chats: [...state.messages.chats, data] },
+			}));
+		}
+	}
+
+	onNewLikeEvent(data) {
+		this.setState((state, props) => {
+			if (props.pageNum === data.pageNum && props.qid === data.qid) {
+				const likes = state.messages.chats[data.cid].likes;
+				if (data.likeCountChange > 0) {
+					likes.push(data.user);
+				} else {
+					likes.splice(
+						likes.findIndex((name) => name === data.user),
+						1
+					);
+				}
+				return { messages: state.messages };
+			}
+		});
+	}
+
+	onNewModifyEvent(data) {
+		console.log(this.state.messages);
+		// TODO
+	}
+
+	onNewDeleteEvent(data) {
+		console.log(this.state.messages);
+		// TODO
+	}
+
+	onNewEndorseEvent(data) {
+		this.setState((state, props) => {
+			if (props.pageNum === data.pageNum && props.qid === data.qid) {
+				const endorsement = state.messages.chats[data.cid].endorsement;
+				if (data.endorseCountChange > 0) {
+					endorsement.push(data.user);
+				} else {
+					endorsement.splice(
+						endorsement.findIndex((name) => name === data.user),
+						1
+					);
+				}
+				return { messages: state.messages };
+			}
+		});
+	}
+
 	render() {
 		const { managing, messages, showToast } = this.state;
 		return (
@@ -203,7 +257,7 @@ export default class QuestionDetails extends React.Component {
 												onClick={(e) => this.endorseChat(i)}>
 												verified
 											</span>
-										) : this.props.isInstructor ? (
+										) : this.props.isInstructor && this.props.isInstructorView ? (
 											<span
 												className='material-icons not-endorsed icon'
 												onClick={(e) => this.endorseChat(i)}>

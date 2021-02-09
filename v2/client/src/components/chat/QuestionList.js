@@ -140,7 +140,31 @@ export default class QuestionList extends React.Component {
 	}
 
 	onNewQuestionEvent(data) {
-		this.setState({ questions: this.sortQuestions([...this.state.questions, data], this.state.sorting) });
+		this.setState((state) => ({ questions: this.sortQuestions([...state.questions, data], state.sorting) }));
+	}
+
+	onNewReplyEvent(data) {
+		this.setState((state) => {
+			for (let question of state.questions) {
+				if (question.pageNum === data.pageNum && question.id === data.qid) {
+					question.time = data.time;
+					break;
+				}
+			}
+			return { questions: this.sortQuestions(state.questions, state.sorting) };
+		});
+	}
+
+	onNewEndorseEvent(data) {
+		this.setState((state) => {
+			for (let question of state.questions) {
+				if (question.pageNum === data.pageNum && question.id === data.qid) {
+					question.status = data.solved ? 'solved' : 'unsolved';
+					break;
+				}
+			}
+			return { questions: this.sortQuestions(state.questions, state.sorting) };
+		});
 	}
 
 	render() {
