@@ -229,6 +229,7 @@ function commonAPI(db, io, isInstructor) {
 					if (isInstructor(req.session.uid)) {
 						question.uid = question.chats[0].uid;
 					}
+					delete question.drawing;
 					delete question.chats;
 				}
 			}
@@ -490,7 +491,7 @@ function commonAPI(db, io, isInstructor) {
 			// if anonymous, randomly generated username may repeat, so it does not make
 			// sense to only allow one like per name. So everyone can like as many times
 			// as they want
-			let updateRes, like;
+			let updateRes, likeCountChange;
 			if (slide.anonymity !== 'A') {
 				// like if not yet liked, otherwise unlike
 				if (
@@ -500,20 +501,20 @@ function commonAPI(db, io, isInstructor) {
 						{ _id: ObjectID.createFromHexString(req.body.sid) },
 						{ $addToSet: insertLike }
 					);
-					like = 1;
+					likeCountChange = 1;
 				} else {
 					updateRes = await slides.updateOne(
 						{ _id: ObjectID.createFromHexString(req.body.sid) },
 						{ $pull: insertLike }
 					);
-					like = -1;
+					likeCountChange = -1;
 				}
 			} else {
 				updateRes = await slides.updateOne(
 					{ _id: ObjectID.createFromHexString(req.body.sid) },
 					{ $push: insertLike }
 				);
-				like = 1;
+				likeCountChange = 1;
 			}
 
 			if (updateRes.modifiedCount !== 1) {
@@ -524,7 +525,7 @@ function commonAPI(db, io, isInstructor) {
 				qid: req.body.qid,
 				cid: req.body.cid,
 				user: req.body.user,
-				like: like,
+				likeCountChange: likeCountChange,
 			});
 			res.send();
 		} catch (err) {

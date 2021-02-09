@@ -153,20 +153,27 @@ export default class QuestionDetails extends React.Component {
 		if (this.props.pageNum === data.pageNum && this.props.qid === data.qid) {
 			delete data.pageNum;
 			delete data.qid;
-			this.setState({ messages: { ...this.state.messages, chats: [...this.state.messages.chats, data] } });
+			this.setState((state) => ({
+				messages: { ...state.messages, chats: [...state.messages.chats, data] },
+			}));
 		}
 	}
 
 	onNewLikeEvent(data) {
-		if (this.props.pageNum === data.pageNum && this.props.qid === data.qid) {
-			const likes = this.state.messages.chats[data.cid].likes;
-			if (data.like > 0) {
-				likes.push(data.user);
-			} else {
-				likes.splice(likes.findIndex((e) => e === data.user));
+		this.setState((state, props) => {
+			if (props.pageNum === data.pageNum && props.qid === data.qid) {
+				const likes = state.messages.chats[data.cid].likes;
+				if (data.likeCountChange > 0) {
+					likes.push(data.user);
+				} else {
+					likes.splice(
+						likes.findIndex((name) => name === data.user),
+						1
+					);
+				}
+				return { messages: state.messages };
 			}
-			this.setState({ messages: this.state.messages });
-		}
+		});
 	}
 
 	onNewModifyEvent(data) {
@@ -180,15 +187,20 @@ export default class QuestionDetails extends React.Component {
 	}
 
 	onNewEndorseEvent(data) {
-		if (this.props.pageNum === data.pageNum && this.props.qid === data.qid) {
-			const endorsement = this.state.messages.chats[data.cid].endorsement;
-			if (data.endorse > 0) {
-				endorsement.push(data.user);
-			} else {
-				endorsement.splice(endorsement.findIndex((e) => e === data.user));
+		this.setState((state, props) => {
+			if (props.pageNum === data.pageNum && props.qid === data.qid) {
+				const endorsement = state.messages.chats[data.cid].endorsement;
+				if (data.endorse > 0) {
+					endorsement.push(data.user);
+				} else {
+					endorsement.splice(
+						endorsement.findIndex((name) => name === data.user),
+						1
+					);
+				}
+				return { messages: state.messages };
 			}
-			this.setState({ messages: this.state.messages });
-		}
+		});
 	}
 
 	render() {

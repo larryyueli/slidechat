@@ -971,7 +971,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			let updateRes;
 
 			// endorse if not already endorsed, otherwise revoke the endorsement
-			let endorse;
+			let endorseCountChange;
 			if (
 				slide.pages[+req.body.pageNum - 1].questions[req.body.qid].chats[req.body.cid].endorsement.includes(
 					endorseName
@@ -1001,7 +1001,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 						{ $pull: updateEndorse }
 					);
 				}
-				endorse = -1;
+				endorseCountChange = -1;
 			} else {
 				const setSolved = {};
 				setSolved[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.status`] = 'solved';
@@ -1009,18 +1009,18 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 					{ _id: ObjectID.createFromHexString(req.body.sid) },
 					{ $addToSet: updateEndorse, $set: setSolved }
 				);
-				endorese = 1;
+				endorseCountChange = 1;
 			}
 
 			if (updateRes.modifiedCount !== 1) {
 				throw 'endorse update error';
 			}
-			io.to(req.body.sid).emit('edorse', {
+			io.to(req.body.sid).emit('endorse', {
 				pageNum: req.body.pageNum,
 				qid: req.body.qid,
 				cid: req.body.cid,
 				user: endorseName,
-				endorse: endorse,
+				endorseCountChange: endorseCountChange,
 			});
 			res.send();
 		} catch (err) {
