@@ -584,6 +584,15 @@ function commonAPI(db, io, isInstructor) {
 				throw 'chat modify error';
 			}
 
+			if (req.body != slide.pages[+req.body.pageNum - 1].questions[req.body.qid].chats[req.body.cid].body) {
+				io.to(req.body.sid).emit('modify', {
+					pageNum: req.body.pageNum,
+					qid: req.body.qid,
+					cid: req.body.cid,
+					body: req.body.body,
+				});
+			}
+
 			res.send();
 		} catch (err) {
 			errorHandler(res, err);
@@ -635,6 +644,12 @@ function commonAPI(db, io, isInstructor) {
 			if (updateRes.modifiedCount !== 1) {
 				throw 'delete own chat error';
 			}
+
+			io.to(req.body.sid).emit('delete chat', {
+				pageNum: req.body.pageNum,
+				qid: req.body.qid,
+				cid: req.body.cid,
+			});
 
 			res.send();
 		} catch (err) {

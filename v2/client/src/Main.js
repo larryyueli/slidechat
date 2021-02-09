@@ -103,11 +103,9 @@ function Main(props) {
 			if (questionDetailsRef.current) questionDetailsRef.current.onNewLikeEvent(data);
 		});
 		socket.on('modify', (data) => {
-			console.log(data);
 			if (questionDetailsRef.current) questionDetailsRef.current.onNewModifyEvent(data);
 		});
 		socket.on('delete chat', (data) => {
-			console.log(data);
 			if (questionDetailsRef.current) questionDetailsRef.current.onNewDeleteEvent(data);
 		});
 		socket.on('endorse', (data) => {

@@ -177,13 +177,23 @@ export default class QuestionDetails extends React.Component {
 	}
 
 	onNewModifyEvent(data) {
-		console.log(this.state.messages);
-		// TODO
+		if (this.props.pageNum === data.pageNum && this.props.qid === data.qid) {
+			const chats = this.state.messages.chats;
+			chats[data.cid].body = data.body;
+			this.setState((state) => ({
+				messages: { ...state.messages, chats: [...chats] },
+			}));
+		}
 	}
 
 	onNewDeleteEvent(data) {
-		console.log(this.state.messages);
-		// TODO
+		if (this.props.pageNum === data.pageNum && this.props.qid === data.qid) {
+			const chats = this.state.messages.chats;
+			chats[data.cid] = null;
+			this.setState((state) => ({
+				messages: { ...state.messages, chats: [...chats] },
+			}));
+		}
 	}
 
 	onNewEndorseEvent(data) {
