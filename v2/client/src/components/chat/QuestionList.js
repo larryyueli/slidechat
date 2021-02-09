@@ -156,7 +156,6 @@ export default class QuestionList extends React.Component {
 	}
 
 	onNewEndorseEvent(data) {
-		console.log(this.state);
 		this.setState((state) => {
 			for (let question of state.questions) {
 				if (question.pageNum === data.pageNum && question.id === data.qid) {
@@ -166,7 +165,6 @@ export default class QuestionList extends React.Component {
 			}
 			return { questions: this.sortQuestions(state.questions, state.sorting) };
 		});
-		console.log(this.state);
 	}
 
 	render() {

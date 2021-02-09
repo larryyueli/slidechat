@@ -93,16 +93,13 @@ function Main(props) {
 			console.log('socket reconnected: ', attemptNumber);
 		});
 		socket.on('new question', (data) => {
-			console.log(data);
 			if (questionListRef.current) questionListRef.current.onNewQuestionEvent(data);
 		});
 		socket.on('new reply', (data) => {
-			console.log(data);
 			if (questionListRef.current) questionListRef.current.onNewReplyEvent(data);
 			if (questionDetailsRef.current) questionDetailsRef.current.onNewReplyEvent(data);
 		});
 		socket.on('like', (data) => {
-			console.log(data);
 			if (questionDetailsRef.current) questionDetailsRef.current.onNewLikeEvent(data);
 		});
 		socket.on('modify', (data) => {
@@ -114,7 +111,6 @@ function Main(props) {
 			if (questionDetailsRef.current) questionDetailsRef.current.onNewDeleteEvent(data);
 		});
 		socket.on('endorse', (data) => {
-			console.log(data);
 			if (questionListRef.current) questionListRef.current.onNewEndorseEvent(data);
 			if (questionDetailsRef.current) questionDetailsRef.current.onNewEndorseEvent(data);
 		});
