@@ -113,7 +113,7 @@
 			}
 		}
 
-		button {
+		button:not(:disabled) {
 			background-color: $primary;
 		}
 	}
@@ -122,5 +122,6 @@
 		padding: 0 0.5rem;
 		font-size: x-small;
 		color: $grayText;
+		margin-bottom: 0.5rem;
 	}
 }

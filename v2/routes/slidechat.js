@@ -1,7 +1,7 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectID } = require('mongodb');
 const dbConfig = {
 	useUnifiedTopology: true,
 	useNewUrlParser: true,
@@ -59,7 +59,7 @@ function isInstructor(uid) {
 	}
 }
 
-async function startSlideChat() {
+async function startSlideChat(io) {
 	const router = express.Router();
 
 	let dbClient;
@@ -72,6 +72,7 @@ async function startSlideChat() {
 
 	console.log('connected to database');
 	const db = dbClient.db('slidechat');
+	const slides = db.collection('slides');
 
 	if (process.env.NODE_ENV !== 'production') {
 		router.use('/', (req, res, next) => {
@@ -113,9 +114,29 @@ async function startSlideChat() {
 		});
 	});
 
+	io.on('connection', async (socket) => {
+		socket.on('join slide room', async (slideID) => {
+			let slide;
+			try {
+				slide = await slides.findOne(
+					{ _id: ObjectID.createFromHexString(slideID) },
+					{ projection: { _id: true } }
+				);
+			} catch (err) {
+				return;
+			}
+			if (slide) {
+				socket.join(slideID);
+			} else {
+				socket.emit('error', 'Join slide room: invalid slide ID!');
+			}
+		});
+		socket.on('leave', (roomID) => socket.leave(roomID));
+	});
+
 	// APIs
-	router.use(instructorAPI(db, instructorAuth, isInstructor));
-	router.use(commonAPI(db, isInstructor));
+	router.use(instructorAPI(db, io, instructorAuth, isInstructor));
+	router.use(commonAPI(db, io, isInstructor));
 
 	// Routes
 	router.get(instructorURL, instructorAuth, (req, res) => {

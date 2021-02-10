@@ -13,7 +13,7 @@ export default function ChatAreaTitle(props) {
 			<div className='title'>{props.title}</div>
 			{props.showManage ? (
 				<span className={`manage ${props.managing ? 'managing' : ''}`} onClick={props.toggleManaging}>
-					<span className='material-icons icon'>settings</span>
+					<span className='material-icons'>settings</span>
 				</span>
 			) : (
 				<div className='placeholder'>&nbsp;</div>

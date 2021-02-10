@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import { io } from 'socket.io/client-dist/socket.io';
 
 import Slides from './components/slide/Slides';
 import AppBar from './components/AppBar';
@@ -16,6 +17,7 @@ import { QUESTION_LIST, NEW_QUESTION, MODIFY_CHAT } from './util';
  */
 function Main(props) {
 	const sid = props.match.params.slideId;
+	const [connected, setConnected] = useState(false);
 	const [pageTotal, setPageTotal] = useState(0);
 	const [page, setPage] = useState(1);
 	const [title, setTitle] = useState('');
@@ -29,12 +31,14 @@ function Main(props) {
 	const [qid, setQid] = useState(QUESTION_LIST);
 	const [drawing, setDrawing] = useState(false);
 	const [showTempDrawingBtn, setShowTempDrawingBtn] = useState(true);
-	const [showCarouselPanel, setShowCarouselPanel] = useState(true);
 	const [chatToModify, setChatToModify] = useState({});
 	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
-	const [isInstructorView, setIsInstructorView] = useState(true);
 	const [record, setRecord] = useState({ uploaded: false, recording: false, recordingFile: null, recordingSrc: '' });
 	const [largerSlide, setLargerSlide] = useState(localStorage.getItem('SlideChat_LargerSlide') === '1');
+	const [showCarouselPanel, setShowCarouselPanel] = useState(localStorage.getItem('SlideChat_HideCarousel') !== '1'); // default true for null
+	const [isInstructorView, setIsInstructorView] = useState(localStorage.getItem('SlideChat_StudentView') !== '1'); // default true for null
+	const questionListRef = useRef(null);
+	const questionDetailsRef = useRef(null);
 
 	/**
 	 * fetch slide info from server and redirect to login if needed
@@ -66,17 +70,53 @@ function Main(props) {
 					setUsername(res.data.username);
 				}
 				if (res.data.isInstructor) setIsInstructor(true);
-				setPageTotal(res.data.pageTotal);
 				setTitle(res.data.title);
 				setFilename(res.data.filename);
 				setDrawable(Boolean(res.data.drawable));
 				document.getElementById('pageNum').value = currentPage;
 				setPage(currentPage);
 				if (questionId || questionId === 0) setQid(questionId);
+				setPageTotal(res.data.pageTotal);
 			})
 			.catch((err) => {
 				console.error(err);
 			});
+
+		const socket = io(serverURL);
+		socket.emit('join slide room', sid);
+		socket.on('connect', () => {
+			console.log('socket connected');
+			setConnected(true);
+		});
+		socket.on('disconnect', (reason) => {
+			console.log('socket disconnected, reason: ', reason);
+			setConnected(false);
+		});
+		socket.on('new question', (data) => {
+			if (questionListRef.current) questionListRef.current.onNewQuestionEvent(data);
+		});
+		socket.on('new reply', (data) => {
+			console.log(data);
+			if (questionListRef.current) questionListRef.current.onNewReplyEvent(data);
+			if (questionDetailsRef.current) questionDetailsRef.current.onNewReplyEvent(data);
+		});
+		socket.on('like', (data) => {
+			if (questionDetailsRef.current) questionDetailsRef.current.onLikeEvent(data);
+		});
+		socket.on('modify', (data) => {
+			if (questionDetailsRef.current) questionDetailsRef.current.onModifyEvent(data);
+		});
+		socket.on('delete chat', (data) => {
+			if (questionDetailsRef.current) questionDetailsRef.current.onDeleteEvent(data);
+		});
+		socket.on('endorse', (data) => {
+			if (questionListRef.current) questionListRef.current.onEndorseEvent(data);
+			if (questionDetailsRef.current) questionDetailsRef.current.onEndorseEvent(data);
+		});
+		socket.on('error', (msg) => alert(msg));
+		return () => {
+			socket.emit('leave', sid);
+		};
 	}, [sid, props.match.params]);
 
 	/**
@@ -152,7 +192,7 @@ function Main(props) {
 		setShowTempDrawingBtn(false);
 	};
 
-	const goToModify = (chat, cid) => {
+	const gotoModify = (chat, cid) => {
 		setChatToModify({ ...chat, cid, qid });
 		setQid(MODIFY_CHAT);
 	};
@@ -186,6 +226,7 @@ function Main(props) {
 	return (
 		<>
 			<AppBar
+				title={title}
 				anonymity={anonymity}
 				uid={uid}
 				username={username}
@@ -200,7 +241,6 @@ function Main(props) {
 			/>
 			<div className={`main ${largerSlide ? 'larger-slide' : ''}`}>
 				<Slides
-					title={title}
 					filename={filename}
 					sid={sid}
 					pageNum={page}
@@ -228,6 +268,8 @@ function Main(props) {
 							askNewQuestion={gotoNewQuestion}
 							goToQuestion={gotoQuestion}
 							isInstructorView={isInstructorView}
+							connected={connected}
+							ref={questionListRef}
 						/>
 					) : qid === NEW_QUESTION ? (
 						<NewQuestion
@@ -259,9 +301,11 @@ function Main(props) {
 							setDrawingOverlay={setDrawingOverlay}
 							setShowTempDrawingBtn={setShowTempDrawingBtn}
 							canvasComponentRef={canvasComponentRef}
-							goToModify={goToModify}
+							gotoModify={gotoModify}
 							back={back}
 							isInstructorView={isInstructorView}
+							connected={connected}
+							ref={questionDetailsRef}
 						/>
 					)}
 				</div>

@@ -8,7 +8,7 @@ const { fileStorage, convertOptions } = require('../config');
 const { isNotValidPage, notExistInList, errorHandler, questionCount, shortName } = require('./util');
 const validAnonymities = ['A', 'B', 'C', 'D'];
 
-function instructorAPI(db, instructorAuth, isInstructor) {
+function instructorAPI(db, io, instructorAuth, isInstructor) {
 	let router = express.Router();
 
 	const users = db.collection('users');
@@ -927,6 +927,11 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 			if (updateRes.modifiedCount !== 1) {
 				throw 'delete chat error';
 			}
+			io.to(req.query.sid).emit('delete chat', {
+				pageNum: +req.query.pageNum,
+				qid: +req.query.qid,
+				cid: req.query.cid,
+			});
 
 			res.send();
 		} catch (err) {
@@ -971,6 +976,7 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 			let updateRes;
 
 			// endorse if not already endorsed, otherwise revoke the endorsement
+			let endorseCountChange, solved;
 			if (
 				slide.pages[+req.body.pageNum - 1].questions[req.body.qid].chats[req.body.cid].endorsement.includes(
 					endorseName
@@ -978,40 +984,53 @@ function instructorAPI(db, instructorAuth, isInstructor) {
 			) {
 				const chats = slide.pages[+req.body.pageNum - 1].questions[req.body.qid].chats;
 				let needSetUnsolved = true;
-				setUnsolvedLoop: for (let i of chats) {
-					if (!i) continue;
-					for (let j of i.endorsement) {
-						if (j !== endorseName) {
+				setUnsolvedLoop: for (let i in chats) {
+					if (!chats[i]) continue;
+					for (let j of chats[i].endorsement) {
+						if (j !== endorseName || (j === endorseName && +i !== req.body.cid)) {
 							needSetUnsolved = false;
 							break setUnsolvedLoop;
 						}
 					}
 				}
 				if (needSetUnsolved) {
-					const setUnsolved = {};
-					setUnsolved[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.status`] = 'unsolved';
+					const setUnsolved = {
+						[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.status`]: 'unsolved',
+					};
 					updateRes = await slides.updateOne(
 						{ _id: ObjectID.createFromHexString(req.body.sid) },
 						{ $pull: updateEndorse, $set: setUnsolved }
 					);
+					solved = 0;
 				} else {
 					updateRes = await slides.updateOne(
 						{ _id: ObjectID.createFromHexString(req.body.sid) },
 						{ $pull: updateEndorse }
 					);
+					solved = 1;
 				}
+				endorseCountChange = -1;
 			} else {
-				const setSolved = {};
-				setSolved[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.status`] = 'solved';
+				const setSolved = { [`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.status`]: 'solved' };
 				updateRes = await slides.updateOne(
 					{ _id: ObjectID.createFromHexString(req.body.sid) },
 					{ $addToSet: updateEndorse, $set: setSolved }
 				);
+				endorseCountChange = 1;
+				solved = 1;
 			}
 
 			if (updateRes.modifiedCount !== 1) {
 				throw 'endorse update error';
 			}
+			io.to(req.body.sid).emit('endorse', {
+				pageNum: req.body.pageNum,
+				qid: req.body.qid,
+				cid: req.body.cid,
+				user: endorseName,
+				solved: solved,
+				endorseCountChange: endorseCountChange,
+			});
 			res.send();
 		} catch (err) {
 			errorHandler(res, err);

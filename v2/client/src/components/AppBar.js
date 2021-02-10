@@ -42,11 +42,12 @@ function AppBar(props) {
 	};
 
 	/**
-	 * update showCarouselPanel
+	 * update showCarouselPanel, store setting in localStorage
 	 * @param {Event} e input onChange event
 	 */
 	const setShowCarouselPanel = (e) => {
 		props.setShowCarouselPanel(e.target.checked);
+		localStorage.setItem('SlideChat_HideCarousel', e.target.checked ? '0' : '1');
 	};
 
 	const toggleLargerSlide = (e) => {
@@ -54,11 +55,19 @@ function AppBar(props) {
 		localStorage.setItem('SlideChat_LargerSlide', e.target.checked ? '1' : '0');
 	};
 
+	const toggleStudentView = (e) => {
+		props.setIsInstructorView(!e.target.checked);
+		localStorage.setItem('SlideChat_StudentView', e.target.checked ? '1' : '0');
+	};
+
 	return (
 		<div className='appbar'>
-			<Link to={`${baseURL}/`} className='logo-link'>
-				<img className='appbar-logo' src={`${baseURL}/imgs/logo.png`} alt='SlideChat' />
-			</Link>
+			<div className='appbar-left'>
+				<Link to={`${baseURL}/`} className='logo-link'>
+					<img className='appbar-logo' src={`${baseURL}/imgs/logo.png`} alt='SlideChat' />
+				</Link>
+				<div className='title'>{props.title}</div>
+			</div>
 			<div className='appbar-items'>
 				<ClickAwayListener onClickAway={(e) => setUserDropDown('')}>
 					<span className='dropdown' onClick={(e) => setUserDropDown('open')}>
@@ -66,8 +75,8 @@ function AppBar(props) {
 							Hi, {props.anonymity === 'C' ? props.username : name}
 							{props.anonymity === 'D' && props.isInstructor
 								? props.isInstructorView
-									? "(Instructor's View)"
-									: "(Student's View)"
+									? " (Instructor's View)"
+									: " (Student's View)"
 								: ' '}
 							!
 						</span>
@@ -112,12 +121,11 @@ function AppBar(props) {
 										Signed in as <b>{props.uid}</b>
 									</div>
 									{props.isInstructor ? (
-										<div
-											className='dropdown-item clickable'
-											onClick={(e) => props.setIsInstructorView(!props.isInstructorView)}>
-											{props.isInstructorView
-												? "Change to Student's View"
-												: "Change to Instructor's View"}
+										<div className='dropdown-item'>
+											Student View (for instructors)
+											<Switch
+												checked={!props.isInstructorView}
+												onChange={toggleStudentView}></Switch>
 										</div>
 									) : null}
 									<Link className='dropdown-item clickable' to={`${baseURL}/logout`}>

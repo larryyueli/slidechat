@@ -33,6 +33,9 @@ code {
 	}
 	.main.larger-slide {
 		grid-template-columns: 3fr 1fr;
+		.slide-wrapper {
+			width: 95%;
+		}
 	}
 
 	.chat-area {

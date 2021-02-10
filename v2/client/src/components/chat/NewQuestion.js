@@ -34,8 +34,8 @@ export default function NewQuestion(props) {
 
 	return (
 		<>
-			<ChatAreaTitle title='Ask a Question' showManage={false} showBackBtn={true} back={props.back} />
-			<div className='new-chat-form' key={-1}>
+			<ChatAreaTitle title='New Discussion' showManage={false} showBackBtn={true} back={props.back} />
+			<div className='new-chat-form'>
 				<div>
 					<TextField
 						variant='outlined'
@@ -58,11 +58,11 @@ export default function NewQuestion(props) {
 					<div>
 						{props.drawing ? (
 							<span onClick={props.cancelDrawing} className='add-drawing-btn'>
-								cancel drawing
+								Cancel drawing
 							</span>
 						) : (
 							<span onClick={props.startDrawing} className='add-drawing-btn'>
-								Add some drawing to slide&nbsp;<span className='material-icons'>edit</span>
+								Add some drawing to slide&nbsp;<span className='material-icons'>brush</span>
 							</span>
 						)}
 					</div>

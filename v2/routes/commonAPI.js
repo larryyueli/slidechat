@@ -5,7 +5,7 @@ const { ObjectID } = require('mongodb');
 const { fileStorage } = require('../config');
 const { isNotValidPage, notExistInList, errorHandler, shortName } = require('./util');
 
-function commonAPI(db, isInstructor) {
+function commonAPI(db, io, isInstructor) {
 	let router = express.Router();
 
 	const users = db.collection('users');
@@ -123,7 +123,9 @@ function commonAPI(db, isInstructor) {
 			if (isNotValidPage(req.query.pageNum, slide.pageTotal)) {
 				throw { status: 400, error: 'bad request' };
 			}
-			res.sendFile(path.join(fileStorage, req.query.slideID, 'thumbnails', `thumbnail-${+req.query.pageNum - 1}.png`));
+			res.sendFile(
+				path.join(fileStorage, req.query.slideID, 'thumbnails', `thumbnail-${+req.query.pageNum - 1}.png`)
+			);
 		} catch (err) {
 			errorHandler(res, err);
 		}
@@ -227,6 +229,7 @@ function commonAPI(db, isInstructor) {
 					if (isInstructor(req.session.uid)) {
 						question.uid = question.chats[0].uid;
 					}
+					delete question.drawing;
 					delete question.chats;
 				}
 			}
@@ -257,6 +260,7 @@ function commonAPI(db, isInstructor) {
 						if (isInstructor(req.session.uid)) {
 							question.uid = question.chats[0].uid;
 						}
+						delete question.drawing;
 						delete question.chats;
 					}
 				}
@@ -361,24 +365,33 @@ function commonAPI(db, isInstructor) {
 					},
 				],
 				title: req.body.title,
-				drawing: req.body.drawing,
 			};
 
-			let insertQuestion = {}; // cannot use template string on the left hand side
-			insertQuestion[`pages.${req.body.pageNum - 1}.questions`] = newQuestion;
-			let updateRes = await slides.updateOne(
+			let insertQuestion = {
+				[`pages.${req.body.pageNum - 1}.questions`]: newQuestion,
+			};
+			let updateRes = await slides.findOneAndUpdate(
 				{ _id: ObjectID.createFromHexString(req.body.sid) },
 				{
 					$push: insertQuestion,
 					$set: {
 						lastActive: time,
 					},
-				}
+				},
+				{ projection: { pages: 1 } }
 			);
-			if (updateRes.modifiedCount !== 1) {
+			if (updateRes.ok !== 1) {
 				throw 'question update error';
 			}
-
+			io.to(req.body.sid).emit('new question', {
+				create: time,
+				id: updateRes.value.pages[req.body.pageNum - 1].questions.length,
+				pageNum: req.body.pageNum,
+				status: 'unsolved',
+				time: time,
+				title: req.body.title,
+				user: newQuestion.chats[0].user,
+			});
 			res.send();
 		} catch (err) {
 			errorHandler(res, err);
@@ -424,7 +437,7 @@ function commonAPI(db, isInstructor) {
 
 			let insertChat = {}; // cannot use template string on the left hand side
 			insertChat[`pages.${req.body.pageNum - 1}.questions.${req.body.qid}.chats`] = newChat;
-			let updateRes = await slides.updateOne(
+			let updateRes = await slides.findOneAndUpdate(
 				{ _id: ObjectID.createFromHexString(req.body.sid) },
 				{
 					$push: insertChat,
@@ -434,11 +447,13 @@ function commonAPI(db, isInstructor) {
 					},
 				}
 			);
-
-			if (updateRes.modifiedCount !== 1) {
+			if (updateRes.ok !== 1) {
 				throw 'chat update error';
 			}
-
+			delete newChat.uid;
+			newChat.pageNum = req.body.pageNum;
+			newChat.qid = req.body.qid;
+			io.to(req.body.sid).emit('new reply', newChat);
 			res.send();
 		} catch (err) {
 			errorHandler(res, err);
@@ -477,7 +492,7 @@ function commonAPI(db, isInstructor) {
 			// if anonymous, randomly generated username may repeat, so it does not make
 			// sense to only allow one like per name. So everyone can like as many times
 			// as they want
-			let updateRes;
+			let updateRes, likeCountChange;
 			if (slide.anonymity !== 'A') {
 				// like if not yet liked, otherwise unlike
 				if (
@@ -487,23 +502,32 @@ function commonAPI(db, isInstructor) {
 						{ _id: ObjectID.createFromHexString(req.body.sid) },
 						{ $addToSet: insertLike }
 					);
+					likeCountChange = 1;
 				} else {
 					updateRes = await slides.updateOne(
 						{ _id: ObjectID.createFromHexString(req.body.sid) },
 						{ $pull: insertLike }
 					);
+					likeCountChange = -1;
 				}
 			} else {
 				updateRes = await slides.updateOne(
 					{ _id: ObjectID.createFromHexString(req.body.sid) },
 					{ $push: insertLike }
 				);
+				likeCountChange = 1;
 			}
 
 			if (updateRes.modifiedCount !== 1) {
 				throw 'like update error';
 			}
-
+			io.to(req.body.sid).emit('like', {
+				pageNum: req.body.pageNum,
+				qid: req.body.qid,
+				cid: req.body.cid,
+				user: req.body.user,
+				likeCountChange: likeCountChange,
+			});
 			res.send();
 		} catch (err) {
 			errorHandler(res, err);
@@ -560,6 +584,14 @@ function commonAPI(db, isInstructor) {
 				throw 'chat modify error';
 			}
 
+			io.to(req.body.sid).emit('modify', {
+				pageNum: req.body.pageNum,
+				qid: req.body.qid,
+				cid: req.body.cid,
+				time: time,
+				body: req.body.body,
+			});
+
 			res.send();
 		} catch (err) {
 			errorHandler(res, err);
@@ -611,6 +643,12 @@ function commonAPI(db, isInstructor) {
 			if (updateRes.modifiedCount !== 1) {
 				throw 'delete own chat error';
 			}
+
+			io.to(req.body.sid).emit('delete chat', {
+				pageNum: req.body.pageNum,
+				qid: req.body.qid,
+				cid: req.body.cid,
+			});
 
 			res.send();
 		} catch (err) {
