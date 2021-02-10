@@ -24,7 +24,6 @@ export default function Slides(props) {
 	const carousel = useRef(null);
 
 	useEffect(() => {
-		console.log(props);
 		if (!props.pageTotal) return;
 		fetch(`${serverURL}/api/slideImg?slideID=${props.sid}&pageNum=${props.pageNum}`)
 			.then((res) => {

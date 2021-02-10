@@ -115,7 +115,6 @@ async function startSlideChat(io) {
 	});
 
 	io.on('connection', async (socket) => {
-		console.log('connected');
 		socket.on('join slide room', async (slideID) => {
 			let slide;
 			try {
