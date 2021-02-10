@@ -927,6 +927,11 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			if (updateRes.modifiedCount !== 1) {
 				throw 'delete chat error';
 			}
+			io.to(req.query.sid).emit('delete chat', {
+				pageNum: +req.query.pageNum,
+				qid: +req.query.qid,
+				cid: req.query.cid,
+			});
 
 			res.send();
 		} catch (err) {

@@ -584,6 +584,14 @@ function commonAPI(db, io, isInstructor) {
 				throw 'chat modify error';
 			}
 
+			io.to(req.body.sid).emit('modify', {
+				pageNum: req.body.pageNum,
+				qid: req.body.qid,
+				cid: req.body.cid,
+				time: time,
+				body: req.body.body,
+			});
+
 			res.send();
 		} catch (err) {
 			errorHandler(res, err);
@@ -635,6 +643,12 @@ function commonAPI(db, io, isInstructor) {
 			if (updateRes.modifiedCount !== 1) {
 				throw 'delete own chat error';
 			}
+
+			io.to(req.body.sid).emit('delete chat', {
+				pageNum: req.body.pageNum,
+				qid: req.body.qid,
+				cid: req.body.cid,
+			});
 
 			res.send();
 		} catch (err) {

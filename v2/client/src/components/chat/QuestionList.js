@@ -155,7 +155,7 @@ export default class QuestionList extends React.Component {
 		});
 	}
 
-	onNewEndorseEvent(data) {
+	onEndorseEvent(data) {
 		this.setState((state) => {
 			for (let question of state.questions) {
 				if (question.pageNum === data.pageNum && question.id === data.qid) {

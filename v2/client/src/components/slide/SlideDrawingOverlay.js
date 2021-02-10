@@ -66,13 +66,13 @@ export default class SlideOverlay extends React.Component {
 		for (let line of this.lines) {
 			this.ctx.beginPath();
 			this.ctx.moveTo(
-				((line[0] * this.canvas.width) / resolution) >> 0,
-				((line[1] * this.canvas.height) / resolution) >> 0
+				((line[0] * this.canvas.clientWidth) / resolution) >> 0,
+				((line[1] * this.canvas.clientHeight) / resolution) >> 0
 			);
 			for (let i = 2; i < line.length - 1; i += 2) {
 				this.ctx.lineTo(
-					((line[i] * this.canvas.width) / resolution) >> 0,
-					((line[i + 1] * this.canvas.height) / resolution) >> 0
+					((line[i] * this.canvas.clientWidth) / resolution) >> 0,
+					((line[i + 1] * this.canvas.clientHeight) / resolution) >> 0
 				);
 			}
 			this.ctx.stroke();
@@ -106,8 +106,8 @@ export default class SlideOverlay extends React.Component {
 	drawingOnMouseDown(e) {
 		if (this.state.readOnly) return;
 		this.lines.push([
-			((e.offsetX / this.canvas.width) * resolution) >> 0,
-			((e.offsetY / this.canvas.height) * resolution) >> 0,
+			((e.offsetX / this.canvas.clientWidth) * resolution) >> 0,
+			((e.offsetY / this.canvas.clientHeight) * resolution) >> 0,
 		]);
 		this.isDrawing = true;
 	}
@@ -120,8 +120,8 @@ export default class SlideOverlay extends React.Component {
 		if (this.state.readOnly) return;
 		if (!this.isDrawing) return;
 		let lastLine = this.lines[this.lines.length - 1];
-		lastLine.push(((e.offsetX / this.canvas.width) * resolution) >> 0);
-		lastLine.push(((e.offsetY / this.canvas.height) * resolution) >> 0);
+		lastLine.push(((e.offsetX / this.canvas.clientWidth) * resolution) >> 0);
+		lastLine.push(((e.offsetY / this.canvas.clientHeight) * resolution) >> 0);
 		this.applyLineChange(lastLine);
 	}
 
@@ -156,8 +156,8 @@ export default class SlideOverlay extends React.Component {
 		let offsetY = touch.clientY - rect.top;
 
 		let lastLine = this.lines[this.lines.length - 1];
-		lastLine.push(((offsetX / this.canvas.width) * resolution) >> 0);
-		lastLine.push(((offsetY / this.canvas.height) * resolution) >> 0);
+		lastLine.push(((offsetX / this.canvas.clientWidth) * resolution) >> 0);
+		lastLine.push(((offsetY / this.canvas.clientHeight) * resolution) >> 0);
 		this.applyLineChange(lastLine);
 	}
 
@@ -174,8 +174,8 @@ export default class SlideOverlay extends React.Component {
 		let offsetX = touch.clientX - rect.left;
 		let offsetY = touch.clientY - rect.top;
 		this.lines.push([
-			((offsetX / this.canvas.width) * resolution) >> 0,
-			((offsetY / this.canvas.height) * resolution) >> 0,
+			((offsetX / this.canvas.clientWidth) * resolution) >> 0,
+			((offsetY / this.canvas.clientHeight) * resolution) >> 0,
 		]);
 	}
 

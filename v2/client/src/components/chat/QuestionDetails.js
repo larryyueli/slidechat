@@ -91,7 +91,6 @@ export default class QuestionDetails extends React.Component {
 			})
 			.then((res) => {
 				this.chatRef.current.value = '';
-				this.fetchQuestionDetails();
 			})
 			.catch((err) => {
 				console.error(err);
@@ -106,7 +105,6 @@ export default class QuestionDetails extends React.Component {
 				qid: this.props.qid,
 				cid: cid,
 			})
-			.then(() => this.fetchQuestionDetails())
 			.catch((err) => {
 				console.error(err);
 			});
@@ -121,7 +119,6 @@ export default class QuestionDetails extends React.Component {
 				cid: cid,
 				user: getDisplayName(),
 			})
-			.then(() => this.fetchQuestionDetails())
 			.catch((err) => {
 				console.error(err);
 			});
@@ -135,7 +132,6 @@ export default class QuestionDetails extends React.Component {
 			.delete(
 				`${serverURL}/api/chat?sid=${this.props.sid}&qid=${this.props.qid}&pageNum=${this.props.pageNum}&cid=${cid}`
 			)
-			.then(() => this.fetchQuestionDetails())
 			.catch((err) => {
 				console.error(err);
 			});
@@ -159,7 +155,7 @@ export default class QuestionDetails extends React.Component {
 		}
 	}
 
-	onNewLikeEvent(data) {
+	onLikeEvent(data) {
 		this.setState((state, props) => {
 			if (props.pageNum === data.pageNum && props.qid === data.qid) {
 				const likes = state.messages.chats[data.cid].likes;
@@ -176,17 +172,29 @@ export default class QuestionDetails extends React.Component {
 		});
 	}
 
-	onNewModifyEvent(data) {
-		console.log(this.state.messages);
-		// TODO
+	onModifyEvent(data) {
+		if (this.props.pageNum === data.pageNum && this.props.qid === data.qid) {
+			const chats = this.state.messages.chats;
+			chats[data.cid].body = data.body;
+			chats[data.cid].modified = true;
+			chats[data.cid].time = data.time;
+			this.setState((state) => ({
+				messages: { ...state.messages, chats: [...chats] },
+			}));
+		}
 	}
 
-	onNewDeleteEvent(data) {
-		console.log(this.state.messages);
-		// TODO
+	onDeleteEvent(data) {
+		if (this.props.pageNum === data.pageNum && this.props.qid === data.qid) {
+			const chats = this.state.messages.chats;
+			chats[data.cid] = null;
+			this.setState((state) => ({
+				messages: { ...state.messages, chats: [...chats] },
+			}));
+		}
 	}
 
-	onNewEndorseEvent(data) {
+	onEndorseEvent(data) {
 		this.setState((state, props) => {
 			if (props.pageNum === data.pageNum && props.qid === data.qid) {
 				const endorsement = state.messages.chats[data.cid].endorsement;

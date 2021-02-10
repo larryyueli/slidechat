@@ -12,20 +12,24 @@ export default function ModifyChat(props) {
 		if (!textRef.current.value) {
 			return alert('Message body cannot be empty!');
 		}
-		axios
-			.post(`${serverURL}/api/modifyChat/`, {
-				sid: props.sid,
-				pageNum: props.pageNum,
-				qid: props.old.qid,
-				cid: props.old.cid,
-				body: textRef.current.value,
-			})
-			.then((res) => {
-				props.back();
-			})
-			.catch((err) => {
-				console.error(err);
-			});
+		if (props.old.body !== textRef.current.value) {
+			axios
+				.post(`${serverURL}/api/modifyChat/`, {
+					sid: props.sid,
+					pageNum: props.pageNum,
+					qid: props.old.qid,
+					cid: props.old.cid,
+					body: textRef.current.value,
+				})
+				.then((res) => {
+					props.back();
+				})
+				.catch((err) => {
+					console.error(err);
+				});
+		} else {
+			props.back();
+		}
 	};
 
 	const deleteOwnChat = () => {
