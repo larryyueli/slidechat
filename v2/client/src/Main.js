@@ -8,7 +8,7 @@ import ModifyChat from './components/chat/ModifyChat';
 import NewQuestion from './components/chat/NewQuestion';
 import QuestionList from './components/chat/QuestionList';
 import QuestionDetails from './components/chat/QuestionDetails';
-import { baseURL, serverURL } from './config';
+import { baseURL, serverURL, socketURL, socketPath } from './config';
 import { QUESTION_LIST, NEW_QUESTION, MODIFY_CHAT } from './util';
 
 /**
@@ -82,7 +82,10 @@ function Main(props) {
 				console.error(err);
 			});
 
-		const socket = io(serverURL);
+		const socket = io(socketURL(), {
+			path: socketPath,
+			transports: ['polling'], // web socket doesn't work on the reverse proxy yet...
+		});
 		socket.emit('join slide room', sid);
 		socket.on('connect', () => {
 			console.log('socket connected');
@@ -96,7 +99,6 @@ function Main(props) {
 			if (questionListRef.current) questionListRef.current.onNewQuestionEvent(data);
 		});
 		socket.on('new reply', (data) => {
-			console.log(data);
 			if (questionListRef.current) questionListRef.current.onNewReplyEvent(data);
 			if (questionDetailsRef.current) questionDetailsRef.current.onNewReplyEvent(data);
 		});

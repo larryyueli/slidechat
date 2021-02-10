@@ -70,6 +70,7 @@ morgan.token('body', (req) => {
 
 	const server = http.createServer(app);
 	io.attach(server, {
+		path: config.socketPath,
 		serveClient: false,
 		cors: NODE_ENV !== 'production' ? { origin: '*' } : undefined,
 	});

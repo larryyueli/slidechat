@@ -1,7 +1,7 @@
 const os = require('os');
 const path = require('path');
 const querystring = require('querystring');
-const { dbUser, dbPsw, instructors } = require('./secrets');
+const { dbUser, dbPsw } = require('./secrets');
 
 const escapedUser = querystring.escape(dbUser);
 const escapedPsw = querystring.escape(dbPsw);
@@ -10,6 +10,8 @@ module.exports = {
 	baseURL: '/slidechat',
 
 	instructorURL: '/prof',
+
+	socketPath: '/socket/', // in production mode, client connect to baseURL+socketPath
 
 	cookieName: '_SlideChatSess',
 
