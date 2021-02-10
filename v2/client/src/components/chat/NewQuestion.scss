@@ -11,10 +11,12 @@
 	}
 
 	.add-drawing-btn {
+		@include clickable;
 		display: inline-flex;
 		align-items: center;
 		padding: 0.5rem;
 		text-transform: uppercase;
+		transition: background-color 0.3s ease-out;
 		&:hover {
 			background-color: #00000008;
 		}

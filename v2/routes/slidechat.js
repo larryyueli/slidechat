@@ -131,6 +131,7 @@ async function startSlideChat(io) {
 				socket.emit('error', 'Join slide room: invalid slide ID!');
 			}
 		});
+		socket.on('leave', (roomID) => socket.leave(roomID));
 	});
 
 	// APIs

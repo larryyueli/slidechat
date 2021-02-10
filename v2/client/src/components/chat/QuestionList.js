@@ -18,12 +18,16 @@ export default class QuestionList extends React.Component {
 	}
 
 	componentDidMount() {
-		this.fetchQuestionList();
+		if (this.props.connected) this.fetchQuestionList();
 	}
 
 	// fetch questions when page is changed
 	componentDidUpdate(prevProps) {
-		if (this.props.sid !== prevProps.sid || this.props.pageNum !== prevProps.pageNum) {
+		if (
+			this.props.sid !== prevProps.sid ||
+			this.props.pageNum !== prevProps.pageNum ||
+			(this.props.connected && !prevProps.connected)
+		) {
 			if (!this.state.showAll) this.fetchQuestionList();
 		}
 	}
@@ -180,8 +184,11 @@ export default class QuestionList extends React.Component {
 				/>
 				<div className='chat-list'>
 					<div className='new-chat-btn-row' key={-1}>
-						<Button variant='contained' onClick={this.props.askNewQuestion}>
-							Ask a new question
+						<Button
+							variant='contained'
+							onClick={this.props.askNewQuestion}
+							disabled={!this.props.connected}>
+							{this.props.connected ? 'Start a new discussion' : 'Disconnected'}
 						</Button>
 					</div>
 					<div className='align-right'>

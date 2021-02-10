@@ -47,7 +47,8 @@ export default class QuestionDetails extends React.Component {
 		if (
 			this.props.sid !== prevProps.sid ||
 			this.props.pageNum !== prevProps.pageNum ||
-			this.props.qid !== prevProps.qid
+			this.props.qid !== prevProps.qid ||
+			(this.props.connected && !prevProps.connected)
 		) {
 			this.fetchQuestionDetails();
 			this.props.setDrawingOverlay(false);
@@ -313,11 +314,19 @@ export default class QuestionDetails extends React.Component {
 							rowsMax='4'
 							inputRef={this.chatRef}
 						/>
-						<Button variant='contained' color='primary' onClick={this.sendNewChat}>
+						<Button
+							variant='contained'
+							color='primary'
+							onClick={this.sendNewChat}
+							disabled={!this.props.connected}>
 							Send
 						</Button>
 					</div>
-					<div className='anonymity'>{anonymityMessage(this.props.anonymity, this.props.username)}</div>
+					<div className='anonymity'>
+						{this.props.connected
+							? anonymityMessage(this.props.anonymity, this.props.username)
+							: 'You are disconnected from the chat server.'}
+					</div>
 				</div>
 			</>
 		);

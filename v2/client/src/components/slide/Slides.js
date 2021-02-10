@@ -144,21 +144,9 @@ export default function Slides(props) {
 		centerCarousel(props.pageNum - 1);
 	};
 
-	/**
-	 * go to prev page
-	 * @param {Event} onClick event
-	 */
-	const firstPage = () => {
-		props.gotoPage(1);
-		centerCarousel(1);
-	};
-	/**
-	 * go to prev page
-	 * @param {Event} onClick event
-	 */
-	const lastPage = () => {
-		props.gotoPage(props.pageTotal);
-		centerCarousel(props.pageTotal);
+	const gotoPageAndCenterCarousel = (pageNum) => {
+		props.gotoPage(pageNum);
+		centerCarousel(pageNum);
 	};
 
 	const centerCarousel = (pageNum) => {
@@ -274,7 +262,9 @@ export default function Slides(props) {
 				)}
 
 				<div className='page-panel'>
-					<span className={`material-icons ${props.pageNum <= 1 ? 'disable' : ''}`} onClick={firstPage}>
+					<span
+						className={`material-icons ${props.pageNum <= 1 ? 'disable' : ''}`}
+						onClick={() => gotoPageAndCenterCarousel(1)}>
 						first_page
 					</span>
 					<span className={`material-icons ${props.pageNum <= 1 ? 'disable' : ''}`} onClick={prevPage}>
@@ -300,7 +290,7 @@ export default function Slides(props) {
 					</span>
 					<span
 						className={`material-icons ${props.pageNum >= props.pageTotal ? 'disable' : ''}`}
-						onClick={lastPage}>
+						onClick={() => gotoPageAndCenterCarousel(props.pageTotal)}>
 						last_page
 					</span>
 				</div>
@@ -311,7 +301,7 @@ export default function Slides(props) {
 							<div
 								className={`thumbnail-container ${props.pageNum === i ? 'current-slide' : ''}`}
 								id={`thumbnail-${i}`}
-								onClick={(e) => props.gotoPage(i)}
+								onClick={() => gotoPageAndCenterCarousel(i)}
 								key={i}>
 								<img
 									src={`${serverURL}/api/slideThumbnail?slideID=${props.sid}&pageNum=${i}`}

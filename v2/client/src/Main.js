@@ -17,6 +17,7 @@ import { QUESTION_LIST, NEW_QUESTION, MODIFY_CHAT } from './util';
  */
 function Main(props) {
 	const sid = props.match.params.slideId;
+	const [connected, setConnected] = useState(false);
 	const [pageTotal, setPageTotal] = useState(0);
 	const [page, setPage] = useState(1);
 	const [title, setTitle] = useState('');
@@ -85,12 +86,11 @@ function Main(props) {
 		socket.emit('join slide room', sid);
 		socket.on('connect', () => {
 			console.log('socket connected');
+			setConnected(true);
 		});
 		socket.on('disconnect', (reason) => {
 			console.log('socket disconnected, reason: ', reason);
-		});
-		socket.on('reconnect', (attemptNumber) => {
-			console.log('socket reconnected: ', attemptNumber);
+			setConnected(false);
 		});
 		socket.on('new question', (data) => {
 			if (questionListRef.current) questionListRef.current.onNewQuestionEvent(data);
@@ -114,6 +114,9 @@ function Main(props) {
 			if (questionDetailsRef.current) questionDetailsRef.current.onEndorseEvent(data);
 		});
 		socket.on('error', (msg) => alert(msg));
+		return () => {
+			socket.emit('leave', sid);
+		};
 	}, [sid, props.match.params]);
 
 	/**
@@ -265,6 +268,7 @@ function Main(props) {
 							askNewQuestion={gotoNewQuestion}
 							goToQuestion={gotoQuestion}
 							isInstructorView={isInstructorView}
+							connected={connected}
 							ref={questionListRef}
 						/>
 					) : qid === NEW_QUESTION ? (
@@ -300,6 +304,7 @@ function Main(props) {
 							gotoModify={gotoModify}
 							back={back}
 							isInstructorView={isInstructorView}
+							connected={connected}
 							ref={questionDetailsRef}
 						/>
 					)}
