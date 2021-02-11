@@ -25,10 +25,20 @@ code {
 		display: grid;
 		grid-template-columns: 2fr 1fr;
 		grid-template-rows: auto;
-		height: calc(100vh - 4rem);
-		/* 2rem line height + 0.5rem padding * 2 + 1rem margin */
+		// 2.5rem logo + (0.5rem padding * 2)
+		height: calc(100vh - 3.5rem);
 		.slide-wrapper {
 			width: 90%;
+		}
+		.chat-area-title {
+			border-top: none;
+		}
+		.chat-area-main {
+			height: calc(100vh - 8rem);
+		}
+		.slide-container,
+		.chat-area-main {
+			@include vertical-scrollbar;
 		}
 	}
 	.main.larger-slide {

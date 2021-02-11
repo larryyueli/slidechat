@@ -215,13 +215,13 @@ export default function Slides(props) {
 			<div className='slide-toolbar'>
 				{props.showTempDrawingBtn ? (
 					props.drawing ? (
-						<div className='icon-btn drawing' title='Temporary drawing'>
+						<div className='icon-btn drawing' title='Clear drawing'>
 							<span className={`material-icons icon`} onClick={props.cancelDrawing}>
 								close
 							</span>
 						</div>
 					) : (
-						<div className='icon-btn' title='Clear drawing'>
+						<div className='icon-btn' title='Temporary drawing'>
 							<span className={`material-icons icon`} onClick={props.startDrawing}>
 								brush
 							</span>

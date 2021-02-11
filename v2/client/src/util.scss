@@ -81,3 +81,20 @@
 	}
 	margin-right: 0.5rem;
 }
+
+@mixin vertical-scrollbar {
+	overflow-y: auto;
+	&::-webkit-scrollbar {
+		width: 0.4rem;
+	}
+	&::-webkit-scrollbar-thumb {
+		display: none;
+		background-color: #cccccc;
+		border-radius: 0.2rem;
+	}
+	&:hover {
+		&::-webkit-scrollbar-thumb {
+			display: block;
+		}
+	}
+}

@@ -1,7 +1,7 @@
 .appbar {
-	position: static;
+	position: relative;
 	@include flexSides();
-	padding: 0.5rem 0.5rem;
+	padding: 0.5rem 1rem;
 	@media (min-width: 768px) {
 		padding: 0.5rem 3rem;
 	}
@@ -9,6 +9,7 @@
 	background-color: $primary;
 	box-shadow: 0 3px 10px #aaaaaa;
 	user-select: none;
+	z-index: 1000;
 
 	.appbar-left {
 		display: flex;
@@ -32,25 +33,33 @@
 		}
 	}
 
-	.appbar-items {
+	.appbar-right {
 		display: flex;
 		align-items: center;
 		justify-content: flex-end;
-		.appbar-item {
-			color: #ffffff;
-			text-decoration: none;
-			margin: 0 0.5rem;
-			padding: 0.4rem;
-			border-radius: 0.4rem;
-
-			&:hover {
-				background-color: #ffffff20;
-			}
-		}
 	}
 
 	.dropdown {
 		position: relative;
+		display: flex;
+		align-items: center;
+
+		.greeting-text {
+			display: none;
+			cursor: pointer;
+		}
+		.menu-icon {
+			display: block;
+			cursor: pointer;
+		}
+		@media (min-width: 768px) {
+			.greeting-text {
+				display: block;
+			}
+			.menu-icon {
+				display: none;
+			}
+		}
 
 		.dropdown-content {
 			display: none;
@@ -58,9 +67,10 @@
 			right: 0;
 			top: 2rem;
 			background-color: $backgroundColour;
-			min-width: 100%;
+			width: 36ch;
+			max-width: 90vw;
 			box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-			z-index: 1000;
+			z-index: 1100;
 			color: black;
 
 			.dropdown-item {

@@ -35,7 +35,7 @@ export default function NewQuestion(props) {
 	return (
 		<>
 			<ChatAreaTitle title='New Discussion' showManage={false} showBackBtn={true} back={props.back} />
-			<div className='new-chat-form'>
+			<div className='chat-area-main new-chat-form'>
 				<div>
 					<TextField
 						variant='outlined'

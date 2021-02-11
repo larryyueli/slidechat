@@ -71,7 +71,7 @@ function AppBar(props) {
 			<div className='appbar-items'>
 				<ClickAwayListener onClickAway={(e) => setUserDropDown('')}>
 					<span className='dropdown' onClick={(e) => setUserDropDown('open')}>
-						<span className='appbar-item'>
+						<span className='greeting-text'>
 							Hi, {props.anonymity === 'C' ? props.username : name}
 							{props.anonymity === 'D' && props.isInstructor
 								? props.isInstructorView
@@ -80,6 +80,7 @@ function AppBar(props) {
 								: ' '}
 							!
 						</span>
+						<span className='material-icons menu-icon'>menu</span>
 						<div className={`dropdown-content ${userDropDown}`}>
 							{props.anonymity !== 'C' ? (
 								<>

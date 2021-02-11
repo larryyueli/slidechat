@@ -52,7 +52,7 @@ export default function ModifyChat(props) {
 	return (
 		<>
 			<ChatAreaTitle title='Modify a Message' showManage={false} showBackBtn={true} back={props.back} />
-			<div className='new-chat-form'>
+			<div className='chat-area-main new-chat-form'>
 				<div>
 					<TextField variant='outlined' multiline rows='6' defaultValue={props.old.body} inputRef={textRef} />
 				</div>

@@ -224,7 +224,7 @@ export default class QuestionDetails extends React.Component {
 					showBackBtn={true}
 					back={this.props.back}
 				/>
-				<div className='chat-details'>
+				<div className='chat-area-main chat-details'>
 					<div className='title' key={-2}>
 						{messages.title}
 					</div>

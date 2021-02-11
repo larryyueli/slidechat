@@ -182,7 +182,7 @@ export default class QuestionList extends React.Component {
 					toggleManaging={() => this.setState({ managing: !this.state.managing })}
 					showBackBtn={false}
 				/>
-				<div className='chat-list'>
+				<div className='chat-area-main chat-list'>
 					<div className='new-chat-btn-row' key={-1}>
 						<Button
 							variant='contained'
