@@ -40,6 +40,8 @@ function Main(props) {
 	const questionListRef = useRef(null);
 	const questionDetailsRef = useRef(null);
 
+	const [darkTheme, setDarkTheme] = useState(document.documentElement.getAttribute('data-theme') === 'dark');
+
 	/**
 	 * fetch slide info from server and redirect to login if needed
 	 */
@@ -240,6 +242,8 @@ function Main(props) {
 				setShowCarouselPanel={setShowCarouselPanel}
 				largerSlide={largerSlide}
 				setLargerSlide={setLargerSlide}
+				darkTheme={darkTheme}
+				setDarkTheme={setDarkTheme}
 			/>
 			<div className={`main ${largerSlide ? 'larger-slide' : ''}`}>
 				<Slides

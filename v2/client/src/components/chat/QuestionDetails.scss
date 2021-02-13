@@ -1,6 +1,4 @@
 .chat-details {
-	@import './github-gist.scss';
-
 	.title {
 		font-size: 1.4rem;
 		padding: 2rem 1rem 0 1rem;
@@ -66,7 +64,7 @@
 				.delete {
 					color: $secondary;
 					&:hover {
-						color: lighten($secondary, 10%);
+						color: $secondaryHover;
 					}
 				}
 			}
@@ -86,6 +84,10 @@
 				margin-top: 1rem;
 				color: $endorsementColour;
 			}
+		}
+
+		:root[data-theme='dark'] pre {
+			background-color: #af4c4c;
 		}
 
 		p > code {

@@ -1,12 +1,37 @@
-$primary: rgb(108, 161, 124);
-$primaryLight: rgb(146, 197, 162);
-$primaryShadow: rgba(108, 161, 124, 0.04);
-$secondary: rgb(202, 41, 98);
-$gray: rgb(226, 231, 229);
-$grayText: rgb(186, 195, 191);
-$disabled: rgb(190, 190, 190);
-$dividerColour: #cccccc;
-$backgroundColour: #fafafa;
-$likeColour: #e97b89;
-$endorsementColour: rgb(236, 196, 84);
-$codeBackground: #0000000a;
+:root {
+	--primary: rgb(108, 161, 124);
+	--primary-light: rgb(146, 197, 162);
+	--primary-shadow: rgba(108, 161, 124, 0.04);
+	--secondary: rgb(202, 41, 98);
+	--secondary-hover: rgb(228, 70, 125);
+	--gray: rgb(226, 231, 229);
+	--gray-text: rgb(186, 195, 191);
+	--disabled: rgb(190, 190, 190);
+	--divider-colour: #cccccc;
+	--background-colour: #fafafa;
+	--like-colour: #e97b89;
+	--endorsement-colour: rgb(236, 196, 84);
+	--text-colour: #000;
+	color: var(--text-colour);
+	@import './components/code-highlighting/github-gist.scss';
+}
+:root[data-theme='dark'] {
+	--primary: rgb(70 95 77);
+	--background-colour: #121212;
+	color: white;
+	@import './components/code-highlighting/vs2015.scss';
+}
+
+$primary: var(--primary);
+$primaryLight: var(--primary-light);
+$primaryShadow: var(--primary-shadow);
+$secondary: var(--secondary);
+$secondaryHover: var(--secondary-hover);
+$gray: var(--gray);
+$grayText: var(--gray-text);
+$disabled: var(--disabled);
+$dividerColour: var(--divider-colour);
+$backgroundColour: var(--background-colour);
+$likeColour: var(--like-colour);
+$endorsementColour: var(--endorsement-colour);
+$codeBackground: var(--code-background);

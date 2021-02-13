@@ -1,10 +1,10 @@
 .landing {
-	margin: 1rem 0;
+	height: calc(100vh - 3.5rem);
 	text-align: center;
 	.text {
 		width: 50%;
-		margin-top: 5rem;
-		margin-left: 25%;
+		padding-top: 5rem;
+		padding-left: 25%;
 		font-size: 1.5rem;
 
 		div {

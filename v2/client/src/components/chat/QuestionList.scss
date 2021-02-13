@@ -69,7 +69,7 @@
 			.delete {
 				color: $secondary;
 				&:hover {
-					color: lighten($secondary, 10%);
+					color: $secondaryHover;
 				}
 			}
 		}

@@ -60,6 +60,14 @@ function AppBar(props) {
 		localStorage.setItem('SlideChat_StudentView', e.target.checked ? '1' : '0');
 	};
 
+	const toggleDarkTheme = (e) => {
+		const dark = e.target.checked;
+		props.setDarkTheme(dark);
+		localStorage.setItem('SlideChat_DarkTheme', dark ? '1' : '0');
+		if (dark) document.documentElement.setAttribute('data-theme', 'dark');
+		else document.documentElement.setAttribute('data-theme', 'light');
+	};
+
 	return (
 		<div className='appbar'>
 			<div className='appbar-left'>
@@ -108,6 +116,10 @@ function AppBar(props) {
 									</div>
 								</>
 							) : null}
+							<div className='dropdown-item'>
+								Dark theme
+								<Switch checked={props.darkTheme} onChange={toggleDarkTheme}></Switch>
+							</div>
 							<div className='dropdown-item'>
 								Display thumbnails
 								<Switch checked={props.showCarouselPanel} onChange={setShowCarouselPanel}></Switch>
