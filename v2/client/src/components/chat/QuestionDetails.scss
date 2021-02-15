@@ -107,7 +107,7 @@
 		align-items: center;
 
 		.MuiTextField-root {
-			background-color: var(--text-input-color);
+			background-color: $backgroundColour;
 			flex: 1;
 			margin-right: 0.5rem;
 
