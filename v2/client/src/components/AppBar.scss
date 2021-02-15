@@ -73,12 +73,21 @@
 			z-index: 1100;
 			color: black;
 
+			& input {
+				background-color: var(--text-input-bg-color);
+				color: var(--text-colour);
+			}
+
 			.dropdown-item {
-				color: black;
+				color: var(--text-colour);
 				padding: 0.5rem 1.3rem;
 				text-decoration: none;
 				display: block;
 				text-align: left;
+
+				.MuiButton-label {
+					color: var(--text-colour);
+				}
 
 				.MuiSwitch-root {
 					.Mui-checked {
@@ -87,8 +96,14 @@
 					.Mui-checked + .MuiSwitch-track {
 						background-color: $primaryLight;
 					}
+					.MuiSwitch-track {
+						background-color: $primaryLight;
+					}
 					.Mui-checked:hover {
 						background-color: $primaryShadow;
+					}
+					.MuiSwitch-thumb {
+						background-color: $primary;
 					}
 				}
 			}
@@ -96,7 +111,8 @@
 			.clickable {
 				padding: 1rem 1.3rem;
 				&:hover {
-					background-color: #f1f1f1;
+					background-color: var(--button-hover);
+					color: var(--text-colour);
 				}
 			}
 

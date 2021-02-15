@@ -17,11 +17,15 @@
 	--carousel-border: #d4d4d4;
 	--icon-button-hover: #e9e9e9;
 	--icon-hover: black;
+	--button-hover: #cccccc;
+	--text-input-bg-color: white;
+	--text-input-border-color: #cccccc;
 	color: var(--text-colour);
 	@import './components/code-highlighting/github-gist.scss';
 }
 :root[data-theme='dark'] {
 	--primary: #161717;
+	--primary-light: #cccccc;
 	--divider-colour: rgb(62, 68, 70);
 	--background-colour: #0f1010;
 	--option-selected: rgb(232, 230, 227);
@@ -29,6 +33,10 @@
 	--carousel-border: rgb(60, 65, 68);
 	--icon-button-hover: rgb(36, 39, 41);
 	--icon-hover: white;
+	--text-colour: #cccccc;
+	--button-hover: rgb(25, 27, 28);
+	--text-input-bg-color: black;
+	--text-input-border-color: rgb(62, 68, 70);
 	color: white;
 	@import './components/code-highlighting/vs2015.scss';
 }
