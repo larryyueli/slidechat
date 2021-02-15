@@ -32,8 +32,8 @@
 		width: 100%;
 
 		.MuiOutlinedInput-root {
-			border: 1px solid var(--text-input-border-color);
-			color: var(--text-colour);
+			border: 1px solid $textInputBorderColour;
+			color: $textColour;
 		}
 
 		.MuiOutlinedInput-input {

@@ -18,8 +18,8 @@
 	--icon-button-hover: #e9e9e9;
 	--icon-hover: black;
 	--button-hover: #cccccc;
-	--text-input-bg-color: white;
-	--text-input-border-color: #cccccc;
+	--text-input-bg-colour: white;
+	--text-input-border-colour: #cccccc;
 	color: var(--text-colour);
 	@import './components/code-highlighting/github-gist.scss';
 }
@@ -35,8 +35,7 @@
 	--icon-hover: white;
 	--text-colour: #cccccc;
 	--button-hover: rgb(25, 27, 28);
-	--text-input-bg-color: #161717;
-	--text-input-border-color: rgb(62, 68, 70);
+	--text-input-border-colour: rgb(62, 68, 70);
 	color: white;
 	@import './components/code-highlighting/vs2015.scss';
 }
@@ -59,3 +58,6 @@ $chatHover: var(--chat-hover);
 $carouselBorder: var(--carousel-border);
 $iconButtonHover: var(--icon-button-hover);
 $iconHover: var(--icon-hover);
+$textColour: var(--text-colour);
+$buttonHover: var(--button-hover);
+$textInputBorderColour: var(--text-input-border-colour);

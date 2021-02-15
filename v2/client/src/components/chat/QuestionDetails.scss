@@ -107,17 +107,17 @@
 		align-items: center;
 
 		.MuiTextField-root {
-			background-color: var(--text-input-color);
+			background-color: $backgroundColour;
 			flex: 1;
 			margin-right: 0.5rem;
 
 			.MuiOutlinedInput-root {
-				border: 1px solid var(--text-input-border-color);
+				border: 1px solid $textInputBorderColour;
 			}
 
 			.MuiOutlinedInput-multiline {
 				padding: 6px;
-				color: var(--text-colour);
+				color: $textColour;
 			}
 		}
 
