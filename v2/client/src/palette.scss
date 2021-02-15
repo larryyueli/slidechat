@@ -11,13 +11,24 @@
 	--background-colour: #fafafa;
 	--like-colour: #e97b89;
 	--endorsement-colour: rgb(236, 196, 84);
-	--text-colour: #000;
+	--text-colour: #000000;
+	--option-selected: #000000;
+	--chat-hover: #fdfdfd;
+	--carousel-border: #d4d4d4;
+	--icon-button-hover: #e9e9e9;
+	--icon-hover: black;
 	color: var(--text-colour);
 	@import './components/code-highlighting/github-gist.scss';
 }
 :root[data-theme='dark'] {
-	--primary: rgb(70 95 77);
-	--background-colour: #121212;
+	--primary: #161717;
+	--divider-colour: rgb(62, 68, 70);
+	--background-colour: #0f1010;
+	--option-selected: rgb(232, 230, 227);
+	--chat-hover: rgb(25, 27, 28);
+	--carousel-border: rgb(60, 65, 68);
+	--icon-button-hover: rgb(36, 39, 41);
+	--icon-hover: white;
 	color: white;
 	@import './components/code-highlighting/vs2015.scss';
 }
@@ -35,3 +46,8 @@ $backgroundColour: var(--background-colour);
 $likeColour: var(--like-colour);
 $endorsementColour: var(--endorsement-colour);
 $codeBackground: var(--code-background);
+$optionSelected: var(--option-selected);
+$chatHover: var(--chat-hover);
+$carouselBorder: var(--carousel-border);
+$iconButtonHover: var(--icon-button-hover);
+$iconHover: var(--icon-hover);

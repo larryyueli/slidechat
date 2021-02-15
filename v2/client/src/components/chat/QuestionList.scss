@@ -2,7 +2,7 @@
 	.new-chat-btn-row {
 		text-align: center;
 		padding: 1rem 0;
-		border-bottom: 1px solid #cccccc;
+		border-bottom: 1px solid $dividerColour;
 		button:not(:disabled) {
 			background-color: $primary;
 			color: white;
@@ -28,16 +28,16 @@
 			@include clickable();
 			text-align: center;
 			&.selected {
-				color: #000000;
+				color: $optionSelected;
 			}
 		}
 	}
 
 	.chat {
 		padding: 1rem;
-		border-bottom: 1px solid #cccccc;
+		border-bottom: 1px solid $dividerColour;
 		&:hover {
-			background: #fdfdfd;
+			background: $chatHover;
 			cursor: pointer;
 		}
 

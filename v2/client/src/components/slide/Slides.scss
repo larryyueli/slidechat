@@ -183,7 +183,7 @@
 		overflow-x: auto;
 		padding: 0.5rem;
 		box-sizing: border-box;
-		border: 1px solid #d4d4d4;
+		border: 1px solid $carouselBorder;
 		border-radius: 0.2rem;
 		position: relative;
 		&::-webkit-scrollbar {
