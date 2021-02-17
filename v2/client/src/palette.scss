@@ -23,15 +23,16 @@
 	@import './components/code-highlighting/github-gist.scss';
 }
 :root[data-theme='dark'] {
-	--primary: #161717;
+	--primary: #161b22;
 	--primary-light: #cccccc;
 	--divider-colour: rgb(62, 68, 70);
-	--background-colour: #0f1010;
+	--background-colour: #0d1116;
 	--option-selected: rgb(232, 230, 227);
-	--chat-hover: rgb(25, 27, 28);
+	--chat-hover: #21262d;
+	--gray: rgb(114, 114, 114);
 	--carousel-border: rgb(60, 65, 68);
 	--icon-hover: white;
-	--text-colour: #cccccc;
+	--text-colour: #c9d1d9;
 	--button-hover: rgb(25, 27, 28);
 	--text-input-border-colour: rgb(62, 68, 70);
 	--drawing-controls-bg-colour: #161717;
