@@ -96,14 +96,17 @@
 					.Mui-checked + .MuiSwitch-track {
 						background-color: $primaryLight;
 					}
-					.MuiSwitch-track {
-						background-color: $primaryLight;
+
+					.Mui-checked > .MuiIconButton-label > .MuiSwitch-thumb {
+						background-color: $switchCheckedThumbColour;
 					}
+
 					.Mui-checked:hover {
 						background-color: $primaryShadow;
 					}
+
 					.MuiSwitch-thumb {
-						background-color: $primary;
+						background-color: $switchThumbColour;
 					}
 				}
 			}

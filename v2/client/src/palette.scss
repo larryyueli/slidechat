@@ -19,14 +19,16 @@
 	--button-hover: #cccccc;
 	--text-input-border-colour: #cccccc;
 	--drawing-controls-bg-colour: #cccccc;
+	--switch-checked-thumb-colour: rgb(108, 161, 124);
+	--switch-thumb-colour: white;
 	color: var(--text-colour);
 	@import './components/code-highlighting/github-gist.scss';
 }
 :root[data-theme='dark'] {
-	--primary: #161b22;
+	--primary: #1d1f1f;
 	--primary-light: #cccccc;
 	--divider-colour: rgb(62, 68, 70);
-	--background-colour: #0d1116;
+	--background-colour: #141616;
 	--option-selected: rgb(232, 230, 227);
 	--chat-hover: #21262d;
 	--gray: rgb(114, 114, 114);
@@ -36,6 +38,8 @@
 	--button-hover: rgb(25, 27, 28);
 	--text-input-border-colour: rgb(62, 68, 70);
 	--drawing-controls-bg-colour: #161717;
+	--switch-checked-thumb-colour: white;
+	--switch-thumb-colour: rgb(80, 80, 80);
 	color: white;
 	@import './components/code-highlighting/vs2015.scss';
 }
@@ -60,3 +64,5 @@ $textColour: var(--text-colour);
 $buttonHover: var(--button-hover);
 $textInputBorderColour: var(--text-input-border-colour);
 $drawingControlsBgColour: var(--drawing-controls-bg-colour);
+$switchCheckedThumbColour: var(--switch-checked-thumb-colour);
+$switchThumbColour: var(--switch-thumb-colour);
