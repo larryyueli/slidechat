@@ -21,6 +21,7 @@
 	--drawing-controls-bg-colour: #cccccc;
 	--switch-checked-thumb-colour: rgb(108, 161, 124);
 	--switch-thumb-colour: white;
+	--switch-track-colour: #9c9c9c;
 	color: var(--text-colour);
 	@import './components/code-highlighting/github-gist.scss';
 }
@@ -38,8 +39,9 @@
 	--button-hover: rgb(25, 27, 28);
 	--text-input-border-colour: rgb(62, 68, 70);
 	--drawing-controls-bg-colour: #161717;
-	--switch-checked-thumb-colour: white;
+	--switch-checked-thumb-colour: #cccccc;
 	--switch-thumb-colour: rgb(80, 80, 80);
+	--switch-track-colour: #626363;
 	color: white;
 	@import './components/code-highlighting/vs2015.scss';
 }
@@ -66,3 +68,4 @@ $textInputBorderColour: var(--text-input-border-colour);
 $drawingControlsBgColour: var(--drawing-controls-bg-colour);
 $switchCheckedThumbColour: var(--switch-checked-thumb-colour);
 $switchThumbColour: var(--switch-thumb-colour);
+$switchTrackColour: var(--switch-track-colour);
