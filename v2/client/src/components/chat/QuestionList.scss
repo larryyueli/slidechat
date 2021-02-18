@@ -4,7 +4,7 @@
 		padding: 1rem 0;
 		border-bottom: 1px solid $dividerColour;
 		button:not(:disabled) {
-			background-color: $primary;
+			background-color: $buttonBackgroundColour;
 			color: white;
 		}
 	}
@@ -20,7 +20,7 @@
 		column-gap: 0.8rem;
 		font-size: 0.8rem;
 		text-transform: uppercase;
-		color: #aaaaaa;
+		color: $optionLabel;
 		.option-label {
 			text-align: right;
 		}

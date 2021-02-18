@@ -108,7 +108,7 @@
 		.upload,
 		.start,
 		.stop {
-			background-color: $primary;
+			background-color: $buttonBackgroundColour;
 			color: white;
 			margin: 0 0.5rem;
 			&:disabled {

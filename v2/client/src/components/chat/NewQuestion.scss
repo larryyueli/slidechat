@@ -28,6 +28,10 @@
 		color: white;
 	}
 
+	.MuiButtonBase-root {
+		background-color: $buttonBackgroundColour;
+	}
+
 	.MuiTextField-root {
 		width: 100%;
 

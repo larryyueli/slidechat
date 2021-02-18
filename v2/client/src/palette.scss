@@ -22,26 +22,32 @@
 	--switch-checked-thumb-colour: rgb(108, 161, 124);
 	--switch-thumb-colour: white;
 	--switch-track-colour: #9c9c9c;
+	--option-label: #b5b5b5;
+	--button-bg-colour: rgb(108, 161, 124);
 	color: var(--text-colour);
 	@import './components/code-highlighting/github-gist.scss';
 }
 :root[data-theme='dark'] {
-	--primary: #1d1f1f;
+	--primary: #2b2b2b;
 	--primary-light: #cccccc;
+	--primary-shadow: #cccccc3d;
 	--divider-colour: rgb(62, 68, 70);
-	--background-colour: #141616;
-	--option-selected: rgb(232, 230, 227);
-	--chat-hover: #21262d;
+	--background-colour: #252525;
+	--option-selected: rgb(5, 5, 4);
+	--chat-hover: #1a1a1a;
+	--option-selected: white;
+	--option-label: #929292;
 	--gray: rgb(114, 114, 114);
 	--carousel-border: rgb(60, 65, 68);
 	--icon-hover: white;
-	--text-colour: #c9d1d9;
-	--button-hover: rgb(25, 27, 28);
+	--text-colour: #ffffff;
+	--button-hover: #1a1a1a;
 	--text-input-border-colour: rgb(62, 68, 70);
-	--drawing-controls-bg-colour: #161717;
+	--drawing-controls-bg-colour: #1a1a1a;
 	--switch-checked-thumb-colour: #cccccc;
 	--switch-thumb-colour: rgb(80, 80, 80);
 	--switch-track-colour: #626363;
+	--button-bg-colour: #1a1a1a;
 	color: white;
 	@import './components/code-highlighting/vs2015.scss';
 }
@@ -69,3 +75,5 @@ $drawingControlsBgColour: var(--drawing-controls-bg-colour);
 $switchCheckedThumbColour: var(--switch-checked-thumb-colour);
 $switchThumbColour: var(--switch-thumb-colour);
 $switchTrackColour: var(--switch-track-colour);
+$buttonBackgroundColour: var(--button-bg-colour);
+$optionLabel: var(--option-label);
