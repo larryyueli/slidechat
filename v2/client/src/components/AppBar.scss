@@ -73,44 +73,41 @@
 			z-index: 1100;
 			color: black;
 
-			& input {
+			& input[type='text'] {
 				background-color: $backgroundColour;
-				color: $textColour;
+				color: $textPrimary;
 			}
 
 			.dropdown-item {
-				color: $textColour;
+				color: $textPrimary;
 				padding: 0.5rem 1.3rem;
 				text-decoration: none;
 				display: block;
 				text-align: left;
 
 				.MuiButton-label {
-					color: $textColour;
+					color: $textPrimary;
 				}
 
 				.MuiSwitch-root {
-					.Mui-checked {
-						color: $primary;
-					}
-					.Mui-checked + .MuiSwitch-track {
-						background-color: $primaryLight;
-					}
-
-					.Mui-checked > .MuiIconButton-label > .MuiSwitch-thumb {
-						background-color: $switchCheckedThumbColour;
-					}
-
-					.Mui-checked:hover {
-						background-color: $primaryShadow;
-					}
-
 					.MuiSwitch-thumb {
 						background-color: $switchThumbColour;
 					}
-
 					.MuiSwitch-track {
 						background-color: $switchTrackColour;
+					}
+
+					.Mui-checked {
+						color: $primary;
+						.MuiSwitch-thumb {
+							background-color: $switchCheckedThumbColour;
+						}
+						& + .MuiSwitch-track {
+							background-color: $primaryLight;
+						}
+						&:hover {
+							background-color: $primaryShadow;
+						}
 					}
 				}
 			}
@@ -118,8 +115,8 @@
 			.clickable {
 				padding: 1rem 1.3rem;
 				&:hover {
-					background-color: $buttonHover;
-					color: $textColour;
+					background-color: $dropdownHover;
+					color: $textPrimary;
 				}
 			}
 

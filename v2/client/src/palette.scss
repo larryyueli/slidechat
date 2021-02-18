@@ -1,79 +1,78 @@
 :root {
-	--primary: rgb(108, 161, 124);
-	--primary-light: rgb(146, 197, 162);
-	--primary-shadow: rgba(108, 161, 124, 0.04);
-	--secondary: rgb(202, 41, 98);
-	--secondary-hover: rgb(228, 70, 125);
-	--gray: rgb(226, 231, 229);
-	--gray-text: rgb(186, 195, 191);
-	--disabled: rgb(190, 190, 190);
+	--primary: #6ca17c;
+	--primary-light: #b5d8c0;
+	--primary-shadow: #6ca17c1a;
+	--primary-gray: #e2e7e5;
+	--secondary: #ce4b4b;
+	--secondary-hover: #e95f5f;
+	--disabled: #bebebe;
+
 	--divider-colour: #cccccc;
 	--background-colour: #fafafa;
 	--like-colour: #e97b89;
-	--endorsement-colour: rgb(236, 196, 84);
-	--text-colour: #000000;
-	--option-selected: #000000;
-	--chat-hover: #fdfdfd;
-	--carousel-border: #d4d4d4;
-	--icon-hover: black;
-	--button-hover: #cccccc;
-	--text-input-border-colour: #cccccc;
-	--drawing-controls-bg-colour: #cccccc;
-	--switch-checked-thumb-colour: rgb(108, 161, 124);
-	--switch-thumb-colour: white;
+	--endorsement-colour: #ecc454;
+
+	--text-primary: #000000;
+	--text-secondary: #cccccc;
+
+	--question-hover: #fdfdfd;
+	--dropdown-hover: #e8e8e8;
+	--icon-hover: #e2e2e2;
+
+	--switch-checked-thumb-colour: var(--primary);
+	--switch-thumb-colour: #ffffff;
 	--switch-track-colour: #9c9c9c;
-	--option-label: #b5b5b5;
-	--button-bg-colour: rgb(108, 161, 124);
-	color: var(--text-colour);
+
 	@import './components/code-highlighting/github-gist.scss';
+
+	color: var(--text-primary);
 }
+
 :root[data-theme='dark'] {
-	--primary: #2b2b2b;
+	--primary: #3c3c3c;
 	--primary-light: #cccccc;
-	--primary-shadow: #cccccc3d;
-	--divider-colour: rgb(62, 68, 70);
+	--primary-shadow: #ffffff0a;
+	--primary-gray: #464646;
+	--disabled: #6f6f6f;
+
+	--divider-colour: #3e4446;
 	--background-colour: #252525;
-	--option-selected: rgb(5, 5, 4);
-	--chat-hover: #1a1a1a;
-	--option-selected: white;
-	--option-label: #929292;
-	--gray: rgb(114, 114, 114);
-	--carousel-border: rgb(60, 65, 68);
-	--icon-hover: white;
-	--text-colour: #ffffff;
-	--button-hover: #1a1a1a;
-	--text-input-border-colour: rgb(62, 68, 70);
-	--drawing-controls-bg-colour: #151618;
+	--endorsement-colour: #d4b561;
+
+	--text-primary: #eeeeee;
+	--text-secondary: #a5a5a5;
+
+	--question-hover: #1a1a1a;
+	--dropdown-hover: #1a1a1a;
+	--icon-hover: #ffffff;
+
 	--switch-checked-thumb-colour: #cccccc;
-	--switch-thumb-colour: rgb(80, 80, 80);
+	--switch-thumb-colour: #505050;
 	--switch-track-colour: #626363;
-	--button-bg-colour: #151618;
-	color: white;
+
 	@import './components/code-highlighting/vs2015.scss';
 }
 
 $primary: var(--primary);
 $primaryLight: var(--primary-light);
 $primaryShadow: var(--primary-shadow);
+$primaryGray: var(--primary-gray);
 $secondary: var(--secondary);
 $secondaryHover: var(--secondary-hover);
-$gray: var(--gray);
-$grayText: var(--gray-text);
 $disabled: var(--disabled);
+
 $dividerColour: var(--divider-colour);
 $backgroundColour: var(--background-colour);
 $likeColour: var(--like-colour);
 $endorsementColour: var(--endorsement-colour);
-$codeBackground: var(--code-background);
-$optionSelected: var(--option-selected);
-$chatHover: var(--chat-hover);
-$carouselBorder: var(--carousel-border);
-$textColour: var(--text-colour);
-$buttonHover: var(--button-hover);
-$textInputBorderColour: var(--text-input-border-colour);
-$drawingControlsBgColour: var(--drawing-controls-bg-colour);
+
+$textPrimary: var(--text-primary);
+$textSecondary: var(--text-secondary);
+
+$questionHover: var(--question-hover);
+$dropdownHover: var(--dropdown-hover);
+$iconHover: var(--icon-hover);
+
 $switchCheckedThumbColour: var(--switch-checked-thumb-colour);
 $switchThumbColour: var(--switch-thumb-colour);
 $switchTrackColour: var(--switch-track-colour);
-$buttonBackgroundColour: var(--button-bg-colour);
-$optionLabel: var(--option-label);

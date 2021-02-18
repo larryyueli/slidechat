@@ -17,7 +17,7 @@
 			@include flexCenter();
 			height: 2.4rem;
 			width: 2.4rem;
-			color: $grayText;
+			color: $textSecondary;
 			border-radius: 0.4rem;
 			font-size: 1.5rem;
 			transition: background-color 0.3s ease-out;
@@ -28,7 +28,7 @@
 		}
 		a {
 			text-decoration: none;
-			color: $grayText;
+			color: $textSecondary;
 			&:hover {
 				color: black;
 			}
@@ -68,11 +68,11 @@
 
 			& > span {
 				@include clickable();
-				background-color: $drawingControlsBgColour;
+				background-color: $primaryGray;
 				padding: 0.3rem 0.5rem;
 				margin: 0.5rem;
 				border-radius: 0.2rem;
-				box-shadow: 1px 2px 3px $buttonHover;
+				box-shadow: 1px 2px 3px #00000038;
 			}
 		}
 
@@ -108,7 +108,7 @@
 		.upload,
 		.start,
 		.stop {
-			background-color: $buttonBackgroundColour;
+			background-color: $primary;
 			color: white;
 			margin: 0 0.5rem;
 			&:disabled {
@@ -159,21 +159,21 @@
 			@include clickable;
 			margin: 0rem 0.5rem;
 			font-size: 35px;
-			transition: color 0.1s;
-			&:hover {
-				color: $gray;
+			transition: color 0.2s ease-out;
+			&:not(.disable):hover {
+				color: $iconHover;
 			}
+		}
+		.disable {
+			color: $disabled;
+			cursor: default;
 		}
 		.page-input {
 			margin: 0 0.5rem;
 			input {
 				background-color: $backgroundColour;
-				color: $textColour;
+				color: $textPrimary;
 			}
-		}
-		.disable {
-			color: $gray;
-			cursor: default;
 		}
 	}
 
@@ -188,7 +188,7 @@
 		overflow-x: auto;
 		padding: 0.5rem;
 		box-sizing: border-box;
-		border: 1px solid $carouselBorder;
+		border: 1px solid $dividerColour;
 		border-radius: 0.2rem;
 		position: relative;
 		&::-webkit-scrollbar {

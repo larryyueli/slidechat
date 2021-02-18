@@ -24,10 +24,10 @@
 			@include clickable();
 			display: flex;
 			align-items: center;
-			transition: color 0.2s;
+			transition: color 0.2s ease-out;
 
 			&:hover {
-				color: #aaaaaa;
+				color: $iconHover;
 			}
 		}
 

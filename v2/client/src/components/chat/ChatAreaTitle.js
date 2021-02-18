@@ -4,9 +4,9 @@ export default function ChatAreaTitle(props) {
 	return (
 		<div className='chat-area-title'>
 			{props.showBackBtn ? (
-				<div className='back-button' onClick={props.back}>
-					<span className='material-icons'>arrow_back_ios</span>
-				</div>
+				<span className='material-icons back-button' onClick={props.back}>
+					arrow_back_ios
+				</span>
 			) : (
 				<div className='placeholder'>&nbsp;</div>
 			)}
