@@ -136,7 +136,7 @@
 	.recording {
 		@include flexCenter();
 		margin: 1rem auto;
-		border: 2px dashed gray;
+		border: 2px dashed $dividerColour;
 		width: fit-content;
 		padding: 1rem;
 		border-radius: 10px;
@@ -171,8 +171,20 @@
 		.page-input {
 			margin: 0 0.5rem;
 			input {
+				width: 1.8rem;
+				padding: 0.1rem;
+				text-align: center;
+				font-size: 1rem;
+				border-radius: 0.25rem;
+				border: 1px solid $dividerColour;
 				background-color: $backgroundColour;
 				color: $textPrimary;
+				&:hover {
+					background-color: $questionHover;
+				}
+				&:focus {
+					outline: none;
+				}
 			}
 		}
 	}
@@ -196,7 +208,7 @@
 		}
 		&::-webkit-scrollbar-thumb {
 			display: none;
-			background-color: #cccccc;
+			background-color: $dividerColour;
 			border-radius: 0.2rem;
 		}
 		&:hover {
@@ -226,33 +238,5 @@
 				margin: 0 1.5rem;
 			}
 		}
-	}
-
-	input {
-		width: 1.8rem;
-		background-color: $backgroundColour;
-		padding: 0.1rem;
-		font-size: 1em;
-		text-align: center;
-		border: 1px solid $backgroundColour;
-		border-radius: 0.25rem;
-
-		&:hover {
-			background-color: #e9e9e9;
-		}
-
-		&:focus {
-			outline: none;
-			border-color: black;
-			background-color: #e9e9e9;
-		}
-	}
-
-	input[type='tel'] {
-		border: 1px solid #00000020;
-	}
-
-	.download-link {
-		color: #aaaaaa;
 	}
 }

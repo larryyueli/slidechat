@@ -13,7 +13,7 @@ export function formatTime(time) {
 	const elapsed = now - time;
 
 	if (elapsed < oneMinute) {
-		return `${(elapsed / 1000) >> 0} seconds ago`;
+		return 'Just now';
 	} else if (elapsed < oneHour) {
 		return `${(elapsed / oneMinute) >> 0} minutes ago`;
 	} else if (elapsed < oneDay) {

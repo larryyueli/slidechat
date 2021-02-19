@@ -15,6 +15,9 @@
 	--text-primary: #000000;
 	--text-secondary: #cccccc;
 
+	--link-colour: #4e4ef1;
+	--link-hover: #9595f6;
+
 	--question-hover: #fdfdfd;
 	--dropdown-hover: #e8e8e8;
 	--icon-hover: #e2e2e2;
@@ -33,6 +36,7 @@
 	--primary-light: #cccccc;
 	--primary-shadow: #ffffff0a;
 	--primary-gray: #464646;
+	--secondary: #903333;
 	--disabled: #6f6f6f;
 
 	--divider-colour: #3e4446;
@@ -41,6 +45,9 @@
 
 	--text-primary: #eeeeee;
 	--text-secondary: #a5a5a5;
+
+	--link-colour: #9ca0ff;
+	--link-hover: #c6c8ff;
 
 	--question-hover: #1a1a1a;
 	--dropdown-hover: #1a1a1a;
@@ -68,6 +75,9 @@ $endorsementColour: var(--endorsement-colour);
 
 $textPrimary: var(--text-primary);
 $textSecondary: var(--text-secondary);
+
+$linkColour: var(--link-colour);
+$linkHover: var(--link-hover);
 
 $questionHover: var(--question-hover);
 $dropdownHover: var(--dropdown-hover);

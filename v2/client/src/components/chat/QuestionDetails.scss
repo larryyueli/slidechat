@@ -86,6 +86,14 @@
 			}
 		}
 
+		a {
+			color: $linkColour;
+			transition: color 0.2s ease-out;
+			&:hover {
+				color: $linkHover;
+			}
+		}
+
 		p > code {
 			background-color: $dropdownHover;
 			padding: 0.15rem;
