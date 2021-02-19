@@ -2,7 +2,7 @@
 	.new-chat-btn-row {
 		text-align: center;
 		padding: 1rem 0;
-		border-bottom: 1px solid #cccccc;
+		border-bottom: 1px solid $dividerColour;
 		button:not(:disabled) {
 			background-color: $primary;
 			color: white;
@@ -20,7 +20,7 @@
 		column-gap: 0.8rem;
 		font-size: 0.8rem;
 		text-transform: uppercase;
-		color: #aaaaaa;
+		color: $textSecondary;
 		.option-label {
 			text-align: right;
 		}
@@ -28,16 +28,16 @@
 			@include clickable();
 			text-align: center;
 			&.selected {
-				color: #000000;
+				color: $textPrimary;
 			}
 		}
 	}
 
 	.chat {
 		padding: 1rem;
-		border-bottom: 1px solid #cccccc;
+		border-bottom: 1px solid $dividerColour;
 		&:hover {
-			background: #fdfdfd;
+			background: $questionHover;
 			cursor: pointer;
 		}
 
@@ -69,7 +69,7 @@
 			.delete {
 				color: $secondary;
 				&:hover {
-					color: lighten($secondary, 10%);
+					color: $secondaryHover;
 				}
 			}
 		}
@@ -80,18 +80,18 @@
 			.author {
 				flex: 1;
 				font-size: 0.9rem;
-				color: #cccccc;
+				color: $textSecondary;
 				@include ellipsis();
 			}
 
 			.time {
 				font-size: 0.9rem;
 				margin-left: 0.5rem;
-				color: #cccccc;
+				color: $textSecondary;
 			}
 		}
 		.extra-info {
-			color: #cccccc;
+			color: $textSecondary;
 			font-size: 0.9rem;
 		}
 	}

@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from '@material-ui/core/Button';
+import { Link } from 'react-router-dom';
 
-import AppBar from './components/AppBar';
 import { baseURL } from './config';
 
 /**
@@ -10,7 +10,15 @@ import { baseURL } from './config';
 export default function Landing(props) {
 	return (
 		<>
-			<AppBar />
+			<div className='appbar'>
+				<div className='appbar-left'>
+					<Link to={`${baseURL}/`} className='logo-link'>
+						<img className='appbar-logo' src={`${baseURL}/imgs/logo.png`} alt='SlideChat' />
+					</Link>
+					<div className='title'>{props.title}</div>
+				</div>
+				<div>&nbsp;</div>
+			</div>
 			<div className='landing'>
 				<div className='text'>
 					<div>

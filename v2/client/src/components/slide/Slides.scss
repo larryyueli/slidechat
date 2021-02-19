@@ -17,7 +17,7 @@
 			@include flexCenter();
 			height: 2.4rem;
 			width: 2.4rem;
-			color: $grayText;
+			color: $textSecondary;
 			border-radius: 0.4rem;
 			font-size: 1.5rem;
 			transition: background-color 0.3s ease-out;
@@ -28,7 +28,7 @@
 		}
 		a {
 			text-decoration: none;
-			color: $grayText;
+			color: $textSecondary;
 			&:hover {
 				color: black;
 			}
@@ -49,6 +49,7 @@
 		width: 100%;
 		margin: 0 auto;
 		position: relative;
+		padding-top: 0.4rem;
 
 		.slide {
 			width: 100%;
@@ -67,11 +68,11 @@
 
 			& > span {
 				@include clickable();
-				background-color: #cccccc;
-				padding: 0.3rem;
+				background-color: $primaryGray;
+				padding: 0.3rem 0.5rem;
 				margin: 0.5rem;
 				border-radius: 0.2rem;
-				box-shadow: 1px 2px 3px #aaaaaa;
+				box-shadow: 1px 2px 3px #00000038;
 			}
 		}
 
@@ -79,7 +80,6 @@
 			position: absolute;
 			top: 0;
 			left: 0;
-			// background-color: #ff000008;
 			display: grid;
 			grid-template-columns: 1fr 1fr 1fr;
 			width: 100%;
@@ -97,6 +97,7 @@
 
 		.file {
 			width: 13rem;
+			background-color: $backgroundColour;
 		}
 
 		.progress {
@@ -135,7 +136,7 @@
 	.recording {
 		@include flexCenter();
 		margin: 1rem auto;
-		border: 2px dashed gray;
+		border: 2px dashed $dividerColour;
 		width: fit-content;
 		padding: 1rem;
 		border-radius: 10px;
@@ -158,17 +159,33 @@
 			@include clickable;
 			margin: 0rem 0.5rem;
 			font-size: 35px;
-			transition: color 0.1s;
-			&:hover {
-				color: $gray;
+			transition: color 0.2s ease-out;
+			&:not(.disable):hover {
+				color: $iconHover;
 			}
+		}
+		.disable {
+			color: $disabled;
+			cursor: default;
 		}
 		.page-input {
 			margin: 0 0.5rem;
-		}
-		.disable {
-			color: $gray;
-			cursor: default;
+			input {
+				width: 1.8rem;
+				padding: 0.1rem;
+				text-align: center;
+				font-size: 1rem;
+				border-radius: 0.25rem;
+				border: 1px solid $dividerColour;
+				background-color: $backgroundColour;
+				color: $textPrimary;
+				&:hover {
+					background-color: $questionHover;
+				}
+				&:focus {
+					outline: none;
+				}
+			}
 		}
 	}
 
@@ -183,7 +200,7 @@
 		overflow-x: auto;
 		padding: 0.5rem;
 		box-sizing: border-box;
-		border: 1px solid #d4d4d4;
+		border: 1px solid $dividerColour;
 		border-radius: 0.2rem;
 		position: relative;
 		&::-webkit-scrollbar {
@@ -191,7 +208,7 @@
 		}
 		&::-webkit-scrollbar-thumb {
 			display: none;
-			background-color: #cccccc;
+			background-color: $dividerColour;
 			border-radius: 0.2rem;
 		}
 		&:hover {
@@ -221,33 +238,5 @@
 				margin: 0 1.5rem;
 			}
 		}
-	}
-
-	input {
-		width: 1.8rem;
-		background-color: $backgroundColour;
-		padding: 0.1rem;
-		font-size: 1em;
-		text-align: center;
-		border: 1px solid $backgroundColour;
-		border-radius: 0.25rem;
-
-		&:hover {
-			background-color: #e9e9e9;
-		}
-
-		&:focus {
-			outline: none;
-			border-color: black;
-			background-color: #e9e9e9;
-		}
-	}
-
-	input[type='tel'] {
-		border: 1px solid #00000020;
-	}
-
-	.download-link {
-		color: #aaaaaa;
 	}
 }

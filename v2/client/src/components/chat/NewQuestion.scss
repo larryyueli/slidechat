@@ -31,6 +31,10 @@
 	.MuiTextField-root {
 		width: 100%;
 
+		.MuiOutlinedInput-root {
+			color: $textPrimary;
+		}
+
 		.MuiOutlinedInput-input {
 			padding: 6px 6px 6px 14px;
 		}
@@ -41,6 +45,15 @@
 				padding: 6px;
 			}
 		}
+
+		fieldset {
+			border: 1px solid $dividerColour !important;
+		}
+		&:hover {
+			fieldset {
+				border: 1px solid $primary !important;
+			}
+		}
 	}
 
 	.delete-btn {
@@ -49,6 +62,6 @@
 
 	.anonymity {
 		font-size: small;
-		color: $grayText;
+		color: $textSecondary;
 	}
 }

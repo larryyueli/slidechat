@@ -1,6 +1,4 @@
 .chat-details {
-	@import './github-gist.scss';
-
 	.title {
 		font-size: 1.4rem;
 		padding: 2rem 1rem 0 1rem;
@@ -14,7 +12,7 @@
 
 	.chat {
 		padding: 1rem;
-		border-bottom: 1px solid #cccccc;
+		border-bottom: 1px solid $dividerColour;
 		overflow-wrap: anywhere;
 
 		.info {
@@ -27,46 +25,46 @@
 
 			.time {
 				margin-left: 0.5rem;
-				color: #cccccc;
+				color: $textSecondary;
 			}
 
 			.icons {
 				display: flex;
 				align-items: center;
 
-				.quote {
-					color: #cccccc;
-				}
-
 				.icon {
 					@include clickable();
 					margin: 0 0.3rem;
+				}
+
+				.quote,
+				.not-endorsed,
+				.nobody-liked {
+					color: $textSecondary;
+					transition: color 0.2s ease-out;
+					&:hover {
+						color: $iconHover;
+					}
 				}
 
 				.endorsed {
 					color: $endorsementColour;
 				}
 
-				.not-endorsed {
-					color: #cccccc;
-				}
-
-				.liked {
-					display: flex;
-					align-items: center;
-					color: $likeColour;
-				}
-
+				.liked,
 				.nobody-liked {
 					display: flex;
 					align-items: center;
-					color: #cccccc;
+				}
+
+				.liked {
+					color: $likeColour;
 				}
 
 				.delete {
 					color: $secondary;
 					&:hover {
-						color: lighten($secondary, 10%);
+						color: $secondaryHover;
 					}
 				}
 			}
@@ -78,7 +76,7 @@
 			.modify-btn {
 				margin-top: 1rem;
 				@include clickable();
-				color: #cccccc;
+				color: $textSecondary;
 				text-decoration: underline;
 			}
 
@@ -88,15 +86,18 @@
 			}
 		}
 
+		a {
+			color: $linkColour;
+			transition: color 0.2s ease-out;
+			&:hover {
+				color: $linkHover;
+			}
+		}
+
 		p > code {
-			background-color: $codeBackground;
+			background-color: $dropdownHover;
 			padding: 0.15rem;
 		}
-	}
-
-	.MuiExpansionPanelDetails-root {
-		padding-top: 16px !important;
-		padding-bottom: 16px !important;
 	}
 
 	.send-message-bar {
@@ -105,11 +106,22 @@
 		align-items: center;
 
 		.MuiTextField-root {
+			background-color: $backgroundColour;
 			flex: 1;
 			margin-right: 0.5rem;
 
 			.MuiOutlinedInput-multiline {
 				padding: 6px;
+				color: $textPrimary;
+			}
+
+			fieldset {
+				border: 1px solid $dividerColour;
+			}
+			&:hover {
+				fieldset {
+					border: 1px solid $primary !important;
+				}
 			}
 		}
 
@@ -121,7 +133,7 @@
 	.anonymity {
 		padding: 0 0.5rem;
 		font-size: x-small;
-		color: $grayText;
+		color: $textSecondary;
 		margin-bottom: 0.5rem;
 	}
 }

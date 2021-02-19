@@ -311,7 +311,7 @@ export default class QuestionDetails extends React.Component {
 							variant='outlined'
 							id={`chat-response`}
 							multiline
-							rowsMax='4'
+							rowsMax='10'
 							inputRef={this.chatRef}
 						/>
 						<Button

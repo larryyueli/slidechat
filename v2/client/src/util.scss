@@ -89,7 +89,7 @@
 	}
 	&::-webkit-scrollbar-thumb {
 		display: none;
-		background-color: #cccccc;
+		background-color: $textSecondary;
 		border-radius: 0.2rem;
 	}
 	&:hover {

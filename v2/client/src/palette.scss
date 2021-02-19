@@ -1,12 +1,88 @@
-$primary: rgb(108, 161, 124);
-$primaryLight: rgb(146, 197, 162);
-$primaryShadow: rgba(108, 161, 124, 0.04);
-$secondary: rgb(202, 41, 98);
-$gray: rgb(226, 231, 229);
-$grayText: rgb(186, 195, 191);
-$disabled: rgb(190, 190, 190);
-$dividerColour: #cccccc;
-$backgroundColour: #fafafa;
-$likeColour: #e97b89;
-$endorsementColour: rgb(236, 196, 84);
-$codeBackground: #0000000a;
+:root {
+	--primary: #6ca17c;
+	--primary-light: #b5d8c0;
+	--primary-shadow: #6ca17c1a;
+	--primary-gray: #e2e7e5;
+	--secondary: #ce4b4b;
+	--secondary-hover: #e95f5f;
+	--disabled: #bebebe;
+
+	--divider-colour: #cccccc;
+	--background-colour: #fafafa;
+	--like-colour: #e97b89;
+	--endorsement-colour: #ecc454;
+
+	--text-primary: #000000;
+	--text-secondary: #cccccc;
+
+	--link-colour: #4e4ef1;
+	--link-hover: #9595f6;
+
+	--question-hover: #fdfdfd;
+	--dropdown-hover: #e8e8e8;
+	--icon-hover: #e2e2e2;
+
+	--switch-checked-thumb-colour: var(--primary);
+	--switch-thumb-colour: #ffffff;
+	--switch-track-colour: #9c9c9c;
+
+	@import './components/code-highlighting/github-gist.scss';
+
+	color: var(--text-primary);
+}
+
+:root[data-theme='dark'] {
+	--primary: #3c3c3c;
+	--primary-light: #cccccc;
+	--primary-shadow: #ffffff0a;
+	--primary-gray: #464646;
+	--secondary: #903333;
+	--disabled: #6f6f6f;
+
+	--divider-colour: #3e4446;
+	--background-colour: #303030;
+	--endorsement-colour: #d4b561;
+
+	--text-primary: #e0e0e0;
+	--text-secondary: #a5a5a5;
+
+	--link-colour: #9ca0ff;
+	--link-hover: #c6c8ff;
+
+	--question-hover: #1a1a1a;
+	--dropdown-hover: #1a1a1a;
+	--icon-hover: #ffffff;
+
+	--switch-checked-thumb-colour: #cccccc;
+	--switch-thumb-colour: #505050;
+	--switch-track-colour: #626363;
+
+	@import './components/code-highlighting/vs2015.scss';
+}
+
+$primary: var(--primary);
+$primaryLight: var(--primary-light);
+$primaryShadow: var(--primary-shadow);
+$primaryGray: var(--primary-gray);
+$secondary: var(--secondary);
+$secondaryHover: var(--secondary-hover);
+$disabled: var(--disabled);
+
+$dividerColour: var(--divider-colour);
+$backgroundColour: var(--background-colour);
+$likeColour: var(--like-colour);
+$endorsementColour: var(--endorsement-colour);
+
+$textPrimary: var(--text-primary);
+$textSecondary: var(--text-secondary);
+
+$linkColour: var(--link-colour);
+$linkHover: var(--link-hover);
+
+$questionHover: var(--question-hover);
+$dropdownHover: var(--dropdown-hover);
+$iconHover: var(--icon-hover);
+
+$switchCheckedThumbColour: var(--switch-checked-thumb-colour);
+$switchThumbColour: var(--switch-thumb-colour);
+$switchTrackColour: var(--switch-track-colour);

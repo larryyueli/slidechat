@@ -7,7 +7,7 @@
 	}
 	color: #ffffff;
 	background-color: $primary;
-	box-shadow: 0 3px 10px #aaaaaa;
+	box-shadow: 0 3px 10px #00000060;
 	user-select: none;
 	z-index: 1000;
 
@@ -73,22 +73,41 @@
 			z-index: 1100;
 			color: black;
 
+			& input[type='text'] {
+				background-color: $backgroundColour;
+				color: $textPrimary;
+			}
+
 			.dropdown-item {
-				color: black;
+				color: $textPrimary;
 				padding: 0.5rem 1.3rem;
 				text-decoration: none;
 				display: block;
 				text-align: left;
 
+				.MuiButton-label {
+					color: $textPrimary;
+				}
+
 				.MuiSwitch-root {
+					.MuiSwitch-thumb {
+						background-color: $switchThumbColour;
+					}
+					.MuiSwitch-track {
+						background-color: $switchTrackColour;
+					}
+
 					.Mui-checked {
 						color: $primary;
-					}
-					.Mui-checked + .MuiSwitch-track {
-						background-color: $primaryLight;
-					}
-					.Mui-checked:hover {
-						background-color: $primaryShadow;
+						.MuiSwitch-thumb {
+							background-color: $switchCheckedThumbColour;
+						}
+						& + .MuiSwitch-track {
+							background-color: $primaryLight;
+						}
+						&:hover {
+							background-color: $primaryShadow;
+						}
 					}
 				}
 			}
@@ -96,7 +115,8 @@
 			.clickable {
 				padding: 1rem 1.3rem;
 				&:hover {
-					background-color: #f1f1f1;
+					background-color: $dropdownHover;
+					color: $textPrimary;
 				}
 			}
 

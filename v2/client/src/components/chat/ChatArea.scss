@@ -7,9 +7,9 @@
 		justify-content: space-between;
 		align-items: center;
 		padding: 1rem 1.5rem;
-		border-top: 1px solid #cccccc;
-		border-bottom: 1px solid #cccccc;
-		box-shadow: 0 3px 6px #cccccc;
+		border-top: 1px solid $dividerColour;
+		border-bottom: 1px solid $dividerColour;
+		box-shadow: 0 3px 6px #00000026;
 		user-select: none;
 
 		.title {
@@ -24,10 +24,10 @@
 			@include clickable();
 			display: flex;
 			align-items: center;
-			transition: color 0.2s;
+			transition: color 0.2s ease-out;
 
 			&:hover {
-				color: #aaaaaa;
+				color: $iconHover;
 			}
 		}
 
@@ -40,7 +40,6 @@
 			@include flexCenter();
 			height: 2.4rem;
 			width: 2.4rem;
-			color: black;
 			border-radius: 0.4rem;
 			font-size: 1.5rem;
 			transition: background-color 0.3s ease-out;
@@ -50,6 +49,7 @@
 			&:hover,
 			&.managing {
 				background-color: #e9e9e9;
+				color: black;
 			}
 			&.managing {
 				.material-icons {
