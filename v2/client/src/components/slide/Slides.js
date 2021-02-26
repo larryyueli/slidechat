@@ -150,7 +150,7 @@ export default function Slides(props) {
 	};
 
 	const centerCarousel = (pageNum) => {
-		if (!props.showCarouselPanel) return;
+		if (!props.showCarouselPanel || props.fullscreen) return;
 		const thumbnail = carousel.current.querySelector(`#thumbnail-${pageNum}`);
 		if (!thumbnail) return;
 		carousel.current.scroll({
@@ -210,43 +210,66 @@ export default function Slides(props) {
 		setShowToast(true);
 	};
 
+	const startFullscreen = async () => {
+		try {
+			await document.querySelector('.main').requestFullscreen();
+		} catch (err) {
+			alert('Full screen is not allowed!');
+		}
+	};
+
 	return (
 		<div className='slide-container'>
-			<div className='slide-toolbar'>
-				{props.showTempDrawingBtn ? (
-					props.drawing ? (
-						<div className='icon-btn drawing' title='Clear drawing'>
-							<span className={`material-icons icon`} onClick={props.cancelDrawing}>
-								close
+			{props.fullscreen ? null : (
+				<div className='slide-toolbar'>
+					{props.showTempDrawingBtn ? (
+						props.drawing ? (
+							<div className='icon-btn drawing' title='Clear drawing'>
+								<span className={`material-icons icon`} onClick={props.cancelDrawing}>
+									close
+								</span>
+							</div>
+						) : (
+							<div className='icon-btn' title='Temporary drawing'>
+								<span className={`material-icons icon`} onClick={props.startDrawing}>
+									brush
+								</span>
+							</div>
+						)
+					) : null}
+					<div className='icon-btn' title='Quote this page'>
+						<span className='material-icons' onClick={copyLink}>
+							link
+						</span>
+					</div>
+					<div className='icon-btn' title='Download PDF'>
+						<a className='material-icons' href={`${serverURL}/api/downloadPdf?slideID=${props.sid}`}>
+							file_download
+						</a>
+					</div>
+					{props.fullscreen ? (
+						<div className='icon-btn' title='Fullscreen'>
+							<span className='material-icons' onClick={() => document.exitFullscreen()}>
+								fullscreen_exit
 							</span>
 						</div>
 					) : (
-						<div className='icon-btn' title='Temporary drawing'>
-							<span className={`material-icons icon`} onClick={props.startDrawing}>
-								brush
+						<div className='icon-btn' title='Fullscreen'>
+							<span className='material-icons' onClick={() => startFullscreen()}>
+								fullscreen
 							</span>
 						</div>
-					)
-				) : null}
-				<div className='icon-btn' title='Quote this page'>
-					<span className='material-icons' onClick={copyLink}>
-						link
-					</span>
+					)}
+					<Snackbar
+						className='toast'
+						anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+						open={showToast}
+						onClose={() => setShowToast(false)}
+						autoHideDuration={2500}
+						message='Link copied to clipboard!'
+					/>
 				</div>
-				<div className='icon-btn' title='Download PDF'>
-					<a className='material-icons' href={`${serverURL}/api/downloadPdf?slideID=${props.sid}`}>
-						file_download
-					</a>
-				</div>
-				<Snackbar
-					className='toast'
-					anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-					open={showToast}
-					onClose={() => setShowToast(false)}
-					autoHideDuration={2500}
-					message='Link copied to clipboard!'
-				/>
-			</div>
+			)}
 
 			<div className='slide-wrapper'>
 				<img id='slide-img' src={img} alt='slide' className='slide' />
@@ -295,7 +318,7 @@ export default function Slides(props) {
 					</span>
 				</div>
 
-				{props.showCarouselPanel ? (
+				{props.showCarouselPanel && !props.fullscreen ? (
 					<div className='carousel' ref={carousel}>
 						{range(1, props.pageTotal + 1).map((i) => (
 							<div
@@ -316,7 +339,7 @@ export default function Slides(props) {
 					Your browser does not support the audio element.
 				</audio>
 
-				{props.isInstructor && props.isInstructorView ? (
+				{props.isInstructor && props.isInstructorView && !props.fullscreen ? (
 					<>
 						<div className='audio-instructor'>
 							<input type='file' id='file' className='file' ref={fileUpload} accept='.mp3' />

@@ -37,6 +37,7 @@ function Main(props) {
 	const [largerSlide, setLargerSlide] = useState(localStorage.getItem('SlideChat_LargerSlide') === '1');
 	const [showCarouselPanel, setShowCarouselPanel] = useState(localStorage.getItem('SlideChat_HideCarousel') !== '1'); // default true for null
 	const [isInstructorView, setIsInstructorView] = useState(localStorage.getItem('SlideChat_StudentView') !== '1'); // default true for null
+	const [fullscreen, setFullscreen] = useState(false);
 	const questionListRef = useRef(null);
 	const questionDetailsRef = useRef(null);
 
@@ -227,6 +228,13 @@ function Main(props) {
 		setDrawingOverlay(false);
 	};
 
+	useEffect(() => {
+		document.querySelector('.main').addEventListener('fullscreenchange', () => {
+			console.log(document.fullscreenElement);
+			setFullscreen(Boolean(document.fullscreenElement));
+		});
+	}, []);
+
 	return (
 		<>
 			<AppBar
@@ -245,7 +253,7 @@ function Main(props) {
 				darkTheme={darkTheme}
 				setDarkTheme={setDarkTheme}
 			/>
-			<div className={`main ${largerSlide ? 'larger-slide' : ''}`}>
+			<div className={`main ${largerSlide ? 'larger-slide' : ''} ${fullscreen ? 'fullscreen' : ''}`}>
 				<Slides
 					filename={filename}
 					sid={sid}
@@ -264,6 +272,7 @@ function Main(props) {
 					showCarouselPanel={showCarouselPanel}
 					record={record}
 					setRecord={setRecord}
+					fullscreen={fullscreen}
 				/>
 				<div className='chat-area'>
 					{qid === QUESTION_LIST ? (

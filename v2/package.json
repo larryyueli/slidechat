@@ -22,11 +22,11 @@
 		"express-session": "^1.17.1",
 		"mongodb": "^3.6.3",
 		"morgan": "^1.9.1",
-		"pm2": "^4.5.1",
+		"pm2": "^4.5.5",
 		"socket.io": "^3.1.1"
 	},
 	"devDependencies": {
-		"@material-ui/core": "^4.11.2",
+		"@material-ui/core": "^4.11.3",
 		"cross-env": "^7.0.3",
 		"highlight.js": "^10.4.1",
 		"markdown-it": "^12.0.4",

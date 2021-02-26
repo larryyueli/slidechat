@@ -20,8 +20,12 @@ code {
 	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
+.main {
+	background-color: $backgroundColour;
+}
+
 @media (min-width: 768px) {
-	.main {
+	.main:not(.fullscreen) {
 		display: grid;
 		grid-template-columns: 2fr 1fr;
 		grid-template-rows: auto;
@@ -41,7 +45,7 @@ code {
 			@include vertical-scrollbar;
 		}
 	}
-	.main.larger-slide {
+	.main.larger-slide:not(.fullscreen) {
 		grid-template-columns: 3fr 1fr;
 		.slide-wrapper {
 			width: 95%;
@@ -52,5 +56,40 @@ code {
 		min-width: 300px;
 		overflow-y: auto;
 		border-left: 1px solid $dividerColour;
+	}
+}
+
+.main.fullscreen {
+	display: flex;
+	.chat-area {
+		display: none;
+	}
+	.slide-container {
+		padding: 0;
+		width: 100%;
+		height: 100%;
+		.slide-wrapper {
+			position: relative;
+			padding: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			height: 100%;
+			.slide {
+				max-width: 100%;
+				max-height: 100%;
+			}
+			.page-panel {
+				position: absolute;
+				left: 0;
+				bottom: 0.5rem;
+			}
+			.slide-audio {
+				position: absolute;
+				left: 24rem;
+				bottom: 0.5rem;
+				width: revert;
+			}
+		}
 	}
 }
