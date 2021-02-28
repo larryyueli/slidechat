@@ -274,13 +274,18 @@ export default function Slides(props) {
 			<div className='slide-wrapper'>
 				<img id='slide-img' src={img} alt='slide' className='slide' />
 				{props.drawingOverlay ? (
-					<SlideDrawingOverlay ref={props.canvasComponentRef} drawing={props.drawing} />
+					<SlideDrawingOverlay
+						ref={props.canvasComponentRef}
+						drawing={props.drawing}
+						fullscreen={props.fullscreen}
+					/>
 				) : (
 					<SlideFlipOverlay
 						prevBtnDisable={prevDisable}
 						nextBtnDisable={nextDisable}
 						prevPage={prevPage}
 						nextPage={nextPage}
+						fullscreen={props.fullscreen}
 					/>
 				)}
 
@@ -317,6 +322,27 @@ export default function Slides(props) {
 						last_page
 					</span>
 				</div>
+				{props.fullscreen ? (
+					props.showTempDrawingBtn ? (
+						props.drawing ? (
+							<div className='icon-btn drawing' title='Clear drawing'>
+								<span className={`material-icons icon`} onClick={props.cancelDrawing}>
+									close
+								</span>
+							</div>
+						) : (
+							<div className='icon-btn' title='Temporary drawing'>
+								<span className={`material-icons icon`} onClick={props.startDrawing}>
+									brush
+								</span>
+							</div>
+						)
+					) : null
+				) : null}
+
+				<audio className='slide-audio' controls={audioSrc && props.fullscreen ? true : false} src={audioSrc}>
+					Your browser does not support the audio element.
+				</audio>
 
 				{props.showCarouselPanel && !props.fullscreen ? (
 					<div className='carousel' ref={carousel}>
@@ -335,7 +361,7 @@ export default function Slides(props) {
 					</div>
 				) : null}
 
-				<audio className='slide-audio' controls={audioSrc ? true : false} src={audioSrc}>
+				<audio className='slide-audio' controls={audioSrc && !props.fullscreen ? true : false} src={audioSrc}>
 					Your browser does not support the audio element.
 				</audio>
 

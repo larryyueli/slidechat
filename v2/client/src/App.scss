@@ -22,6 +22,9 @@ code {
 
 .main {
 	background-color: $backgroundColour;
+	.handle {
+		display: none;
+	}
 }
 
 @media (min-width: 768px) {
@@ -61,13 +64,19 @@ code {
 
 .main.fullscreen {
 	display: flex;
+	.handle {
+		position: absolute;
+		bottom: 0.86rem;
+		right: 20rem;
+		width: 10rem;
+	}
 	.chat-area {
 		display: none;
 	}
 	.slide-container {
 		padding: 0;
 		width: 100%;
-		height: 100%;
+		//height: 100%;
 		.slide-wrapper {
 			position: relative;
 			padding: 0;
@@ -79,16 +88,74 @@ code {
 				max-width: 100%;
 				max-height: 100%;
 			}
+			.slide-overlay {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 95%;
+			}
+			.fullscreen-drawing-controls {
+				@include clickable();
+				@include flexCenter();
+				position: absolute;
+				left: 23.8rem;
+				bottom: 0.86rem;
+				height: 2.4rem;
+				width: 2.4rem;
+				color: $textSecondary;
+				border-radius: 0.4rem;
+				font-size: 1.5rem;
+				transition: background-color 0.3s ease-out;
+				background-color: #e9e9e9;
+				color: black;
+				&:hover {
+					background-color: #a1a0a0;
+					color: rgb(102, 84, 84);
+				}
+			}
+			.flip-page-overlay {
+				position: absolute;
+				top: 0;
+				left: 0;
+				display: grid;
+				grid-template-columns: 1fr 1fr 1fr;
+				width: 100%;
+				height: 95%;
+			}
 			.page-panel {
 				position: absolute;
 				left: 0;
 				bottom: 0.5rem;
+				width: auto;
+			}
+			.icon-btn {
+				@include clickable();
+				@include flexCenter();
+				position: absolute;
+				left: 20.8rem;
+				bottom: 0.86rem;
+				height: 2.4rem;
+				width: 2.4rem;
+				color: $textSecondary;
+				border-radius: 0.4rem;
+				font-size: 1.5rem;
+				transition: background-color 0.3s ease-out;
+				&:hover {
+					background-color: #e9e9e9;
+					color: black;
+				}
+			}
+			.drawing {
+				background-color: #e9e9e9;
+				color: black;
 			}
 			.slide-audio {
 				position: absolute;
-				left: 24rem;
-				bottom: 0.5rem;
+				bottom: 0.86rem;
+				height: 2.4rem;
 				width: revert;
+				outline: none;
 			}
 		}
 	}

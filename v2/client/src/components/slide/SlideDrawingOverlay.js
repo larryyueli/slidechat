@@ -215,7 +215,13 @@ export default class SlideOverlay extends React.Component {
 							: {}
 					}
 					ref={this.canvasRef}></canvas>
-				{this.state.readOnly ? null : (
+				{this.state.readOnly ? null : this.props.fullscreen ? (
+					<div className='fullscreen-drawing-controls'>
+						<span className='material-icons' onClick={(e) => this.undo(e)}>
+							undo
+						</span>
+					</div>
+				) : (
 					<div className='drawing-controls'>
 						<span onClick={(e) => this.undo(e)}>Undo</span>
 						<span onClick={(e) => this.clear(e)}>Clear</span>
