@@ -17,7 +17,10 @@ export default class SlideFlipOverlay extends Component {
 	 * @param {Event} e resize event
 	 */
 	resize(e) {
+		this.overlay.style.width = `${this.slide.clientWidth}px`;
 		this.overlay.style.height = `${this.slide.clientHeight}px`;
+		this.overlay.style.top = `${this.slide.offsetTop}px`;
+		this.overlay.style.left = `${this.slide.offsetLeft}px`;
 	}
 
 	componentDidMount() {

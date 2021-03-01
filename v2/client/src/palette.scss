@@ -26,7 +26,7 @@
 	--switch-thumb-colour: #ffffff;
 	--switch-track-colour: #9c9c9c;
 
-	--page-panel-bg: white;
+	--page-panel-bg: #ffffff80;
 
 	@import './components/code-highlighting/github-gist.scss';
 
@@ -59,7 +59,7 @@
 	--switch-thumb-colour: #505050;
 	--switch-track-colour: #626363;
 
-	--page-panel-bg: #373737;
+	--page-panel-bg: #37373780;
 
 	@import './components/code-highlighting/vs2015.scss';
 }

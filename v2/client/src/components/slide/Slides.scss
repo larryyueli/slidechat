@@ -13,18 +13,7 @@
 		padding: 0 1rem;
 
 		.icon-btn {
-			@include clickable();
-			@include flexCenter();
-			height: 2.4rem;
-			width: 2.4rem;
-			color: $textSecondary;
-			border-radius: 0.4rem;
-			font-size: 1.5rem;
-			transition: background-color 0.3s ease-out;
-			&:hover {
-				background-color: #e9e9e9;
-				color: black;
-			}
+			@include icon-btn;
 		}
 		a {
 			text-decoration: none;
@@ -151,7 +140,7 @@
 		}
 	}
 
-	.page-panel {
+	.page-panel .buttons {
 		margin: 0.5rem 0;
 		display: flex;
 		align-items: center;
@@ -164,16 +153,6 @@
 			&:not(.disable):hover {
 				color: $iconHover;
 			}
-		}
-
-		&.fullscreen {
-			background-color: $pagePanelBg;
-			opacity: 0;
-			transition: opacity 0.25s;
-			margin-left: 38vw;
-		}
-		&.fullscreen:hover {
-			opacity: 1;
 		}
 
 		.disable {

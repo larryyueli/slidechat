@@ -38,10 +38,9 @@ function Main(props) {
 	const [showCarouselPanel, setShowCarouselPanel] = useState(localStorage.getItem('SlideChat_HideCarousel') !== '1'); // default true for null
 	const [isInstructorView, setIsInstructorView] = useState(localStorage.getItem('SlideChat_StudentView') !== '1'); // default true for null
 	const [fullscreen, setFullscreen] = useState(false);
-	const [isChatOpen, setChatOpen] = useState(false);
+	const [chatOpen, setChatOpen] = useState(false);
 	const questionListRef = useRef(null);
 	const questionDetailsRef = useRef(null);
-	const chatRef = useRef(null);
 
 	const [darkTheme, setDarkTheme] = useState(document.documentElement.getAttribute('data-theme') === 'dark');
 
@@ -231,23 +230,20 @@ function Main(props) {
 	};
 
 	const openOrHideChat = () => {
-		if (isChatOpen) {
-			chatRef.current.style.display = 'none';
-			setChatOpen(false);
-		} else {
-			chatRef.current.style.display = 'initial';
-			setChatOpen(true);
-		}
+		setChatOpen(!chatOpen);
 	};
 
 	useEffect(() => {
 		document.querySelector('.main').addEventListener('fullscreenchange', () => {
 			setFullscreen(Boolean(document.fullscreenElement));
+			if (canvasComponentRef.current) canvasComponentRef.current.resize();
 			if (!Boolean(document.fullscreenElement)) {
 				const image = document.getElementById('slide-img');
 				image.style.width = '100%';
-				chatRef.current.style.display = 'initial';
 				setChatOpen(false);
+			} else {
+				setQid(QUESTION_LIST);
+				setShowTempDrawingBtn(true);
 			}
 		});
 	}, []);
@@ -291,9 +287,8 @@ function Main(props) {
 					setRecord={setRecord}
 					fullscreen={fullscreen}
 					openOrHideChat={openOrHideChat}
-					chatRef={chatRef}
 				/>
-				<div className='chat-area' ref={chatRef}>
+				<div className={`chat-area ${chatOpen ? '' : 'hidden'}`}>
 					{qid === QUESTION_LIST ? (
 						<QuestionList
 							sid={sid}
