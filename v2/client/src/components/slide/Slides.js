@@ -252,21 +252,19 @@ export default function Slides(props) {
 							file_download
 						</a>
 					</div>
-					<div>
-						{props.fullscreen ? (
-							<div className='icon-btn' title='Fullscreen'>
-								<span className='material-icons' onClick={() => document.exitFullscreen()}>
-									fullscreen_exit
-								</span>
-							</div>
-						) : (
-							<div className='icon-btn' title='Fullscreen'>
-								<span className='material-icons' onClick={() => startFullscreen()}>
-									fullscreen
-								</span>
-							</div>
-						)}
-					</div>
+					{props.fullscreen ? (
+						<div className='icon-btn' title='Fullscreen'>
+							<span className='material-icons' onClick={() => document.exitFullscreen()}>
+								fullscreen_exit
+							</span>
+						</div>
+					) : (
+						<div className='icon-btn' title='Fullscreen'>
+							<span className='material-icons' onClick={() => startFullscreen()}>
+								fullscreen
+							</span>
+						</div>
+					)}
 					<Snackbar
 						className='toast'
 						anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
