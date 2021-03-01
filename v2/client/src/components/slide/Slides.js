@@ -213,6 +213,11 @@ export default function Slides(props) {
 	const startFullscreen = async () => {
 		try {
 			await document.querySelector('.main').requestFullscreen();
+			const image = document.getElementById('slide-img');
+			if (image.clientHeight > image.clientWidth && Boolean(document.fullscreenElement)) {
+				image.style.width = 'auto';
+			}
+			props.chatRef.current.style.display = 'none';
 		} catch (err) {
 			alert('Full screen is not allowed!');
 		}
@@ -247,19 +252,21 @@ export default function Slides(props) {
 							file_download
 						</a>
 					</div>
-					{props.fullscreen ? (
-						<div className='icon-btn' title='Fullscreen'>
-							<span className='material-icons' onClick={() => document.exitFullscreen()}>
-								fullscreen_exit
-							</span>
-						</div>
-					) : (
-						<div className='icon-btn' title='Fullscreen'>
-							<span className='material-icons' onClick={() => startFullscreen()}>
-								fullscreen
-							</span>
-						</div>
-					)}
+					<div>
+						{props.fullscreen ? (
+							<div className='icon-btn' title='Fullscreen'>
+								<span className='material-icons' onClick={() => document.exitFullscreen()}>
+									fullscreen_exit
+								</span>
+							</div>
+						) : (
+							<div className='icon-btn' title='Fullscreen'>
+								<span className='material-icons' onClick={() => startFullscreen()}>
+									fullscreen
+								</span>
+							</div>
+						)}
+					</div>
 					<Snackbar
 						className='toast'
 						anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
@@ -289,7 +296,7 @@ export default function Slides(props) {
 					/>
 				)}
 
-				<div className='page-panel'>
+				<div className={`page-panel ${props.fullscreen ? 'fullscreen' : ''}`}>
 					<span
 						className={`material-icons ${props.pageNum <= 1 ? 'disable' : ''}`}
 						onClick={() => gotoPageAndCenterCarousel(1)}>

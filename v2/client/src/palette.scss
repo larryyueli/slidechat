@@ -26,6 +26,8 @@
 	--switch-thumb-colour: #ffffff;
 	--switch-track-colour: #9c9c9c;
 
+	--page-panel-bg: white;
+
 	@import './components/code-highlighting/github-gist.scss';
 
 	color: var(--text-primary);
@@ -57,6 +59,8 @@
 	--switch-thumb-colour: #505050;
 	--switch-track-colour: #626363;
 
+	--page-panel-bg: #484848;
+
 	@import './components/code-highlighting/vs2015.scss';
 }
 
@@ -86,3 +90,5 @@ $iconHover: var(--icon-hover);
 $switchCheckedThumbColour: var(--switch-checked-thumb-colour);
 $switchThumbColour: var(--switch-thumb-colour);
 $switchTrackColour: var(--switch-track-colour);
+
+$pagePanelBg: var(--page-panel-bg);

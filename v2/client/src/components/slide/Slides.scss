@@ -150,6 +150,7 @@
 			margin: 0 0.5rem;
 		}
 	}
+
 	.page-panel {
 		margin: 0.5rem 0;
 		display: flex;
@@ -164,12 +165,24 @@
 				color: $iconHover;
 			}
 		}
+
+		&.fullscreen {
+			background-color: $pagePanelBg;
+			opacity: 0;
+			transition: opacity 0.25s;
+			margin-left: 38vw;
+		}
+		&.fullscreen:hover {
+			opacity: 1;
+		}
+
 		.disable {
 			color: $disabled;
 			cursor: default;
 		}
 		.page-input {
 			margin: 0 0.5rem;
+			padding: 0.25rem;
 			input {
 				width: 1.8rem;
 				padding: 0.1rem;
@@ -179,9 +192,7 @@
 				border: 1px solid $dividerColour;
 				background-color: $backgroundColour;
 				color: $textPrimary;
-				&:hover {
-					background-color: $questionHover;
-				}
+
 				&:focus {
 					outline: none;
 				}

@@ -242,8 +242,13 @@ function Main(props) {
 
 	useEffect(() => {
 		document.querySelector('.main').addEventListener('fullscreenchange', () => {
-			console.log(document.fullscreenElement);
 			setFullscreen(Boolean(document.fullscreenElement));
+			if (!Boolean(document.fullscreenElement)) {
+				const image = document.getElementById('slide-img');
+				image.style.width = '100%';
+				chatRef.current.style.display = 'initial';
+				setChatOpen(false);
+			}
 		});
 	}, []);
 
@@ -286,6 +291,7 @@ function Main(props) {
 					setRecord={setRecord}
 					fullscreen={fullscreen}
 					openOrHideChat={openOrHideChat}
+					chatRef={chatRef}
 				/>
 				<div className='chat-area' ref={chatRef}>
 					{qid === QUESTION_LIST ? (
