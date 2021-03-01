@@ -22,9 +22,6 @@ code {
 
 .main {
 	background-color: $backgroundColour;
-	.handle {
-		display: none;
-	}
 }
 
 @media (min-width: 768px) {
@@ -71,12 +68,12 @@ code {
 		width: 10rem;
 	}
 	.chat-area {
+		min-width: 450px;
 		display: none;
 	}
 	.slide-container {
 		padding: 0;
 		width: 100%;
-		//height: 100%;
 		.slide-wrapper {
 			position: relative;
 			padding: 0;
@@ -156,6 +153,25 @@ code {
 				height: 2.4rem;
 				width: revert;
 				outline: none;
+			}
+			.chat-handle {
+				@include clickable();
+				@include flexCenter();
+				position: absolute;
+				left: auto;
+				right: 0;
+				bottom: 0.86rem;
+				height: 2.4rem;
+				width: 2.4rem;
+				background-color: #e9e9e9;
+				color: $textSecondary;
+				border-radius: 1.2rem 0 0 1.2rem;
+				font-size: 1.5rem;
+				transition: background-color 0.3s ease-out;
+				&:hover {
+					background-color: #e9e9e9;
+					color: black;
+				}
 			}
 		}
 	}

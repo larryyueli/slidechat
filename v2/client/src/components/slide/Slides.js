@@ -344,6 +344,12 @@ export default function Slides(props) {
 					Your browser does not support the audio element.
 				</audio>
 
+				{props.fullscreen ? (
+					<span className='material-icons chat-handle' onClick={props.openOrHideChat}>
+						chat
+					</span>
+				) : null}
+
 				{props.showCarouselPanel && !props.fullscreen ? (
 					<div className='carousel' ref={carousel}>
 						{range(1, props.pageTotal + 1).map((i) => (

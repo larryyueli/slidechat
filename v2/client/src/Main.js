@@ -38,8 +38,10 @@ function Main(props) {
 	const [showCarouselPanel, setShowCarouselPanel] = useState(localStorage.getItem('SlideChat_HideCarousel') !== '1'); // default true for null
 	const [isInstructorView, setIsInstructorView] = useState(localStorage.getItem('SlideChat_StudentView') !== '1'); // default true for null
 	const [fullscreen, setFullscreen] = useState(false);
+	const [isChatOpen, setChatOpen] = useState(false);
 	const questionListRef = useRef(null);
 	const questionDetailsRef = useRef(null);
+	const chatRef = useRef(null);
 
 	const [darkTheme, setDarkTheme] = useState(document.documentElement.getAttribute('data-theme') === 'dark');
 
@@ -228,6 +230,16 @@ function Main(props) {
 		setDrawingOverlay(false);
 	};
 
+	const openOrHideChat = () => {
+		if (isChatOpen) {
+			chatRef.current.style.display = 'none';
+			setChatOpen(false);
+		} else {
+			chatRef.current.style.display = 'initial';
+			setChatOpen(true);
+		}
+	};
+
 	useEffect(() => {
 		document.querySelector('.main').addEventListener('fullscreenchange', () => {
 			console.log(document.fullscreenElement);
@@ -273,8 +285,9 @@ function Main(props) {
 					record={record}
 					setRecord={setRecord}
 					fullscreen={fullscreen}
+					openOrHideChat={openOrHideChat}
 				/>
-				<div className='chat-area'>
+				<div className='chat-area' ref={chatRef}>
 					{qid === QUESTION_LIST ? (
 						<QuestionList
 							sid={sid}
