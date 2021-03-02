@@ -365,6 +365,7 @@ function commonAPI(db, io, isInstructor) {
 					},
 				],
 				title: req.body.title,
+				drawing: req.body.drawing,
 			};
 
 			let insertQuestion = {
