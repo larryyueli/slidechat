@@ -59,7 +59,9 @@ export default function Slides(props) {
 			.catch((err) => {
 				console.error(err);
 			});
+	}, [props.sid, props.pageTotal, props.pageNum]);
 
+	useEffect(() => {
 		if (props.showCarouselPanel && !props.fullscreen) {
 			const thumbnail = carousel.current.querySelector(`#thumbnail-${props.pageNum}`);
 			if (!thumbnail) return;
@@ -69,7 +71,7 @@ export default function Slides(props) {
 				behavior: 'smooth',
 			});
 		}
-	}, [props.sid, props.pageTotal, props.pageNum, props.showCarouselPanel, props.fullscreen]);
+	}, [props.pageNum, props.showCarouselPanel, props.fullscreen]);
 
 	/**
 	 * upload audio to server
@@ -207,11 +209,7 @@ export default function Slides(props) {
 		const imgAspectRatio = img.naturalWidth / img.naturalHeight;
 		const container = document.querySelector('.slide-wrapper');
 		const containerAspectRatio = container.clientWidth / container.clientHeight;
-		if (containerAspectRatio > imgAspectRatio) {
-			setFullscreenPortrait(true);
-		} else {
-			setFullscreenPortrait(false);
-		}
+		setFullscreenPortrait(containerAspectRatio > imgAspectRatio);
 	};
 	const startFullscreen = async () => {
 		try {
@@ -254,19 +252,11 @@ export default function Slides(props) {
 							file_download
 						</a>
 					</div>
-					{props.fullscreen ? (
-						<div className='icon-btn' title='Fullscreen'>
-							<span className='material-icons' onClick={() => document.exitFullscreen()}>
-								fullscreen_exit
-							</span>
-						</div>
-					) : (
-						<div className='icon-btn' title='Fullscreen'>
-							<span className='material-icons' onClick={() => startFullscreen()}>
-								fullscreen
-							</span>
-						</div>
-					)}
+					<div className='icon-btn fullscreen-btn' title='Fullscreen'>
+						<span className='material-icons' onClick={() => startFullscreen()}>
+							fullscreen
+						</span>
+					</div>
 					<Snackbar
 						className='toast'
 						anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
