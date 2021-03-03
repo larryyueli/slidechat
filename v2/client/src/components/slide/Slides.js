@@ -202,21 +202,28 @@ export default function Slides(props) {
 		setShowToast(true);
 	};
 
+	const adjustAspectRatio = () => {
+		const img = document.getElementById('slide-img');
+		const imgAspectRatio = img.naturalWidth / img.naturalHeight;
+		const container = document.querySelector('.slide-wrapper');
+		const containerAspectRatio = container.clientWidth / container.clientHeight;
+		if (containerAspectRatio > imgAspectRatio) {
+			setFullscreenPortrait(true);
+		} else {
+			setFullscreenPortrait(false);
+		}
+	};
 	const startFullscreen = async () => {
 		try {
-			const img = document.getElementById('slide-img');
-			const imgAspectRatio = img.clientWidth / img.clientHeight;
 			await document.querySelector('.main').requestFullscreen();
-			const screenAspectRatio = document.fullscreenElement.clientWidth / document.fullscreenElement.clientHeight;
-			if (screenAspectRatio > imgAspectRatio) {
-				setFullscreenPortrait(true);
-			} else {
-				setFullscreenPortrait(false);
-			}
 		} catch (err) {
 			alert('Full screen is not allowed!');
 		}
 	};
+	useEffect(() => {
+		if (!props.fullscreen) return;
+		adjustAspectRatio();
+	}, [props.fullscreen, props.fullscreenChatOpen]);
 
 	return (
 		<div className='slide-container'>
@@ -278,6 +285,7 @@ export default function Slides(props) {
 						ref={props.canvasComponentRef}
 						drawing={props.drawing}
 						fullscreen={props.fullscreen}
+						fullscreenChatOpen={props.fullscreenChatOpen}
 					/>
 				) : (
 					<SlideFlipOverlay
@@ -286,6 +294,7 @@ export default function Slides(props) {
 						prevPage={prevPage}
 						nextPage={nextPage}
 						fullscreen={props.fullscreen}
+						fullscreenChatOpen={props.fullscreenChatOpen}
 					/>
 				)}
 

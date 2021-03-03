@@ -65,6 +65,10 @@ export default class SlideOverlay extends React.Component {
 		window.addEventListener('resize', () => this.resize());
 	}
 
+	componentDidUpdate(prevProps) {
+		if (this.props.fullscreen && this.props.fullscreenChatOpen !== prevProps.fullscreenChatOpen) this.resize();
+	}
+
 	componentWillUnmount() {
 		window.removeEventListener('resize', () => this.resize());
 	}

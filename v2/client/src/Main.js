@@ -38,7 +38,7 @@ function Main(props) {
 	const [showCarouselPanel, setShowCarouselPanel] = useState(localStorage.getItem('SlideChat_HideCarousel') !== '1'); // default true for null
 	const [isInstructorView, setIsInstructorView] = useState(localStorage.getItem('SlideChat_StudentView') !== '1'); // default true for null
 	const [fullscreen, setFullscreen] = useState(false);
-	const [chatOpen, setChatOpen] = useState(false);
+	const [fullscreenChatOpen, setFullscreenChatOpen] = useState(false);
 	const isTypingRef = useRef(false);
 	const questionListRef = useRef(null);
 	const questionDetailsRef = useRef(null);
@@ -189,6 +189,11 @@ function Main(props) {
 	};
 
 	const gotoQuestion = (pageNum, qid) => {
+		if (drawing) {
+			// exit temp drawing mode
+			canvasComponentRef.current.clear();
+			setDrawing(false);
+		}
 		applyPage(pageNum);
 		setQid(qid);
 		setShowTempDrawingBtn(false);
@@ -233,7 +238,7 @@ function Main(props) {
 	};
 
 	const openOrHideChat = () => {
-		setChatOpen(!chatOpen);
+		setFullscreenChatOpen(!fullscreenChatOpen);
 	};
 
 	pageNumRef.current = page;
@@ -242,11 +247,8 @@ function Main(props) {
 		document.querySelector('.main').addEventListener('fullscreenchange', () => {
 			setFullscreen(Boolean(document.fullscreenElement));
 			if (canvasComponentRef.current) canvasComponentRef.current.resize();
-			if (!Boolean(document.fullscreenElement)) {
-				const image = document.getElementById('slide-img');
-				image.style.width = '100%';
-				setChatOpen(false);
-			} else {
+			if (Boolean(document.fullscreenElement)) {
+				setFullscreenChatOpen(false);
 				setQid(QUESTION_LIST);
 				setShowTempDrawingBtn(true);
 			}
@@ -303,10 +305,11 @@ function Main(props) {
 					record={record}
 					setRecord={setRecord}
 					fullscreen={fullscreen}
+					fullscreenChatOpen={fullscreenChatOpen}
 					openOrHideChat={openOrHideChat}
 					isTypingRef={isTypingRef}
 				/>
-				<div className={`chat-area ${chatOpen ? '' : 'hidden'}`}>
+				<div className={`chat-area ${fullscreen && !fullscreenChatOpen ? 'hidden' : ''}`}>
 					{qid === QUESTION_LIST ? (
 						<QuestionList
 							sid={sid}
