@@ -67,6 +67,12 @@ function commonAPI(db, io, isInstructor) {
 				{ projection: { pages: 0 } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
+
+			slides.updateOne(
+				{ _id: ObjectID.createFromHexString(req.query.slideID) },
+				{ $inc: { 'viewCount': 1 } }
+			);
+
 			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
 			res.json({
 				filename: slide.filename,
@@ -100,6 +106,13 @@ function commonAPI(db, io, isInstructor) {
 			if (isNotValidPage(req.query.pageNum, slide.pageTotal)) {
 				throw { status: 400, error: 'bad request' };
 			}
+			
+			const viewCountField = `pages.${+req.query.pageNum - 1}.viewCount`;
+			slides.updateOne(
+				{ _id: ObjectID.createFromHexString(req.query.slideID) },
+				{ $inc: { [`${viewCountField}`]: 1 } }
+			);
+
 			res.sendFile(path.join(fileStorage, req.query.slideID, `page-${+req.query.pageNum - 1}.png`));
 		} catch (err) {
 			errorHandler(res, err);
@@ -300,6 +313,12 @@ function commonAPI(db, io, isInstructor) {
 					if (i && i.uid !== req.session.uid) i.uid = undefined;
 				}
 			}
+
+			const viewCountField = `pages.${+req.query.pageNum - 1}.questions.${req.query.qid}.viewCount`;
+			slides.updateOne(
+				{ _id: ObjectID.createFromHexString(req.query.slideID) },
+				{ $inc: { [`${viewCountField}`]: 1 } }
+			);
 
 			res.json({
 				title: question.title,
