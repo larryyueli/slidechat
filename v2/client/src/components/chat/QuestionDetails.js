@@ -313,6 +313,12 @@ export default class QuestionDetails extends React.Component {
 							multiline
 							rowsMax='10'
 							inputRef={this.chatRef}
+							onBlur={() => {
+								this.props.isTypingRef.current = false;
+							}}
+							onFocus={() => {
+								this.props.isTypingRef.current = true;
+							}}
 						/>
 						<Button
 							variant='contained'

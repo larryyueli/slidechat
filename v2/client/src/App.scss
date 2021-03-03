@@ -5,6 +5,7 @@
 @import './components/chat/ChatArea.scss';
 @import './components/slide/Slides.scss';
 @import './Landing.scss';
+@import './Fullscreen.scss';
 
 body {
 	margin: 0;
@@ -20,8 +21,12 @@ code {
 	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
+.main {
+	background-color: $backgroundColour;
+}
+
 @media (min-width: 768px) {
-	.main {
+	.main:not(.fullscreen) {
 		display: grid;
 		grid-template-columns: 2fr 1fr;
 		grid-template-rows: auto;
@@ -41,7 +46,7 @@ code {
 			@include vertical-scrollbar;
 		}
 	}
-	.main.larger-slide {
+	.main.larger-slide:not(.fullscreen) {
 		grid-template-columns: 3fr 1fr;
 		.slide-wrapper {
 			width: 95%;

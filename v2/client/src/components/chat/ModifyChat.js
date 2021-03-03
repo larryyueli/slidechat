@@ -54,7 +54,19 @@ export default function ModifyChat(props) {
 			<ChatAreaTitle title='Modify a Message' showManage={false} showBackBtn={true} back={props.back} />
 			<div className='chat-area-main new-chat-form'>
 				<div>
-					<TextField variant='outlined' multiline rows='6' defaultValue={props.old.body} inputRef={textRef} />
+					<TextField
+						variant='outlined'
+						multiline
+						rows='6'
+						defaultValue={props.old.body}
+						inputRef={textRef}
+						onBlur={() => {
+							props.isTypingRef.current = false;
+						}}
+						onFocus={() => {
+							props.isTypingRef.current = true;
+						}}
+					/>
 				</div>
 				<div>
 					<Button onClick={done} variant='contained'>

@@ -20,6 +20,7 @@ export default function Slides(props) {
 	const [uploading, setUploading] = useState(false);
 	const [img, setImg] = useState(loadingImg);
 	const [showToast, setShowToast] = useState(false);
+	const [fullscreenPortrait, setFullscreenPortrait] = useState(false);
 	const fileUpload = useRef(null);
 	const carousel = useRef(null);
 
@@ -58,8 +59,19 @@ export default function Slides(props) {
 			.catch((err) => {
 				console.error(err);
 			});
-		// eslint-disable-next-line
-	}, [props.pageTotal, props.pageNum]);
+	}, [props.sid, props.pageTotal, props.pageNum]);
+
+	useEffect(() => {
+		if (props.showCarouselPanel && !props.fullscreen) {
+			const thumbnail = carousel.current.querySelector(`#thumbnail-${props.pageNum}`);
+			if (!thumbnail) return;
+			carousel.current.scroll({
+				top: 0,
+				left: thumbnail.offsetLeft - carousel.current.clientWidth / 2 + 40,
+				behavior: 'smooth',
+			});
+		}
+	}, [props.pageNum, props.showCarouselPanel, props.fullscreen]);
 
 	/**
 	 * upload audio to server
@@ -131,7 +143,6 @@ export default function Slides(props) {
 	const nextPage = (e) => {
 		setNextDisable(true);
 		props.gotoPage(props.pageNum + 1);
-		centerCarousel(props.pageNum + 1);
 	};
 
 	/**
@@ -141,23 +152,6 @@ export default function Slides(props) {
 	const prevPage = (e) => {
 		setPrevDisable(true);
 		props.gotoPage(props.pageNum - 1);
-		centerCarousel(props.pageNum - 1);
-	};
-
-	const gotoPageAndCenterCarousel = (pageNum) => {
-		props.gotoPage(pageNum);
-		centerCarousel(pageNum);
-	};
-
-	const centerCarousel = (pageNum) => {
-		if (!props.showCarouselPanel) return;
-		const thumbnail = carousel.current.querySelector(`#thumbnail-${pageNum}`);
-		if (!thumbnail) return;
-		carousel.current.scroll({
-			top: 0,
-			left: thumbnail.offsetLeft - carousel.current.clientWidth / 2 + 40,
-			behavior: 'smooth',
-		});
 	};
 
 	const startRecording = async () => {
@@ -210,98 +204,180 @@ export default function Slides(props) {
 		setShowToast(true);
 	};
 
+	const adjustAspectRatio = () => {
+		const img = document.getElementById('slide-img');
+		const imgAspectRatio = img.naturalWidth / img.naturalHeight;
+		const container = document.querySelector('.slide-wrapper');
+		const containerAspectRatio = container.clientWidth / container.clientHeight;
+		setFullscreenPortrait(containerAspectRatio > imgAspectRatio);
+	};
+	const startFullscreen = async () => {
+		try {
+			await document.querySelector('.main').requestFullscreen();
+		} catch (err) {
+			alert('Full screen is not allowed!');
+		}
+	};
+	useEffect(() => {
+		if (!props.fullscreen) return;
+		adjustAspectRatio();
+	}, [props.fullscreen, props.fullscreenChatOpen]);
+
 	return (
 		<div className='slide-container'>
-			<div className='slide-toolbar'>
-				{props.showTempDrawingBtn ? (
-					props.drawing ? (
-						<div className='icon-btn drawing' title='Clear drawing'>
-							<span className={`material-icons icon`} onClick={props.cancelDrawing}>
-								close
-							</span>
-						</div>
-					) : (
-						<div className='icon-btn' title='Temporary drawing'>
-							<span className={`material-icons icon`} onClick={props.startDrawing}>
-								brush
-							</span>
-						</div>
-					)
-				) : null}
-				<div className='icon-btn' title='Quote this page'>
-					<span className='material-icons' onClick={copyLink}>
-						link
-					</span>
+			{props.fullscreen ? null : (
+				<div className='slide-toolbar'>
+					{props.showTempDrawingBtn ? (
+						props.drawing ? (
+							<div className='icon-btn drawing' title='Clear drawing'>
+								<span className={`material-icons icon`} onClick={props.cancelDrawing}>
+									close
+								</span>
+							</div>
+						) : (
+							<div className='icon-btn' title='Temporary drawing'>
+								<span className={`material-icons icon`} onClick={props.startDrawing}>
+									brush
+								</span>
+							</div>
+						)
+					) : null}
+					<div className='icon-btn' title='Quote this page'>
+						<span className='material-icons' onClick={copyLink}>
+							link
+						</span>
+					</div>
+					<div className='icon-btn' title='Download PDF'>
+						<a className='material-icons' href={`${serverURL}/api/downloadPdf?slideID=${props.sid}`}>
+							file_download
+						</a>
+					</div>
+					<div className='icon-btn fullscreen-btn' title='Fullscreen'>
+						<span className='material-icons' onClick={() => startFullscreen()}>
+							fullscreen
+						</span>
+					</div>
+					<Snackbar
+						className='toast'
+						anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+						open={showToast}
+						onClose={() => setShowToast(false)}
+						autoHideDuration={2500}
+						message='Link copied to clipboard!'
+					/>
 				</div>
-				<div className='icon-btn' title='Download PDF'>
-					<a className='material-icons' href={`${serverURL}/api/downloadPdf?slideID=${props.sid}`}>
-						file_download
-					</a>
-				</div>
-				<Snackbar
-					className='toast'
-					anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-					open={showToast}
-					onClose={() => setShowToast(false)}
-					autoHideDuration={2500}
-					message='Link copied to clipboard!'
-				/>
-			</div>
+			)}
 
-			<div className='slide-wrapper'>
+			<div className={`slide-wrapper ${props.fullscreen && fullscreenPortrait ? 'fullscreen-portrait' : ''}`}>
 				<img id='slide-img' src={img} alt='slide' className='slide' />
 				{props.drawingOverlay ? (
-					<SlideDrawingOverlay ref={props.canvasComponentRef} drawing={props.drawing} />
+					<SlideDrawingOverlay
+						ref={props.canvasComponentRef}
+						drawing={props.drawing}
+						fullscreen={props.fullscreen}
+						fullscreenChatOpen={props.fullscreenChatOpen}
+					/>
 				) : (
 					<SlideFlipOverlay
 						prevBtnDisable={prevDisable}
 						nextBtnDisable={nextDisable}
 						prevPage={prevPage}
 						nextPage={nextPage}
+						fullscreen={props.fullscreen}
+						fullscreenChatOpen={props.fullscreenChatOpen}
 					/>
 				)}
 
-				<div className='page-panel'>
-					<span
-						className={`material-icons ${props.pageNum <= 1 ? 'disable' : ''}`}
-						onClick={() => gotoPageAndCenterCarousel(1)}>
-						first_page
-					</span>
-					<span className={`material-icons ${props.pageNum <= 1 ? 'disable' : ''}`} onClick={prevPage}>
-						navigate_before
-					</span>
-					<div className='page-input'>
-						Page{' '}
-						<input
-							id='pageNum'
-							type='tel'
-							defaultValue={props.pageNum}
-							onBlur={props.gotoInputPage}
-							onKeyDown={(e) => {
-								if (e.key === 'Enter') document.getElementById('pageNum').blur();
-							}}
-						/>{' '}
-						of {props.pageTotal}
+				<div className={`page-panel ${props.fullscreen ? 'fullscreen' : ''}`}>
+					<div className='buttons'>
+						<span
+							className={`material-icons ${props.pageNum <= 1 ? 'disable' : ''}`}
+							onClick={() => props.gotoPage(1)}>
+							first_page
+						</span>
+						<span className={`material-icons ${props.pageNum <= 1 ? 'disable' : ''}`} onClick={prevPage}>
+							navigate_before
+						</span>
+						<div className='page-input'>
+							Page{' '}
+							<input
+								id='pageNum'
+								type='tel'
+								defaultValue={props.pageNum}
+								onKeyDown={(e) => {
+									if (e.key === 'Enter') document.getElementById('pageNum').blur();
+								}}
+								onBlur={() => {
+									props.isTypingRef.current = false;
+									props.gotoInputPage();
+								}}
+								onFocus={() => {
+									props.isTypingRef.current = true;
+								}}
+							/>{' '}
+							of {props.pageTotal}
+						</div>
+						<span
+							className={`material-icons ${props.pageNum >= props.pageTotal ? 'disable' : ''}`}
+							onClick={nextPage}>
+							navigate_next
+						</span>
+						<span
+							className={`material-icons ${props.pageNum >= props.pageTotal ? 'disable' : ''}`}
+							onClick={() => props.gotoPage(props.pageTotal)}>
+							last_page
+						</span>
+
+						{props.fullscreen ? (
+							<>
+								{props.showTempDrawingBtn ? (
+									props.drawing ? (
+										<>
+											<span
+												className='material-icons'
+												title='Clear drawing'
+												onClick={props.cancelDrawing}>
+												close
+											</span>
+											<span
+												className='material-icons'
+												title='Undo'
+												onClick={() => props.canvasComponentRef.current.undo()}>
+												undo
+											</span>
+										</>
+									) : (
+										<span
+											className='material-icons'
+											title='Temporary drawing'
+											onClick={props.startDrawing}>
+											brush
+										</span>
+									)
+								) : null}
+							</>
+						) : null}
 					</div>
-					<span
-						className={`material-icons ${props.pageNum >= props.pageTotal ? 'disable' : ''}`}
-						onClick={nextPage}>
-						navigate_next
-					</span>
-					<span
-						className={`material-icons ${props.pageNum >= props.pageTotal ? 'disable' : ''}`}
-						onClick={() => gotoPageAndCenterCarousel(props.pageTotal)}>
-						last_page
-					</span>
+					{props.fullscreen ? (
+						<audio className='slide-audio' controls={Boolean(audioSrc)} src={audioSrc}>
+							Your browser does not support the audio element.
+						</audio>
+					) : null}
 				</div>
 
-				{props.showCarouselPanel ? (
+				{props.fullscreen ? (
+					<span className='material-icons chat-handle' onClick={props.openOrHideChat}>
+						chat
+					</span>
+				) : null}
+
+				{props.showCarouselPanel && !props.fullscreen ? (
 					<div className='carousel' ref={carousel}>
 						{range(1, props.pageTotal + 1).map((i) => (
 							<div
 								className={`thumbnail-container ${props.pageNum === i ? 'current-slide' : ''}`}
 								id={`thumbnail-${i}`}
-								onClick={() => gotoPageAndCenterCarousel(i)}
+								onClick={() => props.gotoPage(i)}
 								key={i}>
 								<img
 									src={`${serverURL}/api/slideThumbnail?slideID=${props.sid}&pageNum=${i}`}
@@ -312,11 +388,11 @@ export default function Slides(props) {
 					</div>
 				) : null}
 
-				<audio className='slide-audio' controls={audioSrc ? true : false} src={audioSrc}>
+				<audio className='slide-audio' controls={Boolean(audioSrc) && !props.fullscreen} src={audioSrc}>
 					Your browser does not support the audio element.
 				</audio>
 
-				{props.isInstructor && props.isInstructorView ? (
+				{props.isInstructor && props.isInstructorView && !props.fullscreen ? (
 					<>
 						<div className='audio-instructor'>
 							<input type='file' id='file' className='file' ref={fileUpload} accept='.mp3' />

@@ -37,8 +37,13 @@ function Main(props) {
 	const [largerSlide, setLargerSlide] = useState(localStorage.getItem('SlideChat_LargerSlide') === '1');
 	const [showCarouselPanel, setShowCarouselPanel] = useState(localStorage.getItem('SlideChat_HideCarousel') !== '1'); // default true for null
 	const [isInstructorView, setIsInstructorView] = useState(localStorage.getItem('SlideChat_StudentView') !== '1'); // default true for null
+	const [fullscreen, setFullscreen] = useState(false);
+	const [fullscreenChatOpen, setFullscreenChatOpen] = useState(false);
+	const isTypingRef = useRef(false);
 	const questionListRef = useRef(null);
 	const questionDetailsRef = useRef(null);
+	const pageNumRef = useRef(-1);
+	const gotoPageRef = useRef(() => {});
 
 	const [darkTheme, setDarkTheme] = useState(document.documentElement.getAttribute('data-theme') === 'dark');
 
@@ -184,6 +189,11 @@ function Main(props) {
 	};
 
 	const gotoQuestion = (pageNum, qid) => {
+		if (drawing) {
+			// exit temp drawing mode
+			canvasComponentRef.current.clear();
+			setDrawing(false);
+		}
 		applyPage(pageNum);
 		setQid(qid);
 		setShowTempDrawingBtn(false);
@@ -227,6 +237,35 @@ function Main(props) {
 		setDrawingOverlay(false);
 	};
 
+	const openOrHideChat = () => {
+		setFullscreenChatOpen(!fullscreenChatOpen);
+	};
+
+	pageNumRef.current = page;
+	gotoPageRef.current = gotoPage;
+	useEffect(() => {
+		document.querySelector('.main').addEventListener('fullscreenchange', () => {
+			setFullscreen(Boolean(document.fullscreenElement));
+			if (canvasComponentRef.current) canvasComponentRef.current.resize();
+			if (Boolean(document.fullscreenElement)) {
+				setFullscreenChatOpen(false);
+				setQid(QUESTION_LIST);
+				setShowTempDrawingBtn(true);
+			}
+		});
+
+		window.addEventListener('keydown', (e) => {
+			if (isTypingRef.current) return;
+			if (e.key === 'ArrowLeft') {
+				gotoPageRef.current(pageNumRef.current - 1);
+			} else if (e.key === 'ArrowRight') {
+				gotoPageRef.current(pageNumRef.current + 1);
+			} else if (e.key === ' ' && document.fullscreenElement) {
+				gotoPageRef.current(pageNumRef.current + 1);
+			}
+		});
+	}, []);
+
 	return (
 		<>
 			<AppBar
@@ -244,8 +283,9 @@ function Main(props) {
 				setLargerSlide={setLargerSlide}
 				darkTheme={darkTheme}
 				setDarkTheme={setDarkTheme}
+				isTypingRef={isTypingRef}
 			/>
-			<div className={`main ${largerSlide ? 'larger-slide' : ''}`}>
+			<div className={`main ${largerSlide ? 'larger-slide' : ''} ${fullscreen ? 'fullscreen' : ''}`}>
 				<Slides
 					filename={filename}
 					sid={sid}
@@ -264,57 +304,71 @@ function Main(props) {
 					showCarouselPanel={showCarouselPanel}
 					record={record}
 					setRecord={setRecord}
+					fullscreen={fullscreen}
+					fullscreenChatOpen={fullscreenChatOpen}
+					openOrHideChat={openOrHideChat}
+					isTypingRef={isTypingRef}
 				/>
-				<div className='chat-area'>
-					{qid === QUESTION_LIST ? (
-						<QuestionList
-							sid={sid}
-							pageNum={page}
-							isInstructor={isInstructor}
-							askNewQuestion={gotoNewQuestion}
-							goToQuestion={gotoQuestion}
-							isInstructorView={isInstructorView}
-							connected={connected}
-							ref={questionListRef}
-						/>
-					) : qid === NEW_QUESTION ? (
-						<NewQuestion
-							sid={sid}
-							pageNum={page}
-							anonymity={anonymity}
-							username={username}
-							back={back}
-							drawable={drawable}
-							drawing={drawing}
-							startDrawing={startDrawing}
-							cancelDrawing={cancelDrawing}
-							canvasComponentRef={canvasComponentRef}
-						/>
-					) : qid === MODIFY_CHAT ? (
-						<ModifyChat sid={sid} pageNum={page} old={chatToModify} back={back} />
-					) : (
-						<QuestionDetails
-							sid={sid}
-							filename={filename}
-							pageNum={page}
-							qid={qid}
-							uid={uid}
-							anonymity={anonymity}
-							username={username}
-							isInstructor={isInstructor}
-							drawable={drawable}
-							setDrawing={setDrawing}
-							setDrawingOverlay={setDrawingOverlay}
-							setShowTempDrawingBtn={setShowTempDrawingBtn}
-							canvasComponentRef={canvasComponentRef}
-							gotoModify={gotoModify}
-							back={back}
-							isInstructorView={isInstructorView}
-							connected={connected}
-							ref={questionDetailsRef}
-						/>
-					)}
-				</div>
+				{!fullscreen || fullscreenChatOpen ? (
+					<div className='chat-area'>
+						{qid === QUESTION_LIST ? (
+							<QuestionList
+								sid={sid}
+								pageNum={page}
+								isInstructor={isInstructor}
+								askNewQuestion={gotoNewQuestion}
+								goToQuestion={gotoQuestion}
+								isInstructorView={isInstructorView}
+								connected={connected}
+								ref={questionListRef}
+							/>
+						) : qid === NEW_QUESTION ? (
+							<NewQuestion
+								sid={sid}
+								pageNum={page}
+								anonymity={anonymity}
+								username={username}
+								back={back}
+								drawable={drawable}
+								drawing={drawing}
+								startDrawing={startDrawing}
+								cancelDrawing={cancelDrawing}
+								canvasComponentRef={canvasComponentRef}
+								isTypingRef={isTypingRef}
+							/>
+						) : qid === MODIFY_CHAT ? (
+							<ModifyChat
+								sid={sid}
+								pageNum={page}
+								old={chatToModify}
+								back={back}
+								isTypingRef={isTypingRef}
+							/>
+						) : (
+							<QuestionDetails
+								sid={sid}
+								filename={filename}
+								pageNum={page}
+								qid={qid}
+								uid={uid}
+								anonymity={anonymity}
+								username={username}
+								isInstructor={isInstructor}
+								drawable={drawable}
+								setDrawing={setDrawing}
+								setDrawingOverlay={setDrawingOverlay}
+								setShowTempDrawingBtn={setShowTempDrawingBtn}
+								canvasComponentRef={canvasComponentRef}
+								gotoModify={gotoModify}
+								back={back}
+								isInstructorView={isInstructorView}
+								connected={connected}
+								ref={questionDetailsRef}
+								isTypingRef={isTypingRef}
+							/>
+						)}
+					</div>
+				) : null}
 			</div>
 		</>
 	);

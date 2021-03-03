@@ -13,18 +13,7 @@
 		padding: 0 1rem;
 
 		.icon-btn {
-			@include clickable();
-			@include flexCenter();
-			height: 2.4rem;
-			width: 2.4rem;
-			color: $textSecondary;
-			border-radius: 0.4rem;
-			font-size: 1.5rem;
-			transition: background-color 0.3s ease-out;
-			&:hover {
-				background-color: #e9e9e9;
-				color: black;
-			}
+			@include icon-btn;
 		}
 		a {
 			text-decoration: none;
@@ -77,12 +66,8 @@
 		}
 
 		.flip-page-overlay {
-			position: absolute;
-			top: 0;
-			left: 0;
 			display: grid;
 			grid-template-columns: 1fr 1fr 1fr;
-			width: 100%;
 		}
 
 		.slide-audio {
@@ -150,7 +135,8 @@
 			margin: 0 0.5rem;
 		}
 	}
-	.page-panel {
+
+	.page-panel .buttons {
 		margin: 0.5rem 0;
 		display: flex;
 		align-items: center;
@@ -164,12 +150,14 @@
 				color: $iconHover;
 			}
 		}
+
 		.disable {
 			color: $disabled;
 			cursor: default;
 		}
 		.page-input {
 			margin: 0 0.5rem;
+			padding: 0.25rem;
 			input {
 				width: 1.8rem;
 				padding: 0.1rem;
@@ -179,9 +167,7 @@
 				border: 1px solid $dividerColour;
 				background-color: $backgroundColour;
 				color: $textPrimary;
-				&:hover {
-					background-color: $questionHover;
-				}
+
 				&:focus {
 					outline: none;
 				}

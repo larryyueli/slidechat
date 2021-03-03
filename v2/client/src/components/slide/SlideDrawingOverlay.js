@@ -17,15 +17,18 @@ export default class SlideOverlay extends React.Component {
 		this.canvasRef = createRef(null);
 		this.canvas = null;
 		this.ctx = null;
+		this.slide = null;
 	}
 
 	/**
 	 * resize the canvas to the same size as the slide
 	 * @param {*} slide
 	 */
-	resize(slide) {
-		this.canvas.width = slide.clientWidth;
-		this.canvas.height = slide.clientHeight;
+	resize() {
+		this.canvas.style.top = `${this.slide.offsetTop}px`;
+		this.canvas.style.left = `${this.slide.offsetLeft}px`;
+		this.canvas.width = this.slide.clientWidth;
+		this.canvas.height = this.slide.clientHeight;
 		this.setupCtx();
 		this.redraw();
 	}
@@ -53,12 +56,21 @@ export default class SlideOverlay extends React.Component {
 		this.canvas.addEventListener('touchmove', (e) => this.touchmove(e));
 		this.canvas.addEventListener('touchstart', (e) => this.touchstart(e));
 
-		const slide = document.getElementById('slide-img');
-		if (slide.complete) {
-			this.resize(slide);
+		this.slide = document.getElementById('slide-img');
+		if (this.slide.complete) {
+			this.resize();
 		} else {
-			slide.onload = (e) => this.resize(slide);
+			this.slide.onload = () => this.resize();
 		}
+		window.addEventListener('resize', () => this.resize());
+	}
+
+	componentDidUpdate(prevProps) {
+		if (this.props.fullscreen && this.props.fullscreenChatOpen !== prevProps.fullscreenChatOpen) this.resize();
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener('resize', () => this.resize());
 	}
 
 	redraw() {
@@ -215,7 +227,7 @@ export default class SlideOverlay extends React.Component {
 							: {}
 					}
 					ref={this.canvasRef}></canvas>
-				{this.state.readOnly ? null : (
+				{this.state.readOnly ? null : this.props.fullscreen ? null : (
 					<div className='drawing-controls'>
 						<span onClick={(e) => this.undo(e)}>Undo</span>
 						<span onClick={(e) => this.clear(e)}>Clear</span>

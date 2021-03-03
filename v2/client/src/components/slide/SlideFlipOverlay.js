@@ -17,7 +17,10 @@ export default class SlideFlipOverlay extends Component {
 	 * @param {Event} e resize event
 	 */
 	resize(e) {
+		this.overlay.style.width = `${this.slide.clientWidth}px`;
 		this.overlay.style.height = `${this.slide.clientHeight}px`;
+		this.overlay.style.top = `${this.slide.offsetTop}px`;
+		this.overlay.style.left = `${this.slide.offsetLeft}px`;
 	}
 
 	componentDidMount() {
@@ -31,6 +34,10 @@ export default class SlideFlipOverlay extends Component {
 		window.addEventListener('resize', this.resize);
 	}
 
+	componentDidUpdate(prevProps) {
+		if (this.props.fullscreen && this.props.fullscreenChatOpen !== prevProps.fullscreenChatOpen) this.resize();
+	}
+
 	componentWillUnmount() {
 		window.removeEventListener('resize', this.resize);
 	}
@@ -38,7 +45,7 @@ export default class SlideFlipOverlay extends Component {
 	render() {
 		return (
 			<>
-				<div className='flip-page-overlay' ref={this.overlayRef}>
+				<div className='slide-overlay flip-page-overlay' ref={this.overlayRef}>
 					<div
 						className={this.props.prevBtnDisable ? 'disabled' : 'prev'}
 						onClick={this.props.prevBtnDisable ? () => {} : this.props.prevPage}></div>

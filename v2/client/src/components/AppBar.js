@@ -98,7 +98,13 @@ function AppBar(props) {
 											type='text'
 											value={name}
 											onChange={setNewName}
-											onBlur={(e) => confirmName(name)}
+											onBlur={() => {
+												props.isTypingRef.current = false;
+												confirmName(name);
+											}}
+											onFocus={() => {
+												props.isTypingRef.current = true;
+											}}
 											maxLength={30}
 										/>
 										<Button
