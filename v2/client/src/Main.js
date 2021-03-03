@@ -309,58 +309,66 @@ function Main(props) {
 					openOrHideChat={openOrHideChat}
 					isTypingRef={isTypingRef}
 				/>
-				<div className={`chat-area ${fullscreen && !fullscreenChatOpen ? 'hidden' : ''}`}>
-					{qid === QUESTION_LIST ? (
-						<QuestionList
-							sid={sid}
-							pageNum={page}
-							isInstructor={isInstructor}
-							askNewQuestion={gotoNewQuestion}
-							goToQuestion={gotoQuestion}
-							isInstructorView={isInstructorView}
-							connected={connected}
-							ref={questionListRef}
-						/>
-					) : qid === NEW_QUESTION ? (
-						<NewQuestion
-							sid={sid}
-							pageNum={page}
-							anonymity={anonymity}
-							username={username}
-							back={back}
-							drawable={drawable}
-							drawing={drawing}
-							startDrawing={startDrawing}
-							cancelDrawing={cancelDrawing}
-							canvasComponentRef={canvasComponentRef}
-							isTypingRef={isTypingRef}
-						/>
-					) : qid === MODIFY_CHAT ? (
-						<ModifyChat sid={sid} pageNum={page} old={chatToModify} back={back} isTypingRef={isTypingRef} />
-					) : (
-						<QuestionDetails
-							sid={sid}
-							filename={filename}
-							pageNum={page}
-							qid={qid}
-							uid={uid}
-							anonymity={anonymity}
-							username={username}
-							isInstructor={isInstructor}
-							drawable={drawable}
-							setDrawing={setDrawing}
-							setDrawingOverlay={setDrawingOverlay}
-							setShowTempDrawingBtn={setShowTempDrawingBtn}
-							canvasComponentRef={canvasComponentRef}
-							gotoModify={gotoModify}
-							back={back}
-							isInstructorView={isInstructorView}
-							connected={connected}
-							ref={questionDetailsRef}
-							isTypingRef={isTypingRef}
-						/>
-					)}
-				</div>
+				{!fullscreen || fullscreenChatOpen ? (
+					<div className='chat-area'>
+						{qid === QUESTION_LIST ? (
+							<QuestionList
+								sid={sid}
+								pageNum={page}
+								isInstructor={isInstructor}
+								askNewQuestion={gotoNewQuestion}
+								goToQuestion={gotoQuestion}
+								isInstructorView={isInstructorView}
+								connected={connected}
+								ref={questionListRef}
+							/>
+						) : qid === NEW_QUESTION ? (
+							<NewQuestion
+								sid={sid}
+								pageNum={page}
+								anonymity={anonymity}
+								username={username}
+								back={back}
+								drawable={drawable}
+								drawing={drawing}
+								startDrawing={startDrawing}
+								cancelDrawing={cancelDrawing}
+								canvasComponentRef={canvasComponentRef}
+								isTypingRef={isTypingRef}
+							/>
+						) : qid === MODIFY_CHAT ? (
+							<ModifyChat
+								sid={sid}
+								pageNum={page}
+								old={chatToModify}
+								back={back}
+								isTypingRef={isTypingRef}
+							/>
+						) : (
+							<QuestionDetails
+								sid={sid}
+								filename={filename}
+								pageNum={page}
+								qid={qid}
+								uid={uid}
+								anonymity={anonymity}
+								username={username}
+								isInstructor={isInstructor}
+								drawable={drawable}
+								setDrawing={setDrawing}
+								setDrawingOverlay={setDrawingOverlay}
+								setShowTempDrawingBtn={setShowTempDrawingBtn}
+								canvasComponentRef={canvasComponentRef}
+								gotoModify={gotoModify}
+								back={back}
+								isInstructorView={isInstructorView}
+								connected={connected}
+								ref={questionDetailsRef}
+								isTypingRef={isTypingRef}
+							/>
+						)}
+					</div>
+				) : null}
 			</div>
 		</>
 	);
