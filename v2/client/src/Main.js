@@ -39,8 +39,11 @@ function Main(props) {
 	const [isInstructorView, setIsInstructorView] = useState(localStorage.getItem('SlideChat_StudentView') !== '1'); // default true for null
 	const [fullscreen, setFullscreen] = useState(false);
 	const [chatOpen, setChatOpen] = useState(false);
+	const isTypingRef = useRef(false);
 	const questionListRef = useRef(null);
 	const questionDetailsRef = useRef(null);
+	const pageNumRef = useRef(-1);
+	const gotoPageRef = useRef(() => {});
 
 	const [darkTheme, setDarkTheme] = useState(document.documentElement.getAttribute('data-theme') === 'dark');
 
@@ -233,6 +236,8 @@ function Main(props) {
 		setChatOpen(!chatOpen);
 	};
 
+	pageNumRef.current = page;
+	gotoPageRef.current = gotoPage;
 	useEffect(() => {
 		document.querySelector('.main').addEventListener('fullscreenchange', () => {
 			setFullscreen(Boolean(document.fullscreenElement));
@@ -244,6 +249,17 @@ function Main(props) {
 			} else {
 				setQid(QUESTION_LIST);
 				setShowTempDrawingBtn(true);
+			}
+		});
+
+		window.addEventListener('keydown', (e) => {
+			if (isTypingRef.current) return;
+			if (e.key === 'ArrowLeft') {
+				gotoPageRef.current(pageNumRef.current - 1);
+			} else if (e.key === 'ArrowRight') {
+				gotoPageRef.current(pageNumRef.current + 1);
+			} else if (e.key === ' ' && document.fullscreenElement) {
+				gotoPageRef.current(pageNumRef.current + 1);
 			}
 		});
 	}, []);
@@ -265,6 +281,7 @@ function Main(props) {
 				setLargerSlide={setLargerSlide}
 				darkTheme={darkTheme}
 				setDarkTheme={setDarkTheme}
+				isTypingRef={isTypingRef}
 			/>
 			<div className={`main ${largerSlide ? 'larger-slide' : ''} ${fullscreen ? 'fullscreen' : ''}`}>
 				<Slides
@@ -287,6 +304,7 @@ function Main(props) {
 					setRecord={setRecord}
 					fullscreen={fullscreen}
 					openOrHideChat={openOrHideChat}
+					isTypingRef={isTypingRef}
 				/>
 				<div className={`chat-area ${chatOpen ? '' : 'hidden'}`}>
 					{qid === QUESTION_LIST ? (
@@ -312,9 +330,10 @@ function Main(props) {
 							startDrawing={startDrawing}
 							cancelDrawing={cancelDrawing}
 							canvasComponentRef={canvasComponentRef}
+							isTypingRef={isTypingRef}
 						/>
 					) : qid === MODIFY_CHAT ? (
-						<ModifyChat sid={sid} pageNum={page} old={chatToModify} back={back} />
+						<ModifyChat sid={sid} pageNum={page} old={chatToModify} back={back} isTypingRef={isTypingRef} />
 					) : (
 						<QuestionDetails
 							sid={sid}
@@ -335,6 +354,7 @@ function Main(props) {
 							isInstructorView={isInstructorView}
 							connected={connected}
 							ref={questionDetailsRef}
+							isTypingRef={isTypingRef}
 						/>
 					)}
 				</div>

@@ -59,8 +59,17 @@ export default function Slides(props) {
 			.catch((err) => {
 				console.error(err);
 			});
-		// eslint-disable-next-line
-	}, [props.pageTotal, props.pageNum]);
+
+		if (props.showCarouselPanel && !props.fullscreen) {
+			const thumbnail = carousel.current.querySelector(`#thumbnail-${props.pageNum}`);
+			if (!thumbnail) return;
+			carousel.current.scroll({
+				top: 0,
+				left: thumbnail.offsetLeft - carousel.current.clientWidth / 2 + 40,
+				behavior: 'smooth',
+			});
+		}
+	}, [props.sid, props.pageTotal, props.pageNum, props.showCarouselPanel, props.fullscreen]);
 
 	/**
 	 * upload audio to server
@@ -132,7 +141,6 @@ export default function Slides(props) {
 	const nextPage = (e) => {
 		setNextDisable(true);
 		props.gotoPage(props.pageNum + 1);
-		centerCarousel(props.pageNum + 1);
 	};
 
 	/**
@@ -142,23 +150,6 @@ export default function Slides(props) {
 	const prevPage = (e) => {
 		setPrevDisable(true);
 		props.gotoPage(props.pageNum - 1);
-		centerCarousel(props.pageNum - 1);
-	};
-
-	const gotoPageAndCenterCarousel = (pageNum) => {
-		props.gotoPage(pageNum);
-		centerCarousel(pageNum);
-	};
-
-	const centerCarousel = (pageNum) => {
-		if (!props.showCarouselPanel || props.fullscreen) return;
-		const thumbnail = carousel.current.querySelector(`#thumbnail-${pageNum}`);
-		if (!thumbnail) return;
-		carousel.current.scroll({
-			top: 0,
-			left: thumbnail.offsetLeft - carousel.current.clientWidth / 2 + 40,
-			behavior: 'smooth',
-		});
 	};
 
 	const startRecording = async () => {
@@ -302,7 +293,7 @@ export default function Slides(props) {
 					<div className='buttons'>
 						<span
 							className={`material-icons ${props.pageNum <= 1 ? 'disable' : ''}`}
-							onClick={() => gotoPageAndCenterCarousel(1)}>
+							onClick={() => props.gotoPage(1)}>
 							first_page
 						</span>
 						<span className={`material-icons ${props.pageNum <= 1 ? 'disable' : ''}`} onClick={prevPage}>
@@ -314,9 +305,15 @@ export default function Slides(props) {
 								id='pageNum'
 								type='tel'
 								defaultValue={props.pageNum}
-								onBlur={props.gotoInputPage}
 								onKeyDown={(e) => {
 									if (e.key === 'Enter') document.getElementById('pageNum').blur();
+								}}
+								onBlur={() => {
+									props.isTypingRef.current = false;
+									props.gotoInputPage();
+								}}
+								onFocus={() => {
+									props.isTypingRef.current = true;
 								}}
 							/>{' '}
 							of {props.pageTotal}
@@ -328,7 +325,7 @@ export default function Slides(props) {
 						</span>
 						<span
 							className={`material-icons ${props.pageNum >= props.pageTotal ? 'disable' : ''}`}
-							onClick={() => gotoPageAndCenterCarousel(props.pageTotal)}>
+							onClick={() => props.gotoPage(props.pageTotal)}>
 							last_page
 						</span>
 
@@ -381,7 +378,7 @@ export default function Slides(props) {
 							<div
 								className={`thumbnail-container ${props.pageNum === i ? 'current-slide' : ''}`}
 								id={`thumbnail-${i}`}
-								onClick={() => gotoPageAndCenterCarousel(i)}
+								onClick={() => props.gotoPage(i)}
 								key={i}>
 								<img
 									src={`${serverURL}/api/slideThumbnail?slideID=${props.sid}&pageNum=${i}`}
