@@ -46,6 +46,7 @@ function Main(props) {
 	const questionDetailsRef = useRef(null);
 	const pageNumRef = useRef(-1);
 	const gotoPageRef = useRef(() => {});
+	const addSlideTimeRef = useRef(() => {});
 
 	const [darkTheme, setDarkTheme] = useState(document.documentElement.getAttribute('data-theme') === 'dark');
 
@@ -251,7 +252,7 @@ function Main(props) {
 			...slideTimes,
 			[page]: (page in slideTimes) ? slideTimes[page] + timeSpent : timeSpent
 		};
-
+		
 		setSlideTimes(newSlideTimes);
 		setSlideStartTime(Date.now());
 
@@ -260,6 +261,7 @@ function Main(props) {
 
 	pageNumRef.current = page;
 	gotoPageRef.current = gotoPage;
+	addSlideTimeRef.current = addSlideTime;
 	useEffect(() => {
 		document.querySelector('.main').addEventListener('fullscreenchange', () => {
 			setFullscreen(Boolean(document.fullscreenElement));
@@ -285,8 +287,7 @@ function Main(props) {
 		window.addEventListener('beforeunload', (e) => {
 			e.preventDefault();
 			e.returnValue = '';
-			const newSlideTimes = addSlideTime();
-			console.log('reaching here', page)
+			const newSlideTimes = addSlideTimeRef.current();
 			axios.post(`${serverURL}/api/slideTimes`, newSlideTimes);
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
