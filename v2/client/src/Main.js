@@ -39,6 +39,8 @@ function Main(props) {
 	const [isInstructorView, setIsInstructorView] = useState(localStorage.getItem('SlideChat_StudentView') !== '1'); // default true for null
 	const [fullscreen, setFullscreen] = useState(false);
 	const [fullscreenChatOpen, setFullscreenChatOpen] = useState(false);
+	const [slideTimes, setSlideTimes] = useState({});
+	const [slideStartTime, setSlideStartTime] = useState(Date.now());
 	const isTypingRef = useRef(false);
 	const questionListRef = useRef(null);
 	const questionDetailsRef = useRef(null);
@@ -185,6 +187,8 @@ function Main(props) {
 		} else if (drawing) {
 			canvasComponentRef.current.clear();
 		}
+
+		addSlideTime();
 		applyPage(pageNum);
 	};
 
@@ -241,6 +245,19 @@ function Main(props) {
 		setFullscreenChatOpen(!fullscreenChatOpen);
 	};
 
+	const addSlideTime = () => {
+		const timeSpent = Date.now() - slideStartTime;
+		const newSlideTimes = {
+			...slideTimes,
+			[page]: (page in slideTimes) ? slideTimes[page] + timeSpent : timeSpent
+		};
+
+		setSlideTimes(newSlideTimes);
+		setSlideStartTime(Date.now());
+
+		return newSlideTimes;
+	};
+
 	pageNumRef.current = page;
 	gotoPageRef.current = gotoPage;
 	useEffect(() => {
@@ -264,6 +281,15 @@ function Main(props) {
 				gotoPageRef.current(pageNumRef.current + 1);
 			}
 		});
+		
+		window.addEventListener('beforeunload', (e) => {
+			e.preventDefault();
+			e.returnValue = '';
+			const newSlideTimes = addSlideTime();
+			console.log('reaching here', page)
+			axios.post(`${serverURL}/api/slideTimes`, newSlideTimes);
+		});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return (

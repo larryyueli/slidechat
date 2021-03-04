@@ -676,6 +676,12 @@ function commonAPI(db, io, isInstructor) {
 		}
 	});
 
+	router.post('/api/slideTimes', async (req, res) => {
+		console.log('--------------------------')
+		console.log(req.body)
+		console.log('--------------------------')
+	});
+
 	return router;
 }
 
