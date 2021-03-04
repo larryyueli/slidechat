@@ -252,7 +252,7 @@ function Main(props) {
 			...slideTimes,
 			[page]: (page in slideTimes) ? slideTimes[page] + timeSpent : timeSpent
 		};
-		
+
 		setSlideTimes(newSlideTimes);
 		setSlideStartTime(Date.now());
 
@@ -288,7 +288,7 @@ function Main(props) {
 			e.preventDefault();
 			e.returnValue = '';
 			const newSlideTimes = addSlideTimeRef.current();
-			axios.post(`${serverURL}/api/slideTimes`, newSlideTimes);
+			axios.post(`${serverURL}/api/slideTimes?slideID=${sid}`, newSlideTimes);
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);

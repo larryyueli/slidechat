@@ -677,9 +677,34 @@ function commonAPI(db, io, isInstructor) {
 	});
 
 	router.post('/api/slideTimes', async (req, res) => {
-		console.log('--------------------------')
-		console.log(req.body)
-		console.log('--------------------------')
+		try {
+			let slide = await slides.findOne(
+				{ _id: ObjectID.createFromHexString(req.query.slideID) },
+				{ projection: { pages: true, anonymity: true } }
+			);
+			if (!slide) throw { status: 404, error: 'slide not found' };
+			if (slide.anonymity !== 'A' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
+
+			const slideTimes = req.body;
+			if (Object.keys(slideTimes).some(pageNum => isNotValidPage(pageNum, slide.pageTotal))) {
+				throw { status: 400, error: 'bad request' };
+			}
+
+			// 10 min in ms
+			const maxTime = 10 * 60 * 1000;
+			for (let pageNum in slideTimes) {
+				const timeViewedField = `pages.${+pageNum - 1}.timeViewed`;
+				const slideTime = slideTimes[pageNum];
+				slides.updateOne(
+					{ _id: ObjectID.createFromHexString(req.query.slideID) },
+					{ $inc: { [`${timeViewedField}`]: (slideTime > maxTime) ? maxTime : slideTime } }
+				);
+			}
+
+			res.send();
+		} catch (err) {
+			errorHandler(res, err);
+		}
 	});
 
 	return router;
