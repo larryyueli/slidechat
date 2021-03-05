@@ -39,14 +39,14 @@ function Main(props) {
 	const [isInstructorView, setIsInstructorView] = useState(localStorage.getItem('SlideChat_StudentView') !== '1'); // default true for null
 	const [fullscreen, setFullscreen] = useState(false);
 	const [fullscreenChatOpen, setFullscreenChatOpen] = useState(false);
-	const [slideTimes, setSlideTimes] = useState({});
+	const [slideStats, setSlideStats] = useState({});
 	const [slideStartTime, setSlideStartTime] = useState(Date.now());
 	const isTypingRef = useRef(false);
 	const questionListRef = useRef(null);
 	const questionDetailsRef = useRef(null);
 	const pageNumRef = useRef(-1);
 	const gotoPageRef = useRef(() => {});
-	const addSlideTimeRef = useRef(() => {});
+	const addSlideStatsRef = useRef(() => {});
 
 	const [darkTheme, setDarkTheme] = useState(document.documentElement.getAttribute('data-theme') === 'dark');
 
@@ -189,7 +189,7 @@ function Main(props) {
 			canvasComponentRef.current.clear();
 		}
 
-		addSlideTime();
+		addSlideStats();
 		applyPage(pageNum);
 	};
 
@@ -246,22 +246,26 @@ function Main(props) {
 		setFullscreenChatOpen(!fullscreenChatOpen);
 	};
 
-	const addSlideTime = () => {
-		const timeSpent = Date.now() - slideStartTime;
-		const newSlideTimes = {
-			...slideTimes,
-			[page]: (page in slideTimes) ? slideTimes[page] + timeSpent : timeSpent
-		};
+	const addSlideStats = () => {
+		const timeViewed = Date.now() - slideStartTime;
+		const newSlideStats = slideStats;
 
-		setSlideTimes(newSlideTimes);
+		if (page in slideStats) {
+			newSlideStats[page].viewCount += 1;
+			newSlideStats[page].timeViewed += timeViewed
+		} else {
+			newSlideStats[page] = { 'viewCount': 1, 'timeViewed': timeViewed };
+		}
+
+		setSlideStats(newSlideStats);
 		setSlideStartTime(Date.now());
 
-		return newSlideTimes;
+		return newSlideStats;
 	};
 
 	pageNumRef.current = page;
 	gotoPageRef.current = gotoPage;
-	addSlideTimeRef.current = addSlideTime;
+	addSlideStatsRef.current = addSlideStats;
 	useEffect(() => {
 		document.querySelector('.main').addEventListener('fullscreenchange', () => {
 			setFullscreen(Boolean(document.fullscreenElement));
@@ -287,8 +291,8 @@ function Main(props) {
 		window.addEventListener('beforeunload', (e) => {
 			e.preventDefault();
 			e.returnValue = '';
-			const newSlideTimes = addSlideTimeRef.current();
-			axios.post(`${serverURL}/api/slideTimes?slideID=${sid}`, newSlideTimes);
+			const newSlideStats = addSlideStatsRef.current();
+			axios.post(`${serverURL}/api/slideStats?slideID=${sid}`, newSlideStats);
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);

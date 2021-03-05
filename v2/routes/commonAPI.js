@@ -106,13 +106,6 @@ function commonAPI(db, io, isInstructor) {
 			if (isNotValidPage(req.query.pageNum, slide.pageTotal)) {
 				throw { status: 400, error: 'bad request' };
 			}
-			
-			const viewCountField = `pages.${+req.query.pageNum - 1}.viewCount`;
-			slides.updateOne(
-				{ _id: ObjectID.createFromHexString(req.query.slideID) },
-				{ $inc: { [`${viewCountField}`]: 1 } }
-			);
-
 			res.sendFile(path.join(fileStorage, req.query.slideID, `page-${+req.query.pageNum - 1}.png`));
 		} catch (err) {
 			errorHandler(res, err);
@@ -676,7 +669,7 @@ function commonAPI(db, io, isInstructor) {
 		}
 	});
 
-	router.post('/api/slideTimes', async (req, res) => {
+	router.post('/api/slideStats', async (req, res) => {
 		try {
 			let slide = await slides.findOne(
 				{ _id: ObjectID.createFromHexString(req.query.slideID) },
@@ -685,19 +678,23 @@ function commonAPI(db, io, isInstructor) {
 			if (!slide) throw { status: 404, error: 'slide not found' };
 			if (slide.anonymity !== 'A' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
 
-			const slideTimes = req.body;
-			if (Object.keys(slideTimes).some(pageNum => isNotValidPage(pageNum, slide.pageTotal))) {
+			const slideStats = req.body;
+			if (Object.keys(slideStats).some(pageNum => isNotValidPage(pageNum, slide.pageTotal))) {
 				throw { status: 400, error: 'bad request' };
 			}
 
 			// 10 min in ms
 			const maxTime = 10 * 60 * 1000;
-			for (let pageNum in slideTimes) {
+			for (let pageNum in slideStats) {
+				const viewCountField = `pages.${+pageNum - 1}.viewCount`;
 				const timeViewedField = `pages.${+pageNum - 1}.timeViewed`;
-				const slideTime = slideTimes[pageNum];
+				const { viewCount, timeViewed } = slideStats[pageNum];
 				slides.updateOne(
 					{ _id: ObjectID.createFromHexString(req.query.slideID) },
-					{ $inc: { [`${timeViewedField}`]: (slideTime > maxTime) ? maxTime : slideTime } }
+					{ $inc: { 
+						[`${viewCountField}`]: viewCount,
+						[`${timeViewedField}`]: (timeViewed > maxTime) ? maxTime : timeViewed } 
+					}
 				);
 			}
 
