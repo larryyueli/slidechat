@@ -11,6 +11,25 @@ import QuestionDetails from './components/chat/QuestionDetails';
 import { baseURL, serverURL, socketURL, socketPath } from './config';
 import { QUESTION_LIST, NEW_QUESTION, MODIFY_CHAT } from './util';
 
+const slideStats = {};
+let slideStartTime = Date.now();
+
+/**
+ * Add viewCount and timeViewed stats for a page
+ */
+const addSlideStats = (page) => {
+	const timeViewed = Date.now() - slideStartTime;
+
+	if (page in slideStats) {
+		slideStats[page].viewCount += 1;
+		slideStats[page].timeViewed += timeViewed
+	} else {
+		slideStats[page] = { 'viewCount': 1, 'timeViewed': timeViewed };
+	}
+
+	slideStartTime = Date.now();
+};
+
 /**
  * Main page of the application: the slides and chats of a given set of slides, given
  * from the URL.
@@ -39,14 +58,11 @@ function Main(props) {
 	const [isInstructorView, setIsInstructorView] = useState(localStorage.getItem('SlideChat_StudentView') !== '1'); // default true for null
 	const [fullscreen, setFullscreen] = useState(false);
 	const [fullscreenChatOpen, setFullscreenChatOpen] = useState(false);
-	const [slideStats, setSlideStats] = useState({});
-	const [slideStartTime, setSlideStartTime] = useState(Date.now());
 	const isTypingRef = useRef(false);
 	const questionListRef = useRef(null);
 	const questionDetailsRef = useRef(null);
 	const pageNumRef = useRef(-1);
 	const gotoPageRef = useRef(() => {});
-	const addSlideStatsRef = useRef(() => {});
 
 	const [darkTheme, setDarkTheme] = useState(document.documentElement.getAttribute('data-theme') === 'dark');
 
@@ -189,7 +205,7 @@ function Main(props) {
 			canvasComponentRef.current.clear();
 		}
 
-		addSlideStats();
+		addSlideStats(page);
 		applyPage(pageNum);
 	};
 
@@ -246,26 +262,8 @@ function Main(props) {
 		setFullscreenChatOpen(!fullscreenChatOpen);
 	};
 
-	const addSlideStats = () => {
-		const timeViewed = Date.now() - slideStartTime;
-		const newSlideStats = slideStats;
-
-		if (page in slideStats) {
-			newSlideStats[page].viewCount += 1;
-			newSlideStats[page].timeViewed += timeViewed
-		} else {
-			newSlideStats[page] = { 'viewCount': 1, 'timeViewed': timeViewed };
-		}
-
-		setSlideStats(newSlideStats);
-		setSlideStartTime(Date.now());
-
-		return newSlideStats;
-	};
-
 	pageNumRef.current = page;
 	gotoPageRef.current = gotoPage;
-	addSlideStatsRef.current = addSlideStats;
 	useEffect(() => {
 		document.querySelector('.main').addEventListener('fullscreenchange', () => {
 			setFullscreen(Boolean(document.fullscreenElement));
@@ -290,8 +288,8 @@ function Main(props) {
 		
 		window.addEventListener('beforeunload', (e) => {
 			e.preventDefault();
-			const newSlideStats = addSlideStatsRef.current();
-			axios.post(`${serverURL}/api/slideStats?slideID=${sid}`, newSlideStats);
+			addSlideStats(pageNumRef.current);
+			axios.post(`${serverURL}/api/slideStats?slideID=${sid}`, slideStats);
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);

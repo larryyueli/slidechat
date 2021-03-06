@@ -1038,11 +1038,11 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 	});
 
 	/**
-	 * get the page stats (view count and time viewed) for a slide
+	 * get the stats for a slide (view count and time viewed for every page)
 	 * req query:
 	 *   slideID: object ID of a slide
 	 */
-	router.get('/api/pageStats', instructorAuth, async (req, res) => {
+	router.get('/api/slideStats', instructorAuth, async (req, res) => {
 		try {
 			const sid = req.query.slideID;
 			if (sid.length != 24) {
@@ -1057,12 +1057,12 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 				throw { status: 403, error: 'Unauthorized' };
 			}
 
-			const pageState = slide.pages.map(page => ({
+			const slideStats = slide.pages.map(page => ({
 				viewCount: page.viewCount || 0, 
 				timeViewed: page.timeViewed || 0
 			}));
 
-			res.send(pageState);
+			res.send(slideStats);
 		} catch (err) {
 			errorHandler(res, err);
 		}

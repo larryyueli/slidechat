@@ -311,7 +311,7 @@ function commonAPI(db, io, isInstructor) {
 			const viewCountField = `pages.${+req.query.pageNum - 1}.questions.${req.query.qid}.viewCount`;
 			slides.updateOne(
 				{ _id: ObjectID.createFromHexString(req.query.slideID) },
-				{ $inc: { [`${viewCountField}`]: 1 } }
+				{ $inc: { [viewCountField]: 1 } }
 			);
 
 			res.json({
@@ -698,18 +698,19 @@ function commonAPI(db, io, isInstructor) {
 
 			// 10 min in ms
 			const maxTime = 10 * 60 * 1000;
+			const increment = {};
 			for (let pageNum in slideStats) {
 				const viewCountField = `pages.${+pageNum - 1}.viewCount`;
 				const timeViewedField = `pages.${+pageNum - 1}.timeViewed`;
 				const { viewCount, timeViewed } = slideStats[pageNum];
-				slides.updateOne(
-					{ _id: ObjectID.createFromHexString(req.query.slideID) },
-					{ $inc: { 
-						[`${viewCountField}`]: viewCount,
-						[`${timeViewedField}`]: (timeViewed > maxTime) ? maxTime : timeViewed } 
-					}
-				);
+				increment[viewCountField] = viewCount;
+				increment[timeViewedField] = (timeViewed > maxTime) ? maxTime : timeViewed
 			}
+
+			slides.updateOne(
+				{ _id: ObjectID.createFromHexString(req.query.slideID) },
+				{ $inc: increment }
+			);
 
 			res.send();
 		} catch (err) {
