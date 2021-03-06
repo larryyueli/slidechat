@@ -225,6 +225,9 @@ export default class QuestionDetails extends React.Component {
 					back={this.props.back}
 				/>
 				<div className='chat-area-main chat-details'>
+					<div className='view-count'>
+						Views: {messages.viewCount}
+					</div>
 					<div className='title' key={-2}>
 						{messages.title}
 					</div>

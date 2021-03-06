@@ -1069,7 +1069,6 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 
 	});
 
-
 	return router;
 }
 
