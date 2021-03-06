@@ -678,8 +678,8 @@ function commonAPI(db, io, isInstructor) {
 	 *   [pageNum]: { viewCount: int, timeViewed: int (milliseconds) }
 	 * example:
 	 * {
-	 * 		1: { viewCount: 4, timeViewed: 60000 },
-	 * 		4: { viewCount: 1, timeViewed: 45000 }
+	 *   1: { viewCount: 4, timeViewed: 60000 },
+	 *   4: { viewCount: 1, timeViewed: 45000 }
 	 * }
 	 */
 	router.post('/api/slideStats', async (req, res) => {

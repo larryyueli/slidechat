@@ -39,7 +39,9 @@ export default class QuestionDetails extends React.Component {
 	}
 
 	componentDidMount() {
-		this.fetchQuestionDetails();
+		if (this.props.connected) {
+			this.fetchQuestionDetails();
+		}
 		window.MathJax.typeset();
 	}
 

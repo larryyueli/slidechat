@@ -290,7 +290,6 @@ function Main(props) {
 		
 		window.addEventListener('beforeunload', (e) => {
 			e.preventDefault();
-			e.returnValue = '';
 			const newSlideStats = addSlideStatsRef.current();
 			axios.post(`${serverURL}/api/slideStats?slideID=${sid}`, newSlideStats);
 		});
