@@ -41,6 +41,7 @@ function commonAPI(db, io, isInstructor) {
 					lastActive: slideEntry.lastActive,
 					anonymity: slideEntry.anonymity,
 					drawable: slideEntry.drawable,
+					viewCount: slideEntry.viewCount,
 				});
 			}
 			res.json({
@@ -317,6 +318,7 @@ function commonAPI(db, io, isInstructor) {
 				title: question.title,
 				chats: question.chats,
 				drawing: question.drawing,
+				viewCount: question.viewCount ? question.viewCount + 1 : 1
 			});
 		} catch (err) {
 			errorHandler(res, err);
@@ -669,6 +671,17 @@ function commonAPI(db, io, isInstructor) {
 		}
 	});
 
+	/**
+	 * Set the view count and time viewed for multiple pages
+	 * 
+	 * req body:
+	 *   [pageNum]: { viewCount: int, timeViewed: int (milliseconds) }
+	 * example:
+	 * {
+	 * 		1: { viewCount: 4, timeViewed: 60000 },
+	 * 		4: { viewCount: 1, timeViewed: 45000 }
+	 * }
+	 */
 	router.post('/api/slideStats', async (req, res) => {
 		try {
 			let slide = await slides.findOne(

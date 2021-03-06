@@ -426,7 +426,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			}
 			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
 			if (!slide) {
-				throw { status: 400, error: 'slide not exist' };
+				throw { status: 400, error: 'slide not found' };
 			}
 
 			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
@@ -529,7 +529,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			}
 			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
 			if (!slide) {
-				throw { status: 400, error: 'slide not exist' };
+				throw { status: 400, error: 'slide not found' };
 			}
 
 			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
@@ -575,7 +575,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			}
 			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.sid) });
 			if (!slide) {
-				throw { status: 400, error: 'slide not exist' };
+				throw { status: 400, error: 'slide not found' };
 			}
 
 			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
@@ -621,7 +621,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
 
 			if (!slide) {
-				throw { status: 400, error: 'slide not exist' };
+				throw { status: 400, error: 'slide not found' };
 			}
 
 			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
@@ -699,7 +699,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			}
 			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
 			if (!slide) {
-				throw { status: 400, error: 'slide not exist' };
+				throw { status: 400, error: 'slide not found' };
 			}
 
 			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
@@ -742,7 +742,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
 
 			if (!slide) {
-				throw { status: 400, error: 'slide not exist' };
+				throw { status: 400, error: 'slide not found' };
 			}
 
 			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
@@ -779,7 +779,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
 
 			if (!slide) {
-				throw { status: 400, error: 'slide not exist' };
+				throw { status: 400, error: 'slide not found' };
 			}
 
 			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
@@ -1036,6 +1036,39 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			errorHandler(res, err);
 		}
 	});
+
+	/**
+	 * get the page stats (view count and time viewed) for a slide
+	 * req query:
+	 *   slideID: object ID of a slide
+	 */
+	router.get('/api/pageStats', instructorAuth, async (req, res) => {
+		try {
+			const sid = req.query.slideID;
+			if (sid.length != 24) {
+				return res.status(400).send();
+			}
+
+			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(sid) });
+			if (!slide) throw { status: 400, error: 'slide not found' };
+
+			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
+			if (course.instructors.indexOf(req.session.uid) < 0) {
+				throw { status: 403, error: 'Unauthorized' };
+			}
+
+			const pageState = slide.pages.map(page => ({
+				viewCount: page.viewCount || 0, 
+				timeViewed: page.timeViewed || 0
+			}));
+
+			res.send(pageState);
+		} catch (err) {
+			errorHandler(res, err);
+		}
+
+	});
+
 
 	return router;
 }
