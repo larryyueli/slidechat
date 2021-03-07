@@ -76,16 +76,19 @@ export default class SlideOverlay extends React.Component {
 	redraw() {
 		this.clearCanvas();
 		for (let line of this.lines) {
-			this.ctx.strokeStyle = line.strokeColor;
+			this.ctx.strokeStyle = Array.isArray(line) ? 'red' : line.strokeColor;
+			console.log(this.ctx.strokeStyle);
 			this.ctx.beginPath();
 			this.ctx.moveTo(
-				((line.coords[0] * this.canvas.clientWidth) / resolution) >> 0,
-				((line.coords[1] * this.canvas.clientHeight) / resolution) >> 0
+				(((Array.isArray(line) ? line[0] : line.coords[0]) * this.canvas.clientWidth) / resolution) >> 0,
+				(((Array.isArray(line) ? line[1] : line.coords[1]) * this.canvas.clientHeight) / resolution) >> 0
 			);
-			for (let i = 2; i < line.coords.length - 1; i += 2) {
+
+			let coords = Array.isArray(line) ? line : line.coords;
+			for (let i = 2; i < coords.length - 1; i += 2) {
 				this.ctx.lineTo(
-					((line.coords[i] * this.canvas.clientWidth) / resolution) >> 0,
-					((line.coords[i + 1] * this.canvas.clientHeight) / resolution) >> 0
+					((coords[i] * this.canvas.clientWidth) / resolution) >> 0,
+					((coords[i + 1] * this.canvas.clientHeight) / resolution) >> 0
 				);
 			}
 			this.ctx.stroke();
