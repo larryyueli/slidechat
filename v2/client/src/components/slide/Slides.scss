@@ -20,14 +20,14 @@
 				width: 25px;
 				margin-right: 1rem;
 				cursor: pointer;
-				border-radius: 2px;
+				border-radius: 5px;
 				position: relative;
 
 				.color-picker-wrapper {
 					position: absolute;
 					z-index: 1;
-					left: -14rem;
-					top: -0.5rem;
+					right: 1.8rem;
+					top: -0.35rem;
 				}
 			}
 		}
@@ -171,16 +171,14 @@
 				height: 25px;
 				width: 25px;
 				cursor: pointer;
-				border-radius: 2px;
+				border-radius: 5px;
 				position: relative;
-				display: flex;
-				margin-right: 0.5rem;
-				align-items: center;
+				margin: 0 0.5rem;
 				.color-picker-wrapper {
 					position: absolute;
 					z-index: 1;
-					right: 0;
-					top: -3rem;
+					left: -100px;
+					top: -2.6rem;
 					opacity: 0.9;
 				}
 			}

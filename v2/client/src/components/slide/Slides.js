@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Button, CircularProgress, Snackbar, ClickAwayListener } from '@material-ui/core';
+import { Button, CircularProgress, Snackbar } from '@material-ui/core';
 import axios from 'axios';
 
 import SlideDrawingOverlay from './SlideDrawingOverlay';
 import SlideFlipOverlay from './SlideFlipOverlay';
-import { GithubPicker } from 'react-color';
+import ColourPicker, { palette } from './ColourPicker';
 import { fullURL, serverURL } from '../../config';
 import { randInt, range } from '../../util';
 
@@ -23,10 +23,8 @@ export default function Slides(props) {
 	const [showToast, setShowToast] = useState(false);
 	const [fullscreenPortrait, setFullscreenPortrait] = useState(false);
 	const fileUpload = useRef(null);
-	const [strokeColour, setStrokeColour] = useState('red');
-	const [showColourPicker, setShowColourPicker] = useState(false);
+	const [strokeColour, setStrokeColour] = useState(palette[0]);
 	const carousel = useRef(null);
-	const palette = ['#ff0000', '#FFA500', '#FCCB00', '#008B02', '#006B76', '#004DCF', '#5300EB', '#000000'];
 
 	useEffect(() => {
 		if (!props.pageTotal) return;
@@ -227,34 +225,13 @@ export default function Slides(props) {
 		adjustAspectRatio();
 	}, [props.fullscreen, props.fullscreenChatOpen]);
 
-	const updateStrokeColour = (colour, e) => setStrokeColour(colour.hex);
-
-	const closeColourPicker = (e) => setShowColourPicker(false);
-
-	const openColourPicker = () => setShowColourPicker(true);
-
 	return (
 		<div className='slide-container'>
 			{props.fullscreen ? null : (
 				<div className='slide-toolbar'>
 					<div className='draw-buttons'>
 						{props.drawing ? (
-							<div
-								className='colour-block'
-								style={{ backgroundColor: strokeColour }}
-								onClick={openColourPicker}>
-								{showColourPicker ? (
-									<ClickAwayListener onClickAway={closeColourPicker}>
-										<div className='color-picker-wrapper'>
-											<GithubPicker
-												colors={palette}
-												onChangeComplete={updateStrokeColour}
-												triangle={'hide'}
-											/>
-										</div>
-									</ClickAwayListener>
-								) : null}
-							</div>
+							<ColourPicker currentColour={strokeColour} setColour={setStrokeColour} />
 						) : null}
 						{props.showTempDrawingBtn ? (
 							props.drawing ? (
@@ -363,22 +340,7 @@ export default function Slides(props) {
 						{props.fullscreen ? (
 							<>
 								{props.drawing ? (
-									<div
-										className='colour-block'
-										style={{ backgroundColor: strokeColour }}
-										onClick={openColourPicker}>
-										{props.fullscreen && props.drawing && showColourPicker ? (
-											<div className='color-picker-wrapper'>
-												<ClickAwayListener onClickAway={closeColourPicker}>
-													<GithubPicker
-														colors={palette}
-														onChangeComplete={updateStrokeColour}
-														triangle={'hide'}
-													/>
-												</ClickAwayListener>
-											</div>
-										) : null}
-									</div>
+									<ColourPicker currentColour={strokeColour} setColour={setStrokeColour} />
 								) : null}
 								{props.showTempDrawingBtn ? (
 									props.drawing ? (

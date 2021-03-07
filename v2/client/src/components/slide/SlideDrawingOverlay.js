@@ -169,13 +169,13 @@ export default class SlideOverlay extends React.Component {
 	touchmove(e) {
 		if (this.state.readOnly) return;
 		if (!this.isDrawing) return;
-		let touch = e.touches[0];
-		let rect = this.canvas.getBoundingClientRect();
-		let offsetX = touch.clientX - rect.left;
-		let offsetY = touch.clientY - rect.top;
-		let lastLine = this.lines[this.lines.length - 1];
-		lastLine.points.push(((e.offsetX / this.canvas.clientWidth) * resolution) >> 0);
-		lastLine.points.push(((e.offsetY / this.canvas.clientHeight) * resolution) >> 0);
+		const touch = e.touches[0];
+		const rect = this.canvas.getBoundingClientRect();
+		const offsetX = touch.clientX - rect.left;
+		const offsetY = touch.clientY - rect.top;
+		const lastLine = this.lines[this.lines.length - 1];
+		lastLine.points.push(((offsetX / this.canvas.clientWidth) * resolution) >> 0);
+		lastLine.points.push(((offsetY / this.canvas.clientHeight) * resolution) >> 0);
 		this.applyLineChange(lastLine.points);
 	}
 
@@ -187,10 +187,10 @@ export default class SlideOverlay extends React.Component {
 		e.preventDefault();
 		if (this.state.readOnly || this.isDrawing) return;
 		this.isDrawing = true;
-		let touch = e.touches[0];
-		let rect = this.canvas.getBoundingClientRect();
-		let offsetX = touch.clientX - rect.left;
-		let offsetY = touch.clientY - rect.top;
+		const touch = e.touches[0];
+		const rect = this.canvas.getBoundingClientRect();
+		const offsetX = touch.clientX - rect.left;
+		const offsetY = touch.clientY - rect.top;
 		this.lines.push({
 			colour: this.props.strokeColour,
 			points: [
@@ -202,18 +202,16 @@ export default class SlideOverlay extends React.Component {
 
 	/**
 	 * undo the lest line
-	 * @param {*} e onClick event
 	 */
-	undo(e) {
+	undo() {
 		this.lines.pop();
 		this.redraw();
 	}
 
 	/**
 	 * clear the canvas
-	 * @param {*} e onClick event
 	 */
-	clear(e) {
+	clear() {
 		this.lines = [];
 		this.clearCanvas();
 	}
