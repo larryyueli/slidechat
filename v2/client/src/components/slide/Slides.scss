@@ -27,7 +27,7 @@
 					position: absolute;
 					z-index: 1;
 					left: -14rem;
-					top: -0.2rem;
+					top: -0.5rem;
 				}
 			}
 		}
@@ -159,6 +159,7 @@
 	}
 
 	.page-panel {
+		padding: 0rem 1rem;
 		.buttons {
 			margin: 0.5rem 0;
 			display: flex;
@@ -173,12 +174,13 @@
 				border-radius: 2px;
 				position: relative;
 				display: flex;
+				margin-right: 0.5rem;
 				align-items: center;
 				.color-picker-wrapper {
 					position: absolute;
 					z-index: 1;
 					right: 0;
-					top: -4rem;
+					top: -3rem;
 					opacity: 0.9;
 				}
 			}

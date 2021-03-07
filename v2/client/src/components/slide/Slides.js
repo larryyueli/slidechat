@@ -26,6 +26,7 @@ export default function Slides(props) {
 	const [strokeColour, setStrokeColour] = useState('red');
 	const [showColourPicker, setShowColourPicker] = useState(false);
 	const carousel = useRef(null);
+	const palette = ['#ff0000', '#FFA500', '#FCCB00', '#008B02', '#006B76', '#004DCF', '#5300EB', '#000000'];
 
 	useEffect(() => {
 		if (!props.pageTotal) return;
@@ -245,7 +246,11 @@ export default function Slides(props) {
 								{showColourPicker ? (
 									<ClickAwayListener onClickAway={closeColourPicker}>
 										<div className='color-picker-wrapper'>
-											<GithubPicker onChangeComplete={updateStrokeColour} triangle={'hide'} />
+											<GithubPicker
+												colors={palette}
+												onChangeComplete={updateStrokeColour}
+												triangle={'hide'}
+											/>
 										</div>
 									</ClickAwayListener>
 								) : null}
@@ -366,6 +371,7 @@ export default function Slides(props) {
 											<div className='color-picker-wrapper'>
 												<ClickAwayListener onClickAway={closeColourPicker}>
 													<GithubPicker
+														colors={palette}
 														onChangeComplete={updateStrokeColour}
 														triangle={'hide'}
 													/>

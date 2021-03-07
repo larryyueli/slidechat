@@ -76,19 +76,18 @@ export default class SlideOverlay extends React.Component {
 	redraw() {
 		this.clearCanvas();
 		for (let line of this.lines) {
-			this.ctx.strokeStyle = Array.isArray(line) ? 'red' : line.strokeColor;
-			console.log(this.ctx.strokeStyle);
+			this.ctx.strokeStyle = Array.isArray(line) ? 'red' : line.colour;
 			this.ctx.beginPath();
 			this.ctx.moveTo(
-				(((Array.isArray(line) ? line[0] : line.coords[0]) * this.canvas.clientWidth) / resolution) >> 0,
-				(((Array.isArray(line) ? line[1] : line.coords[1]) * this.canvas.clientHeight) / resolution) >> 0
+				(((Array.isArray(line) ? line[0] : line.points[0]) * this.canvas.clientWidth) / resolution) >> 0,
+				(((Array.isArray(line) ? line[1] : line.points[1]) * this.canvas.clientHeight) / resolution) >> 0
 			);
 
-			let coords = Array.isArray(line) ? line : line.coords;
-			for (let i = 2; i < coords.length - 1; i += 2) {
+			let points = Array.isArray(line) ? line : line.points;
+			for (let i = 2; i < points.length - 1; i += 2) {
 				this.ctx.lineTo(
-					((coords[i] * this.canvas.clientWidth) / resolution) >> 0,
-					((coords[i + 1] * this.canvas.clientHeight) / resolution) >> 0
+					((points[i] * this.canvas.clientWidth) / resolution) >> 0,
+					((points[i + 1] * this.canvas.clientHeight) / resolution) >> 0
 				);
 			}
 			this.ctx.stroke();
@@ -123,8 +122,8 @@ export default class SlideOverlay extends React.Component {
 	drawingOnMouseDown(e) {
 		if (this.state.readOnly) return;
 		this.lines.push({
-			strokeColor: this.props.strokeColour,
-			coords: [
+			colour: this.props.strokeColour,
+			points: [
 				((e.offsetX / this.canvas.clientWidth) * resolution) >> 0,
 				((e.offsetY / this.canvas.clientHeight) * resolution) >> 0,
 			],
@@ -140,9 +139,9 @@ export default class SlideOverlay extends React.Component {
 		if (this.state.readOnly) return;
 		if (!this.isDrawing) return;
 		let lastLine = this.lines[this.lines.length - 1];
-		lastLine.coords.push(((e.offsetX / this.canvas.clientWidth) * resolution) >> 0);
-		lastLine.coords.push(((e.offsetY / this.canvas.clientHeight) * resolution) >> 0);
-		this.applyLineChange(lastLine.coords);
+		lastLine.points.push(((e.offsetX / this.canvas.clientWidth) * resolution) >> 0);
+		lastLine.points.push(((e.offsetY / this.canvas.clientHeight) * resolution) >> 0);
+		this.applyLineChange(lastLine.points);
 	}
 
 	/**
@@ -175,9 +174,9 @@ export default class SlideOverlay extends React.Component {
 		let offsetX = touch.clientX - rect.left;
 		let offsetY = touch.clientY - rect.top;
 		let lastLine = this.lines[this.lines.length - 1];
-		lastLine.coords.push(((e.offsetX / this.canvas.clientWidth) * resolution) >> 0);
-		lastLine.coords.push(((e.offsetY / this.canvas.clientHeight) * resolution) >> 0);
-		this.applyLineChange(lastLine.coords);
+		lastLine.points.push(((e.offsetX / this.canvas.clientWidth) * resolution) >> 0);
+		lastLine.points.push(((e.offsetY / this.canvas.clientHeight) * resolution) >> 0);
+		this.applyLineChange(lastLine.points);
 	}
 
 	/**
@@ -193,8 +192,8 @@ export default class SlideOverlay extends React.Component {
 		let offsetX = touch.clientX - rect.left;
 		let offsetY = touch.clientY - rect.top;
 		this.lines.push({
-			strokeColour: this.strokeColour,
-			coords: [
+			colour: this.props.strokeColour,
+			points: [
 				((offsetX / this.canvas.clientWidth) * resolution) >> 0,
 				((offsetY / this.canvas.clientHeight) * resolution) >> 0,
 			],
