@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "mic-recorder-to-mp3": "^2.2.2",
+    "react-color": "^2.17.3",
     "react-scripts": "^4.0.1"
   },
   "homepage": "/slidechat/",

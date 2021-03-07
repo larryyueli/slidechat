@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Button, CircularProgress, Snackbar } from '@material-ui/core';
+import { Button, CircularProgress, Snackbar, ClickAwayListener } from '@material-ui/core';
 import axios from 'axios';
 
 import SlideDrawingOverlay from './SlideDrawingOverlay';
 import SlideFlipOverlay from './SlideFlipOverlay';
+import { GithubPicker } from 'react-color';
 import { fullURL, serverURL } from '../../config';
 import { randInt, range } from '../../util';
 
@@ -22,6 +23,8 @@ export default function Slides(props) {
 	const [showToast, setShowToast] = useState(false);
 	const [fullscreenPortrait, setFullscreenPortrait] = useState(false);
 	const fileUpload = useRef(null);
+	const [strokeColour, setStrokeColour] = useState('red');
+	const [showColourPicker, setShowColourPicker] = useState('false');
 	const carousel = useRef(null);
 
 	useEffect(() => {
@@ -223,30 +226,59 @@ export default function Slides(props) {
 		adjustAspectRatio();
 	}, [props.fullscreen, props.fullscreenChatOpen]);
 
+	const updateStrokeColour = (colour, e) => {
+		setStrokeColour(colour.hex);
+	};
+
+	const closeColourPicker = (e) => {
+		setShowColourPicker(false);
+	};
+
+	const openColourPicker = () => {
+		setShowColourPicker(true);
+	};
+
 	return (
 		<div className='slide-container'>
 			{props.fullscreen ? null : (
 				<div className='slide-toolbar'>
-					{props.showTempDrawingBtn ? (
-						props.drawing ? (
-							<div className='icon-btn drawing' title='Clear drawing'>
-								<span className={`material-icons icon`} onClick={props.cancelDrawing}>
-									close
-								</span>
+					<div className='draw-buttons'>
+						{props.drawing ? (
+							<div
+								className='colour-block'
+								style={{ backgroundColor: strokeColour }}
+								onClick={openColourPicker}>
+								{showColourPicker ? (
+									<ClickAwayListener onClickAway={closeColourPicker}>
+										<div className='color-picker-wrapper'>
+											<GithubPicker onChangeComplete={updateStrokeColour} triangle={'hide'} />
+										</div>
+									</ClickAwayListener>
+								) : null}
 							</div>
-						) : (
-							<div className='icon-btn' title='Temporary drawing'>
-								<span className={`material-icons icon`} onClick={props.startDrawing}>
-									brush
-								</span>
-							</div>
-						)
-					) : null}
+						) : null}
+						{props.showTempDrawingBtn ? (
+							props.drawing ? (
+								<div className='icon-btn drawing' title='Clear drawing'>
+									<span className={`material-icons icon`} onClick={props.cancelDrawing}>
+										close
+									</span>
+								</div>
+							) : (
+								<div className='icon-btn' title='Temporary drawing'>
+									<span className={`material-icons icon`} onClick={props.startDrawing}>
+										brush
+									</span>
+								</div>
+							)
+						) : null}
+					</div>
 					<div className='icon-btn' title='Quote this page'>
 						<span className='material-icons' onClick={copyLink}>
 							link
 						</span>
 					</div>
+
 					<div className='icon-btn' title='Download PDF'>
 						<a className='material-icons' href={`${serverURL}/api/downloadPdf?slideID=${props.sid}`}>
 							file_download
@@ -276,6 +308,7 @@ export default function Slides(props) {
 						drawing={props.drawing}
 						fullscreen={props.fullscreen}
 						fullscreenChatOpen={props.fullscreenChatOpen}
+						strokeColour={strokeColour}
 					/>
 				) : (
 					<SlideFlipOverlay
@@ -330,6 +363,23 @@ export default function Slides(props) {
 
 						{props.fullscreen ? (
 							<>
+								{props.drawing ? (
+									<div
+										className='colour-block'
+										style={{ backgroundColor: strokeColour }}
+										onClick={openColourPicker}>
+										{props.fullscreen && props.drawing && showColourPicker ? (
+											<div className='color-picker-wrapper'>
+												<ClickAwayListener onClickAway={closeColourPicker}>
+													<GithubPicker
+														onChangeComplete={updateStrokeColour}
+														triangle={'hide'}
+													/>
+												</ClickAwayListener>
+											</div>
+										) : null}
+									</div>
+								) : null}
 								{props.showTempDrawingBtn ? (
 									props.drawing ? (
 										<>

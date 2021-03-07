@@ -341,8 +341,8 @@ function commonAPI(db, io, isInstructor) {
 
 			if (req.body.drawing) {
 				for (let line of req.body.drawing) {
-					for (let i = 0; i < line.length - 1; i++) {
-						if (!Number.isInteger(line[i])) {
+					for (let i = 0; i < line.coords.length - 1; i++) {
+						if (!Number.isInteger(line.coords[i])) {
 							throw { status: 400, error: 'bad request' };
 						}
 					}
