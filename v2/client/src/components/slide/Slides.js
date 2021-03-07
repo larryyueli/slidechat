@@ -24,7 +24,7 @@ export default function Slides(props) {
 	const [fullscreenPortrait, setFullscreenPortrait] = useState(false);
 	const fileUpload = useRef(null);
 	const [strokeColour, setStrokeColour] = useState('red');
-	const [showColourPicker, setShowColourPicker] = useState('false');
+	const [showColourPicker, setShowColourPicker] = useState(false);
 	const carousel = useRef(null);
 
 	useEffect(() => {
@@ -226,17 +226,11 @@ export default function Slides(props) {
 		adjustAspectRatio();
 	}, [props.fullscreen, props.fullscreenChatOpen]);
 
-	const updateStrokeColour = (colour, e) => {
-		setStrokeColour(colour.hex);
-	};
+	const updateStrokeColour = (colour, e) => setStrokeColour(colour.hex);
 
-	const closeColourPicker = (e) => {
-		setShowColourPicker(false);
-	};
+	const closeColourPicker = (e) => setShowColourPicker(false);
 
-	const openColourPicker = () => {
-		setShowColourPicker(true);
-	};
+	const openColourPicker = () => setShowColourPicker(true);
 
 	return (
 		<div className='slide-container'>
