@@ -66,6 +66,22 @@ export default function SlideSettings({ sid, open, onClose }) {
 			});
 	};
 
+	const changeDownloadable = (e) => {
+		axios
+			.post(`${serverURL}/api/setDownloadable`, {
+				sid: sid,
+				downloadable: e.target.value,
+			})
+			.then((res) => {
+				setResult(true, 'changes saved');
+				setSettings({ ...settings, downloadable: e.target.value });
+			})
+			.catch((err) => {
+				console.log(err);
+				setResult(false, 'update failed!');
+			});
+	};
+
 	const changeTitle = (e) => {
 		axios
 			.post(`${serverURL}/api/setTitle`, {
@@ -118,7 +134,7 @@ export default function SlideSettings({ sid, open, onClose }) {
 	};
 
 	return (
-		<Dialog onClose={onClose} open={open} maxWidth='40rem'>
+		<Dialog onClose={onClose} open={open} maxWidth={false}>
 			<div className='setting'>
 				{loading ? (
 					<div style={{ textAlign: 'center' }}>
@@ -144,6 +160,13 @@ export default function SlideSettings({ sid, open, onClose }) {
 						<div className='row'>
 							<span className='label'>Drawing:</span>
 							<Select value={Boolean(settings.drawable)} onChange={changeDrawable}>
+								<MenuItem value={true}>On</MenuItem>
+								<MenuItem value={false}>Off</MenuItem>
+							</Select>
+						</div>
+						<div className='row'>
+							<span className='label'>Downloadable:</span>
+							<Select value={Boolean(settings.downloadable)} onChange={changeDownloadable}>
 								<MenuItem value={true}>On</MenuItem>
 								<MenuItem value={false}>Off</MenuItem>
 							</Select>

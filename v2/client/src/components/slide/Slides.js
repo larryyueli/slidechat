@@ -150,11 +150,13 @@ export default function Slides(props) {
 						</span>
 					</div>
 
-					<div className='icon-btn' title='Download PDF'>
-						<a className='material-icons' href={`${serverURL}/api/downloadPdf?slideID=${props.sid}`}>
-							file_download
-						</a>
-					</div>
+					{props.downloadable ? (
+						<div className='icon-btn' title='Download PDF'>
+							<a className='material-icons' href={`${serverURL}/api/downloadPdf?slideID=${props.sid}`}>
+								file_download
+							</a>
+						</div>
+					) : null}
 					<div className='icon-btn fullscreen-btn' title='Fullscreen'>
 						<span className='material-icons' onClick={() => startFullscreen()}>
 							fullscreen

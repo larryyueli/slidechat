@@ -23,6 +23,7 @@ function Main(props) {
 	const [title, setTitle] = useState('');
 	const [filename, setFilename] = useState('');
 	const [drawable, setDrawable] = useState(false);
+	const [downloadable, setDownloadable] = useState(true);
 	const [drawingOverlay, setDrawingOverlay] = useState(false);
 	const [isInstructor, setIsInstructor] = useState(false);
 	const [uid, setUid] = useState('');
@@ -84,6 +85,7 @@ function Main(props) {
 				setTitle(res.data.title);
 				setFilename(res.data.filename);
 				setDrawable(Boolean(res.data.drawable));
+				setDownloadable(Boolean(res.data.downloadable));
 				document.getElementById('pageNum').value = currentPage;
 				setPage(currentPage);
 				if (questionId || questionId === 0) setQid(questionId);
@@ -312,6 +314,7 @@ function Main(props) {
 					fullscreenChatOpen={fullscreenChatOpen}
 					openOrHideChat={openOrHideChat}
 					isTypingRef={isTypingRef}
+					downloadable={downloadable}
 				/>
 				{!fullscreen || fullscreenChatOpen ? (
 					<div className='chat-area'>

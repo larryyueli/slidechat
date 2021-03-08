@@ -1,8 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
-const PDFImage = require('../lib/pdf-image').PDFImage;
+const PDFImage = require('../lib/pdf-image');
 const { ObjectID } = require('mongodb');
+const { exec } = require('child_process');
 
 const { fileStorage, convertOptions } = require('../config');
 const { isNotValidPage, notExistInList, errorHandler, questionCount, shortName } = require('./util');
@@ -105,6 +106,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 	 *     C: non-anonymous
 	 *     D: anonymous to classmates but not instructors
 	 *   drawable: allow drawing
+	 * 	 downloadable: allow downloading
 	 */
 	router.post('/api/createCourse', instructorAuth, async (req, res) => {
 		try {
@@ -112,7 +114,8 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 				typeof req.body.name !== 'string' ||
 				!req.body.name ||
 				!req.body.anonymity ||
-				req.body.drawable === null
+				req.body.drawable === null ||
+				req.body.downloadable === null
 			) {
 				throw { status: 400, error: 'bad request' };
 			}
@@ -122,7 +125,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 				instructors: [req.session.uid],
 				slides: [],
 				anonymity: req.body.anonymity,
-				drawable: req.body.drawable,
+				notAllowDownload: !req.body.downloadable,
 			});
 
 			let courseID = insertRes.ops[0]._id.toHexString();
@@ -138,7 +141,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			}
 
 			console.log(`created course: ${req.body.course}`);
-			res.json({ id: courseID });
+			res.send();
 		} catch (err) {
 			errorHandler(res, err);
 		}
@@ -164,7 +167,8 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 				typeof req.body.name !== 'string' ||
 				!req.body.name ||
 				!req.body.anonymity ||
-				req.body.drawable === null
+				req.body.drawable === null ||
+				req.body.downloadable === null
 			) {
 				throw { status: 400, error: 'bad request' };
 			}
@@ -181,6 +185,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 						name: req.body.name,
 						anonymity: req.body.anonymity,
 						drawable: req.body.drawable,
+						notAllowDownload: !req.body.downloadable,
 					},
 				}
 			);
@@ -317,6 +322,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 				filename: req.files.file.name,
 				anonymity: course.anonymity,
 				drawable: course.drawable,
+				notAllowDownload: course.notAllowDownload,
 			});
 
 			// Step 2: use the id as the directory name, create a directory, move pdf to directory
@@ -402,7 +408,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 				throw 'error when adding default question after uploading';
 			}
 
-			res.json({ id: id });
+			res.send();
 		} catch (err) {
 			errorHandler(res, err);
 		}
@@ -504,6 +510,60 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 				throw { status: 400, error: 'upload new slide failed' };
 			}
 
+			res.send();
+		} catch (err) {
+			errorHandler(res, err);
+		}
+	});
+
+	/**
+	 * import a slide from another course
+	 * req body:
+	 *   cid: course id
+	 *   sid: slide id
+	 */
+	router.post('/api/importSlide', instructorAuth, async (req, res) => {
+		try {
+			if (req.body.sid.length != 24) return res.status(400).send();
+			const slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
+			if (!slide) throw { status: 400, error: 'Slides do not exist' };
+			if (slide.notAllowDownload)
+				throw { status: 400, error: 'You cannot import a slide that does not allow download' };
+			let course = await courses.findOne(
+				{ _id: ObjectID.createFromHexString(req.body.cid) },
+				{ projection: { instructors: 1 } }
+			);
+			if (course.instructors.indexOf(req.session.uid) < 0) throw { status: 403, error: 'Unauthorized' };
+			if (course.slides && course.slides.indexOf(req.body.sid) > 0)
+				throw { status: 400, error: 'Slides already exists' };
+
+			delete slide._id;
+			const copied = await slides.insertOne(slide);
+			const newObjID = copied.ops[0]._id;
+			const newID = newObjID.toHexString();
+			const newDir = path.join(fileStorage, newID);
+			const dir = path.join(fileStorage, req.body.sid);
+			await new Promise((resolve, reject) => {
+				exec(`cp -R ${dir} ${newDir}`, (err, stdout, stderr) => {
+					if (err) {
+						return reject({
+							message: 'Failed to copy files',
+							error: err,
+							stdout: stdout,
+							stderr: stderr,
+						});
+					}
+					return resolve();
+				});
+			});
+
+			const updateRes = await courses.updateOne(
+				{ _id: ObjectID.createFromHexString(req.body.cid) },
+				{ $push: { slides: newID } }
+			);
+			if (updateRes.modifiedCount !== 1) {
+				throw 'slide add to course failed';
+			}
 			res.send();
 		} catch (err) {
 			errorHandler(res, err);
@@ -684,7 +744,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 				throw { status: 400, error: 'change pages order failed' };
 			}
 
-			res.json({});
+			res.send();
 		} catch (err) {
 			errorHandler(res, err);
 		}
@@ -723,7 +783,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 				throw { status: 400, error: 'set title failed' };
 			}
 
-			res.json({});
+			res.send();
 		} catch (err) {
 			errorHandler(res, err);
 		}
@@ -763,7 +823,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 				throw { status: 400, error: 'set anonymity failed' };
 			}
 
-			res.json({});
+			res.send();
 		} catch (err) {
 			errorHandler(res, err);
 		}
@@ -800,7 +860,44 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 				throw { status: 400, error: 'set drawable failed' };
 			}
 
-			res.json({});
+			res.send();
+		} catch (err) {
+			errorHandler(res, err);
+		}
+	});
+
+	/**
+	 * set downloadable of a slide
+	 * req body:
+	 *   downloadable: the slide is downloadable or not
+	 *   sid: the slide id
+	 */
+	router.post('/api/setDownloadable', instructorAuth, async (req, res) => {
+		try {
+			if (req.body.sid.length != 24 || [true, false].indexOf(req.body.downloadable) < 0) {
+				return res.status(400).send();
+			}
+			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
+
+			if (!slide) {
+				throw { status: 400, error: 'slide not exist' };
+			}
+
+			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
+			if (course.instructors.indexOf(req.session.uid) < 0) {
+				throw { status: 403, error: 'Unauthorized' };
+			}
+
+			let updateRes = await slides.updateOne(
+				{ _id: ObjectID.createFromHexString(req.body.sid) },
+				{ $set: { notAllowDownload: !req.body.downloadable } }
+			);
+
+			if (updateRes.result.n == 0) {
+				throw { status: 400, error: 'set downloadable failed' };
+			}
+
+			res.send();
 		} catch (err) {
 			errorHandler(res, err);
 		}

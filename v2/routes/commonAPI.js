@@ -41,6 +41,7 @@ function commonAPI(db, io, isInstructor) {
 					lastActive: slideEntry.lastActive,
 					anonymity: slideEntry.anonymity,
 					drawable: slideEntry.drawable,
+					downloadable: !slideEntry.notAllowDownload,
 				});
 			}
 			res.json({
@@ -49,6 +50,7 @@ function commonAPI(db, io, isInstructor) {
 				slides: courseSlides,
 				anonymity: course.anonymity,
 				drawable: course.drawable,
+				downloadable: !course.notAllowDownload,
 			});
 		} catch (err) {
 			errorHandler(res, err);
@@ -77,6 +79,7 @@ function commonAPI(db, io, isInstructor) {
 				username: shortName(req.session.realName),
 				isInstructor: course.instructors.indexOf(req.session.uid) >= 0,
 				drawable: slide.drawable,
+				downloadable: !slide.notAllowDownload,
 			});
 		} catch (err) {
 			errorHandler(res, err);
@@ -180,10 +183,11 @@ function commonAPI(db, io, isInstructor) {
 		try {
 			let slide = await slides.findOne(
 				{ _id: ObjectID.createFromHexString(req.query.slideID) },
-				{ projection: { filename: true, anonymity: true } }
+				{ projection: { filename: true, anonymity: true, notAllowDownload: true } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
 			if (slide.anonymity != 'A' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
+			if (slide.notAllowDownload) throw { status: 403, error: 'The slide is not allowed to be downloaded' };
 			res.download(path.join(fileStorage, req.query.slideID, slide.filename));
 		} catch (err) {
 			errorHandler(res, err);
