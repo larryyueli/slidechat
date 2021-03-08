@@ -139,47 +139,33 @@ function commonAPI(db, io, isInstructor) {
 	 */
 	router.get('/api/slideAudio', async (req, res) => {
 		try {
-			let slide = await slides.findOne(
+			const slide = await slides.findOne(
 				{ _id: ObjectID.createFromHexString(req.query.slideID) },
-				{ projection: { _id: true, anonymity: true, pageTotal: true, pages: true } }
+				{ projection: { _id: true, anonymity: true, audios: true } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
 			if (slide.anonymity !== 'A' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
-			if (isNotValidPage(req.query.pageNum, slide.pageTotal)) {
-				throw { status: 400, error: 'bad request' };
-			}
-
-			res.sendFile(
-				path.join(fileStorage, req.query.slideID, req.query.pageNum, slide.pages[+req.query.pageNum - 1].audio)
-			);
+			const filename = slide.audios[req.query.pageNum];
+			if (!filename) return res.status(404).send();
+			res.sendFile(path.join(fileStorage, req.query.slideID, req.query.pageNum, filename));
 		} catch (err) {
 			errorHandler(res, err);
 		}
 	});
 
 	/**
-	 * send {audio : true} iff the asking page has audio attached
+	 * send { [page]: filename } if such page has an audio
 	 * req query:
 	 *   slideID: object ID of the slide
-	 *   pageNum: integer range from from 1 to pageTotal (inclusive)
 	 */
 	router.get('/api/hasAudio', async (req, res) => {
 		try {
-			let slide = await slides.findOne(
+			const slide = await slides.findOne(
 				{ _id: ObjectID.createFromHexString(req.query.slideID) },
-				{ projection: { _id: true, pageTotal: true, audio: true, pages: true } }
+				{ projection: { _id: true, pageTotal: true, audios: true } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
-			if (isNotValidPage(req.query.pageNum, slide.pageTotal)) {
-				throw { status: 400, error: 'bad request' };
-			}
-			let response = {};
-			if (slide.pages[+req.query.pageNum - 1].audio) {
-				response.audio = true;
-			} else {
-				response.audio = false;
-			}
-			res.json(response);
+			res.json(slide.audios);
 		} catch (err) {
 			errorHandler(res, err);
 		}

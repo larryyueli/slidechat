@@ -34,9 +34,13 @@ function Main(props) {
 	const [chatToModify, setChatToModify] = useState({});
 	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
 	const [record, setRecord] = useState({ uploaded: false, recording: false, recordingFile: null, recordingSrc: '' });
-	const [largerSlide, setLargerSlide] = useState(localStorage.getItem('SlideChat_LargerSlide') === '1');
-	const [showCarouselPanel, setShowCarouselPanel] = useState(localStorage.getItem('SlideChat_HideCarousel') !== '1'); // default true for null
-	const [isInstructorView, setIsInstructorView] = useState(localStorage.getItem('SlideChat_StudentView') !== '1'); // default true for null
+	const [largerSlide, setLargerSlide] = useState(() => localStorage.getItem('SlideChat_LargerSlide') === '1');
+	const [showCarouselPanel, setShowCarouselPanel] = useState(
+		() => localStorage.getItem('SlideChat_HideCarousel') !== '1'
+	); // default true for null
+	const [isInstructorView, setIsInstructorView] = useState(
+		() => localStorage.getItem('SlideChat_StudentView') !== '1'
+	); // default true for null
 	const [fullscreen, setFullscreen] = useState(false);
 	const [fullscreenChatOpen, setFullscreenChatOpen] = useState(false);
 	const isTypingRef = useRef(false);
@@ -124,7 +128,7 @@ function Main(props) {
 		});
 		socket.on('error', (msg) => alert(msg));
 		return () => {
-			socket.emit('leave', sid);
+			socket.close();
 		};
 	}, [sid, props.match.params]);
 
