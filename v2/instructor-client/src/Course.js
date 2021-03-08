@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Button, TextField, CircularProgress } from '@material-ui/core';
 
 import SlideSettings from './SlideSettings';
-import { serverURL, fullURL } from './config';
+import { serverURL, fullURL, baseURL } from './config';
 import { formatTime } from './util';
 import EditCourse from './EditCourse';
 
@@ -17,12 +17,16 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 	const [showCourseEditor, setShowCourseEditor] = useState(false);
 	const [uploading, setUploading] = useState(false);
 	const [uploadErr, setUploadErr] = useState(null);
+	const [importErr, setImportErr] = useState(null);
 	const [minimized, setMinimized] = useState(minimizeStatus);
 	const [addInstructorRes, setAddInstructorRes] = useState(null);
 	const [openModify, setOpenModify] = useState({ open: false });
 	const [lastActive, setLastActive] = useState(0);
 	const fileUpload = useRef(null);
+	const linkImport = useRef(null);
 	const newUserRef = useRef(null);
+
+	const linkRegex = new RegExp(`.*${baseURL}/([a-f0-9]{24}).*`, 'i');
 
 	const showOrHideCourseEditor = () => {
 		setShowCourseEditor(!showCourseEditor);
@@ -75,6 +79,29 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 				setUploading(false);
 				fetchCourse();
 			}
+		}
+	};
+
+	const importSlidesfromLink = async () => {
+		const res = linkRegex.exec(linkImport.current.value);
+		if (!res) {
+			setImportErr(
+				'This is not a valid SlideChat URL. An example could be https://mcsapps.utm.utoronto.ca/slidechat/5f1b35eb3997b943b856e362'
+			);
+			return;
+		}
+		const sid = res[1];
+		try {
+			await axios.post(`${serverURL}/api/importSlide`, {
+				cid: cid,
+				sid: sid,
+			});
+		} catch (err) {
+			console.error(err);
+			setImportErr(err);
+		} finally {
+			linkImport.current.value = '';
+			fetchCourse();
 		}
 	};
 
@@ -234,6 +261,14 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 						{uploading ? <CircularProgress /> : null}
 					</div>
 					<div className='result-fail'>{uploadErr}</div>
+					<div className='separator'>or import from another course...</div>
+					<div className='import-bar'>
+						<TextField variant='outlined' placeholder='Paste slide link here' inputRef={linkImport} />
+						<Button variant='contained' color='primary' onClick={importSlidesfromLink}>
+							Import
+						</Button>
+					</div>
+					<div className='result-fail'>{importErr}</div>
 				</>
 			) : null}
 

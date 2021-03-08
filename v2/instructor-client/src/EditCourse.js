@@ -18,6 +18,7 @@ import { serverURL } from './config';
 export default function EditCourse({ show, showOrHide, cid, course, fetchCourse }) {
 	const [anonymity, setAnonymity] = useState(course.anonymity);
 	const [drawable, setDrawable] = useState(course.drawable);
+	const [downloadable, setDownloadable] = useState(course.downloadable);
 	const resultRef = useRef(null);
 	const nameRef = useRef(null);
 
@@ -36,6 +37,10 @@ export default function EditCourse({ show, showOrHide, cid, course, fetchCourse 
 		setDrawable(e.target.value);
 	};
 
+	const changeDownloadable = (e) => {
+		setDownloadable(e.target.value);
+	};
+
 	const saveChange = async () => {
 		if (nameRef.current.value === '') {
 			setResult(false, 'course name is required');
@@ -46,6 +51,7 @@ export default function EditCourse({ show, showOrHide, cid, course, fetchCourse 
 				name: nameRef.current.value,
 				anonymity: anonymity,
 				drawable: drawable,
+				downloadable: downloadable,
 			})
 			.then((_) => {
 				setResult(true, 'change saved!');
@@ -118,6 +124,17 @@ export default function EditCourse({ show, showOrHide, cid, course, fetchCourse 
 							</TableCell>
 							<TableCell>
 								<Select className='input' value={Boolean(drawable)} onChange={changeDrawable}>
+									<MenuItem value={true}>On</MenuItem>
+									<MenuItem value={false}>Off</MenuItem>
+								</Select>
+							</TableCell>
+						</TableRow>
+						<TableRow>
+							<TableCell>
+								<span className='label'>Default Downloadable:</span>
+							</TableCell>
+							<TableCell>
+								<Select className='input' value={Boolean(downloadable)} onChange={changeDownloadable}>
 									<MenuItem value={true}>On</MenuItem>
 									<MenuItem value={false}>Off</MenuItem>
 								</Select>

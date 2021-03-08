@@ -41,6 +41,7 @@ function commonAPI(db, io, isInstructor) {
 					lastActive: slideEntry.lastActive,
 					anonymity: slideEntry.anonymity,
 					drawable: slideEntry.drawable,
+					downloadable: !slideEntry.notAllowDownload,
 				});
 			}
 			res.json({
@@ -49,6 +50,7 @@ function commonAPI(db, io, isInstructor) {
 				slides: courseSlides,
 				anonymity: course.anonymity,
 				drawable: course.drawable,
+				downloadable: !course.notAllowDownload,
 			});
 		} catch (err) {
 			errorHandler(res, err);
@@ -77,6 +79,7 @@ function commonAPI(db, io, isInstructor) {
 				username: shortName(req.session.realName),
 				isInstructor: course.instructors.indexOf(req.session.uid) >= 0,
 				drawable: slide.drawable,
+				downloadable: !slide.notAllowDownload,
 			});
 		} catch (err) {
 			errorHandler(res, err);
