@@ -1,11 +1,13 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Button, CircularProgress, Snackbar } from '@material-ui/core';
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { Snackbar } from '@material-ui/core';
 import axios from 'axios';
 
 import SlideDrawingOverlay from './SlideDrawingOverlay';
 import SlideFlipOverlay from './SlideFlipOverlay';
+import ColourPicker, { palette } from './ColourPicker';
 import { fullURL, serverURL } from '../../config';
 import { randInt, range } from '../../util';
+import AudioUploadPanel from './AudioUploadPanel';
 
 const loadingImg = process.env.PUBLIC_URL + '/imgs/loading.png';
 const disconnectedImg = process.env.PUBLIC_URL + '/imgs/disconnected.png';
@@ -14,16 +16,16 @@ const disconnectedImg = process.env.PUBLIC_URL + '/imgs/disconnected.png';
  * Slides on the left side of the screen
  */
 export default function Slides(props) {
-	const [audioSrc, setAudioSrc] = useState('');
+	const [audioInfo, setAudioInfo] = useState({});
 	const [nextDisable, setNextDisable] = useState(true);
 	const [prevDisable, setPrevDisable] = useState(true);
-	const [uploading, setUploading] = useState(false);
 	const [img, setImg] = useState(loadingImg);
 	const [showToast, setShowToast] = useState(false);
 	const [fullscreenPortrait, setFullscreenPortrait] = useState(false);
-	const fileUpload = useRef(null);
+	const [strokeColour, setStrokeColour] = useState(palette[0]);
 	const carousel = useRef(null);
 
+	// fetch page image
 	useEffect(() => {
 		if (!props.pageTotal) return;
 		fetch(`${serverURL}/api/slideImg?slideID=${props.sid}&pageNum=${props.pageNum}`)
@@ -43,24 +45,9 @@ export default function Slides(props) {
 				setNextDisable(props.pageNum === props.pageTotal);
 				setPrevDisable(props.pageNum === 1);
 			});
-		axios
-			.get(`${serverURL}/api/hasAudio?slideID=${props.sid}&pageNum=${props.pageNum}`)
-			.then((res) => {
-				if (res.data.audio) {
-					setAudioSrc(
-						`${serverURL}/api/slideAudio?slideID=${props.sid}&pageNum=${props.pageNum}&random=${randInt(
-							10000
-						)}`
-					);
-				} else {
-					setAudioSrc('');
-				}
-			})
-			.catch((err) => {
-				console.error(err);
-			});
 	}, [props.sid, props.pageTotal, props.pageNum]);
 
+	// center carousel to the current page
 	useEffect(() => {
 		if (props.showCarouselPanel && !props.fullscreen) {
 			const thumbnail = carousel.current.querySelector(`#thumbnail-${props.pageNum}`);
@@ -71,70 +58,22 @@ export default function Slides(props) {
 				behavior: 'smooth',
 			});
 		}
-	}, [props.pageNum, props.showCarouselPanel, props.fullscreen]);
+	}, [props.pageNum, props.pageTotal, props.showCarouselPanel, props.fullscreen]);
 
-	/**
-	 * upload audio to server
-	 */
-	const uploadAudio = async () => {
-		if (fileUpload.current.files.length !== 1) return;
-
-		let formData = new FormData();
-		formData.append('sid', props.sid);
-		formData.append('pageNum', props.pageNum);
-		formData.append('file', fileUpload.current.files[0]);
+	const fetchAudioInfo = useCallback(async () => {
 		try {
-			setUploading(true);
-			await axios.post(`${serverURL}/api/audio/`, formData);
+			const res = await axios.get(`${serverURL}/api/hasAudio?slideID=${props.sid}`);
+			setAudioInfo(res.data);
 		} catch (err) {
-			console.log(err);
-		} finally {
-			setUploading(false);
-			document.getElementById('file').value = '';
-			setAudioSrc(
-				`${serverURL}/api/slideAudio?slideID=${props.sid}&pageNum=${props.pageNum}&random=${randInt(10000)}`
-			);
+			console.error(err);
 		}
-	};
+	}, [props.sid]);
 
-	const uploadRecording = async () => {
-		setUploading(true);
-		let formData = new FormData();
-		formData.append('sid', props.sid);
-		formData.append('pageNum', props.pageNum);
-		formData.append('file', props.record.recordingFile);
-		try {
-			setUploading(true);
-			await axios.post(`${serverURL}/api/audio/`, formData);
-			setAudioSrc(
-				`${serverURL}/api/slideAudio?slideID=${props.sid}&pageNum=${props.pageNum}&random=${randInt(10000)}`
-			);
-			props.setRecord({ ...props.record, uploaded: true });
-		} catch (err) {
-			console.log(err);
-		} finally {
-			setUploading(false);
-			props.setRecord({ ...props.record, recordingFile: null, recordingSrc: '' });
-		}
-	};
+	useEffect(() => {
+		fetchAudioInfo();
+	}, [fetchAudioInfo]);
 
-	/**
-	 * delete the audio on this page
-	 */
-	const deleteAudio = async () => {
-		if (!window.confirm(`Are you sure to delete this audio?`)) return;
-		setUploading(true);
-		axios
-			.delete(`${serverURL}/api/audio?sid=${props.sid}&pageNum=${props.pageNum}`)
-			.then((res) => {
-				setAudioSrc('');
-				setUploading(false);
-			})
-			.catch((err) => {
-				console.error(err);
-				setUploading(false);
-			});
-	};
+	const hasAudio = Boolean(audioInfo[props.pageNum]);
 
 	/**
 	 * go to next page
@@ -152,48 +91,6 @@ export default function Slides(props) {
 	const prevPage = (e) => {
 		setPrevDisable(true);
 		props.gotoPage(props.pageNum - 1);
-	};
-
-	const startRecording = async () => {
-		if (!navigator.mediaDevices) {
-			window.alert("Your browser doesn't support using microphone. Are you using HTTPS?");
-			return;
-		}
-		if (props.record.recordingSrc !== '' && !props.record.uploaded) {
-			if (!window.confirm("You haven't uploaded your recording. Do you want to discard it?")) return;
-		}
-		navigator.mediaDevices
-			.getUserMedia({ audio: true })
-			.then(async () => {
-				const MicRecorder = (await import('mic-recorder-to-mp3')).default;
-				window.audioRecorder = new MicRecorder({ bitRate: 128 });
-				window.audioRecorder
-					.start()
-					.then(() => {
-						props.setRecord({ ...props.record, recording: true });
-					})
-					.catch((err) => console.error(err));
-			})
-			.catch(() => {
-				window.alert('Audio permission denied.');
-			});
-	};
-
-	const stopRecording = () => {
-		window.audioRecorder
-			.stop()
-			.getMp3()
-			.then(([buffer, blob]) => {
-				props.setRecord({
-					...props.record,
-					recording: false,
-					uploaded: false,
-					recordingFile: new File(buffer, 'recording.mp3', { type: blob.type, lastModified: Date.now() }),
-					recordingSrc: URL.createObjectURL(blob),
-				});
-			})
-			.catch((err) => console.error(err));
-		delete window.audioRecorder;
 	};
 
 	const copyLink = async () => {
@@ -227,31 +124,39 @@ export default function Slides(props) {
 		<div className='slide-container'>
 			{props.fullscreen ? null : (
 				<div className='slide-toolbar'>
-					{props.showTempDrawingBtn ? (
-						props.drawing ? (
-							<div className='icon-btn drawing' title='Clear drawing'>
-								<span className={`material-icons icon`} onClick={props.cancelDrawing}>
-									close
-								</span>
-							</div>
-						) : (
-							<div className='icon-btn' title='Temporary drawing'>
-								<span className={`material-icons icon`} onClick={props.startDrawing}>
-									brush
-								</span>
-							</div>
-						)
-					) : null}
+					<div className='draw-buttons'>
+						{props.drawing ? (
+							<ColourPicker currentColour={strokeColour} setColour={setStrokeColour} />
+						) : null}
+						{props.showTempDrawingBtn ? (
+							props.drawing ? (
+								<div className='icon-btn drawing' title='Clear drawing'>
+									<span className={`material-icons icon`} onClick={props.cancelDrawing}>
+										close
+									</span>
+								</div>
+							) : (
+								<div className='icon-btn' title='Temporary drawing'>
+									<span className={`material-icons icon`} onClick={props.startDrawing}>
+										brush
+									</span>
+								</div>
+							)
+						) : null}
+					</div>
 					<div className='icon-btn' title='Quote this page'>
 						<span className='material-icons' onClick={copyLink}>
 							link
 						</span>
 					</div>
-					<div className='icon-btn' title='Download PDF'>
-						<a className='material-icons' href={`${serverURL}/api/downloadPdf?slideID=${props.sid}`}>
-							file_download
-						</a>
-					</div>
+
+					{props.downloadable ? (
+						<div className='icon-btn' title='Download PDF'>
+							<a className='material-icons' href={`${serverURL}/api/downloadPdf?slideID=${props.sid}`}>
+								file_download
+							</a>
+						</div>
+					) : null}
 					<div className='icon-btn fullscreen-btn' title='Fullscreen'>
 						<span className='material-icons' onClick={() => startFullscreen()}>
 							fullscreen
@@ -276,6 +181,7 @@ export default function Slides(props) {
 						drawing={props.drawing}
 						fullscreen={props.fullscreen}
 						fullscreenChatOpen={props.fullscreenChatOpen}
+						strokeColour={strokeColour}
 					/>
 				) : (
 					<SlideFlipOverlay
@@ -330,6 +236,9 @@ export default function Slides(props) {
 
 						{props.fullscreen ? (
 							<>
+								{props.drawing ? (
+									<ColourPicker currentColour={strokeColour} setColour={setStrokeColour} />
+								) : null}
 								{props.showTempDrawingBtn ? (
 									props.drawing ? (
 										<>
@@ -358,8 +267,13 @@ export default function Slides(props) {
 							</>
 						) : null}
 					</div>
-					{props.fullscreen ? (
-						<audio className='slide-audio' controls={Boolean(audioSrc)} src={audioSrc}>
+					{props.fullscreen && hasAudio ? (
+						<audio
+							className='slide-audio'
+							controls
+							src={`${serverURL}/api/slideAudio?slideID=${props.sid}&pageNum=${
+								props.pageNum
+							}&random=${randInt(10000)}`}>
 							Your browser does not support the audio element.
 						</audio>
 					) : null}
@@ -388,54 +302,26 @@ export default function Slides(props) {
 					</div>
 				) : null}
 
-				<audio className='slide-audio' controls={Boolean(audioSrc) && !props.fullscreen} src={audioSrc}>
-					Your browser does not support the audio element.
-				</audio>
+				{!props.fullscreen && hasAudio ? (
+					<audio
+						className='slide-audio'
+						controls
+						src={`${serverURL}/api/slideAudio?slideID=${props.sid}&pageNum=${
+							props.pageNum
+						}&random=${randInt(10000)}`}>
+						Your browser does not support the audio element.
+					</audio>
+				) : null}
 
 				{props.isInstructor && props.isInstructorView && !props.fullscreen ? (
-					<>
-						<div className='audio-instructor'>
-							<input type='file' id='file' className='file' ref={fileUpload} accept='.mp3' />
-							<Button variant='contained' onClick={uploadAudio} disabled={uploading} className='upload'>
-								{audioSrc ? 'Replace' : 'Upload'} audio
-							</Button>
-							{uploading ? <CircularProgress /> : null}
-							{audioSrc ? (
-								<Button
-									variant='contained'
-									onClick={deleteAudio}
-									disabled={uploading}
-									className='delete'>
-									Delete Audio
-								</Button>
-							) : null}
-							{props.record.recording ? (
-								<Button variant='contained' className='stop' onClick={stopRecording}>
-									<span className='material-icons stop-icon'>stop</span>
-									Stop recording
-								</Button>
-							) : (
-								<Button variant='contained' className='start' onClick={startRecording}>
-									<span className='material-icons start-icon'>radio_button_checked</span>
-									Start recording
-								</Button>
-							)}
-						</div>
-						{props.record.recordingSrc ? (
-							<div className='recording'>
-								<audio className='recording-audio' controls={true} src={props.record.recordingSrc}>
-									Your browser does not support the audio element.
-								</audio>
-								<Button
-									variant='contained'
-									onClick={uploadRecording}
-									disabled={uploading}
-									className='upload'>
-									{audioSrc ? 'Replace' : 'Upload'} audio
-								</Button>
-							</div>
-						) : null}
-					</>
+					<AudioUploadPanel
+						record={props.record}
+						setRecord={props.setRecord}
+						hasAudio={hasAudio}
+						sid={props.sid}
+						pageNum={props.pageNum}
+						fetchAudioInfo={fetchAudioInfo}
+					/>
 				) : null}
 			</div>
 		</div>

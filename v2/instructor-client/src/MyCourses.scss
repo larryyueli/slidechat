@@ -118,9 +118,36 @@
 
 		.upload-bar {
 			@include flexCenter;
-			margin: 1rem 0rem;
+			margin: 0.5rem 0rem;
 			.MuiCircularProgress-root {
 				margin-left: 1rem;
+			}
+			button {
+				background-color: $primary;
+				color: white;
+				&:disabled {
+					background-color: $disabled;
+				}
+			}
+		}
+
+		.separator {
+			text-align: center;
+		}
+
+		.import-bar {
+			@include flexCenter();
+			margin: 0.5rem 0rem;
+			.MuiCircularProgress-root {
+				margin-left: 1rem;
+			}
+			.MuiTextField-root {
+				width: 45%;
+				margin-right: 1.75em;
+				.MuiOutlinedInput-input,
+				.MuiOutlinedInput-multiline {
+					padding: 6px;
+				}
 			}
 			button {
 				background-color: $primary;

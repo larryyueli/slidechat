@@ -251,4 +251,4 @@ class PDFImage {
 	}
 }
 
-exports.PDFImage = PDFImage;
+module.exports = PDFImage;

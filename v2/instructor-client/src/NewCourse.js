@@ -18,6 +18,7 @@ import { serverURL } from './config';
 export default function NewCourse({ show, showOrHide, fetchCourses }) {
 	const [anonymity, setAnonymity] = useState('B');
 	const [drawable, setDrawable] = useState(true);
+	const [downloadable, setDownloadable] = useState(true);
 	const resultRef = useRef(null);
 	const nameRef = useRef(null);
 
@@ -36,6 +37,10 @@ export default function NewCourse({ show, showOrHide, fetchCourses }) {
 		setDrawable(e.target.value);
 	};
 
+	const changeDownloadable = (e) => {
+		setDownloadable(e.target.value);
+	};
+
 	const createCourse = async () => {
 		if (nameRef.current.value === '') {
 			setResult(false, 'course name is required');
@@ -46,6 +51,7 @@ export default function NewCourse({ show, showOrHide, fetchCourses }) {
 				name: nameRef.current.value,
 				anonymity: anonymity,
 				drawable: drawable,
+				downloadable: downloadable,
 			})
 			.then((_) => {
 				setResult(true, 'course created!');
@@ -120,6 +126,17 @@ export default function NewCourse({ show, showOrHide, fetchCourses }) {
 							</TableCell>
 							<TableCell>
 								<Select className='input' value={Boolean(drawable)} onChange={changeDrawable}>
+									<MenuItem value={true}>On</MenuItem>
+									<MenuItem value={false}>Off</MenuItem>
+								</Select>
+							</TableCell>
+						</TableRow>
+						<TableRow>
+							<TableCell>
+								<span className='label'>Default Downloadable:</span>
+							</TableCell>
+							<TableCell>
+								<Select className='input' value={Boolean(downloadable)} onChange={changeDownloadable}>
 									<MenuItem value={true}>On</MenuItem>
 									<MenuItem value={false}>Off</MenuItem>
 								</Select>

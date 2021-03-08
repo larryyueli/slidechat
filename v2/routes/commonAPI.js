@@ -42,6 +42,7 @@ function commonAPI(db, io, isInstructor) {
 					anonymity: slideEntry.anonymity,
 					drawable: slideEntry.drawable,
 					viewCount: slideEntry.viewCount,
+					downloadable: !slideEntry.notAllowDownload,
 				});
 			}
 			res.json({
@@ -50,6 +51,7 @@ function commonAPI(db, io, isInstructor) {
 				slides: courseSlides,
 				anonymity: course.anonymity,
 				drawable: course.drawable,
+				downloadable: !course.notAllowDownload,
 			});
 		} catch (err) {
 			errorHandler(res, err);
@@ -69,10 +71,7 @@ function commonAPI(db, io, isInstructor) {
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
 
-			slides.updateOne(
-				{ _id: ObjectID.createFromHexString(req.query.slideID) },
-				{ $inc: { 'viewCount': 1 } }
-			);
+			slides.updateOne({ _id: ObjectID.createFromHexString(req.query.slideID) }, { $inc: { viewCount: 1 } });
 
 			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
 			res.json({
@@ -84,6 +83,7 @@ function commonAPI(db, io, isInstructor) {
 				username: shortName(req.session.realName),
 				isInstructor: course.instructors.indexOf(req.session.uid) >= 0,
 				drawable: slide.drawable,
+				downloadable: !slide.notAllowDownload,
 			});
 		} catch (err) {
 			errorHandler(res, err);
@@ -146,47 +146,33 @@ function commonAPI(db, io, isInstructor) {
 	 */
 	router.get('/api/slideAudio', async (req, res) => {
 		try {
-			let slide = await slides.findOne(
+			const slide = await slides.findOne(
 				{ _id: ObjectID.createFromHexString(req.query.slideID) },
-				{ projection: { _id: true, anonymity: true, pageTotal: true, pages: true } }
+				{ projection: { _id: true, anonymity: true, audios: true } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
 			if (slide.anonymity !== 'A' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
-			if (isNotValidPage(req.query.pageNum, slide.pageTotal)) {
-				throw { status: 400, error: 'bad request' };
-			}
-
-			res.sendFile(
-				path.join(fileStorage, req.query.slideID, req.query.pageNum, slide.pages[+req.query.pageNum - 1].audio)
-			);
+			const filename = slide.audios[req.query.pageNum];
+			if (!filename) return res.status(404).send();
+			res.sendFile(path.join(fileStorage, req.query.slideID, req.query.pageNum, filename));
 		} catch (err) {
 			errorHandler(res, err);
 		}
 	});
 
 	/**
-	 * send {audio : true} iff the asking page has audio attached
+	 * send { [page]: filename } if such page has an audio
 	 * req query:
 	 *   slideID: object ID of the slide
-	 *   pageNum: integer range from from 1 to pageTotal (inclusive)
 	 */
 	router.get('/api/hasAudio', async (req, res) => {
 		try {
-			let slide = await slides.findOne(
+			const slide = await slides.findOne(
 				{ _id: ObjectID.createFromHexString(req.query.slideID) },
-				{ projection: { _id: true, pageTotal: true, audio: true, pages: true } }
+				{ projection: { _id: true, pageTotal: true, audios: true } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
-			if (isNotValidPage(req.query.pageNum, slide.pageTotal)) {
-				throw { status: 400, error: 'bad request' };
-			}
-			let response = {};
-			if (slide.pages[+req.query.pageNum - 1].audio) {
-				response.audio = true;
-			} else {
-				response.audio = false;
-			}
-			res.json(response);
+			res.json(slide.audios);
 		} catch (err) {
 			errorHandler(res, err);
 		}
@@ -201,10 +187,11 @@ function commonAPI(db, io, isInstructor) {
 		try {
 			let slide = await slides.findOne(
 				{ _id: ObjectID.createFromHexString(req.query.slideID) },
-				{ projection: { filename: true, anonymity: true } }
+				{ projection: { filename: true, anonymity: true, notAllowDownload: true } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
 			if (slide.anonymity != 'A' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
+			if (slide.notAllowDownload) throw { status: 403, error: 'The slide is not allowed to be downloaded' };
 			res.download(path.join(fileStorage, req.query.slideID, slide.filename));
 		} catch (err) {
 			errorHandler(res, err);
@@ -318,7 +305,7 @@ function commonAPI(db, io, isInstructor) {
 				title: question.title,
 				chats: question.chats,
 				drawing: question.drawing,
-				viewCount: question.viewCount ? question.viewCount + 1 : 1
+				viewCount: question.viewCount ? question.viewCount + 1 : 1,
 			});
 		} catch (err) {
 			errorHandler(res, err);
@@ -355,8 +342,8 @@ function commonAPI(db, io, isInstructor) {
 
 			if (req.body.drawing) {
 				for (let line of req.body.drawing) {
-					for (let i = 0; i < line.length - 1; i++) {
-						if (!Number.isInteger(line[i])) {
+					for (let i = 0; i < line.points.length - 1; i++) {
+						if (!Number.isInteger(line.points[i])) {
 							throw { status: 400, error: 'bad request' };
 						}
 					}
@@ -673,7 +660,7 @@ function commonAPI(db, io, isInstructor) {
 
 	/**
 	 * Set the view count and time viewed for multiple pages
-	 * 
+	 *
 	 * req body:
 	 *   [pageNum]: { viewCount: int, timeViewed: int (milliseconds) }
 	 * example:
@@ -692,7 +679,7 @@ function commonAPI(db, io, isInstructor) {
 			if (slide.anonymity !== 'A' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
 
 			const slideStats = req.body;
-			if (Object.keys(slideStats).some(pageNum => isNotValidPage(pageNum, slide.pageTotal))) {
+			if (Object.keys(slideStats).some((pageNum) => isNotValidPage(pageNum, slide.pageTotal))) {
 				throw { status: 400, error: 'bad request' };
 			}
 
@@ -704,13 +691,10 @@ function commonAPI(db, io, isInstructor) {
 				const timeViewedField = `pages.${+pageNum - 1}.timeViewed`;
 				const { viewCount, timeViewed } = slideStats[pageNum];
 				increment[viewCountField] = viewCount;
-				increment[timeViewedField] = (timeViewed > maxTime) ? maxTime : timeViewed
+				increment[timeViewedField] = timeViewed > maxTime ? maxTime : timeViewed;
 			}
 
-			slides.updateOne(
-				{ _id: ObjectID.createFromHexString(req.query.slideID) },
-				{ $inc: increment }
-			);
+			slides.updateOne({ _id: ObjectID.createFromHexString(req.query.slideID) }, { $inc: increment });
 
 			res.send();
 		} catch (err) {

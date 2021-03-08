@@ -42,6 +42,7 @@ function Main(props) {
 	const [title, setTitle] = useState('');
 	const [filename, setFilename] = useState('');
 	const [drawable, setDrawable] = useState(false);
+	const [downloadable, setDownloadable] = useState(true);
 	const [drawingOverlay, setDrawingOverlay] = useState(false);
 	const [isInstructor, setIsInstructor] = useState(false);
 	const [uid, setUid] = useState('');
@@ -53,9 +54,13 @@ function Main(props) {
 	const [chatToModify, setChatToModify] = useState({});
 	const canvasComponentRef = useRef(null); // this ref is used to read canvas data from chat area
 	const [record, setRecord] = useState({ uploaded: false, recording: false, recordingFile: null, recordingSrc: '' });
-	const [largerSlide, setLargerSlide] = useState(localStorage.getItem('SlideChat_LargerSlide') === '1');
-	const [showCarouselPanel, setShowCarouselPanel] = useState(localStorage.getItem('SlideChat_HideCarousel') !== '1'); // default true for null
-	const [isInstructorView, setIsInstructorView] = useState(localStorage.getItem('SlideChat_StudentView') !== '1'); // default true for null
+	const [largerSlide, setLargerSlide] = useState(() => localStorage.getItem('SlideChat_LargerSlide') === '1');
+	const [showCarouselPanel, setShowCarouselPanel] = useState(
+		() => localStorage.getItem('SlideChat_HideCarousel') !== '1'
+	); // default true for null
+	const [isInstructorView, setIsInstructorView] = useState(
+		() => localStorage.getItem('SlideChat_StudentView') !== '1'
+	); // default true for null
 	const [fullscreen, setFullscreen] = useState(false);
 	const [fullscreenChatOpen, setFullscreenChatOpen] = useState(false);
 	const isTypingRef = useRef(false);
@@ -99,6 +104,7 @@ function Main(props) {
 				setTitle(res.data.title);
 				setFilename(res.data.filename);
 				setDrawable(Boolean(res.data.drawable));
+				setDownloadable(Boolean(res.data.downloadable));
 				document.getElementById('pageNum').value = currentPage;
 				setPage(currentPage);
 				if (questionId || questionId === 0) setQid(questionId);
@@ -143,7 +149,7 @@ function Main(props) {
 		});
 		socket.on('error', (msg) => alert(msg));
 		return () => {
-			socket.emit('leave', sid);
+			socket.close();
 		};
 	}, [sid, props.match.params]);
 
@@ -336,6 +342,7 @@ function Main(props) {
 					fullscreenChatOpen={fullscreenChatOpen}
 					openOrHideChat={openOrHideChat}
 					isTypingRef={isTypingRef}
+					downloadable={downloadable}
 				/>
 				{!fullscreen || fullscreenChatOpen ? (
 					<div className='chat-area'>
