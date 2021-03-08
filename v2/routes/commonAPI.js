@@ -661,7 +661,7 @@ function commonAPI(db, io, isInstructor) {
 	/**
 	 * Set the view count and time viewed for multiple pages
 	 *
-	 * req body:
+	 * req body (JSON string, because of limitation of navigator.sendBeacon):
 	 *   [pageNum]: { viewCount: int, timeViewed: int (milliseconds) }
 	 * example:
 	 * {
@@ -669,26 +669,25 @@ function commonAPI(db, io, isInstructor) {
 	 *   4: { viewCount: 1, timeViewed: 45000 }
 	 * }
 	 */
-	router.post('/api/slideStats', async (req, res) => {
+	router.post('/api/slideStats', express.text(), async (req, res) => {
 		try {
-			let slide = await slides.findOne(
+			const slide = await slides.findOne(
 				{ _id: ObjectID.createFromHexString(req.query.slideID) },
 				{ projection: { pages: true, anonymity: true } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
 			if (slide.anonymity !== 'A' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
 
-			const slideStats = req.body;
+			const slideStats = JSON.parse(req.body);
 			if (Object.keys(slideStats).some((pageNum) => isNotValidPage(pageNum, slide.pageTotal))) {
 				throw { status: 400, error: 'bad request' };
 			}
 
-			// 10 min in ms
-			const maxTime = 10 * 60 * 1000;
+			const maxTime = 600_000; // 10 min in ms
 			const increment = {};
 			for (let pageNum in slideStats) {
-				const viewCountField = `pages.${+pageNum - 1}.viewCount`;
-				const timeViewedField = `pages.${+pageNum - 1}.timeViewed`;
+				const viewCountField = `pages.${pageNum - 1}.viewCount`;
+				const timeViewedField = `pages.${pageNum - 1}.timeViewed`;
 				const { viewCount, timeViewed } = slideStats[pageNum];
 				increment[viewCountField] = viewCount;
 				increment[timeViewedField] = timeViewed > maxTime ? maxTime : timeViewed;
