@@ -14,6 +14,7 @@ if (window.navigator.serviceWorker) {
 		navigator.serviceWorker
 			.register(`${process.env.PUBLIC_URL}/serviceWorker.js`)
 			.then((reg) => console.log(`service worker registered with scope "${reg.scope}"`))
+			.then(() => caches.delete('SlideChat-temp'))
 			.catch((err) => console.error(err));
 	});
 } else {

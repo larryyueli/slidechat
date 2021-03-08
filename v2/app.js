@@ -5,7 +5,6 @@ const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const cors = require('cors');
 const compression = require('compression');
-const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
 const session = require('express-session');
 const MongoSessStore = require('connect-mongodb-session')(session);
@@ -44,8 +43,8 @@ morgan.token('body', (req) => {
 	app.use(compression());
 	if (NODE_ENV !== 'production') app.use(cors());
 	app.use(morgan(':id :method :url :body :status :res[content-length] - :response-time ms'));
-	app.use(bodyParser.json()); // support json encoded bodies
-	app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+	app.use(express.json()); // support json encoded bodies
+	app.use(express.urlencoded({ extended: true })); // support encoded bodies
 	app.use(cookieParser());
 	app.use(fileUpload());
 
