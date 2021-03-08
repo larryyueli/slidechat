@@ -20,12 +20,12 @@ export default function AudioUploadPanel({ record, setRecord, sid, pageNum, hasA
 		try {
 			setUploading(true);
 			await axios.post(`${serverURL}/api/audio/`, formData);
+			document.getElementById('file').value = '';
+			fetchAudioInfo();
 		} catch (err) {
 			console.log(err);
 		} finally {
 			setUploading(false);
-			document.getElementById('file').value = '';
-			fetchAudioInfo();
 		}
 	};
 

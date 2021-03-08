@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import { Button, TextField, CircularProgress } from '@material-ui/core';
 
@@ -23,10 +23,8 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 	const [openModify, setOpenModify] = useState({ open: false });
 	const [lastActive, setLastActive] = useState(0);
 	const fileUpload = useRef(null);
-	const linkImport = useRef(null);
+	const importLink = useRef(null);
 	const newUserRef = useRef(null);
-
-	const linkRegex = new RegExp(`.*${baseURL}/([a-f0-9]{24}).*`, 'i');
 
 	const showOrHideCourseEditor = () => {
 		setShowCourseEditor(!showCourseEditor);
@@ -35,7 +33,7 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 	/**
 	 * fetch course information from server
 	 */
-	const fetchCourse = async () => {
+	const fetchCourse = useCallback(async () => {
 		try {
 			let res = await axios.get(`${serverURL}/api/course?id=${cid}`);
 			setCourse(res.data);
@@ -48,12 +46,11 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 		} catch (err) {
 			console.error(err);
 		}
-	};
+	}, [cid]);
 
 	useEffect(() => {
 		fetchCourse();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [fetchCourse]);
 
 	const uploadPDF = async () => {
 		for (let i = 0; i < fileUpload.current.files.length; i++) {
@@ -67,6 +64,7 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 			try {
 				setUploading(true);
 				await axios.post(`${serverURL}/api/addSlide/`, formData);
+				setImportErr('');
 			} catch (err) {
 				if (err.response.status === 502) {
 					setUploadErr(
@@ -82,26 +80,28 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 		}
 	};
 
-	const importSlidesfromLink = async () => {
-		const res = linkRegex.exec(linkImport.current.value);
-		if (!res) {
-			setImportErr(
-				'This is not a valid SlideChat URL. An example could be https://mcsapps.utm.utoronto.ca/slidechat/5f1b35eb3997b943b856e362'
-			);
-			return;
-		}
-		const sid = res[1];
+	const importSlidesFromLink = async () => {
+		const linkRegex = new RegExp(`${baseURL}/([a-f0-9]{24})`);
+		if (!importLink.current.value) return;
 		try {
+			const res = linkRegex.exec(importLink.current.value);
+			if (!res) {
+				setImportErr(
+					'This is not a valid SlideChat URL. An example could be https://mcsapps.utm.utoronto.ca/slidechat/5f1b35eb3997b943b856e362'
+				);
+				return;
+			}
+			const sid = res[1];
 			await axios.post(`${serverURL}/api/importSlide`, {
 				cid: cid,
 				sid: sid,
 			});
+			importLink.current.value = '';
+			fetchCourse();
+			setImportErr('');
 		} catch (err) {
 			console.error(err);
 			setImportErr(err);
-		} finally {
-			linkImport.current.value = '';
-			fetchCourse();
 		}
 	};
 
@@ -109,10 +109,9 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 		if (!window.confirm(`Are you sure to delete "${filename}"?`)) return;
 		try {
 			await axios.delete(`${serverURL}/api/slide?sid=${sid}`);
+			fetchCourse();
 		} catch (err) {
 			console.log(err);
-		} finally {
-			fetchCourse();
 		}
 	};
 
@@ -263,8 +262,8 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 					<div className='result-fail'>{uploadErr}</div>
 					<div className='separator'>or import from another course...</div>
 					<div className='import-bar'>
-						<TextField variant='outlined' placeholder='Paste slide link here' inputRef={linkImport} />
-						<Button variant='contained' color='primary' onClick={importSlidesfromLink}>
+						<TextField variant='outlined' placeholder='Paste slide link here' inputRef={importLink} />
+						<Button variant='contained' color='primary' onClick={importSlidesFromLink}>
 							Import
 						</Button>
 					</div>
@@ -285,36 +284,37 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 									<div className='time-row'>Last activity: {formatTime(slide.lastActive)}</div>
 									<div className='time-row'>
 										Anonymity: {slide.anonymity}&nbsp;&nbsp;&nbsp;Drawing:{' '}
-										{slide.drawable ? 'Y' : 'N'}
+										{slide.drawable ? 'Y' : 'N'}&nbsp;&nbsp;&nbsp;Downloadable:{' '}
+										{slide.downloadable ? 'Y' : 'N'}
 									</div>
 								</div>
-								{managing ? (
-									<div className='btns'>
-										<Button
-											className='slide-delete-btn'
-											variant='outlined'
-											color='primary'
-											onClick={(e) => modifySlide(slide.filename, slide.id)}>
-											Modify
-										</Button>
-										<Button
-											className='slide-delete-btn'
-											variant='outlined'
-											color='secondary'
-											onClick={(e) => deleteSlide(slide.filename, slide.id)}>
-											Delete
-										</Button>
-									</div>
-								) : (
-									<div className='btns'>
+								<div className='btns'>
+									{managing ? (
+										<>
+											<Button
+												className='slide-delete-btn'
+												variant='outlined'
+												color='primary'
+												onClick={(e) => modifySlide(slide.filename, slide.id)}>
+												Modify
+											</Button>
+											<Button
+												className='slide-delete-btn'
+												variant='outlined'
+												color='secondary'
+												onClick={(e) => deleteSlide(slide.filename, slide.id)}>
+												Delete
+											</Button>
+										</>
+									) : (
 										<Button
 											variant='outlined'
 											color='primary'
 											onClick={(e) => copyToClipboard(link)}>
 											Copy link
 										</Button>
-									</div>
-								)}
+									)}
+								</div>
 							</div>
 						);
 					})}

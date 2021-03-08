@@ -134,7 +134,7 @@ export default function SlideSettings({ sid, open, onClose }) {
 	};
 
 	return (
-		<Dialog onClose={onClose} open={open} maxWidth='40rem'>
+		<Dialog onClose={onClose} open={open} maxWidth={false}>
 			<div className='setting'>
 				{loading ? (
 					<div style={{ textAlign: 'center' }}>

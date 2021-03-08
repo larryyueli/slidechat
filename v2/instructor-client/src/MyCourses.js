@@ -48,7 +48,6 @@ export default function MyCourses(props) {
 						showOrHide={showOrHideNewCourseEditor}
 						fetchCourses={fetchCourses}
 					/>
-					{/* <TextField variant='outlined' id={`new-course`} placeholder='Course Name' inputRef={newCourseRef} /> */}
 				</div>
 				{courses.map((course) => (
 					<Course

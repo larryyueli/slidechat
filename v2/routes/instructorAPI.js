@@ -1,9 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
-const PDFImage = require('../lib/pdf-image').PDFImage;
+const PDFImage = require('../lib/pdf-image');
 const { ObjectID } = require('mongodb');
-const exec = require('child_process').exec;
+const { exec } = require('child_process');
 
 const { fileStorage, convertOptions } = require('../config');
 const { isNotValidPage, notExistInList, errorHandler, questionCount, shortName } = require('./util');
@@ -141,7 +141,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			}
 
 			console.log(`created course: ${req.body.course}`);
-			res.json({ id: courseID });
+			res.send();
 		} catch (err) {
 			errorHandler(res, err);
 		}
@@ -408,7 +408,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 				throw 'error when adding default question after uploading';
 			}
 
-			res.json({ id: id });
+			res.send();
 		} catch (err) {
 			errorHandler(res, err);
 		}
@@ -543,7 +543,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			const newID = newObjID.toHexString();
 			const newDir = path.join(fileStorage, newID);
 			const dir = path.join(fileStorage, req.body.sid);
-			const promise = new Promise((resolve, reject) => {
+			await new Promise((resolve, reject) => {
 				exec(`cp -R ${dir} ${newDir}`, (err, stdout, stderr) => {
 					if (err) {
 						return reject({
@@ -556,7 +556,6 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 					return resolve();
 				});
 			});
-			await promise;
 
 			const updateRes = await courses.updateOne(
 				{ _id: ObjectID.createFromHexString(req.body.cid) },
@@ -745,7 +744,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 				throw { status: 400, error: 'change pages order failed' };
 			}
 
-			res.json({});
+			res.send();
 		} catch (err) {
 			errorHandler(res, err);
 		}
@@ -784,7 +783,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 				throw { status: 400, error: 'set title failed' };
 			}
 
-			res.json({});
+			res.send();
 		} catch (err) {
 			errorHandler(res, err);
 		}
@@ -824,7 +823,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 				throw { status: 400, error: 'set anonymity failed' };
 			}
 
-			res.json({});
+			res.send();
 		} catch (err) {
 			errorHandler(res, err);
 		}
@@ -861,7 +860,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 				throw { status: 400, error: 'set drawable failed' };
 			}
 
-			res.json({});
+			res.send();
 		} catch (err) {
 			errorHandler(res, err);
 		}
@@ -898,7 +897,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 				throw { status: 400, error: 'set downloadable failed' };
 			}
 
-			res.json({});
+			res.send();
 		} catch (err) {
 			errorHandler(res, err);
 		}
