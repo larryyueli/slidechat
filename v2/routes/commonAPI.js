@@ -183,10 +183,11 @@ function commonAPI(db, io, isInstructor) {
 		try {
 			let slide = await slides.findOne(
 				{ _id: ObjectID.createFromHexString(req.query.slideID) },
-				{ projection: { filename: true, anonymity: true } }
+				{ projection: { filename: true, anonymity: true, notAllowDownload: true } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
 			if (slide.anonymity != 'A' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
+			if (slide.notAllowDownload) throw { status: 403, error: 'The slide is not allowed to be downloaded' };
 			res.download(path.join(fileStorage, req.query.slideID, slide.filename));
 		} catch (err) {
 			errorHandler(res, err);
