@@ -21,7 +21,8 @@ export default function ReorderQuestions(props) {
 				setUser(res.data.loginUser);
 				let slide = { pageTotal: res.data.pageTotal, pages: [], unused: [] };
 				let i = 1;
-				for (; i <= slide.pageTotal; i++) { // fetch all questions
+				for (; i <= slide.pageTotal; i++) {
+					// fetch all questions
 					let res = await axios.get(`${serverURL}/api/questions?slideID=${sid}&pageNum=${i}`);
 					let questions = { pageNum: i, questions: res.data };
 					questions.count = res.data.reduce((total, curr) => {
@@ -121,7 +122,7 @@ export default function ReorderQuestions(props) {
 
 	/**
 	 * Return the preview of questions on a given page
-	 * @param {*} page 
+	 * @param {*} page
 	 * @returns preview
 	 */
 	const previewPage = (page) => {
@@ -176,24 +177,24 @@ export default function ReorderQuestions(props) {
 									{slide.pages.map((qPages, index) => (
 										<div className='page-item' key={index}>
 											<div className='page-item-left'>
-												<span className='page-num'>{index + 1}.</span>
+												<div className='page-num'>{index + 1}.</div>
 												<img
 													className='thumbnail'
-													src={`${serverURL}/api/slideImg?slideID=${sid}&pageNum=${
+													src={`${serverURL}/api/slideThumbnail?slideID=${sid}&pageNum=${
 														index + 1
 													}`}
 													alt='slideImg'
 												/>
-												<span>Questions:</span>
+												<div>Questions:</div>
 												{qPages.map((page, i) => {
 													if (page.count === 0) return null;
 													return (
-														<span className='tooltip' key={i}>
+														<div className='tooltip' key={i}>
 															<span className='question-icon'>
 																page {page.pageNum}({page.count})
 															</span>
 															<ul className='tooltip-text'>{previewPage(page)}</ul>
-														</span>
+														</div>
 													);
 												})}
 											</div>

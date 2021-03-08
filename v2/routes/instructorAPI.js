@@ -10,7 +10,7 @@ const { isNotValidPage, notExistInList, errorHandler, questionCount, shortName }
 const validAnonymities = ['A', 'B', 'C', 'D'];
 
 function instructorAPI(db, io, instructorAuth, isInstructor) {
-	let router = express.Router();
+	const router = express.Router();
 
 	const users = db.collection('users');
 	const courses = db.collection('courses');
@@ -588,19 +588,19 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			) {
 				return res.status(400).send();
 			}
-			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
+			const slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
 			if (!slide) {
 				throw { status: 400, error: 'slide not exist' };
 			}
 
-			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
+			const course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
 			if (course.instructors.indexOf(req.session.uid) < 0) {
 				throw { status: 403, error: 'Unauthorized' };
 			} else if (isNotValidPage(req.body.pageNum, slide.pageTotal)) {
 				throw { status: 400, error: 'bad request' };
 			}
 
-			let dir = path.join(fileStorage, req.body.sid, req.body.pageNum);
+			const dir = path.join(fileStorage, req.body.sid, req.body.pageNum);
 			// remove old audio
 			if (fs.existsSync(dir)) {
 				await fs.promises.rmdir(dir, { recursive: true });
@@ -608,11 +608,13 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			await fs.promises.mkdir(dir, { recursive: true });
 			await req.files.file.mv(path.join(dir, req.files.file.name));
 
-			let updateQuery = {};
-			updateQuery[`pages.${req.body.pageNum - 1}.audio`] = req.files.file.name;
-			let updateRes = await slides.updateOne(
+			const updateRes = await slides.updateOne(
 				{ _id: ObjectID.createFromHexString(req.body.sid) },
-				{ $set: updateQuery }
+				{
+					$set: {
+						[`audios.${req.body.pageNum}`]: req.files.file.name,
+					},
+				}
 			);
 			if (updateRes.result.ok !== 1) {
 				throw 'audio upload failed';
@@ -634,32 +636,34 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			if (req.query.sid.length != 24) {
 				return res.status(400).send();
 			}
-			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.sid) });
+			const slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.sid) });
 			if (!slide) {
 				throw { status: 400, error: 'slide not exist' };
 			}
 
-			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
+			const course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
 			if (course.instructors.indexOf(req.session.uid) < 0) {
 				throw { status: 403, error: 'Unauthorized' };
 			} else if (isNotValidPage(req.query.pageNum, slide.pageTotal)) {
 				throw { status: 400, error: 'bad request' };
 			}
 
-			let dir = path.join(fileStorage, req.query.sid, req.query.pageNum);
+			const dir = path.join(fileStorage, req.query.sid, req.query.pageNum);
 			// remove old audio
 			if (fs.existsSync(dir)) {
 				await fs.promises.rmdir(dir, { recursive: true });
 			}
 
-			let updateQuery = {};
-			updateQuery[`pages.${req.query.pageNum - 1}.audio`] = null;
-			let updateRes = await slides.updateOne(
+			const updateRes = await slides.updateOne(
 				{ _id: ObjectID.createFromHexString(req.query.sid) },
-				{ $set: updateQuery }
+				{
+					$unset: {
+						[`audios.${req.query.pageNum}`]: '',
+					},
+				}
 			);
-			if (updateRes.modifiedCount !== 1) {
-				throw 'audio upload failed';
+			if (updateRes.result.ok !== 1) {
+				throw 'audio delete failed';
 			}
 
 			res.send();
