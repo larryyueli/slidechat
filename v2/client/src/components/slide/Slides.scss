@@ -12,6 +12,26 @@
 		justify-content: flex-end;
 		padding: 0 1rem;
 
+		.draw-buttons {
+			display: flex;
+			align-items: center;
+			.colour-block {
+				height: 25px;
+				width: 25px;
+				margin-right: 1rem;
+				cursor: pointer;
+				border-radius: 5px;
+				position: relative;
+
+				.color-picker-wrapper {
+					position: absolute;
+					z-index: 1;
+					right: 1.8rem;
+					top: -0.35rem;
+				}
+			}
+		}
+
 		.icon-btn {
 			@include icon-btn;
 		}
@@ -26,6 +46,8 @@
 		.drawing {
 			background-color: #e9e9e9;
 			color: black;
+			display: flex;
+			align-items: center;
 		}
 
 		.toast .MuiSnackbarContent-root {
@@ -136,40 +158,61 @@
 		}
 	}
 
-	.page-panel .buttons {
-		margin: 0.5rem 0;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		.material-icons {
-			@include clickable;
-			margin: 0rem 0.5rem;
-			font-size: 35px;
-			transition: color 0.2s ease-out;
-			&:not(.disable):hover {
-				color: $iconHover;
+	.page-panel {
+		padding: 0rem 1rem;
+		.buttons {
+			margin: 0.5rem 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			position: relative;
+
+			.colour-block {
+				height: 25px;
+				width: 25px;
+				cursor: pointer;
+				border-radius: 5px;
+				position: relative;
+				margin: 0 0.5rem;
+				.color-picker-wrapper {
+					position: absolute;
+					z-index: 1;
+					left: -100px;
+					top: -2.6rem;
+					opacity: 0.9;
+				}
 			}
-		}
 
-		.disable {
-			color: $disabled;
-			cursor: default;
-		}
-		.page-input {
-			margin: 0 0.5rem;
-			padding: 0.25rem;
-			input {
-				width: 1.8rem;
-				padding: 0.1rem;
-				text-align: center;
-				font-size: 1rem;
-				border-radius: 0.25rem;
-				border: 1px solid $dividerColour;
-				background-color: $backgroundColour;
-				color: $textPrimary;
+			.material-icons {
+				@include clickable;
+				margin: 0rem 0.5rem;
+				font-size: 35px;
+				transition: color 0.2s ease-out;
+				&:not(.disable):hover {
+					color: $iconHover;
+				}
+			}
 
-				&:focus {
-					outline: none;
+			.disable {
+				color: $disabled;
+				cursor: default;
+			}
+			.page-input {
+				margin: 0 0.5rem;
+				padding: 0.25rem;
+				input {
+					width: 1.8rem;
+					padding: 0.1rem;
+					text-align: center;
+					font-size: 1rem;
+					border-radius: 0.25rem;
+					border: 1px solid $dividerColour;
+					background-color: $backgroundColour;
+					color: $textPrimary;
+
+					&:focus {
+						outline: none;
+					}
 				}
 			}
 		}

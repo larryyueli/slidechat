@@ -4,6 +4,7 @@ import axios from 'axios';
 
 import SlideDrawingOverlay from './SlideDrawingOverlay';
 import SlideFlipOverlay from './SlideFlipOverlay';
+import ColourPicker, { palette } from './ColourPicker';
 import { fullURL, serverURL } from '../../config';
 import { randInt, range } from '../../util';
 
@@ -22,6 +23,7 @@ export default function Slides(props) {
 	const [showToast, setShowToast] = useState(false);
 	const [fullscreenPortrait, setFullscreenPortrait] = useState(false);
 	const fileUpload = useRef(null);
+	const [strokeColour, setStrokeColour] = useState(palette[0]);
 	const carousel = useRef(null);
 
 	useEffect(() => {
@@ -227,26 +229,32 @@ export default function Slides(props) {
 		<div className='slide-container'>
 			{props.fullscreen ? null : (
 				<div className='slide-toolbar'>
-					{props.showTempDrawingBtn ? (
-						props.drawing ? (
-							<div className='icon-btn drawing' title='Clear drawing'>
-								<span className={`material-icons icon`} onClick={props.cancelDrawing}>
-									close
-								</span>
-							</div>
-						) : (
-							<div className='icon-btn' title='Temporary drawing'>
-								<span className={`material-icons icon`} onClick={props.startDrawing}>
-									brush
-								</span>
-							</div>
-						)
-					) : null}
+					<div className='draw-buttons'>
+						{props.drawing ? (
+							<ColourPicker currentColour={strokeColour} setColour={setStrokeColour} />
+						) : null}
+						{props.showTempDrawingBtn ? (
+							props.drawing ? (
+								<div className='icon-btn drawing' title='Clear drawing'>
+									<span className={`material-icons icon`} onClick={props.cancelDrawing}>
+										close
+									</span>
+								</div>
+							) : (
+								<div className='icon-btn' title='Temporary drawing'>
+									<span className={`material-icons icon`} onClick={props.startDrawing}>
+										brush
+									</span>
+								</div>
+							)
+						) : null}
+					</div>
 					<div className='icon-btn' title='Quote this page'>
 						<span className='material-icons' onClick={copyLink}>
 							link
 						</span>
 					</div>
+
 					<div className='icon-btn' title='Download PDF'>
 						<a className='material-icons' href={`${serverURL}/api/downloadPdf?slideID=${props.sid}`}>
 							file_download
@@ -276,6 +284,7 @@ export default function Slides(props) {
 						drawing={props.drawing}
 						fullscreen={props.fullscreen}
 						fullscreenChatOpen={props.fullscreenChatOpen}
+						strokeColour={strokeColour}
 					/>
 				) : (
 					<SlideFlipOverlay
@@ -330,6 +339,9 @@ export default function Slides(props) {
 
 						{props.fullscreen ? (
 							<>
+								{props.drawing ? (
+									<ColourPicker currentColour={strokeColour} setColour={setStrokeColour} />
+								) : null}
 								{props.showTempDrawingBtn ? (
 									props.drawing ? (
 										<>
