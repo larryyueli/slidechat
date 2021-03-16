@@ -95,10 +95,7 @@ function Main(props) {
 				console.error(err);
 			});
 
-		const socket = io(socketURL(), {
-			path: socketPath,
-			transports: ['polling'], // web socket doesn't work on the reverse proxy yet...
-		});
+		const socket = io(socketURL(), { path: socketPath });
 		socket.emit('join slide room', sid);
 		socket.on('connect', () => {
 			console.log('socket connected');

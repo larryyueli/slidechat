@@ -24,9 +24,9 @@ Reference: https://www.kb.cert.org/vuls/id/332928/
 
 ```js
 module.exports = {
-	dbUser: "slidechat",
-	dbPsw: "password",
-	sessSecret: "secret",
+	dbUser: 'slidechat',
+	dbPsw: 'password',
+	sessSecret: 'secret',
 };
 ```
 
@@ -78,3 +78,30 @@ Just add their ID to `instructorList.json`, it will be loaded automatically when
 
 To **remove an instructor**:
 Remove their ID from `instructorList.json` and restart the server
+
+## Reverse proxy
+
+Apache is used in our production environment, here are some settings to make it work.
+
+Enable the modules (for Ubuntu):
+
+```sh
+a2enmod proxy proxy_http proxy_wstunnel rewrite
+```
+
+```conf
+	RewriteEngine on
+
+	RewriteCond %{REQUEST_URI} /slidechat/socket			# rewrite to websocket protocol when URL matches
+	RewriteCond %{QUERY_STRING} ^(?:(?!polling).)*$			# and not for long polling fallback of Socket.IO
+	RewriteRule /slidechat/socket/(.*) "ws://localhost:10000/socket/$1" [P,L]	# rewrite wss to ws
+	ProxyPass /slidechat http://localhost:10000
+	ProxyPassReverse /slidechat http://localhost:10000
+
+	# Dev environment
+	RewriteCond %{REQUEST_URI} /slidechatdev/socket
+	RewriteCond %{QUERY_STRING} ^(?:(?!polling).)*$
+	RewriteRule /slidechatdev/socket/(.*) "ws://localhost:10200/socket/$1" [P,L]
+	ProxyPass /slidechatdev http://localhost:10200
+	ProxyPassReverse /slidechatdev http://localhost:10200
+```
