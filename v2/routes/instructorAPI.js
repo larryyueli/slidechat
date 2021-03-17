@@ -1158,16 +1158,17 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 				throw { status: 403, error: 'Unauthorized' };
 			}
 
-			const slideStats = slide.pages.map(page => ({
-				viewCount: page.viewCount || 0, 
-				timeViewed: page.timeViewed || 0
-			}));
+			const viewCount = [];
+			const timeViewed = [];
+			for (const i of slide.pages) {
+				viewCount.push(i.viewCount || 0);
+				timeViewed.push((i.timeViewed || 0) / 60000);
+			}
 
-			res.send(slideStats);
+			res.send({ viewCount, timeViewed });
 		} catch (err) {
 			errorHandler(res, err);
 		}
-
 	});
 
 	return router;

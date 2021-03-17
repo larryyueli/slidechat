@@ -6,7 +6,7 @@ import SlideSettings from './SlideSettings';
 import { serverURL, fullURL, baseURL } from './config';
 import { formatTime } from './util';
 import EditCourse from './EditCourse';
-import Statistics from './Statistics';
+import SlideStats from './SlideStats';
 
 /**
  * A block containing information about one course
@@ -26,9 +26,7 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 	const fileUpload = useRef(null);
 	const importLink = useRef(null);
 	const newUserRef = useRef(null);
-	const [statsData, setStatsData] = useState(null);
-	const [showStats, setShowStats] = useState(false);
-	const [sid, setSid] = useState('');
+	const [slideStats, setSlideStats] = useState({ open: false });
 
 	const showOrHideCourseEditor = () => {
 		setShowCourseEditor(!showCourseEditor);
@@ -55,33 +53,6 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 	useEffect(() => {
 		fetchCourse();
 	}, [fetchCourse]);
-
-	const handleShowStats = () => {
-		setShowStats(!showStats);
-	};
-
-	const handleShowStatsButton = (slideId) => {
-		setSid(slideId);
-		handleShowStats();
-	};
-
-	/**
-	 * fetch statistics data from server
-	 */
-	const fetchStatistics = useCallback(async () => {
-		try {
-			if (sid.length === 24) {
-				let res = await axios.get(`${serverURL}/api/slideStats?slideID=${sid}`);
-				setStatsData(res.data);
-			}
-		} catch (err) {
-			console.error(err);
-		}
-	}, [sid]);
-
-	useEffect(() => {
-		fetchStatistics();
-	}, [fetchStatistics]);
 
 	const uploadPDF = async () => {
 		for (let i = 0; i < fileUpload.current.files.length; i++) {
@@ -342,20 +313,17 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 											<Button
 												variant='outlined'
 												color='primary'
-												onClick={(e) => copyToClipboard(link)}>
-												Copy link
+												onClick={() => {
+													setSlideStats({ open: true, sid: slide.id });
+												}}>
+												Stats
 											</Button>
 											<Button
 												variant='outlined'
 												color='primary'
-												onClick={(e) => handleShowStatsButton(slide.id)}>
-												Statistics
+												onClick={(e) => copyToClipboard(link)}>
+												Copy link
 											</Button>
-											<Statistics
-												show={showStats}
-												showOrHide={handleShowStats}
-												statsData={statsData}
-											/>
 										</>
 									)}
 								</div>
@@ -396,6 +364,7 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 					sid={openModify.sid}
 				/>
 			) : null}
+			<SlideStats open={slideStats.open} onClose={() => setSlideStats({ open: false })} sid={slideStats.sid} />
 		</div>
 	);
 }
