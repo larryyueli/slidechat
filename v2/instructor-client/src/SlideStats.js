@@ -9,8 +9,8 @@ import { range } from './util';
 const datasetStyle = {
 	fill: true,
 	lineTension: 0.4,
-	backgroundColor: 'rgb(75,192,192)',
-	borderColor: 'rgb(53, 151, 151)',
+	backgroundColor: 'rgba(75,192,192,0.5)',
+	borderColor: 'rgb(75,192,192)',
 	borderWidth: 2,
 };
 const options = (title) => {

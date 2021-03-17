@@ -1,13 +1,14 @@
 .chat-details {
 	.view-count {
-		float: right;
+		text-align: right;
+		font-size: 0.9rem;
 		padding: 0.5rem 1rem;
 		color: $textSecondary;
 	}
 
 	.title {
 		font-size: 1.4rem;
-		padding: 2rem 1rem 0 1rem;
+		padding: 0 1rem;
 		overflow-wrap: anywhere;
 	}
 

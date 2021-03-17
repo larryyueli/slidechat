@@ -686,11 +686,9 @@ function commonAPI(db, io, isInstructor) {
 			const maxTime = 600_000; // 10 min in ms
 			const increment = {};
 			for (let pageNum in slideStats) {
-				const viewCountField = `pages.${pageNum - 1}.viewCount`;
-				const timeViewedField = `pages.${pageNum - 1}.timeViewed`;
 				const { viewCount, timeViewed } = slideStats[pageNum];
-				increment[viewCountField] = viewCount;
-				increment[timeViewedField] = timeViewed > maxTime ? maxTime : timeViewed;
+				increment[`pages.${pageNum - 1}.viewCount`] = viewCount;
+				increment[`pages.${pageNum - 1}.timeViewed`] = timeViewed > maxTime ? maxTime : timeViewed;
 			}
 
 			slides.updateOne({ _id: ObjectID.createFromHexString(req.query.slideID) }, { $inc: increment });

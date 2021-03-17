@@ -311,7 +311,6 @@ function Main(props) {
 						);
 					slideStats.data = {};
 				} else {
-					console.log('123');
 					slideStats.slideStartTime = Date.now();
 				}
 			}

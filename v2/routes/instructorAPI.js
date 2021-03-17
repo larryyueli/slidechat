@@ -1146,7 +1146,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 	router.get('/api/slideStats', instructorAuth, async (req, res) => {
 		try {
 			const sid = req.query.slideID;
-			if (sid.length != 24) {
+			if (sid.length !== 24) {
 				return res.status(400).send();
 			}
 
@@ -1162,7 +1162,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			const timeViewed = [];
 			for (const i of slide.pages) {
 				viewCount.push(i.viewCount || 0);
-				timeViewed.push((i.timeViewed || 0) / 60000);
+				timeViewed.push((i.timeViewed || 0) / 60000); // convert to minutes
 			}
 
 			res.send({ viewCount, timeViewed });

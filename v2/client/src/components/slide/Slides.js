@@ -126,11 +126,25 @@ export default function Slides(props) {
 				<div className='slide-toolbar'>
 					<div className='draw-buttons'>
 						{props.drawing ? (
-							<ColourPicker currentColour={strokeColour} setColour={setStrokeColour} />
+							<>
+								<div
+									className='icon-btn'
+									title='Clear drawing'
+									onClick={() => props.canvasComponentRef.current.clear()}>
+									<span className='material-icons'>delete_forever</span>
+								</div>
+								<div
+									className='icon-btn'
+									title='Undo'
+									onClick={() => props.canvasComponentRef.current.undo()}>
+									<span className='material-icons'>undo</span>
+								</div>
+								<ColourPicker currentColour={strokeColour} setColour={setStrokeColour} />
+							</>
 						) : null}
 						{props.showTempDrawingBtn ? (
 							props.drawing ? (
-								<div className='icon-btn drawing' title='Clear drawing'>
+								<div className='icon-btn drawing' title='Clear and stop drawing'>
 									<span className={`material-icons icon`} onClick={props.cancelDrawing}>
 										close
 									</span>
@@ -236,28 +250,32 @@ export default function Slides(props) {
 
 						{props.fullscreen ? (
 							<>
-								{props.drawing ? (
-									<ColourPicker currentColour={strokeColour} setColour={setStrokeColour} />
-								) : null}
 								{props.showTempDrawingBtn ? (
 									props.drawing ? (
 										<>
 											<span
-												className='material-icons'
-												title='Clear drawing'
+												className='material-icons smaller'
+												title='Clear and stop drawing'
 												onClick={props.cancelDrawing}>
 												close
 											</span>
+											<ColourPicker currentColour={strokeColour} setColour={setStrokeColour} />
 											<span
-												className='material-icons'
+												className='material-icons smaller'
 												title='Undo'
 												onClick={() => props.canvasComponentRef.current.undo()}>
 												undo
 											</span>
+											<span
+												className='material-icons smaller'
+												title='Clear drawing'
+												onClick={() => props.canvasComponentRef.current.clear()}>
+												delete_forever
+											</span>
 										</>
 									) : (
 										<span
-											className='material-icons'
+											className='material-icons smaller'
 											title='Temporary drawing'
 											onClick={props.startDrawing}>
 											brush

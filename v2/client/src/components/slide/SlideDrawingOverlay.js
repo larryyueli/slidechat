@@ -225,22 +225,14 @@ export default class SlideOverlay extends React.Component {
 
 	render() {
 		return (
-			<>
-				<canvas
-					className='slide-overlay'
-					style={
-						this.props.drawing
-							? { cursor: `url(${process.env.PUBLIC_URL}/imgs/laser_pointer.png) 9 9, crosshair` }
-							: {}
-					}
-					ref={this.canvasRef}></canvas>
-				{this.state.readOnly ? null : this.props.fullscreen ? null : (
-					<div className='drawing-controls'>
-						<span onClick={(e) => this.undo(e)}>Undo</span>
-						<span onClick={(e) => this.clear(e)}>Clear</span>
-					</div>
-				)}
-			</>
+			<canvas
+				className='slide-overlay'
+				style={
+					this.props.drawing
+						? { cursor: `url(${process.env.PUBLIC_URL}/imgs/laser_pointer.png) 9 9, crosshair` }
+						: {}
+				}
+				ref={this.canvasRef}></canvas>
 		);
 	}
 }
