@@ -41,6 +41,7 @@ function commonAPI(db, io, isInstructor) {
 					lastActive: slideEntry.lastActive,
 					anonymity: slideEntry.anonymity,
 					drawable: slideEntry.drawable,
+					viewCount: slideEntry.viewCount,
 					downloadable: !slideEntry.notAllowDownload,
 				});
 			}
@@ -69,6 +70,9 @@ function commonAPI(db, io, isInstructor) {
 				{ projection: { pages: 0 } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
+
+			slides.updateOne({ _id: ObjectID.createFromHexString(req.query.slideID) }, { $inc: { viewCount: 1 } });
+
 			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
 			res.json({
 				filename: slide.filename,
@@ -291,10 +295,17 @@ function commonAPI(db, io, isInstructor) {
 				}
 			}
 
+			const viewCountField = `pages.${+req.query.pageNum - 1}.questions.${req.query.qid}.viewCount`;
+			slides.updateOne(
+				{ _id: ObjectID.createFromHexString(req.query.slideID) },
+				{ $inc: { [viewCountField]: 1 } }
+			);
+
 			res.json({
 				title: question.title,
 				chats: question.chats,
 				drawing: question.drawing,
+				viewCount: question.viewCount ? question.viewCount + 1 : 1,
 			});
 		} catch (err) {
 			errorHandler(res, err);
@@ -640,6 +651,47 @@ function commonAPI(db, io, isInstructor) {
 				qid: req.body.qid,
 				cid: req.body.cid,
 			});
+
+			res.send();
+		} catch (err) {
+			errorHandler(res, err);
+		}
+	});
+
+	/**
+	 * Set the view count and time viewed for multiple pages
+	 *
+	 * req body (JSON string, because of limitation of navigator.sendBeacon):
+	 *   [pageNum]: { viewCount: int, timeViewed: int (milliseconds) }
+	 * example:
+	 * {
+	 *   1: { viewCount: 4, timeViewed: 60000 },
+	 *   4: { viewCount: 1, timeViewed: 45000 }
+	 * }
+	 */
+	router.post('/api/slideStats', express.text(), async (req, res) => {
+		try {
+			const slide = await slides.findOne(
+				{ _id: ObjectID.createFromHexString(req.query.slideID) },
+				{ projection: { pages: true, anonymity: true } }
+			);
+			if (!slide) throw { status: 404, error: 'slide not found' };
+			if (slide.anonymity !== 'A' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
+
+			const slideStats = JSON.parse(req.body);
+			if (Object.keys(slideStats).some((pageNum) => isNotValidPage(pageNum, slide.pageTotal))) {
+				throw { status: 400, error: 'bad request' };
+			}
+
+			const maxTime = 600_000; // 10 min in ms
+			const increment = {};
+			for (let pageNum in slideStats) {
+				const { viewCount, timeViewed } = slideStats[pageNum];
+				increment[`pages.${pageNum - 1}.viewCount`] = viewCount;
+				increment[`pages.${pageNum - 1}.timeViewed`] = timeViewed > maxTime ? maxTime : timeViewed;
+			}
+
+			slides.updateOne({ _id: ObjectID.createFromHexString(req.query.slideID) }, { $inc: increment });
 
 			res.send();
 		} catch (err) {

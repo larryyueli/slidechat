@@ -6,6 +6,7 @@ import SlideSettings from './SlideSettings';
 import { serverURL, fullURL, baseURL } from './config';
 import { formatTime } from './util';
 import EditCourse from './EditCourse';
+import SlideStats from './SlideStats';
 
 /**
  * A block containing information about one course
@@ -25,6 +26,7 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 	const fileUpload = useRef(null);
 	const importLink = useRef(null);
 	const newUserRef = useRef(null);
+	const [slideStats, setSlideStats] = useState({ open: false });
 
 	const showOrHideCourseEditor = () => {
 		setShowCourseEditor(!showCourseEditor);
@@ -307,12 +309,22 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 											</Button>
 										</>
 									) : (
-										<Button
-											variant='outlined'
-											color='primary'
-											onClick={(e) => copyToClipboard(link)}>
-											Copy link
-										</Button>
+										<>
+											<Button
+												variant='outlined'
+												color='primary'
+												onClick={() => {
+													setSlideStats({ open: true, sid: slide.id });
+												}}>
+												Stats
+											</Button>
+											<Button
+												variant='outlined'
+												color='primary'
+												onClick={(e) => copyToClipboard(link)}>
+												Copy link
+											</Button>
+										</>
 									)}
 								</div>
 							</div>
@@ -352,6 +364,7 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 					sid={openModify.sid}
 				/>
 			) : null}
+			<SlideStats open={slideStats.open} onClose={() => setSlideStats({ open: false })} sid={slideStats.sid} />
 		</div>
 	);
 }

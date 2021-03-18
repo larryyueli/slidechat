@@ -11,6 +11,27 @@ import QuestionDetails from './components/chat/QuestionDetails';
 import { baseURL, serverURL, socketURL, socketPath } from './config';
 import { QUESTION_LIST, NEW_QUESTION, MODIFY_CHAT } from './util';
 
+const slideStats = { slideStartTime: Date.now(), data: {} };
+
+/**
+ * Add viewCount and timeViewed stats for a page
+ */
+const incrementStats = (prevPage, newPage, addPrevViewCount) => {
+	const timeViewed = Date.now() - slideStats.slideStartTime;
+	slideStats.slideStartTime = Date.now();
+
+	if (timeViewed < 2000) return; // ignore views with less than 2 seconds (quickly flipping through)
+	if (newPage !== undefined) slideStats.data[newPage] = { viewCount: 1, timeViewed: 0 };
+
+	if (prevPage in slideStats.data) {
+		if (addPrevViewCount) slideStats.data[prevPage].viewCount += 1;
+		slideStats.data[prevPage].timeViewed += timeViewed;
+	} else {
+		if (addPrevViewCount) slideStats.data[prevPage] = { viewCount: 0, timeViewed: timeViewed };
+		else slideStats.data[prevPage] = { viewCount: 1, timeViewed: timeViewed };
+	}
+};
+
 /**
  * Main page of the application: the slides and chats of a given set of slides, given
  * from the URL.
@@ -90,6 +111,7 @@ function Main(props) {
 				setPage(currentPage);
 				if (questionId || questionId === 0) setQid(questionId);
 				setPageTotal(res.data.pageTotal);
+				slideStats.data[currentPage] = { viewCount: 1, timeViewed: 0 };
 			})
 			.catch((err) => {
 				console.error(err);
@@ -188,6 +210,8 @@ function Main(props) {
 		} else if (drawing) {
 			canvasComponentRef.current.clear();
 		}
+
+		incrementStats(page, pageNum, true);
 		applyPage(pageNum);
 	};
 
@@ -256,8 +280,7 @@ function Main(props) {
 				setShowTempDrawingBtn(true);
 			}
 		});
-
-		window.addEventListener('keydown', (e) => {
+		const keyboardHandler = (e) => {
 			if (isTypingRef.current) return;
 			if (e.key === 'ArrowLeft') {
 				gotoPageRef.current(pageNumRef.current - 1);
@@ -266,8 +289,35 @@ function Main(props) {
 			} else if (e.key === ' ' && document.fullscreenElement) {
 				gotoPageRef.current(pageNumRef.current + 1);
 			}
-		});
+		};
+		window.addEventListener('keydown', keyboardHandler);
+		return () => {
+			window.addEventListener('keydown', keyboardHandler);
+		};
 	}, []);
+
+	useEffect(() => {
+		const sendStats = (_) => {
+			if ('sendBeacon' in navigator) {
+				if (document.visibilityState === 'hidden') {
+					incrementStats(pageNumRef.current, undefined, false);
+					if (Object.keys(slideStats.data).length > 0)
+						navigator.sendBeacon(
+							`${serverURL}/api/slideStats?slideID=${sid}`,
+							JSON.stringify(slideStats.data)
+						);
+					slideStats.data = {};
+				} else {
+					slideStats.slideStartTime = Date.now();
+				}
+			}
+		};
+		slideStats.slideStartTime = Date.now();
+		document.addEventListener('visibilitychange', sendStats);
+		return () => {
+			document.removeEventListener('visibilitychange', sendStats);
+		};
+	}, [sid]);
 
 	return (
 		<>

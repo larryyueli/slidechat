@@ -432,7 +432,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			}
 			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
 			if (!slide) {
-				throw { status: 400, error: 'slide not exist' };
+				throw { status: 400, error: 'slide not found' };
 			}
 
 			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
@@ -589,7 +589,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			}
 			const slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
 			if (!slide) {
-				throw { status: 400, error: 'slide not exist' };
+				throw { status: 400, error: 'slide not found' };
 			}
 
 			const course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
@@ -637,7 +637,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			}
 			const slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.query.sid) });
 			if (!slide) {
-				throw { status: 400, error: 'slide not exist' };
+				throw { status: 400, error: 'slide not found' };
 			}
 
 			const course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
@@ -685,7 +685,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
 
 			if (!slide) {
-				throw { status: 400, error: 'slide not exist' };
+				throw { status: 400, error: 'slide not found' };
 			}
 
 			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
@@ -763,7 +763,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			}
 			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
 			if (!slide) {
-				throw { status: 400, error: 'slide not exist' };
+				throw { status: 400, error: 'slide not found' };
 			}
 
 			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
@@ -806,7 +806,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
 
 			if (!slide) {
-				throw { status: 400, error: 'slide not exist' };
+				throw { status: 400, error: 'slide not found' };
 			}
 
 			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
@@ -843,7 +843,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(req.body.sid) });
 
 			if (!slide) {
-				throw { status: 400, error: 'slide not exist' };
+				throw { status: 400, error: 'slide not found' };
 			}
 
 			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
@@ -1133,6 +1133,39 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 				endorseCountChange: endorseCountChange,
 			});
 			res.send();
+		} catch (err) {
+			errorHandler(res, err);
+		}
+	});
+
+	/**
+	 * get the stats for a slide (view count and time viewed for every page)
+	 * req query:
+	 *   slideID: object ID of a slide
+	 */
+	router.get('/api/slideStats', instructorAuth, async (req, res) => {
+		try {
+			const sid = req.query.slideID;
+			if (sid.length !== 24) {
+				return res.status(400).send();
+			}
+
+			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(sid) });
+			if (!slide) throw { status: 400, error: 'slide not found' };
+
+			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
+			if (course.instructors.indexOf(req.session.uid) < 0) {
+				throw { status: 403, error: 'Unauthorized' };
+			}
+
+			const viewCount = [];
+			const timeViewed = [];
+			for (const i of slide.pages) {
+				viewCount.push(i.viewCount || 0);
+				timeViewed.push((i.timeViewed || 0) / 60000); // convert to minutes
+			}
+
+			res.send({ viewCount, timeViewed });
 		} catch (err) {
 			errorHandler(res, err);
 		}
