@@ -84,6 +84,7 @@ function commonAPI(db, io, isInstructor) {
 				isInstructor: course.instructors.indexOf(req.session.uid) >= 0,
 				drawable: slide.drawable,
 				downloadable: !slide.notAllowDownload,
+				updated: slide.updated,
 			});
 		} catch (err) {
 			errorHandler(res, err);
