@@ -5,7 +5,7 @@ const self = this;
 
 const baseURL = '/slidechat';
 const cachePattern = /^(?!chrome-extension).*(?:\.css|\.js|\.ico|\.woff2|\.html)$/;
-const tempCachePattern = /(?:\/api\/slideImg|\/api\/slideThumbnail)/;
+const slideCachePattern = /(?:\/api\/slideImg|\/api\/slideThumbnail)\?slideID=([0-9a-f]{24})&/;
 
 self.addEventListener('install', (e) => {
 	console.log('service worker installed');
@@ -43,11 +43,14 @@ self.addEventListener('fetch', (e) => {
 	let whichCache;
 	if (cachePattern.test(e.request.url)) {
 		whichCache = CACHE_NAME;
-	} else if (tempCachePattern.test(e.request.url)) {
-		whichCache = TEMP_CACHE_NAME;
 	} else {
-		e.respondWith(fetch(e.request));
-		return;
+		const match = e.request.url.match(slideCachePattern);
+		if (match) {
+			whichCache = `SlideChat-slide-${match[1]}`;
+		} else {
+			e.respondWith(fetch(e.request));
+			return;
+		}
 	}
 	e.respondWith(
 		caches.open(whichCache).then((cache) => {

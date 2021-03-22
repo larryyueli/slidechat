@@ -79,10 +79,27 @@ function Main(props) {
 	useEffect(() => {
 		axios
 			.get(`${serverURL}/api/slideInfo?slideID=${sid}`)
-			.then((res) => {
+			.then(async (res) => {
 				if (res.data.anonymity !== 'A' && !res.data.loginUser) {
 					window.location.href = `${serverURL}/p/login/${window.location.pathname.substring(baseURL.length)}`;
 				} else {
+					if (window.caches) {
+						const cacheListJSON = localStorage.getItem('SlideChat_Caches');
+						const now = Date.now();
+						const sevenDays = 7 * 24 * 3600 * 1000;
+						if (cacheListJSON) {
+							const cacheList = JSON.parse(cacheListJSON);
+							for (const i in cacheList) {
+								if (cacheList[i] - now > sevenDays || (i === sid && res.data.updated > cacheList[i])) {
+									await caches.delete(`SlideChat-slide-${i}`);
+								}
+							}
+							cacheList[sid] = now;
+							localStorage.setItem('SlideChat_Caches', JSON.stringify(cacheList));
+						} else {
+							localStorage.setItem('SlideChat_Caches', JSON.stringify({ [sid]: now }));
+						}
+					}
 					return res;
 				}
 			})

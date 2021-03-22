@@ -464,6 +464,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 			let oldLength = pages.length;
 			let newLength = imagePaths.length;
 			let updateRes;
+			const updateTime = Date.now();
 			if (oldLength > newLength) {
 				// remove empty pages
 				let i = newLength;
@@ -481,6 +482,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 							pages: pages.slice(0, newLength),
 							pageTotal: newLength,
 							filename: req.files.file.name,
+							updated: updateTime,
 						},
 						$push: {
 							unused: {
@@ -501,6 +503,7 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 							pages: pages,
 							pageTotal: newLength,
 							filename: req.files.file.name,
+							updated: updateTime,
 						},
 					}
 				);
