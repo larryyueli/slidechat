@@ -674,7 +674,7 @@ function commonAPI(db, io, isInstructor) {
 		try {
 			const slide = await slides.findOne(
 				{ _id: ObjectID.createFromHexString(req.query.slideID) },
-				{ projection: { pages: true, anonymity: true } }
+				{ projection: { pages: true, anonymity: true, pageTotal: true } }
 			);
 			if (!slide) throw { status: 404, error: 'slide not found' };
 			if (slide.anonymity !== 'A' && !req.session.uid) throw { status: 401, error: 'Unauthorized' };
@@ -687,6 +687,7 @@ function commonAPI(db, io, isInstructor) {
 			const maxTime = 600_000; // 10 min in ms
 			const increment = {};
 			for (let pageNum in slideStats) {
+				if (isNotValidPage(pageNum, slide.pageTotal)) continue;
 				const { viewCount, timeViewed } = slideStats[pageNum];
 				increment[`pages.${pageNum - 1}.viewCount`] = viewCount;
 				increment[`pages.${pageNum - 1}.timeViewed`] = timeViewed > maxTime ? maxTime : timeViewed;

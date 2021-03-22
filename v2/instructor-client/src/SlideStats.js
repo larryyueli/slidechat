@@ -59,6 +59,7 @@ export default function SlideStats({ open, onClose, sid }) {
 				const { viewCount, timeViewed } = res.data;
 				const averageTime = [];
 				for (const i in viewCount) {
+					timeViewed[i] /= 1000; // convert to seconds
 					if (viewCount[i] === 0) averageTime.push(0);
 					else averageTime.push(timeViewed[i] / viewCount[i]);
 				}
@@ -85,7 +86,7 @@ export default function SlideStats({ open, onClose, sid }) {
 						datasets: [
 							{
 								...datasetStyle,
-								label: 'Minutes',
+								label: 'Seconds',
 								data: timeViewed,
 							},
 						],
@@ -99,7 +100,7 @@ export default function SlideStats({ open, onClose, sid }) {
 						datasets: [
 							{
 								...datasetStyle,
-								label: 'Minutes',
+								label: 'Seconds',
 								data: averageTime,
 							},
 						],
@@ -114,6 +115,9 @@ export default function SlideStats({ open, onClose, sid }) {
 	const height = width * 0.7;
 	return (
 		<Dialog className='slide-stats' open={open} onClose={onClose} maxWidth={false}>
+			<div className='download-csv'>
+				<a href={`${serverURL}/api/slideStatsCSV?slideID=${sid}`}>Download CSV</a>
+			</div>
 			<canvas id='view-count-chart' width={width} height={height}></canvas>
 			<canvas id='time-viewed-chart' width={width} height={height}></canvas>
 			<canvas id='avg-time-viewed-chart' width={width} height={height}></canvas>
