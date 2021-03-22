@@ -1141,6 +1141,23 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 		}
 	});
 
+	const getSlideStats = async (sid) => {
+		if (sid.length !== 24) {
+			throw { status: 400, error: 'Invalid slide ID' };
+		}
+
+		const slide = await slides.findOne({ _id: ObjectID.createFromHexString(sid) });
+		if (!slide) throw { status: 400, error: 'Slide not found' };
+
+		const viewCount = [];
+		const timeViewed = [];
+		for (const i of slide.pages) {
+			viewCount.push(i.viewCount || 0);
+			timeViewed.push(i.timeViewed || 0);
+		}
+		return { viewCount, timeViewed };
+	};
+
 	/**
 	 * get the stats for a slide (view count and time viewed for every page)
 	 * req query:
@@ -1148,27 +1165,20 @@ function instructorAPI(db, io, instructorAuth, isInstructor) {
 	 */
 	router.get('/api/slideStats', instructorAuth, async (req, res) => {
 		try {
-			const sid = req.query.slideID;
-			if (sid.length !== 24) {
-				return res.status(400).send();
-			}
+			res.send(await getSlideStats(req.query.slideID));
+		} catch (err) {
+			errorHandler(res, err);
+		}
+	});
 
-			let slide = await slides.findOne({ _id: ObjectID.createFromHexString(sid) });
-			if (!slide) throw { status: 400, error: 'slide not found' };
-
-			let course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
-			if (course.instructors.indexOf(req.session.uid) < 0) {
-				throw { status: 403, error: 'Unauthorized' };
-			}
-
-			const viewCount = [];
-			const timeViewed = [];
-			for (const i of slide.pages) {
-				viewCount.push(i.viewCount || 0);
-				timeViewed.push((i.timeViewed || 0) / 60000); // convert to minutes
-			}
-
-			res.send({ viewCount, timeViewed });
+	router.get('/api/slideStatsCSV', instructorAuth, async (req, res) => {
+		try {
+			const { viewCount, timeViewed } = await getSlideStats(req.query.slideID);
+			const csv =
+				'viewCount, totalTime(ms)\n' + viewCount.map((count, i) => `${count}, ${timeViewed[i]}`).join('\n');
+			res.header('Content-Type', 'text/csv');
+			res.attachment(`slide-${req.query.slideID}-stats.csv`);
+			res.send(csv);
 		} catch (err) {
 			errorHandler(res, err);
 		}

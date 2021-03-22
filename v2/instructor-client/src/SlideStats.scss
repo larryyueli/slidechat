@@ -1,4 +1,11 @@
 .slide-stats {
+	.download-csv {
+		margin: 1rem 2rem;
+		text-align: right;
+		a {
+			color: #cccccc;
+		}
+	}
 	canvas {
 		margin: 2rem;
 	}

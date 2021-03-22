@@ -27,8 +27,8 @@ const incrementStats = (prevPage, newPage, addPrevViewCount) => {
 		if (addPrevViewCount) slideStats.data[prevPage].viewCount += 1;
 		slideStats.data[prevPage].timeViewed += timeViewed;
 	} else {
-		if (addPrevViewCount) slideStats.data[prevPage] = { viewCount: 0, timeViewed: timeViewed };
-		else slideStats.data[prevPage] = { viewCount: 1, timeViewed: timeViewed };
+		if (addPrevViewCount) slideStats.data[prevPage] = { viewCount: 1, timeViewed: timeViewed };
+		else slideStats.data[prevPage] = { viewCount: 0, timeViewed: timeViewed };
 	}
 };
 
