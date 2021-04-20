@@ -28,10 +28,6 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 	const newUserRef = useRef(null);
 	const [slideStats, setSlideStats] = useState({ open: false });
 
-	const showOrHideCourseEditor = () => {
-		setShowCourseEditor(!showCourseEditor);
-	};
-
 	/**
 	 * fetch course information from server
 	 */
@@ -215,12 +211,12 @@ export default function Course({ cid, role, minimizeStatus, creationTime, fetchC
 				{managing ? (
 					<div className='title-name'>
 						{course.name}
-						<span className='material-icons icon rename' onClick={showOrHideCourseEditor}>
+						<span className='material-icons icon rename' onClick={() => setShowCourseEditor(true)}>
 							edit
 						</span>
 						<EditCourse
 							show={showCourseEditor}
-							showOrHide={showOrHideCourseEditor}
+							close={() => setShowCourseEditor(false)}
 							cid={cid}
 							course={course}
 							fetchCourse={fetchCourse}

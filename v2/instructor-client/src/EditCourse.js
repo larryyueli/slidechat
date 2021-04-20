@@ -15,7 +15,7 @@ import {
 import axios from 'axios';
 import { serverURL } from './config';
 
-export default function EditCourse({ show, showOrHide, cid, course, fetchCourse }) {
+export default function EditCourse({ show, close, cid, course, fetchCourse }) {
 	const [anonymity, setAnonymity] = useState(course.anonymity);
 	const [drawable, setDrawable] = useState(course.drawable);
 	const [downloadable, setDownloadable] = useState(course.downloadable);
@@ -47,7 +47,8 @@ export default function EditCourse({ show, showOrHide, cid, course, fetchCourse 
 			return;
 		}
 		axios
-			.post(`${serverURL}/api/modifyCourseDefault?id=${cid}`, {
+			.post(`${serverURL}/api/modifyCourseDefault`, {
+				cid,
 				name: nameRef.current.value,
 				anonymity: anonymity,
 				drawable: drawable,
@@ -56,7 +57,7 @@ export default function EditCourse({ show, showOrHide, cid, course, fetchCourse 
 			.then((_) => {
 				setResult(true, 'change saved!');
 				fetchCourse();
-				showOrHide();
+				close();
 			})
 			.catch((err) => {
 				console.log(err);
@@ -83,7 +84,7 @@ export default function EditCourse({ show, showOrHide, cid, course, fetchCourse 
 	};
 
 	return (
-		<Dialog className='editor' open={show} onClose={showOrHide} maxWidth={false}>
+		<Dialog className='editor' open={show} onClose={close} maxWidth={false}>
 			<TableContainer>
 				<Table>
 					<TableHead>
@@ -145,7 +146,7 @@ export default function EditCourse({ show, showOrHide, cid, course, fetchCourse 
 								<Button className='create' variant='contained' onClick={saveChange}>
 									Save
 								</Button>
-								<Button className='cancel' variant='contained' onClick={showOrHide}>
+								<Button className='cancel' variant='contained' onClick={close}>
 									Cancel
 								</Button>
 							</TableCell>

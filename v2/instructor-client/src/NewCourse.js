@@ -15,7 +15,7 @@ import {
 import axios from 'axios';
 import { serverURL } from './config';
 
-export default function NewCourse({ show, showOrHide, fetchCourses }) {
+export default function NewCourse({ show, close, fetchCourses }) {
 	const [anonymity, setAnonymity] = useState('B');
 	const [drawable, setDrawable] = useState(true);
 	const [downloadable, setDownloadable] = useState(true);
@@ -58,7 +58,7 @@ export default function NewCourse({ show, showOrHide, fetchCourses }) {
 				setAnonymity('B');
 				setDrawable(true);
 				fetchCourses();
-				showOrHide();
+				close();
 			})
 			.catch((err) => {
 				console.log(err);
@@ -85,7 +85,7 @@ export default function NewCourse({ show, showOrHide, fetchCourses }) {
 	};
 
 	return (
-		<Dialog className='editor' open={show} onClose={showOrHide} maxWidth={false}>
+		<Dialog className='editor' open={show} onClose={close} maxWidth={false}>
 			<TableContainer>
 				<Table>
 					<TableHead>
@@ -147,7 +147,7 @@ export default function NewCourse({ show, showOrHide, fetchCourses }) {
 								<Button className='create' variant='contained' onClick={createCourse}>
 									Create
 								</Button>
-								<Button className='cancel' variant='contained' onClick={showOrHide}>
+								<Button className='cancel' variant='contained' onClick={close}>
 									Cancel
 								</Button>
 							</TableCell>

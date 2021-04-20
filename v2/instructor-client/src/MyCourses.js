@@ -30,22 +30,18 @@ export default function MyCourses(props) {
 		}
 	};
 
-	const showOrHideNewCourseEditor = () => {
-		setShowNewCourseEditor(!showNewCourseEditor);
-	};
-
 	return (
 		<>
 			<AppBar user={user} />
 			<div className='profile'>
 				<div className='title'>My Courses</div>
 				<div className='createCourse-bar'>
-					<Button onClick={showOrHideNewCourseEditor} variant='contained' color='primary'>
+					<Button onClick={() => setShowNewCourseEditor(true)} variant='contained' color='primary'>
 						Create Course
 					</Button>
 					<NewCourse
 						show={showNewCourseEditor}
-						showOrHide={showOrHideNewCourseEditor}
+						close={() => setShowNewCourseEditor(false)}
 						fetchCourses={fetchCourses}
 					/>
 				</div>

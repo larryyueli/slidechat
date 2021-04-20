@@ -30,7 +30,6 @@ function questionCount(questions) {
 	}, 0);
 }
 
-
 function shortName(name) {
 	if (!name) return undefined;
 	let splittedName = name.split(' ');
@@ -42,10 +41,13 @@ function shortName(name) {
 		.join(' ');
 }
 
+const validAnonymities = ['A', 'B', 'C', 'D'];
+
 module.exports = {
 	errorHandler,
 	isNotValidPage,
 	notExistInList,
 	questionCount,
 	shortName,
+	validAnonymities,
 };
