@@ -2,44 +2,38 @@
 // the original version has the undesired sorting of the output (eg. 1, 10, 11, ..., 2, 20, 21,...)
 
 const path = require('path');
-const fs = require('fs');
+const { stat } = require('fs').promises;
 const { exec } = require('child_process');
 
 class PDFImage {
+	#pdfFilePath;
+
+	// options
+	#outputDirectory;
+	#imageFileBaseName;
+	#outputThumbnailsDirectory;
+	#thumbnailFileBaseName;
+	#convertOptions;
+	#convertExtension;
+	#useGM;
+	#combinedImage;
+
 	constructor(pdfFilePath, options) {
 		if (!options) options = {};
-
-		this.pdfFilePath = pdfFilePath;
-
-		this.setPdfFileBaseName(options.pdfFileBaseName);
-		this.setThumbnailFileBaseName(options.thumbnailFileBaseName);
-		this.setConvertOptions(options.convertOptions);
-		this.setConvertExtension(options.convertExtension);
-		this.useGM = options.graphicsMagick || false;
-		this.combinedImage = options.combinedImage || false;
-
-		this.outputDirectory = options.outputDirectory || path.dirname(pdfFilePath);
-		this.outputThumbnailDirectory =
-			options.outputThumbnailDirectory || path.join(path.dirname(pdfFilePath), 'thumbnails');
-	}
-	constructGetInfoCommand() {
-		return `pdfinfo "${this.pdfFilePath}"`;
-	}
-	parseGetInfoCommandOutput(output) {
-		const info = {};
-		output.split('\n').forEach(function (line) {
-			if (line.match(/^(.*?):[ \t]*(.*)$/)) {
-				info[RegExp.$1] = RegExp.$2;
-			}
-		});
-		return info;
+		this.#pdfFilePath = pdfFilePath;
+		this.#outputDirectory = options.outputDirectory || path.dirname(pdfFilePath);
+		this.#imageFileBaseName = options.imageFileBaseName || path.basename(this.#pdfFilePath, '.pdf');
+		this.#outputThumbnailsDirectory = options.outputThumbnails || false;
+		this.#thumbnailFileBaseName = options.thumbnailFileBaseName || path.basename(this.#pdfFilePath, '.pdf');
+		this.#convertOptions = options.convertOptions || {};
+		this.#convertExtension = options.convertExtension || 'png';
+		this.#useGM = options.graphicsMagick || false;
+		this.#combinedImage = options.combinedImage || false;
 	}
 
-	getInfo() {
-		const self = this;
-		const getInfoCommand = this.constructGetInfoCommand();
-		const promise = new Promise(function (resolve, reject) {
-			exec(getInfoCommand, function (err, stdout, stderr) {
+	getInfo = () => {
+		return new Promise((resolve, reject) => {
+			exec(`pdfinfo "${this.#pdfFilePath}"`, (err, stdout, stderr) => {
 				if (err) {
 					return reject({
 						message: "Failed to get PDF'S information",
@@ -48,73 +42,120 @@ class PDFImage {
 						stderr: stderr,
 					});
 				}
-				return resolve(self.parseGetInfoCommandOutput(stdout));
+				const info = {};
+				stdout.split('\n').forEach((line) => {
+					if (line.match(/^(.*?):[ \t]*(.*)$/)) {
+						info[RegExp.$1] = RegExp.$2;
+					}
+				});
+				return resolve(info);
 			});
 		});
-		return promise;
-	}
-	numberOfPages() {
-		return this.getInfo().then(function (info) {
-			return info['Pages'];
+	};
+
+	convertFile = async () => {
+		const numPages = await this.#numberOfPages();
+		const imagePaths = [];
+		const convertPromises = [];
+		for (let i = 0; i < numPages; i++) {
+			convertPromises.push(
+				this.convertPage(i).then((imagePath) => {
+					imagePaths.push(imagePath);
+				})
+			);
+		}
+		await Promise.all(convertPromises);
+		// Because of async convert we have to re-sort pages.
+		// Ensure that filenames are sorted naturally (numerically)
+		imagePaths.sort((a, b) => {
+			a = a.split('-');
+			a = a[a.length - 1].split('.')[0];
+			b = b.split('-');
+			b = b[b.length - 1].split('.')[0];
+			return a - b;
 		});
-	}
-	getOutputImagePathForPage(pageNumber) {
-		return path.join(this.outputDirectory, this.pdfFileBaseName + '-' + pageNumber + '.' + this.convertExtension);
-	}
-	getOutputThumbnailPathForImage(pageNumber) {
+		if (this.#combinedImage) {
+			const combinedImage = await this.#combineImages(imagePaths);
+			return combinedImage;
+		}
+		return imagePaths;
+	};
+
+	convertPage = async (pageNum) => {
+		const outputImagePath = this.#getOutputImagePathForPage(pageNum);
+		// convert when (1) image doesn't exits or (2) image exists
+		// but its timestamp is older than pdf's one
+		let outputImageStat;
+		try {
+			outputImageStat = await stat(outputImagePath);
+		} catch (err) {
+			if (err.code !== 'ENOENT') throw err;
+			// (1) file does not exist
+			await this.#convertPageToImage(pageNum);
+			return outputImagePath;
+		}
+		const pdfStat = await stat(this.#pdfFilePath);
+		if (outputImageStat.mtime < pdfStat.mtime) {
+			// (2)
+			await this.#convertPageToImage(pageNum);
+		} else {
+			console.log(`Image ${outputImagePath} newer than PDF, skipping`);
+		}
+		return outputImagePath;
+	};
+
+	#numberOfPages = async () => {
+		const info = await this.getInfo();
+		return info['Pages'];
+	};
+	#getOutputImagePathForPage = (pageNumber) => {
 		return path.join(
-			this.outputThumbnailDirectory,
-			this.thumbnailFileBaseName + '-' + pageNumber + '.' + this.convertExtension
+			this.#outputDirectory,
+			this.#imageFileBaseName + '-' + pageNumber + '.' + this.#convertExtension
 		);
-	}
-	getOutputImagePathForFile() {
-		return path.join(this.outputDirectory, this.pdfFileBaseName + '.' + this.convertExtension);
-	}
-	setConvertOptions(convertOptions) {
-		this.convertOptions = convertOptions || {};
-	}
-	setPdfFileBaseName(pdfFileBaseName) {
-		this.pdfFileBaseName = pdfFileBaseName || path.basename(this.pdfFilePath, '.pdf');
-	}
-	setThumbnailFileBaseName(thumbnailFileBaseName) {
-		this.thumbnailFileBaseName = thumbnailFileBaseName || path.basename(this.pdfFilePath, '.pdf');
-	}
-	setConvertExtension(convertExtension) {
-		this.convertExtension = convertExtension || 'png';
-	}
-	constructConvertCommandForPage(pageNumber) {
-		const pdfFilePath = this.pdfFilePath;
-		const outputImagePath = this.getOutputImagePathForPage(pageNumber);
-		const convertOptionsString = this.constructConvertOptions();
-		return `${this.useGM ? 'gm convert' : 'convert'} ${
+	};
+	#getOutputThumbnailPathForImage = (pageNumber) => {
+		return path.join(
+			this.#outputThumbnailsDirectory,
+			this.#thumbnailFileBaseName + '-' + pageNumber + '.' + this.#convertExtension
+		);
+	};
+	#getOutputImagePath = () => {
+		return path.join(this.#outputDirectory, this.#imageFileBaseName + '.' + this.#convertExtension);
+	};
+
+	#constructConvertCommandForPage = (pageNumber) => {
+		const pdfFilePath = this.#pdfFilePath;
+		const outputImagePath = this.#getOutputImagePathForPage(pageNumber);
+		const convertOptionsString = this.#constructConvertOptions();
+		return `${this.#useGM ? 'gm convert' : 'convert'} ${
 			convertOptionsString ? convertOptionsString + ' ' : ''
 		}"${pdfFilePath}[${pageNumber}]" "${outputImagePath}"`;
-	}
-	constructConvertImageToThumbnailCommand(pageNumber) {
-		const imagePath = this.getOutputImagePathForPage(pageNumber);
-		const outputThumbnailPath = this.getOutputThumbnailPathForImage(pageNumber);
-		return `${this.useGM ? 'gm convert' : 'convert'} "${imagePath}" -thumbnail "80x45>" "${outputThumbnailPath}"`;
-	}
-	constructCombineCommandForFile(imagePaths) {
-		return `${this.useGM ? 'gm convert' : 'convert'} -append ${imagePaths.join(
+	};
+	#constructConvertImageToThumbnailCommand = (pageNumber) => {
+		const imagePath = this.#getOutputImagePathForPage(pageNumber);
+		const outputThumbnailPath = this.#getOutputThumbnailPathForImage(pageNumber);
+		return `${this.#useGM ? 'gm convert' : 'convert'} "${imagePath}" -thumbnail "80x45>" "${outputThumbnailPath}"`;
+	};
+	#constructCombineCommandForFile = (imagePaths) => {
+		return `${this.#useGM ? 'gm convert' : 'convert'} -append ${imagePaths.join(
 			' '
-		)} "${this.getOutputImagePathForFile()}"`;
-	}
-	constructConvertOptions() {
-		return Object.keys(this.convertOptions)
+		)} "${this.#getOutputImagePath()}"`;
+	};
+	#constructConvertOptions = () => {
+		return Object.keys(this.#convertOptions)
 			.sort()
-			.map(function (optionName) {
-				if (this.convertOptions[optionName] !== null) {
-					return optionName + ' ' + this.convertOptions[optionName];
+			.map((optionName) => {
+				if (this.#convertOptions[optionName] !== null) {
+					return optionName + ' ' + this.#convertOptions[optionName];
 				} else {
 					return optionName;
 				}
-			}, this)
+			})
 			.join(' ');
-	}
-	combineImages(imagePaths) {
-		const pdfImage = this;
-		const combineCommand = pdfImage.constructCombineCommandForFile(imagePaths);
+	};
+	#combineImages = (imagePaths) => {
+		const combineCommand = this.#constructCombineCommandForFile(imagePaths);
 		return new Promise(function (resolve, reject) {
 			exec(combineCommand, function (err, stdout, stderr) {
 				if (err) {
@@ -126,129 +167,41 @@ class PDFImage {
 					});
 				}
 				exec('rm ' + imagePaths.join(' ')); //cleanUp
-				return resolve(pdfImage.getOutputImagePathForFile());
+				return resolve(this.getOutputImagePathForFile());
 			});
 		});
-	}
-	convertFile() {
-		const pdfImage = this;
-		return new Promise(function (resolve, reject) {
-			pdfImage.numberOfPages().then(function (totalPages) {
-				const convertPromise = new Promise(function (resolve, reject) {
-					const imagePaths = [];
-					for (let i = 0; i < totalPages; i++) {
-						pdfImage
-							.convertPage(i)
-							.then(function (imagePath) {
-								imagePaths.push(imagePath);
-								if (imagePaths.length === parseInt(totalPages)) {
-									// Ensure that filenames are sorted naturally (numerically)
-									imagePaths.sort(function (a, b) {
-										a = a.split('-');
-										a = a[a.length - 1].split('.')[0];
-										b = b.split('-');
-										b = b[b.length - 1].split('.')[0];
-										return a - b;
-									}); //because of asyc pages we have to reSort pages
-									resolve(imagePaths);
-								}
-							})
-							.catch(function (error) {
-								reject(error);
-							});
-					}
-				});
-
-				convertPromise
-					.then(function (imagePaths) {
-						if (pdfImage.combinedImage) {
-							pdfImage.combineImages(imagePaths).then(function (imagePath) {
-								resolve(imagePath);
-							});
-						} else {
-							resolve(imagePaths);
-						}
-					})
-					.catch(function (error) {
-						reject(error);
-					});
-			});
-		});
-	}
-	convertPage(pageNumber) {
-		const pdfFilePath = this.pdfFilePath;
-		const outputImagePath = this.getOutputImagePathForPage(pageNumber);
-		const convertCommand = this.constructConvertCommandForPage(pageNumber);
-		const convertToThumbnailCommand = this.constructConvertImageToThumbnailCommand(pageNumber);
-
-		const promise = new Promise(function (resolve, reject) {
-			function convertImageToThumbnail() {
-				exec(convertToThumbnailCommand, function (err, stdout, stderr) {
-					if (err) {
-						return reject({
-							message: 'Failed to convert image to thumbnail',
-							error: err,
-							stdout: stdout,
-							stderr: stderr,
-						});
-					}
-					return resolve(outputImagePath);
-				});
-			}
-
-			function convertPageToImageAndThumbnail() {
-				exec(convertCommand, function (err, stdout, stderr) {
-					if (err) {
-						return reject({
-							message: 'Failed to convert page to image',
-							error: err,
-							stdout: stdout,
-							stderr: stderr,
-						});
-					}
-					return convertImageToThumbnail();
-				});
-			}
-
-			fs.stat(outputImagePath, function (err, imageFileStat) {
-				const imageNotExists = err && err.code === 'ENOENT';
-				if (!imageNotExists && err) {
+	};
+	#convertPageToImage = (pageNum) => {
+		const convertCommand = this.#constructConvertCommandForPage(pageNum);
+		return new Promise((resolve, reject) => {
+			exec(convertCommand, (err, stdout, stderr) => {
+				if (err) {
 					return reject({
-						message: 'Failed to stat image file',
+						message: 'Failed to convert page to image',
 						error: err,
+						stdout: stdout,
+						stderr: stderr,
 					});
 				}
-
-				// convert when (1) image doesn't exits or (2) image exists
-				// but its timestamp is older than pdf's one
-
-				if (imageNotExists) {
-					// (1)
-					convertPageToImageAndThumbnail();
-					return;
+				if (this.#outputThumbnailsDirectory) {
+					const convertToThumbnailCommand = this.#constructConvertImageToThumbnailCommand(pageNum);
+					exec(convertToThumbnailCommand, (err, stdout, stderr) => {
+						if (err) {
+							return reject({
+								message: 'Failed to convert image to thumbnail',
+								error: err,
+								stdout: stdout,
+								stderr: stderr,
+							});
+						}
+						return resolve();
+					});
+				} else {
+					return resolve();
 				}
-
-				// image exist. check timestamp.
-				fs.stat(pdfFilePath, function (err, pdfFileStat) {
-					if (err) {
-						return reject({
-							message: 'Failed to stat PDF file',
-							error: err,
-						});
-					}
-
-					if (imageFileStat.mtime < pdfFileStat.mtime) {
-						// (2)
-						convertPageToImageAndThumbnail();
-						return;
-					}
-
-					return resolve(outputImagePath);
-				});
 			});
 		});
-		return promise;
-	}
+	};
 }
 
 module.exports = PDFImage;

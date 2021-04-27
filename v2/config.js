@@ -1,21 +1,14 @@
 const os = require('os');
 const path = require('path');
-const querystring = require('querystring');
-const { dbUser, dbPsw } = require('./secrets');
-
-const escapedUser = querystring.escape(dbUser);
-const escapedPsw = querystring.escape(dbPsw);
 
 module.exports = {
 	baseURL: '/slidechat',
-
-	instructorURL: '/prof',
 
 	socketPath: '/socket/', // in production mode, client connect to baseURL+socketPath
 
 	cookieName: '_SlideChatSess',
 
-	dbURL: `mongodb://${escapedUser}:${escapedPsw}@localhost:27017/slidechat`,
+	sessMaxAge: 60 * 24 * 60 * 60 * 1000, // 60 days
 
 	fileStorage: path.join(os.homedir(), '.slidechat', 'files'),
 
