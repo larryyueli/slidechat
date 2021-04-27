@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { ObjectID } = require('mongodb');
 
-const { baseURL, authenticationFailMessage } = require('../config');
+const { authenticationFailMessage } = require('../config');
 
 const instructorListPath = path.join(__dirname, '..', 'instructorList.json');
 
@@ -26,7 +26,7 @@ function instructorAuth(req, res, next) {
 		req.session.realName = 'Rorolina Frixell';
 		next();
 	} else if (!req.session.uid) {
-		res.redirect(`${baseURL}/p/login/prof`);
+		res.redirect(`${process.env.BASE_URL}/p/login/?redirect=${process.env.BASE_URL}/prof/`);
 	} else if (!isInstructor(req.session.uid)) {
 		res.status(401).send(
 			`User ${req.session.uid} is not an instructor. This incident will be reported. ${authenticationFailMessage}`

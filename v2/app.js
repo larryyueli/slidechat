@@ -24,7 +24,7 @@ const {
 } = process.env;
 
 const sessStore = new MongoSessStore({
-	uri: config.dbURL,
+	uri: CONNECTION_STRING,
 	collection: 'sess',
 });
 sessStore.on('error', (err) => {

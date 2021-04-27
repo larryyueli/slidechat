@@ -81,7 +81,9 @@ function Main(props) {
 			.get(`${serverURL}/api/slideInfo?slideID=${sid}`)
 			.then(async (res) => {
 				if (res.data.anonymity !== 'A' && !res.data.loginUser) {
-					window.location.href = `${serverURL}/p/login/${window.location.pathname.substring(baseURL.length)}`;
+					window.location.href = `${serverURL}/p/login/?redirect=${encodeURIComponent(
+						window.location.pathname
+					)}`;
 				} else {
 					if (window.caches) {
 						const cacheListJSON = localStorage.getItem('SlideChat_Caches');
@@ -343,7 +345,7 @@ function Main(props) {
 				anonymity={anonymity}
 				uid={uid}
 				username={username}
-				loginURL={`${serverURL}/p/login/${sid}/${page}`}
+				loginURL={`${serverURL}/p/login/?redirect=${encodeURIComponent(window.location.pathname)}`}
 				isInstructor={isInstructor}
 				isInstructorView={isInstructorView}
 				setIsInstructorView={setIsInstructorView}

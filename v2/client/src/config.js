@@ -1,4 +1,4 @@
-const baseURL = '/slidechat';
+const baseURL = process.env.REACT_APP_BASE_URL ?? '/slidechat';
 let socketPath = '/socket';
 let socketURL = () =>
 	process.env.NODE_ENV === 'production' ? window.location.origin : process.env.REACT_APP_SERVER_URL;

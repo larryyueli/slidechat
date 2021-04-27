@@ -1,4 +1,4 @@
-const baseURL = '/slidechat';
+const baseURL = process.env.REACT_APP_BASE_URL ?? '/slidechat';
 const instructorURL = '/prof';
 const fullURL = () =>
 	`${window.location.protocol}//${window.location.hostname}${

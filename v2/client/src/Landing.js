@@ -30,7 +30,7 @@ export default function Landing(props) {
 					See a Demo
 				</Button>
 				<br />
-				<Button className='instructorButton' variant='contained' href={`${baseURL}/prof`}>
+				<Button className='instructorButton' variant='contained' href={`${baseURL}/prof/`}>
 					Instructor Login
 				</Button>
 			</div>

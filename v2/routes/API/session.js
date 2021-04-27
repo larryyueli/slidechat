@@ -1,4 +1,4 @@
-const { baseURL, cookieName } = require('../../config');
+const { cookieName } = require('../../config');
 const { getInstructors } = require('../instructors');
 
 const loginRedirect = (req, res) => {
@@ -14,7 +14,7 @@ const loginRedirect = (req, res) => {
 		req.session.realName = req.headers.http_cn;
 		req.session.email = req.headers.http_mail;
 	}
-	res.redirect(baseURL + req.path.substring(8));
+	res.redirect(req.query.redirect ?? process.env.BASE_URL);
 };
 
 const logout = (req, res, next) => {

@@ -2,8 +2,6 @@ const os = require('os');
 const path = require('path');
 
 module.exports = {
-	baseURL: '/slidechat',
-
 	socketPath: '/socket/', // in production mode, client connect to baseURL+socketPath
 
 	cookieName: '_SlideChatSess',
