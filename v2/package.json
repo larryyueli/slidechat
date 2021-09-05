@@ -3,42 +3,41 @@
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
-		"start": "cross-env PORT=10001 nodemon app",
-		"prod": "cross-env PORT=10200 NODE_ENV=production nodemon app",
+		"start": "nodemon app",
+		"prod": "NODE_ENV=production nodemon app",
 		"deploy": "npx pm2 start --env production",
 		"build": "npm run build-c && npm run build-i",
-		"build-c": "cd client && cross-env GENERATE_SOURCEMAP=false npm run build && cd ..",
-		"build-i": "cd instructor-client && cross-env GENERATE_SOURCEMAP=false npm run build && cd .."
+		"build-c": "cd client && GENERATE_SOURCEMAP=false npm run build && cd ..",
+		"build-i": "cd instructor-client && GENERATE_SOURCEMAP=false npm run build && cd .."
 	},
 	"dependencies": {
-		"axios": "^0.21.1",
+		"axios": "^0.21.3",
 		"body-parser": "^1.19.0",
 		"compression": "^1.7.4",
-		"connect-mongodb-session": "^2.3.3",
+		"connect-mongodb-session": "^3.1.0",
 		"cookie-parser": "^1.4.5",
 		"cors": "^2.8.5",
-		"dotenv": "^8.2.0",
+		"dotenv": "^10.0.0",
 		"express": "^4.17.1",
 		"express-fileupload": "^1.2.1",
-		"express-session": "^1.17.1",
-		"mongodb": "^3.6.3",
+		"express-session": "^1.17.2",
+		"mongodb": "^4.1.1",
 		"morgan": "^1.9.1",
-		"pm2": "^4.5.6",
-		"socket.io": "^3.1.1"
+		"pm2": "^5.1.1",
+		"socket.io": "^4.2.0"
 	},
 	"devDependencies": {
-		"@material-ui/core": "^4.11.3",
-		"chart.js": "^2.9.4",
-		"cross-env": "^7.0.3",
-		"highlight.js": "^10.4.1",
-		"markdown-it": "^12.0.4",
+		"@material-ui/core": "^4.12.3",
+		"chart.js": "^3.5.1",
+		"highlight.js": "^11.2.0",
+		"markdown-it": "^12.2.0",
 		"markdown-it-mathjax": "^2.0.0",
 		"mic-recorder-to-mp3": "^2.2.2",
-		"node-sass": "^4.14.1",
-		"nodemon": "^2.0.7",
-		"react": "^17.0.1",
+		"node-sass": "^6.0.1",
+		"nodemon": "^2.0.12",
+		"react": "^17.0.2",
 		"react-color": "^2.19.3",
-		"react-dom": "^17.0.1",
-		"react-router-dom": "^5.2.0"
+		"react-dom": "^17.0.2",
+		"react-router-dom": "^5.3.0"
 	}
 }

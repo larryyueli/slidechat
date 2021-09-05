@@ -1,11 +1,11 @@
-const { ObjectID } = require('mongodb');
+const { ObjectId } = require('mongodb');
 const { isNotValidPage, notExistInList, errorHandler, shortName, questionCount } = require('../util');
 const { isInstructor } = require('../instructors');
 
 const unusedQuestions = async (req, res) => {
 	try {
 		const slide = await req.app.locals.slides.findOne(
-			{ _id: ObjectID.createFromHexString(req.query.id) },
+			{ _id: ObjectId.createFromHexString(req.query.id) },
 			{ projection: { unused: 1 } }
 		);
 		if (!slide) return res.sendStatus(404);
@@ -28,7 +28,7 @@ const getQuestions = async (req, res) => {
 	try {
 		const { slideID, pageNum } = req.query;
 		const slide = await req.app.locals.slides.findOne(
-			{ _id: ObjectID.createFromHexString(slideID) },
+			{ _id: ObjectId.createFromHexString(slideID) },
 			{ projection: { pages: true, pageTotal: true, anonymity: true } }
 		);
 		if (!slide) throw { status: 404, error: 'slide not found' };
@@ -58,7 +58,7 @@ const getQuestions = async (req, res) => {
 const getAllQuestions = async (req, res) => {
 	try {
 		const slide = await req.app.locals.slides.findOne(
-			{ _id: ObjectID.createFromHexString(req.query.slideID) },
+			{ _id: ObjectId.createFromHexString(req.query.slideID) },
 			{ projection: { pages: true, anonymity: true } }
 		);
 		if (!slide) throw { status: 404, error: 'slide not found' };
@@ -88,7 +88,7 @@ const addQuestion = async (req, res) => {
 		const { sid, pageNum, title, body, user, drawing } = req.body;
 		const { slides, io } = req.app.locals;
 		const slide = await slides.findOne(
-			{ _id: ObjectID.createFromHexString(sid) },
+			{ _id: ObjectId.createFromHexString(sid) },
 			{ projection: { pageTotal: true, anonymity: true, pages: true } }
 		);
 		if (!slide) throw { status: 404, error: 'slide not found' };
@@ -133,7 +133,7 @@ const addQuestion = async (req, res) => {
 		};
 
 		const updateRes = await slides.findOneAndUpdate(
-			{ _id: ObjectID.createFromHexString(sid) },
+			{ _id: ObjectId.createFromHexString(sid) },
 			{
 				$push: {
 					[`pages.${pageNum - 1}.questions`]: newQuestion,
@@ -170,7 +170,7 @@ const deleteQuestion = async (req, res) => {
 			return res.status(400).send();
 		}
 		const slide = await slides.findOne(
-			{ _id: ObjectID.createFromHexString(sid) },
+			{ _id: ObjectId.createFromHexString(sid) },
 			{ projection: { pageTotal: 1, pages: 1, course: 1 } }
 		);
 		if (!slide) throw { status: 404, error: 'slide not found' };
@@ -184,7 +184,7 @@ const deleteQuestion = async (req, res) => {
 		}
 
 		const updateRes = await slides.updateOne(
-			{ _id: ObjectID.createFromHexString(sid) },
+			{ _id: ObjectId.createFromHexString(sid) },
 			{ $set: { [`pages.${pageNum - 1}.questions.${qid}`]: null } }
 		);
 		if (updateRes.modifiedCount !== 1) {
@@ -204,7 +204,7 @@ const reorderQuestions = async (req, res) => {
 		if (typeof sid !== 'string' || sid.length !== 24) {
 			return res.status(400).send();
 		}
-		const objectSid = ObjectID.createFromHexString(sid);
+		const objectSid = ObjectId.createFromHexString(sid);
 		const slide = await slides.findOne({ _id: objectSid });
 		if (!slide) {
 			throw { status: 400, error: 'slide not found' };

@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
@@ -7,11 +8,11 @@ const compression = require('compression');
 const fileUpload = require('express-fileupload');
 const session = require('express-session');
 const MongoSessStore = require('connect-mongodb-session')(session);
-const { MongoClient, ObjectID } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 const http = require('http');
 const io = require('socket.io')();
 
-require('dotenv').config({ debug: process.env.DEBUG });
+require('dotenv').config({ debug: process.env.DEBUG, path: path.join(__dirname, '.env') });
 
 const config = require('./config');
 const setupRoutes = require('./routes/routes');
@@ -94,7 +95,7 @@ morgan.token('body', (req) => {
 		socket.on('join slide room', async (slideID) => {
 			try {
 				const slide = await app.locals.slides.findOne(
-					{ _id: ObjectID.createFromHexString(slideID) },
+					{ _id: ObjectId.createFromHexString(slideID) },
 					{ projection: { _id: true } }
 				);
 				if (slide) {

@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { ObjectID } = require('mongodb');
+const { ObjectId } = require('mongodb');
 
 const { fileStorage } = require('../../config');
 const { errorHandler, shortName, validAnonymities } = require('../util');
@@ -11,12 +11,12 @@ const slideInfo = async (req, res) => {
 		const { slideID } = req.query;
 		const { courses, slides } = req.app.locals;
 		const slide = await slides.findOne(
-			{ _id: ObjectID.createFromHexString(slideID) },
+			{ _id: ObjectId.createFromHexString(slideID) },
 			{ projection: { pages: 0 } }
 		);
 		if (!slide) throw { status: 404, error: 'slide not found' };
 
-		slides.updateOne({ _id: ObjectID.createFromHexString(slideID) }, { $inc: { viewCount: 1 } });
+		slides.updateOne({ _id: ObjectId.createFromHexString(slideID) }, { $inc: { viewCount: 1 } });
 
 		const course = await courses.findOne({ _id: slide.course }, { projection: { instructors: 1 } });
 
@@ -51,7 +51,7 @@ const deleteSlide = async (req, res) => {
 			throw `delete slide from course error: updateRes = ${updateRes}`;
 		}
 
-		let removeRes = await slides.deleteOne({ _id: ObjectID.createFromHexString(sid) });
+		let removeRes = await slides.deleteOne({ _id: ObjectId.createFromHexString(sid) });
 		if (removeRes.deletedCount !== 1) {
 			throw `delete slide error: removeRes = ${removeRes}`;
 		}
@@ -74,7 +74,7 @@ const setTitle = async (req, res) => {
 		await checkSlideExistsAndIsCourseInstructor(slides, courses, sid, req.session.uid);
 
 		const updateRes = await slides.updateOne(
-			{ _id: ObjectID.createFromHexString(sid) },
+			{ _id: ObjectId.createFromHexString(sid) },
 			{ $set: { title: title } }
 		);
 
@@ -98,7 +98,7 @@ const setAnonymity = async (req, res) => {
 		await checkSlideExistsAndIsCourseInstructor(slides, courses, sid, req.session.uid);
 
 		const updateRes = await slides.updateOne(
-			{ _id: ObjectID.createFromHexString(sid) },
+			{ _id: ObjectId.createFromHexString(sid) },
 			{ $set: { anonymity: anonymity } }
 		);
 
@@ -122,7 +122,7 @@ const setDrawable = async (req, res) => {
 		await checkSlideExistsAndIsCourseInstructor(slides, courses, sid, req.session.uid);
 
 		const updateRes = await req.app.locals.slides.updateOne(
-			{ _id: ObjectID.createFromHexString(sid) },
+			{ _id: ObjectId.createFromHexString(sid) },
 			{ $set: { drawable: drawable } }
 		);
 
@@ -146,7 +146,7 @@ const setDownloadable = async (req, res) => {
 		await checkSlideExistsAndIsCourseInstructor(slides, courses, sid, req.session.uid);
 
 		const updateRes = await req.app.locals.slides.updateOne(
-			{ _id: ObjectID.createFromHexString(sid) },
+			{ _id: ObjectId.createFromHexString(sid) },
 			{ $set: { notAllowDownload: !downloadable } }
 		);
 

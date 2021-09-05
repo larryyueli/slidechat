@@ -1,10 +1,10 @@
-const { ObjectID } = require('mongodb');
+const { ObjectId } = require('mongodb');
 const { isNotValidPage, errorHandler } = require('../util');
 
 const incrementSlideStats = async (req, res) => {
 	try {
 		const { slides } = req.app.locals;
-		const sid = ObjectID.createFromHexString(req.query.slideID);
+		const sid = ObjectId.createFromHexString(req.query.slideID);
 		const slide = await slides.findOne(
 			{ _id: sid },
 			{ projection: { pages: true, anonymity: true, pageTotal: true } }
@@ -39,7 +39,7 @@ const getSlideStats = async (slides, sid) => {
 		throw { status: 400, error: 'Invalid slide ID' };
 	}
 
-	const slide = await slides.findOne({ _id: ObjectID.createFromHexString(sid) });
+	const slide = await slides.findOne({ _id: ObjectId.createFromHexString(sid) });
 	if (!slide) throw { status: 400, error: 'Slide not found' };
 
 	const viewCount = [];

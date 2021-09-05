@@ -1,11 +1,11 @@
-const { ObjectID } = require('mongodb');
+const { ObjectId } = require('mongodb');
 const { isNotValidPage, notExistInList, errorHandler, shortName } = require('../util');
 
 const like = async (req, res) => {
 	try {
 		const { sid, pageNum, qid, cid, user } = req.body;
 		const { slides, io } = req.app.locals;
-		const objectSid = ObjectID.createFromHexString(sid);
+		const objectSid = ObjectId.createFromHexString(sid);
 		const slide = await slides.findOne(
 			{ _id: objectSid },
 			{ projection: { pageTotal: true, pages: true, anonymity: true } }
@@ -63,7 +63,7 @@ const endorse = async (req, res) => {
 		const { sid, pageNum, qid, cid } = req.body;
 		const { courses, slides, io } = req.app.locals;
 		const slide = await slides.findOne(
-			{ _id: ObjectID.createFromHexString(sid) },
+			{ _id: ObjectId.createFromHexString(sid) },
 			{ projection: { pageTotal: 1, pages: 1, anonymity: 1, course: 1 } }
 		);
 		if (!slide) throw { status: 404, error: 'slide not found' };
@@ -103,13 +103,13 @@ const endorse = async (req, res) => {
 					[`pages.${pageNum - 1}.questions.${qid}.status`]: 'unsolved',
 				};
 				updateRes = await req.app.locals.slides.updateOne(
-					{ _id: ObjectID.createFromHexString(sid) },
+					{ _id: ObjectId.createFromHexString(sid) },
 					{ $pull: updateEndorse, $set: setUnsolved }
 				);
 				solved = 0;
 			} else {
 				updateRes = await req.app.locals.slides.updateOne(
-					{ _id: ObjectID.createFromHexString(sid) },
+					{ _id: ObjectId.createFromHexString(sid) },
 					{ $pull: updateEndorse }
 				);
 				solved = 1;
@@ -118,7 +118,7 @@ const endorse = async (req, res) => {
 		} else {
 			const setSolved = { [`pages.${pageNum - 1}.questions.${qid}.status`]: 'solved' };
 			updateRes = await req.app.locals.slides.updateOne(
-				{ _id: ObjectID.createFromHexString(sid) },
+				{ _id: ObjectId.createFromHexString(sid) },
 				{ $addToSet: updateEndorse, $set: setSolved }
 			);
 			endorseCountChange = 1;

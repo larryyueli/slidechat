@@ -1,10 +1,23 @@
 import React, { useEffect } from 'react';
 import { Dialog } from '@material-ui/core';
-import Chart from 'chart.js';
+import {
+	Chart,
+	LineController,
+	LineElement,
+	PointElement,
+	LinearScale,
+	CategoryScale,
+	Title,
+	Filler,
+	Legend,
+	Tooltip,
+} from 'chart.js';
 import axios from 'axios';
 
 import { serverURL } from './config';
 import { range } from './util';
+
+Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Title, Filler, Legend, Tooltip);
 
 const datasetStyle = {
 	fill: true,
@@ -13,36 +26,35 @@ const datasetStyle = {
 	borderColor: 'rgb(75,192,192)',
 	borderWidth: 2,
 };
+
+/** @returns {import("chart.js").ChartOptions} */
 const options = (title) => {
 	return {
-		title: {
-			display: true,
-			text: title,
-			fontSize: 20,
-		},
-		legend: {
-			display: true,
-			position: 'top',
-		},
 		scales: {
-			xAxes: [
-				{
+			x: {
+				display: true,
+				title: {
 					display: true,
-					scaleLabel: {
-						display: true,
-						labelString: 'Page',
-						fontSize: 15,
-					},
+					text: 'Page',
+					font: { size: 15 },
 				},
-			],
-			yAxes: [
-				{
-					display: true,
-					ticks: {
-						beginAtZero: true,
-					},
+			},
+			y: {
+				display: true,
+				ticks: {
+					beginAtZero: true,
 				},
-			],
+			},
+		},
+		plugins: {
+			title: {
+				display: true,
+				text: title,
+				font: { size: 20 },
+			},
+			legend: {
+				position: 'top',
+			},
 		},
 		responsive: false,
 		maintainAspectRatio: false,

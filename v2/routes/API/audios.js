@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const { ObjectID } = require('mongodb');
+const { ObjectId } = require('mongodb');
 
 const { fileStorage } = require('../../config');
 const { isNotValidPage, errorHandler } = require('../util');
@@ -11,7 +11,7 @@ const hasAudio = async (req, res) => {
 			return res.status(400).send();
 		}
 		const slide = await req.app.locals.slides.findOne(
-			{ _id: ObjectID.createFromHexString(req.query.slideID) },
+			{ _id: ObjectId.createFromHexString(req.query.slideID) },
 			{ projection: { audios: true } }
 		);
 		if (!slide) throw { status: 404, error: 'slide not found' };
@@ -28,7 +28,7 @@ const getAudio = async (req, res) => {
 			return res.status(400).send();
 		}
 		const slide = await req.app.locals.slides.findOne(
-			{ _id: ObjectID.createFromHexString(slideID) },
+			{ _id: ObjectId.createFromHexString(slideID) },
 			{ projection: { _id: true, anonymity: true, audios: true } }
 		);
 		if (!slide) throw { status: 404, error: 'slide not found' };
@@ -49,7 +49,7 @@ const postAudio = async (req, res) => {
 		if (typeof sid !== 'string' || sid.length !== 24 || !file || !file.name.toLocaleLowerCase().endsWith('.mp3')) {
 			return res.status(400).send();
 		}
-		const slide = await slides.findOne({ _id: ObjectID.createFromHexString(sid) });
+		const slide = await slides.findOne({ _id: ObjectId.createFromHexString(sid) });
 		if (!slide) {
 			throw { status: 400, error: 'slide not found' };
 		}
@@ -70,7 +70,7 @@ const postAudio = async (req, res) => {
 		await file.mv(path.join(dir, file.name));
 
 		const updateRes = await slides.updateOne(
-			{ _id: ObjectID.createFromHexString(sid) },
+			{ _id: ObjectId.createFromHexString(sid) },
 			{
 				$set: {
 					[`audios.${pageNum}`]: file.name,
@@ -93,7 +93,7 @@ const deleteAudio = async (req, res) => {
 		if (sid.length !== 24) {
 			return res.status(400).send();
 		}
-		const slide = await slides.findOne({ _id: ObjectID.createFromHexString(sid) });
+		const slide = await slides.findOne({ _id: ObjectId.createFromHexString(sid) });
 		if (!slide) {
 			throw { status: 400, error: 'slide not found' };
 		}
@@ -112,7 +112,7 @@ const deleteAudio = async (req, res) => {
 		}
 
 		const updateRes = await slides.updateOne(
-			{ _id: ObjectID.createFromHexString(sid) },
+			{ _id: ObjectId.createFromHexString(sid) },
 			{
 				$unset: {
 					[`audios.${pageNum}`]: '',

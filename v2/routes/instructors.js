@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { ObjectID } = require('mongodb');
+const { ObjectId } = require('mongodb');
 
 const { authenticationFailMessage } = require('../config');
 
@@ -57,7 +57,7 @@ function getInstructors() {
 
 const checkSlideExistsAndIsCourseInstructor = async (slides, courses, sid, uid) => {
 	const slide = await slides.findOne(
-		{ _id: ObjectID.createFromHexString(sid) },
+		{ _id: ObjectId.createFromHexString(sid) },
 		{ projection: { _id: 1, course: 1 } }
 	);
 	if (!slide) {

@@ -1,5 +1,5 @@
 const path = require('path');
-const { ObjectID } = require('mongodb');
+const { ObjectId } = require('mongodb');
 
 const { fileStorage } = require('../../config');
 const { isNotValidPage, errorHandler } = require('../util');
@@ -8,7 +8,7 @@ const slideImg = async (req, res) => {
 	try {
 		const { slideID, pageNum } = req.query;
 		const slide = await req.app.locals.slides.findOne(
-			{ _id: ObjectID.createFromHexString(slideID) },
+			{ _id: ObjectId.createFromHexString(slideID) },
 			{ projection: { _id: true, anonymity: true, pageTotal: true } }
 		);
 		if (!slide) throw { status: 404, error: 'slide not found' };
@@ -26,7 +26,7 @@ const slideThumbnail = async (req, res) => {
 	try {
 		const { slideID, pageNum } = req.query;
 		const slide = await req.app.locals.slides.findOne(
-			{ _id: ObjectID.createFromHexString(slideID) },
+			{ _id: ObjectId.createFromHexString(slideID) },
 			{ projection: { _id: true, anonymity: true, pageTotal: true } }
 		);
 		if (!slide) throw { status: 404, error: 'slide not found' };

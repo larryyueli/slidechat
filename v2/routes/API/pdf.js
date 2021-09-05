@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const { ObjectID } = require('mongodb');
+const { ObjectId } = require('mongodb');
 const { exec } = require('child_process');
 
 const { errorHandler, questionCount } = require('../util');
@@ -16,7 +16,7 @@ const uploadSlide = async (req, res) => {
 			return res.status(400).send();
 		}
 		const course = await courses.findOne(
-			{ _id: ObjectID.createFromHexString(cid) },
+			{ _id: ObjectId.createFromHexString(cid) },
 			{ projection: { _id: 1, instructors: 1, anonymity: 1, drawable: 1 } }
 		);
 
@@ -26,7 +26,7 @@ const uploadSlide = async (req, res) => {
 			throw { status: 403, error: 'Unauthorized' };
 		}
 
-		// Step 1: insert into database to get a ObjectID
+		// Step 1: insert into database to get a ObjectId
 		const insertRes = await slides.insertOne({
 			course: course._id,
 			filename: file.name,
@@ -77,7 +77,7 @@ const uploadSlide = async (req, res) => {
 		}
 
 		// step 5: add slide to its course
-		updateRes = await courses.updateOne({ _id: ObjectID.createFromHexString(cid) }, { $push: { slides: id } });
+		updateRes = await courses.updateOne({ _id: ObjectId.createFromHexString(cid) }, { $push: { slides: id } });
 		if (updateRes.modifiedCount !== 1) {
 			throw 'slide add to course failed';
 		}
@@ -90,8 +90,7 @@ const uploadSlide = async (req, res) => {
 			chats: [
 				{
 					time: time,
-					body:
-						'You can ask a question to have a discussion on any page of the slides; others will be able to answer you and join the discussion. \n\nTo learn more features about how SlideChat works, check out [this demo](https://mcsapps.utm.utoronto.ca/slidechat/5f1b35eb3997b943b856e362)',
+					body: 'You can ask a question to have a discussion on any page of the slides; others will be able to answer you and join the discussion. \n\nTo learn more features about how SlideChat works, check out [this demo](https://mcsapps.utm.utoronto.ca/slidechat/5f1b35eb3997b943b856e362)',
 					user: 'SlideChat',
 					uid: 'SlideChat',
 					likes: [],
@@ -129,7 +128,7 @@ const replaceSlide = async (req, res) => {
 		if (typeof sid !== 'string' || sid.length != 24 || !file || !file.name.toLocaleLowerCase().endsWith('.pdf')) {
 			return res.status(400).send();
 		}
-		const slide = await slides.findOne({ _id: ObjectID.createFromHexString(sid) });
+		const slide = await slides.findOne({ _id: ObjectId.createFromHexString(sid) });
 		if (!slide) {
 			throw { status: 400, error: 'slide not found' };
 		}
@@ -175,7 +174,7 @@ const replaceSlide = async (req, res) => {
 				}
 			}
 			updateRes = await slides.updateOne(
-				{ _id: ObjectID.createFromHexString(sid) },
+				{ _id: ObjectId.createFromHexString(sid) },
 				{
 					$set: {
 						pages: pages.slice(0, newLength),
@@ -196,7 +195,7 @@ const replaceSlide = async (req, res) => {
 				pages.push({ questions: [] });
 			}
 			updateRes = await slides.updateOne(
-				{ _id: ObjectID.createFromHexString(sid) },
+				{ _id: ObjectId.createFromHexString(sid) },
 				{
 					$set: {
 						pages: pages,
@@ -225,12 +224,12 @@ const importSlide = async (req, res) => {
 		if (typeof cid !== 'string' || cid.length !== 24 || typeof sid !== 'string' || sid.length != 24)
 			return res.status(400).send();
 
-		const slide = await slides.findOne({ _id: ObjectID.createFromHexString(sid) });
+		const slide = await slides.findOne({ _id: ObjectId.createFromHexString(sid) });
 		if (!slide) throw { status: 400, error: 'Slides do not exist' };
 		if (slide.notAllowDownload)
 			throw { status: 400, error: 'You cannot import a slide that does not allow download' };
 		const course = await courses.findOne(
-			{ _id: ObjectID.createFromHexString(cid) },
+			{ _id: ObjectId.createFromHexString(cid) },
 			{ projection: { instructors: 1 } }
 		);
 		if (!course.instructors.includes(req.session.uid))
@@ -258,7 +257,7 @@ const importSlide = async (req, res) => {
 		});
 
 		const updateRes = await courses.updateOne(
-			{ _id: ObjectID.createFromHexString(cid) },
+			{ _id: ObjectId.createFromHexString(cid) },
 			{ $push: { slides: newID } }
 		);
 		if (!updateRes.result.ok) {
@@ -275,7 +274,7 @@ const downloadPdf = async (req, res) => {
 	try {
 		const { slideID } = req.query;
 		let slide = await req.app.locals.slides.findOne(
-			{ _id: ObjectID.createFromHexString(slideID) },
+			{ _id: ObjectId.createFromHexString(slideID) },
 			{ projection: { filename: true, anonymity: true, notAllowDownload: true } }
 		);
 		if (!slide) throw { status: 404, error: 'slide not found' };

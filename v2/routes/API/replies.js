@@ -1,4 +1,4 @@
-const { ObjectID } = require('mongodb');
+const { ObjectId } = require('mongodb');
 const { isNotValidPage, notExistInList, errorHandler, shortName } = require('../util');
 const { isInstructor } = require('../instructors');
 
@@ -7,7 +7,7 @@ const getChats = async (req, res) => {
 		const { slideID, pageNum, qid } = req.query;
 		const { slides } = req.app.locals;
 		const slide = await slides.findOne(
-			{ _id: ObjectID.createFromHexString(slideID) },
+			{ _id: ObjectId.createFromHexString(slideID) },
 			{ projection: { pages: true, anonymity: true } }
 		);
 		if (!slide) throw { status: 404, error: 'slide not found' };
@@ -25,7 +25,7 @@ const getChats = async (req, res) => {
 		}
 
 		const viewCountField = `pages.${+pageNum - 1}.questions.${qid}.viewCount`;
-		slides.updateOne({ _id: ObjectID.createFromHexString(slideID) }, { $inc: { [viewCountField]: 1 } });
+		slides.updateOne({ _id: ObjectId.createFromHexString(slideID) }, { $inc: { [viewCountField]: 1 } });
 
 		res.json({
 			title: question.title,
@@ -43,7 +43,7 @@ const addChat = async (req, res) => {
 		const { sid, pageNum, qid, body, user } = req.body;
 		const { slides, io } = req.app.locals;
 		const slide = await slides.findOne(
-			{ _id: ObjectID.createFromHexString(sid) },
+			{ _id: ObjectId.createFromHexString(sid) },
 			{ projection: { pageTotal: true, pages: true, anonymity: true } }
 		);
 		if (!slide) throw { status: 404, error: 'slide not found' };
@@ -69,7 +69,7 @@ const addChat = async (req, res) => {
 		};
 
 		const updateRes = await req.app.locals.slides.updateOne(
-			{ _id: ObjectID.createFromHexString(sid) },
+			{ _id: ObjectId.createFromHexString(sid) },
 			{
 				$push: {
 					[`pages.${pageNum - 1}.questions.${qid}.chats`]: newChat,
@@ -99,7 +99,7 @@ const modifyChat = async (req, res) => {
 		const { sid, qid, cid, pageNum, body } = req.body;
 		const { slides, io } = req.app.locals;
 		const slide = await slides.findOne(
-			{ _id: ObjectID.createFromHexString(sid) },
+			{ _id: ObjectId.createFromHexString(sid) },
 			{ projection: { pageTotal: true, pages: true, anonymity: true } }
 		);
 		if (!slide) throw { status: 404, error: 'slide not found' };
@@ -117,7 +117,7 @@ const modifyChat = async (req, res) => {
 
 		const time = Date.now();
 		const updateRes = await slides.updateOne(
-			{ _id: ObjectID.createFromHexString(sid) },
+			{ _id: ObjectId.createFromHexString(sid) },
 			{
 				$set: {
 					[`pages.${pageNum - 1}.questions.${qid}.chats.${cid}.body`]: body,
@@ -150,7 +150,7 @@ const deleteOwnChat = async (req, res) => {
 		const { sid, qid, cid, pageNum } = req.body;
 		const { slides, io } = req.app.locals;
 		const slide = await slides.findOne(
-			{ _id: ObjectID.createFromHexString(sid) },
+			{ _id: ObjectId.createFromHexString(sid) },
 			{ projection: { pageTotal: true, pages: true, anonymity: true } }
 		);
 		if (!slide) throw { status: 404, error: 'slide not found' };
@@ -166,7 +166,7 @@ const deleteOwnChat = async (req, res) => {
 			throw { status: 403, error: 'Forbidden' };
 
 		const updateRes = await req.app.locals.slides.updateOne(
-			{ _id: ObjectID.createFromHexString(sid) },
+			{ _id: ObjectId.createFromHexString(sid) },
 			{
 				$set: {
 					[`pages.${pageNum - 1}.questions.${qid}.chats.${cid}`]: null,
@@ -197,7 +197,7 @@ const deleteChat = async (req, res) => {
 			return res.status(400).send();
 		}
 		const slide = await slides.findOne(
-			{ _id: ObjectID.createFromHexString(sid) },
+			{ _id: ObjectId.createFromHexString(sid) },
 			{ projection: { pageTotal: 1, pages: 1, course: 1 } }
 		);
 		if (!slide) throw { status: 404, error: 'slide not found' };
@@ -216,7 +216,7 @@ const deleteChat = async (req, res) => {
 		}
 
 		const updateRes = await req.app.locals.slides.updateOne(
-			{ _id: ObjectID.createFromHexString(sid) },
+			{ _id: ObjectId.createFromHexString(sid) },
 			{ $set: { [`pages.${pageNum - 1}.questions.${qid}.chats.${cid}`]: null } }
 		);
 		if (updateRes.modifiedCount !== 1) {

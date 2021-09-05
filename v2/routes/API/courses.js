@@ -1,4 +1,4 @@
-const { ObjectID } = require('mongodb');
+const { ObjectId } = require('mongodb');
 const { errorHandler, shortName, validAnonymities } = require('../util');
 const { isInstructor } = require('../instructors');
 
@@ -13,7 +13,7 @@ const myCourses = async (req, res) => {
 			});
 		} // does not need to initialize here
 		for (let course of user.courses) {
-			course.time = ObjectID.createFromHexString(course.id).getTimestamp().getTime();
+			course.time = ObjectId.createFromHexString(course.id).getTimestamp().getTime();
 		}
 		res.json({
 			uid: req.session.uid,
@@ -104,13 +104,13 @@ const modifyCourseDefault = async (req, res) => {
 		}
 		const { courses } = req.app.locals;
 		const course = await courses.findOne(
-			{ _id: ObjectID.createFromHexString(cid) },
+			{ _id: ObjectId.createFromHexString(cid) },
 			{ projection: { instructors: 1 } }
 		);
 		if (!course) throw { status: 404, error: 'not found' };
 		if (!course.instructors.includes(req.session.uid)) throw { status: 403, error: 'Unauthorized' };
 		const updateRes = await courses.updateOne(
-			{ _id: ObjectID.createFromHexString(cid) },
+			{ _id: ObjectId.createFromHexString(cid) },
 			{
 				$set: {
 					name: name,
@@ -138,7 +138,7 @@ const deleteCourse = async (req, res) => {
 		if (cid.length != 24) {
 			throw { status: 400, error: 'bad request' };
 		}
-		const objectID = ObjectID.createFromHexString(cid);
+		const objectID = ObjectId.createFromHexString(cid);
 		const course = await courses.findOne({ _id: objectID }, { projection: { instructors: 1 } });
 		if (!course) throw { status: 404, error: 'Course not found' };
 		if (!course.instructors.includes(req.session.uid))
@@ -167,7 +167,7 @@ const addInstructor = async (req, res) => {
 			throw { status: 400, error: 'bad request' };
 		}
 		const course = await courses.findOne(
-			{ _id: ObjectID.createFromHexString(cid) },
+			{ _id: ObjectId.createFromHexString(cid) },
 			{ projection: { instructors: 1 } }
 		);
 		if (!course) throw { status: 404, error: 'course not found' };
@@ -179,7 +179,7 @@ const addInstructor = async (req, res) => {
 
 		// add instructor to course
 		let updateRes = await courses.updateOne(
-			{ _id: ObjectID.createFromHexString(cid) },
+			{ _id: ObjectId.createFromHexString(cid) },
 			{ $addToSet: { instructors: newUser } }
 		);
 
@@ -209,13 +209,13 @@ const getCourse = async (req, res) => {
 		const { id: cid } = req.query;
 		const { courses, slides } = req.app.locals;
 		const course = await courses.findOne({
-			_id: ObjectID.createFromHexString(cid),
+			_id: ObjectId.createFromHexString(cid),
 		});
 		if (!course) throw { status: 404, error: 'not found' };
 
 		const courseSlides = [];
 		for (let sid of course.slides) {
-			const slideEntry = await slides.findOne({ _id: ObjectID.createFromHexString(sid) });
+			const slideEntry = await slides.findOne({ _id: ObjectId.createFromHexString(sid) });
 			if (!slideEntry) {
 				console.log(`slide ${sid} not found`);
 				continue;
